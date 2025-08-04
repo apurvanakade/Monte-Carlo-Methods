@@ -1,0 +1,139 @@
+---
+title: "M/M/n Queue"
+date: 2025-06-18
+toc: true
+
+execute:
+  echo: false
+---
+
+The M/M/n queue is a discrete stochastic process that models a queue with n servers. There are three parameters: 
+
+- $n$: the number of servers
+- $\lambda$: the arrival rate of customers
+- $\mu$: the service rate of each server
+
+The "M" in M/M/n stands for "memoryless" or Markovian. The M/M/n queue models the following process:
+- customers arrive at the queue according to a Poisson process with rate $\lambda$.
+- Each customer is served by one of the n servers, and the service times are exponentially distributed with rate $\mu$.
+- If all servers are busy, the customer waits in line until a server becomes available. 
+
+We are interested in testing the performance of the queue as function of the three parameters. There are various performance measures we can compute, including:
+- The average number of customers in the waiting line
+- The average time a customer spends waiting in line 
+- The usage of the servers
+- The probability that a customer has to wait in line
+
+There are two approaches we can take to simulate an M/M/n queue
+
+1. Process driven
+1. Event driven
+
+```{python}
+import heapq
+import numpy as np
+import matplotlib.pyplot as plt
+from collections import deque
+
+class MMnQueueSim:
+    def __init__(self, arrival_rate, service_rate, num_servers, max_customers=1000, seed=None):
+        self.lambda_ = arrival_rate
+        self.mu = service_rate
+        self.n = num_servers
+        self.max_customers = max_customers
+        self.rng = np.random.default_rng(seed)
+
+        self.clock = 0.0
+        self.event_queue = []  # min-heap of (event_time, event_type, customer_id)
+        self.wait_queue = deque()
+        self.server_busy = 0
+
+        self.stats = {
+            'arrival_times': {},
+            'start_service_times': {},
+            'departure_times': {},
+            'queue_length_log': []  # (time, queue_length)
+        }
+
+    def schedule_event(self, time, event_type, customer_id):
+        heapq.heappush(self.event_queue, (time, event_type, customer_id))
+
+    def log_queue_length(self):
+        queue_len = len(self.wait_queue)
+        self.stats['queue_length_log'].append((self.clock, queue_len))
+
+    def run(self):
+        arrival_time = self.clock + self.rng.exponential(1 / self.lambda_)
+        self.schedule_event(arrival_time, 'arrival', 0)
+
+        customer_id = 1
+
+        while self.event_queue and len(self.stats['departure_times']) < self.max_customers:
+            self.clock, event_type, cust_id = heapq.heappop(self.event_queue)
+
+            self.log_queue_length()
+
+            if event_type == 'arrival':
+                self.stats['arrival_times'][cust_id] = self.clock
+
+                if self.server_busy < self.n:
+                    self.server_busy += 1
+                    service_time = self.rng.exponential(1 / self.mu)
+                    departure_time = self.clock + service_time
+                    self.stats['start_service_times'][cust_id] = self.clock
+                    self.schedule_event(departure_time, 'departure', cust_id)
+                else:
+                    self.wait_queue.append(cust_id)
+
+                next_arrival_time = self.clock + self.rng.exponential(1 / self.lambda_)
+                if customer_id < self.max_customers:
+                    self.schedule_event(next_arrival_time, 'arrival', customer_id)
+                    customer_id += 1
+
+            elif event_type == 'departure':
+                self.stats['departure_times'][cust_id] = self.clock
+                self.server_busy -= 1
+
+                if self.wait_queue:
+                    next_cust = self.wait_queue.popleft()
+                    self.server_busy += 1
+                    self.stats['start_service_times'][next_cust] = self.clock
+                    service_time = self.rng.exponential(1 / self.mu)
+                    departure_time = self.clock + service_time
+                    self.schedule_event(departure_time, 'departure', next_cust)
+
+    def report(self):
+        wait_times = []
+        sojourn_times = []
+
+        for cid in self.stats['departure_times']:
+            arrival = self.stats['arrival_times'][cid]
+            start = self.stats['start_service_times'][cid]
+            depart = self.stats['departure_times'][cid]
+            wait_times.append(start - arrival)
+            sojourn_times.append(depart - arrival)
+
+        print(f"Simulated {len(sojourn_times)} customers")
+        print(f"Average wait time     : {np.mean(wait_times):.4f}")
+        print(f"Average sojourn time  : {np.mean(sojourn_times):.4f}")
+        print(f"Server utilization    : {min(1.0, self.lambda_ / (self.n * self.mu)):.4f} (theoretical)")
+
+    def plot_queue_length(self):
+        times, lengths = zip(*self.stats['queue_length_log'])
+        plt.figure(figsize=(10, 4))
+        plt.step(times, lengths, where='post', color='blue')
+        plt.title("Queue Length Over Time")
+        plt.xlabel("Simulation Time")
+        plt.ylabel("Queue Length")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+```
+
+```{python}
+sim = MMnQueueSim(arrival_rate=2.0, service_rate=1.5, num_servers=2, max_customers=1000, seed=42)
+sim.run()
+sim.report()
+sim.plot_queue_length()
+
+```

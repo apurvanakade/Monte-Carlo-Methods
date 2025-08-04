@@ -1,0 +1,29 @@
+# Preface {.unnumbered}
+
+These are the lecture notes for *Monte Carlo Methods* (EN.553.433). These notes are loosely based on the course notes by Dr. Jim Spall and the textbook Rubinstein, R. Y. and Kroese, D. P. (2017), Simulation and the Monte Carlo Method
+(3rd edition), Wiley, ISBN: 978-1-118-63216-1. These notes were written by Apurva Nakade and edited by Kyle Beaty.
+
+These notes only represent half of the content of the course. The other half consists of jupyter notebooks that will be assigned as homework. These jupyter notebooks are not to be published online.
+
+In this course, we'll be covering the following topics:
+
+- Random Number Generation
+  - LCG
+- Sampling methods
+  - Inverse Transform Sampling
+  - Rejection Sampling
+  - Gibbs Sampling
+  - Metropolis-Hastings Algorithm
+- Applications of Sampling Methods
+  - Stochastic Differential Equations
+  - Ising Model
+  - Queueing theory
+  - Bootstrapping
+- Variance Reduction
+- Dynamic Systems
+  - Kalman Filters
+  - Particle Filters
+- Optimization 
+
+Both the contents of this book and the jupyter notebooks are copyrighted to Apurva Nakade. 
+

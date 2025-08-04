@@ -1,0 +1,117 @@
+---
+title: "Other Distributions"
+toc: true  
+
+execute:
+  echo: false
+---
+
+The Beta distribution is a continuous distribution defined on the interval $[0, 1]$. Let $X$ be a random variable with Beta distribution with parameters $\alpha > 0$ and $\beta > 0$. The probability density function of $X$ is given by
+
+\begin{align*}
+f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
+\end{align*}
+
+where $c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}$ is the normalizing constant. (Note that when $\alpha$ and $\beta$ are not integers, we use $\Gamma$ function to as a generalization of the factorial function.)
+
+This is a simple function supported over the interval $[0, 1]$. The Beta distribution is used as a prior distribution in Bayesian statistics. When $\alpha$ and $\beta$ are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.
+
+::: {#def-order-statistics}
+
+**(Order Statistics)**: Let $X_1, X_2, \ldots, X_n$ be independent and identically distributed random variables. The $k$-th order statistic, denoted $X_{(k)}$, is the $k$-th smallest value among $X_1, X_2, \ldots, X_n$.
+
+:::
+
+
+::: {#thm-beta-order-statistics}
+
+**(Beta-Order Statistics)**: Let $U_1, U_2, \ldots, U_n$ be independent random variables with uniform distribution $U(0, 1)$. Then the random variable $X = U_{(k)}$ has Beta distribution with parameters $\alpha = k$ and $\beta = n - k + 1$.
+
+:::
+
+::: {.proof}
+
+We'll work out a partial proof of the theorem. Let $X = U_{(k)}$. The cumulative distribution function of $X$ is given by
+
+\begin{align*}
+F(x) 
+&= \mathbb{P}(U_{(k)} \leq x) \\
+&= \mathbb{P}( \text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
+&= \sum_{i=k}^{n} \binom{n}{i} x^i (1-x)^{n-i}.
+\end{align*}
+
+We differentiate both sides to get the probability density function of $X$:
+
+\begin{align*}
+f(x) &= \frac{d}{dx} F(x) \\
+&= \sum_{i=k}^{n} \binom{n}{i} \frac{d}{dx}x^i (1-x)^{n-i} \\
+&= \sum_{i=k}^{n} \binom{n}{i} i x^{i-1} (1-x)^{n-i} - \binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.
+\end{align*}
+
+The rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with $i = k$ remains. $\blacksquare$
+
+::: 
+
+This theorem gives us a simple algorithm to sample from the Beta distribution:
+
+1. Generate $n$ random numbers $u_1, u_2, \ldots, u_n$ from the uniform distribution $U(0, 1)$.
+2. Sort the numbers in increasing order $u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}$.
+3. Return $u_{(k)}$.
+
+## Mixture Distributions
+
+A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let $X$ be a random variable that is a mixture of distributions $f_1(x), f_2(x), \ldots, f_n(x)$ with weights $w_1, w_2, \ldots, w_n$. The probability density function of $X$ is given by
+
+\begin{align*}
+f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
+\end{align*}
+
+Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by sampling from the component distributions and then taking a weighted sum of the samples $X = Y_1$ with probability $w_1$, $X = Y_2$ with probability $w_2$, $\ldots, X = Y_n$ with probability $w_n$.
+
+
+To sample from a mixture distribution, we can use the following algorithm:
+
+1. Sample from the discrete distribution $[w_1, w_2, \ldots, w_n]$ to select a component distribution.
+2. Sample from the selected component distribution.
+3. Return the sample.
+
+Note that this is not the same as constructing a linear combination of the component distributions. For example, if $X_1 \sim N(\mu_1, \sigma_1^2)$ and $X_2 \sim N(\mu_2, \sigma_2^2)$ are independent, then $w_1 X_1 + w_2 X_2$ is is a normal distribution with mean $w_1 \mu_1 + w_2 \mu_2$ and variance $w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2$. This is not the same as a mixture of two normal distributions.
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def normal_distribution(x, mu, sigma):
+    return 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+def mixture_of_normals(x, mu1, sigma1, mu2, sigma2, p1):
+    return p1 * normal_distribution(x, mu1, sigma1) + (1 - p1) * normal_distribution(x, mu2, sigma2)
+
+def linear_combination_of_normals(x, mu1, sigma1, mu2, sigma2, p1):
+    return normal_distribution(x, mu1*p1 + mu2*(1-p1), np.sqrt(sigma1**2 * p1 + sigma2**2 * (1-p1)))
+
+x = np.linspace(-5, 5, 100)
+y_mixture = [mixture_of_normals(xi, mu1=-2, sigma1=1, mu2=2, sigma2=0.5, p1=0.7) for xi in x]
+y_linear_comb = [linear_combination_of_normals(xi, mu1=-2, sigma1=1, mu2=2, sigma2=0.5, p1=0.7) for xi in x]
+
+fig, axes = plt.subplots(2, 1, figsize=(8, 8))  # Stack vertically (2 rows, 1 column)
+
+# Mixture of Normals
+axes[0].plot(x, y_mixture)
+axes[0].fill_between(x, y_mixture, color='lightblue', alpha=0.5)
+axes[0].set_xlabel('x')
+axes[0].set_ylabel('f(x)')
+axes[0].set_title('Mixture of N(-2, 1) and N(2, 0.5) with p_1=0.7 and p_2=0.3')
+axes[0].axhline(0, color='black', lw=0.5)
+
+# Linear Combination of Normals
+axes[1].plot(x, y_linear_comb)
+axes[1].fill_between(x, y_linear_comb, color='lightblue', alpha=0.5)
+axes[1].set_xlabel('x')
+axes[1].set_ylabel('f(x)')
+axes[1].set_title('0.7X + 0.3Y with X~N(-2, 1) and Y~N(2, 0.5)')
+axes[1].axhline(0, color='black', lw=0.5)
+
+plt.tight_layout()
+plt.show()
+```

@@ -1,0 +1,254 @@
+---
+title: "Bootstrap"
+date: 2025-06-18
+toc: true
+
+execute:
+  echo: false
+---
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Skewed population distribution
+np.random.seed(42)
+population = np.random.exponential(scale=2.0, size=10000)
+
+# 2. Single sample from population
+sample_size = 100
+sample = np.random.choice(population, size=sample_size, replace=False)
+sample_mean = np.mean(sample)
+sample_std = np.std(sample, ddof=1)
+
+# 3. Bootstrap distribution of the mean
+n_bootstraps = 10000
+bootstrap_means = np.array([
+    np.mean(np.random.choice(sample, size=sample_size, replace=True))
+    for _ in range(n_bootstraps)
+])
+boot_ci = np.percentile(bootstrap_means, [2.5, 97.5])
+
+# 4. True CI from repeated sampling
+n_simulations = 10000
+simulated_means = np.array([
+    np.mean(np.random.choice(population, size=sample_size, replace=False))
+    for _ in range(n_simulations)
+])
+true_ci = np.percentile(simulated_means, [2.5, 97.5])
+
+# 5. Normal-theory CI
+normal_ci = sample_mean + np.array([-1.96, 1.96]) * (sample_std / np.sqrt(sample_size))
+
+# 6. Naive CI (ignores n)
+naive_ci = sample_mean + np.array([-1.96, 1.96]) * sample_std
+
+# 7. Plotting
+sns.kdeplot(simulated_means, label="True Sampling Dist", color="blue")
+sns.kdeplot(bootstrap_means, label="Bootstrap Dist", color="orange", linestyle="--")
+plt.axvline(true_ci[0], color="blue", linestyle=":", label="True CI")
+plt.axvline(true_ci[1], color="blue", linestyle=":")
+plt.axvline(boot_ci[0], color="orange", linestyle=":", label="Bootstrap CI")
+plt.axvline(boot_ci[1], color="orange", linestyle=":")
+plt.axvline(normal_ci[0], color="green", linestyle=":", label="Normal-Theory CI")
+plt.axvline(normal_ci[1], color="green", linestyle=":")
+plt.axvline(naive_ci[0], color="red", linestyle=":", label="Naive CI (uses std directly)")
+plt.axvline(naive_ci[1], color="red", linestyle=":")
+plt.title("CI Comparison (Exponential Distribution)")
+plt.legend()
+plt.show()
+
+# 7. Print comparison
+print(f"Sample Mean: {sample_mean:.3f}")
+print(f"True CI: {true_ci}")
+print(f"Bootstrap CI: {boot_ci}")
+print(f"Normal-Theory CI: {normal_ci}")
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Set a skewed population distribution
+np.random.seed(42)
+population = np.random.exponential(scale=2.0, size=10000)  # mean = 2
+
+# 2. Take one random sample from the population
+sample_size = 100
+sample = np.random.choice(population, size=sample_size, replace=False)
+sample_mean = np.mean(sample)
+sample_std = np.std(sample, ddof=1)
+
+# 3. Compute bootstrap distribution of the mean
+n_bootstraps = 10000
+bootstrap_means = np.array([
+    np.mean(np.random.choice(sample, size=sample_size, replace=True))
+    for _ in range(n_bootstraps)
+])
+
+# 4. Bootstrap CI (95%)
+boot_ci = np.percentile(bootstrap_means, [2.5, 97.5])
+
+# 5. True CI by repeated sampling
+n_simulations = 10000
+simulated_means = np.array([
+    np.mean(np.random.choice(population, size=sample_size, replace=False))
+    for _ in range(n_simulations)
+])
+true_ci = np.percentile(simulated_means, [2.5, 97.5])
+
+# 6. Normal-theory CI
+normal_se = sample_std / np.sqrt(sample_size)
+normal_ci = sample_mean + np.array([-1.96, 1.96]) * normal_se
+
+# 7. Naive CI (ignores n)
+naive_ci = sample_mean + np.array([-1.96, 1.96]) * sample_std
+
+# 8. Visualization
+plt.figure(figsize=(10, 6))
+sns.kdeplot(simulated_means, label="True Sampling Dist", color="blue")
+sns.kdeplot(bootstrap_means, label="Bootstrap Dist", color="orange", linestyle="--")
+plt.axvline(true_ci[0], color="blue", linestyle=":", label="True CI")
+plt.axvline(true_ci[1], color="blue", linestyle=":")
+plt.axvline(boot_ci[0], color="orange", linestyle=":", label="Bootstrap CI")
+plt.axvline(boot_ci[1], color="orange", linestyle=":")
+plt.axvline(normal_ci[0], color="green", linestyle=":", label="Normal-Theory CI")
+plt.axvline(normal_ci[1], color="green", linestyle=":")
+plt.axvline(naive_ci[0], color="red", linestyle=":", label="Naive CI (uses std directly)")
+plt.axvline(naive_ci[1], color="red", linestyle=":")
+plt.title("CI Comparison (Exponential Distribution, Sample Size 100)")
+plt.legend()
+plt.show()
+
+# Print comparison
+print(f"True CI: {true_ci}")
+print(f"Bootstrap CI: {boot_ci}")
+print(f"Normal-Theory CI: {normal_ci}")
+print(f"Naive CI: {naive_ci}")
+
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Set up a skewed population
+np.random.seed(42)
+population = np.random.exponential(scale=2.0, size=100000)
+
+# 2. Draw a **small** sample
+sample_size = 10
+sample = np.random.choice(population, size=sample_size, replace=False)
+sample_mean = np.mean(sample)
+sample_std = np.std(sample, ddof=1)
+
+# 3. Bootstrap CI
+n_bootstraps = 10000
+bootstrap_means = np.array([
+    np.mean(np.random.choice(sample, size=sample_size, replace=True))
+    for _ in range(n_bootstraps)
+])
+boot_ci = np.percentile(bootstrap_means, [2.5, 97.5])
+
+# 4. True CI from repeated sampling
+n_simulations = 10000
+simulated_means = np.array([
+    np.mean(np.random.choice(population, size=sample_size, replace=False))
+    for _ in range(n_simulations)
+])
+true_ci = np.percentile(simulated_means, [2.5, 97.5])
+
+# 5. Normal-theory CI (CLT-based)
+normal_se = sample_std / np.sqrt(sample_size)
+normal_ci = sample_mean + np.array([-1.96, 1.96]) * normal_se
+
+# 6. Plotting
+sns.kdeplot(simulated_means, label="True Sampling Dist", color="blue")
+sns.kdeplot(bootstrap_means, label="Bootstrap Dist", color="orange", linestyle="--")
+plt.axvline(true_ci[0], color="blue", linestyle=":", label="True CI")
+plt.axvline(true_ci[1], color="blue", linestyle=":")
+plt.axvline(boot_ci[0], color="orange", linestyle=":", label="Bootstrap CI")
+plt.axvline(boot_ci[1], color="orange", linestyle=":")
+plt.axvline(normal_ci[0], color="green", linestyle=":", label="Normal-Theory CI")
+plt.axvline(normal_ci[1], color="green", linestyle=":")
+plt.title("CI Comparison with Small Sample (n=10) from Skewed Distribution")
+plt.legend()
+plt.show()
+
+# 7. Print comparison
+print(f"Sample Mean: {sample_mean:.3f}")
+print(f"True CI:          {true_ci}")
+print(f"Bootstrap CI:     {boot_ci}")
+print(f"Normal-Theory CI: {normal_ci}")
+
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Sample data: maybe heights, weights, etc.
+np.random.seed(42)
+data = np.random.exponential(scale=2.0, size=100)
+
+def naive_bootstrap(data, n_boot=1000):
+    n = len(data)
+    means = []
+    for _ in range(n_boot):
+        sample = np.random.choice(data, size=n, replace=True)
+        means.append(np.mean(sample))
+    return np.array(means)
+
+def parametric_bootstrap(data, n_boot=1000):
+    n = len(data)
+    fitted_scale = np.mean(data)  # MLE for exponential is just the mean
+    means = []
+    for _ in range(n_boot):
+        sample = np.random.exponential(scale=fitted_scale, size=n)
+        means.append(np.mean(sample))
+    return np.array(means)
+
+# Run bootstraps
+naive_means = naive_bootstrap(data)
+param_means = parametric_bootstrap(data)
+
+# Plot
+sns.kdeplot(naive_means, label="Naive Bootstrap", fill=True)
+sns.kdeplot(param_means, label="Parametric Bootstrap", fill=True, linestyle='--')
+plt.axvline(np.mean(data), color='k', linestyle=':', label='Sample Mean')
+plt.title("Bootstrap Distribution of the Mean")
+plt.xlabel("Mean")
+plt.legend()
+plt.show()
+
+```
+
+```{python}
+from scipy.stats import lognorm
+
+data = np.random.lognormal(mean=0, sigma=1, size=10000)
+
+# print(skew(data))
+
+# plot mean, 0.025 and 0.975 quantiles
+plt.hist(data, bins=30, density=True, alpha=0.5, label="Histogram")
+plt.axvline(np.mean(data), color='k', linestyle=':', label='Sample Mean')
+plt.axvline(np.percentile(data, 2.5), color='r', linestyle=':', label='2.5% Quantile')
+plt.axvline(np.percentile(data, 97.5), color='g', linestyle=':', label='97.5% Quantile')
+plt.xlim(0, 10)
+# Plot the PDF of the lognormal distribution
+x = np.linspace(0, max(data), 1000)
+pdf = lognorm.pdf(x, s=1, scale=np.exp(0))  # s=sigma, scale=exp(mean)
+plt.plot(x, pdf, color='b', label='Lognormal PDF')
+
+plt.title("Histogram with Mean, Quantiles, and Lognormal PDF")
+plt.xlabel("Value")
+plt.ylabel("Density")
+plt.legend()
+plt.show()
+
+```

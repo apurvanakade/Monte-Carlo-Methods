@@ -1,0 +1,17 @@
+---
+title: "Sampling Techniques"
+toc: true  
+
+execute:
+  echo: false
+---
+
+
+In this module, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning. 
+
+We'll use this week to review many of the standard probability distributions and how to sample from them. We'll also discuss the concept of the cumulative distribution function (CDF) and how it can be used to sample from a probability distribution using the inverse transform sampling method.
+
+From now on, we'll assume that we have a reliable way to generate random numbers from the uniform distribution $U(0, 1)$.
+
+To understand what it means to sample from a probability distribution, let's consider a simple example. Let $X$ be a discrete random variable that takes values $1, 2, \ldots, n$ with probabilities $p_1, p_2, \ldots, p_n$. To sample from this distribution, we want to generate a random variable $X$ such that $\mathbb{P}(X = i) = p_i$ for all $i = 1, 2, \ldots, n$ i.e. we want to select a random integer $i$ with probability $p_i$. If we generate enough samples $x_1, x_2, \ldots, x_N$ from this distribution, then the fraction of samples that are equal to $i$ will be approximately equal to $p_i$ for large $N$. 
+

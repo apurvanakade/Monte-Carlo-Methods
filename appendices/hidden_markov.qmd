@@ -1,0 +1,30 @@
+---
+title: Hidden Markov Chains
+date: 2025-02-23 18:42:02
+author: Apurva Nakade
+toc: true  
+
+execute:
+  echo: false
+---
+
+# Particle Filter with Resampling
+
+1. **Inputs:**  
+    - Observations $\{y_1, y_2, \dots, y_T\}$  
+    - Number of particles $N$  
+    - Transition model $p(x_t \mid x_{t-1})$  
+    - Emission model $p(y_t \mid x_t)$  
+    - Initial distribution $p(x_1)$
+
+2. **Initialization:** For $i = 1$ to $N$  
+    1. Set $x_0^{(i)} \leftarrow x_0$  
+    2. Set weight $w_1^{(i)} \leftarrow 1/N$
+
+3. For $t = 1$ to $T$  
+    1. For $i = 1$ to $N$  
+        1. Sample $x_t^{(i)} \sim p(x_t \mid x_{t-1}^{(i)})$  
+        2. Compute weight $w_t^{(i)} \leftarrow w_{t-1}^{(i)} \cdot p(y_t \mid x_t^{(i)})$  
+    2. Normalize weights $w_t^{(i)} \leftarrow \frac{w_t^{(i)}}{\sum_{j=1}^N w_t^{(j)}}$  
+
+4. **Return:** Particles $\{x_t^{(i)}\}$ and weights $w_t^{(i)}$ for all $t$

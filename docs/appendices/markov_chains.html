@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Apurva Nakade">
+<meta name="dcterms.date" content="2025-02-23">
+
+<title>Appendix A — Markov Chains – Monte Carlo Methods</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../appendices/hidden_markov.html" rel="next">
+<link href="../chapters/references.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Appendix A — Markov Chains – Monte Carlo Methods">
+<meta property="og:description" content="">
+<meta property="og:image" content="markov_chains_files/figure-html/cell-3-output-1.png">
+<meta property="og:site_name" content="Monte Carlo Methods">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Monte Carlo Methods</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/markov_chains.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/advanced/kalman.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/markov_chains.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/hidden_markov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#definitions" id="toc-definitions" class="nav-link active" data-scroll-target="#definitions"><span class="header-section-number">A.1</span> Definitions</a></li>
+  <li><a href="#stationary-distribution" id="toc-stationary-distribution" class="nav-link" data-scroll-target="#stationary-distribution"><span class="header-section-number">A.2</span> Stationary Distribution</a></li>
+  <li><a href="#fundamental-theorem" id="toc-fundamental-theorem" class="nav-link" data-scroll-target="#fundamental-theorem"><span class="header-section-number">A.3</span> Fundamental Theorem</a></li>
+  <li><a href="#random-walk-on-graphs" id="toc-random-walk-on-graphs" class="nav-link" data-scroll-target="#random-walk-on-graphs"><span class="header-section-number">A.4</span> Random Walk on Graphs</a></li>
+  <li><a href="#mixing-time" id="toc-mixing-time" class="nav-link" data-scroll-target="#mixing-time"><span class="header-section-number">A.5</span> Mixing Time</a>
+  <ul class="collapse">
+  <li><a href="#connection-to-spectral-theory" id="toc-connection-to-spectral-theory" class="nav-link" data-scroll-target="#connection-to-spectral-theory"><span class="header-section-number">A.5.1</span> Connection to Spectral Theory</a></li>
+  </ul></li>
+  <li><a href="#sampling-from-a-markov-chain" id="toc-sampling-from-a-markov-chain" class="nav-link" data-scroll-target="#sampling-from-a-markov-chain"><span class="header-section-number">A.6</span> Sampling from a Markov Chain</a></li>
+  <li><a href="#reversible-markov-chains" id="toc-reversible-markov-chains" class="nav-link" data-scroll-target="#reversible-markov-chains"><span class="header-section-number">A.7</span> Reversible Markov Chains</a>
+  <ul class="collapse">
+  <li><a href="#reversibility-and-symmetry" id="toc-reversibility-and-symmetry" class="nav-link" data-scroll-target="#reversibility-and-symmetry"><span class="header-section-number">A.7.1</span> Reversibility and Symmetry</a></li>
+  </ul></li>
+  <li><a href="#transition-kernels" id="toc-transition-kernels" class="nav-link" data-scroll-target="#transition-kernels"><span class="header-section-number">A.8</span> Transition Kernels</a></li>
+  <li><a href="#analyzing-convergence-of-markov-chains" id="toc-analyzing-convergence-of-markov-chains" class="nav-link" data-scroll-target="#analyzing-convergence-of-markov-chains"><span class="header-section-number">A.9</span> Analyzing Convergence of Markov Chains</a>
+  <ul class="collapse">
+  <li><a href="#trace-plots" id="toc-trace-plots" class="nav-link" data-scroll-target="#trace-plots"><span class="header-section-number">A.9.1</span> Trace Plots</a></li>
+  <li><a href="#running-average" id="toc-running-average" class="nav-link" data-scroll-target="#running-average"><span class="header-section-number">A.9.2</span> Running Average</a></li>
+  <li><a href="#autocorrelation-function" id="toc-autocorrelation-function" class="nav-link" data-scroll-target="#autocorrelation-function"><span class="header-section-number">A.9.3</span> Autocorrelation Function</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/markov_chains.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Appendix A — Markov Chains</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Apurva Nakade </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 23, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="definitions" class="level2" data-number="A.1">
+<h2 data-number="A.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">A.1</span> Definitions</h2>
+<p>In this module, we will learn about Markov Chains. A Markov Chain is a discrete-time stochastic process that satisfies the Markov property. The Markov property states that the future state of the process depends only on the current state and not on the sequence of events that preceded it. In other words, the future is conditionally independent of the past given the present.</p>
+<div id="def-Markov-Chain" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.1</strong></span> <strong>Markov Chain</strong>: A Markov chain is a sequence of random variables <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> satisfying the following properties:</p>
+<ol type="1">
+<li><strong>State Space</strong>: The random variables <span class="math inline">\(X_i\)</span> take values in a finite set <span class="math inline">\(\Omega\)</span> called the state space.</li>
+<li><strong>Markov Property</strong>: For all <span class="math inline">\(n \geq 0\)</span> and all states <span class="math inline">\(i_0, i_1, \ldots, i_{n+1} \in \Omega\)</span>,</li>
+</ol>
+<p><span class="math display">\[\begin{align*}
+P(X_{n+1} = i_{n+1} \mid X_0 = i_0, X_1 = i_1, \ldots, X_n = i_n) = P(X_{n+1} = i_{n+1} \mid X_n = i_n).
+\end{align*}\]</span></p>
+<ol start="3" type="1">
+<li><strong>Time Homogeneity</strong>: The transition probabilities <span class="math inline">\(P(X_{n+1} = j \mid X_n = i)\)</span> do not depend on <span class="math inline">\(n\)</span>.</li>
+</ol>
+</div>
+<p>The transition matrix of a Markov chain is a square matrix whose <span class="math inline">\((i, j)\)</span>-th entry is the probability of transitioning from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span> in one time step.</p>
+<div id="def-Transition-Matrix" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.2</strong></span> <strong>Transition Matrix</strong>: Let <span class="math inline">\(X_1, X_2, X_3, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span>. The transition matrix <span class="math inline">\(P\)</span> of the Markov chain is an <span class="math inline">\(N \times N\)</span> matrix whose <span class="math inline">\((i, j)\)</span>-th entry is given by</p>
+<p><span class="math display">\[\begin{align*}
+P(i, j) = P(X_{n+1} = j \mid X_n = i).
+\end{align*}\]</span></p>
+</div>
+<p>Throughout this notebook, we’ll let <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span> and transition matrix <span class="math inline">\(P\)</span>.</p>
+<p>We can represent a Markov chain by a directed graph called a <strong>state diagram</strong>. Each state is represented by a node, and the transition probabilities are represented by directed edges between the nodes. The transition matrix can be derived from the state diagram by assigning the transition probabilities to the corresponding entries of the matrix.</p>
+<p>The probability distribution of the Markov chain at time <span class="math inline">\(n\)</span> is a <em>row vector</em> <span class="math inline">\(\pi_n\)</span> whose <span class="math inline">\(i^{th}\)</span> entry is <span class="math inline">\(\mathbb{P}(X_n = i)\)</span> for each <span class="math inline">\(i \in \Omega\)</span>.</p>
+<div id="thm-probability-distribution" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.1</strong></span> Let <span class="math inline">\(\pi_n\)</span> be the probability distribution of the chain at time <span class="math inline">\(n\)</span>. Then,</p>
+<p><span class="math display">\[\begin{align*}
+\pi_{n+1} = \pi_n P.
+\end{align*}\]</span></p>
+<p>And hence,</p>
+<p><span class="math display">\[\begin{align*}
+\pi_n = \pi_0 P^n.
+\end{align*}\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span><span class="math display">\[\begin{align*}
+\pi_{n+1}(j) &amp;= \mathbb{P}(X_{n+1} = j) \\
+&amp;= \sum_{i \in S} \mathbb{P}(X_{n+1} = j \mid X_n = i) \mathbb{P}(X_n = i) \\
+&amp;= \sum_{i \in S} \pi_n(i) P(i, j) \\
+&amp;= \pi_n P(j).
+\end{align*}\]</span></p>
+</div>
+</section>
+<section id="stationary-distribution" class="level2" data-number="A.2">
+<h2 data-number="A.2" class="anchored" data-anchor-id="stationary-distribution"><span class="header-section-number">A.2</span> Stationary Distribution</h2>
+<div id="def-Stationary-Distribution" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.3</strong></span> A probability distribution <span class="math inline">\(\pi\)</span> is called a <strong>stationary distribution</strong> of a Markov chain with transition matrix <span class="math inline">\(P\)</span> if <span class="math inline">\(\pi = \pi P\)</span>.</p>
+</div>
+<p><span class="math inline">\(P\)</span> is guaranteed to have an eigenvalue of 1 because it’s row sum is 1 i.e.&nbsp;</p>
+<p><span class="math display">\[
+  P \vec{1} = \vec{1},
+\]</span></p>
+<p>where <span class="math inline">\(\vec{1}\)</span> is the vector of all ones. Since, there is a right eigenvector corresponding to the eigenvalue 1, there will be a left eigenvector as well. The left eigenvector is a stationary distribution of the Markov chain.</p>
+<p>It is not hard to see that every eigenvalue of <span class="math inline">\(P\)</span> is less than or equal to 1 in magnitude. Suppose <span class="math inline">\(\vec{v}\)</span> is a left eigenvector of <span class="math inline">\(P\)</span> corresponding to an eigenvalue <span class="math inline">\(\lambda\)</span>. Let <span class="math inline">\(v_I\)</span> be the largest component of <span class="math inline">\(\vec{v}\)</span> in magnitude. Then, we have</p>
+<p><span class="math display">\[\begin{align*}
+\lambda \vec{v} &amp;= \vec{v} P \\
+\implies
+\lambda v_I &amp;= \sum_{j} v_j P(j, I) \\
+&amp;\leq \sum_{j} |v_j| P(j, I) \\
+&amp;\leq \sum_{j} |v_I| P(j, I) \\
+&amp;= |v_I|
+\end{align*}\]</span></p>
+<p>Thus, <span class="math inline">\(|\lambda| \leq 1\)</span>. In particular, this means that the Frobenius norm of <span class="math inline">\(P\)</span> is less than or equal to 1 and for all vectors <span class="math inline">\(\vec{v}\)</span>, we have</p>
+<p><span class="math display">\[
+\| \vec{v} \|_2 \leq \| \vec{v} P \|_2.
+\]</span></p>
+<p>We are particularly interested in the case when there is exactly one eigenvector with eigenvalue of magnitude 1 which would then be the stationary distribution of the Markov chain.</p>
+</section>
+<section id="fundamental-theorem" class="level2" data-number="A.3">
+<h2 data-number="A.3" class="anchored" data-anchor-id="fundamental-theorem"><span class="header-section-number">A.3</span> Fundamental Theorem</h2>
+<div id="def-irreducibility" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.4</strong></span> We say that a Markov Chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span> i.e.&nbsp;it is possible to go from any state to any other state in a finite number of steps.</p>
+</div>
+<div id="def-aperiodicity" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic.</p>
+</div>
+<p>Note that sometimes we add a preliminary requirement that the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is non-empty. This condition is called <strong>positive recurrence</strong>. We’ll assume this as a part of the definition of aperiodicity.</p>
+<div id="def-ergodicity" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.6</strong></span> A Markov chain is called <strong>ergodic</strong> if it is irreducible and aperiodic.</p>
+</div>
+<div id="thm-fundamental-theorem" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span> i.e.&nbsp;</p>
+<p><span class="math display">\[\begin{align*}
+\lim_{n \to \infty} \pi_0 P^n = \Pi,
+\end{align*}\]</span></p>
+<p>for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
+</div>
+</section>
+<section id="random-walk-on-graphs" class="level2" data-number="A.4">
+<h2 data-number="A.4" class="anchored" data-anchor-id="random-walk-on-graphs"><span class="header-section-number">A.4</span> Random Walk on Graphs</h2>
+<p>Our main example of a Markov chain is the random walk on a graph. Let <span class="math inline">\(G = (V, E)\)</span> be a graph with vertex set <span class="math inline">\(V\)</span> and edge set <span class="math inline">\(E\)</span>. Suppose you want to move from one vertex to another by following the edges of the graph. At each vertex, you choose an edge uniformly at random and move to the adjacent vertex. This process is called a random walk on the graph.</p>
+<p>The random walk on <span class="math inline">\(G\)</span> is a Markov chain with state space <span class="math inline">\(\Omega = V\)</span> and transition probabilities given by</p>
+<p><span class="math display">\[\begin{align*}
+P(i, j) =
+\begin{cases}
+\frac{1}{\text{deg}(i)} &amp; \text{if } (i, j) \in E, \\
+0 &amp; \text{otherwise},
+\end{cases}
+\end{align*}\]</span></p>
+<p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> i.e.&nbsp;the number of edges incident to <span class="math inline">\(i\)</span>.</p>
+<div id="exm-random-walk" class="theorem example">
+<p><span class="theorem-title"><strong>Example A.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by</p>
+<p><span class="math display">\[\begin{align*}
+  P =
+  \begin{pmatrix}
+    0 &amp; 1 &amp; 0 &amp; 0 \\
+    1/3 &amp; 0 &amp; 1/3 &amp; 1/3 \\
+    0 &amp; 1/2 &amp; 0 &amp; 1/2 \\
+    0 &amp; 1/2 &amp; 1/2 &amp; 0
+  \end{pmatrix}.
+\end{align*}\]</span></p>
+<p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n^{th}\)</span> distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>, as shown below.</p>
+</div>
+<div id="9fa0ea2d" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-3-output-1.png" width="787" height="403" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transition matrix of the Markov chain:
+[[0.         1.         0.         0.        ]
+ [0.33333333 0.         0.33333333 0.33333333]
+ [0.         0.5        0.         0.5       ]
+ [0.         0.5        0.5        0.        ]]
+
+ 
+Example of evolution of a Markov chain:
+State at time 0 : [1, 0, 0, 0]
+State at time 1 : [0. 1. 0. 0.]
+State at time 2 : [0.333 0.    0.333 0.333]
+State at time 3 : [0.    0.667 0.167 0.167]
+State at time 4 : [0.222 0.167 0.306 0.306]
+State at time 5 : [0.056 0.528 0.208 0.208]
+State at time 6 : [0.176 0.264 0.28  0.28 ]
+State at time 7 : [0.088 0.456 0.228 0.228]
+State at time 8 : [0.152 0.316 0.266 0.266]
+State at time 9 : [0.105 0.418 0.238 0.238]
+State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
+</div>
+</div>
+<p>In HW, you’ll prove the following theorem about ergodicity of random walks on graphs.</p>
+<div id="thm-ergodicity-random-walk" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.3</strong></span> A random walk on a graph is</p>
+<ol type="1">
+<li>Irreducible if and only if the graph is connected.</li>
+<li>Aperiodic if and only if the graph is not bipartite.</li>
+</ol>
+<p>If these conditions hold, then the stationary distribution of the random walk is given by</p>
+<p><span class="math display">\[\begin{align*}
+\Pi(i) = \frac{\text{deg}(i)}{2|E|},
+\end{align*}\]</span></p>
+<p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> and <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+</div>
+</section>
+<section id="mixing-time" class="level2" data-number="A.5">
+<h2 data-number="A.5" class="anchored" data-anchor-id="mixing-time"><span class="header-section-number">A.5</span> Mixing Time</h2>
+<p>Assume that the Markov chain is ergodic, and hence has a stationary distribution <span class="math inline">\(\Pi\)</span>. We know that any initial distribution <span class="math inline">\(\pi_0\)</span> converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>. The mixing time measures the rate of this convergence.</p>
+<div id="def-total-variation-distance" class="theorem definition">
+<p><span class="theorem-title"><strong>Definition A.7</strong></span> The <strong>total variation distance</strong> between two probability distributions <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> on a finite state space <span class="math inline">\(\Omega\)</span> is defined as</p>
+<p><span class="math display">\[\begin{align*}
+\| \mu - \nu \|_{\text{TV}}
+&amp;= \frac{1}{2} \sum_{i \in \Omega} |\mu(i) - \nu(i)| \\
+&amp;= \frac{1}{2} \| \mu - \nu \|_{L^1}.
+\end{align*}\]</span></p>
+</div>
+<p>One can show that</p>
+<p><span class="math display">\[\begin{align*}
+\| \mu - \nu \|_{\text{TV}} = \mathrm{sup} \{ |\mu(A) - \nu(A)| : A \subseteq \Omega \},
+\end{align*}\]</span></p>
+<p>i.e.&nbsp;<span class="math inline">\(\|\mu - \nu \|_{\text{TV}}\)</span> is the maximum difference in the probability of any event under the two distributions.</p>
+<p>We use the total variation distance to measure the distance between the distribution of the Markov chain at time <span class="math inline">\(n\)</span> and the stationary distribution. The <strong>mixing time</strong> of the Markov chain is defined as the smallest <span class="math inline">\(N\)</span> such that for the stationary distribution <span class="math inline">\(\Pi\)</span> and any initial distributions <span class="math inline">\(\pi_0\)</span>, we have</p>
+<p><span class="math display">\[\begin{align*}
+\| \pi_0 P^n - \Pi \|_{\text{TV}} \leq \frac{1}{4},
+\end{align*}\]</span></p>
+<p>for all <span class="math inline">\(n \geq N\)</span>. The constant <span class="math inline">\(\frac{1}{4}\)</span> is arbitrary and can be replaced by any other constant in <span class="math inline">\((0, 1)\)</span>. This will only change the value of the mixing time by a constant factor and not the order of magnitude.</p>
+<p>When using Markov chains for sampling, we want the mixing time to be as small as possible. This ensures that the distribution of the chain is close to the stationary distribution after a small number of steps. We think of the time before the chain mixes as a transient phase - the chain has not yet reached equilibrium. This is a burn-in period where we discard the samples. The bigger the mixing time, the more the number of wasted samples in the burn-in phase.</p>
+<p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>A.1</span></a> again. If we start at the vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is 4.</p>
+<p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times.</p>
+<p>In practice, we either provide a theoretical bound on the mixing time or “visually” inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.</p>
+<div id="7e73c217" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-4-output-1.png" width="663" height="376" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="connection-to-spectral-theory" class="level3" data-number="A.5.1">
+<h3 data-number="A.5.1" class="anchored" data-anchor-id="connection-to-spectral-theory"><span class="header-section-number">A.5.1</span> Connection to Spectral Theory</h3>
+<p>Continuing the example from above, the matrix <span class="math inline">\(I_4 - P\)</span> is called the <strong>normalized Laplacian matrix</strong> of the graph <span class="math inline">\(G\)</span>.</p>
+<p><span class="math display">\[\begin{align*}
+\mathcal{L} = I_4 - P =
+  \begin{pmatrix}
+    1 &amp; -1 &amp; 0 &amp; 0 \\
+    -1/3 &amp; 1 &amp; -1/3 &amp; -1/3 \\
+    0 &amp; -1/2 &amp; 1 &amp; -1/2 \\
+    0 &amp; -1/2 &amp; -1/2 &amp; 0
+  \end{pmatrix}
+\end{align*}\]</span></p>
+<p>One can show that 0 is an eigenvalue of <span class="math inline">\(\mathcal{L}\)</span> and all eigenvalues are non-negative. The second smallest eigenvalue of <span class="math inline">\(\mathcal{L}\)</span> is called the <strong>spectral gap</strong> of the graph (which could be 0).</p>
+<p>Spectral graph theory, in particular Cheeger inequalities, prove that there is an inverse relationship between the spectral gap of the graph and the mixing time of the random walk on the graph. The smaller the spectral gap, the larger the mixing time. You’ll explore this connection in the homework.</p>
+</section>
+</section>
+<section id="sampling-from-a-markov-chain" class="level2" data-number="A.6">
+<h2 data-number="A.6" class="anchored" data-anchor-id="sampling-from-a-markov-chain"><span class="header-section-number">A.6</span> Sampling from a Markov Chain</h2>
+<p>The algorithm to generate sample paths of length <span class="math inline">\(n\)</span> of a Markov Chain is simple. Suppose <span class="math inline">\(P\)</span> is the transition matrix of the Markov Chain with mixing time <span class="math inline">\(t\)</span>. The algorithm is as follows:</p>
+<ol type="1">
+<li>Start at some initial state <span class="math inline">\(X_0\)</span>.</li>
+<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>
+<ul>
+<li>Generate <span class="math inline">\(X_{i+1} \sim P(X_i , \cdot )\)</span>.</li>
+</ul></li>
+<li>Discard the first <span class="math inline">\(T\)</span> samples and return <span class="math inline">\(X_{T+1}, X_{T+2}, \ldots, X_N\)</span>.</li>
+</ol>
+<p>We can interpret this algorithm as generating <span class="math inline">\(N-T\)</span> samples from the stationary distribution of the Markov Chain. The number of samples discarded is called the <strong>burn-in period</strong>.</p>
+<p>One big issue with this algorithm is that the samples are highly correlated. If independence is important, selecting every 40th sample may be beneficial. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+<div id="exm-random-walk-on-graph" class="theorem example">
+<p><span class="theorem-title"><strong>Example A.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\([0, 14]\)</span> by generating a random walk over a cycle of length 15.</p>
+<p>The autocorrelation plot below shows the correlation between samples at different lags i.e.&nbsp;<span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
+<p>We can either discard the first 40 samples or select every 40-th sample to reduce the correlation. If independence is important, then we should select every 40-th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+</div>
+<div id="7efcb4a6" class="cell" data-fold="true" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-5-output-1.png" width="691" height="519" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-5-output-2.png" width="764" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="reversible-markov-chains" class="level2" data-number="A.7">
+<h2 data-number="A.7" class="anchored" data-anchor-id="reversible-markov-chains"><span class="header-section-number">A.7</span> Reversible Markov Chains</h2>
+<p>A Markov Chain is <strong>reversible</strong> with respect to a distribution <span class="math inline">\(\pi\)</span> if the following holds:</p>
+<p><span id="eq-reversible"><span class="math display">\[
+\pi_i P(i, j) = \pi_j P(j, i) \quad \text{for all } i, j.
+\tag{A.1}\]</span></span></p>
+<p>This is saying that the probability of transitioning from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> is the same as the probability of transitioning from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. <a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>A.1</span></a> is known as the <strong>detailed balance equation</strong>.</p>
+<div id="thm-detailed-balance" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.4</strong></span> <strong>(Detailed Balance Equation).</strong> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then <span class="math inline">\(\pi\)</span> is a stationary distribution of the Markov Chain.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Suppose the Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Then,</p>
+<p><span class="math display">\[
+\begin{aligned}
+(\pi P)_i &amp;= \sum_j \pi_j P(j, i) \\
+&amp;= \sum_j \pi_i P(i, j) \\
+&amp;= \pi_i \sum_j P(i, j) \\
+&amp;= \pi_i.
+\end{aligned}
+\]</span></p>
+<p>Thus, <span class="math inline">\(\pi\)</span> is the stationary distribution of the Markov Chain.</p>
+</div>
+<p><a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>A.1</span></a> is a sufficient but not necessary condition for <span class="math inline">\(\pi\)</span> to be the stationary distribution of the Markov Chain. You can have a Markov Chain with a stationary distribution that is not reversible.</p>
+<p>Note that we did not use any properties of the Markov Chain in the proof of the theorem, except that the row sum of the transition matrix is <span class="math inline">\(1\)</span>. A better way to phrase this theorem would be to say that “if the row sum of the transition matrix is <span class="math inline">\(1\)</span> and the detailed balance equation holds, then <span class="math inline">\(\pi\)</span> is an eigenvector of the transition matrix with eigenvalue <span class="math inline">\(1\)</span>.”</p>
+<div id="exm-random-walks-on-graphs" class="theorem example">
+<p><span class="theorem-title"><strong>Example A.3</strong></span> <strong>Random Walks on Graphs.</strong> Consider a graph <span class="math inline">\(G = (V, E)\)</span> with vertices <span class="math inline">\(V\)</span> and edges <span class="math inline">\(E\)</span>. Let <span class="math inline">\(P(i, j) = 1/d(i)\)</span> if <span class="math inline">\((i, j) \in E\)</span> and <span class="math inline">\(0\)</span> otherwise, where <span class="math inline">\(d(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>. Then, the stationary distribution of the Markov Chain is <span class="math inline">\(\pi_i = d(i)/2|E|\)</span>, where <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+<p>The Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Consider two vertices <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. If <span class="math inline">\((i, j) \in E\)</span>, then</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi_i P(i, j) &amp;= \frac{d(i)}{2|E|} \cdot \frac{1}{d(i)} \\
+&amp;= \frac{1}{2|E|} \\
+&amp;= \frac{d(j)}{2|E|} \cdot \frac{1}{d(j)} \\
+&amp;= \pi_j P(j, i).
+\end{aligned}
+\]</span></p>
+<p>If <span class="math inline">\((i, j) \notin E\)</span>, then <span class="math inline">\(\pi_i P(i, j) = \pi_j P(j, i) = 0\)</span>.</p>
+</div>
+<p>Many Markov chains encountered in practice are reversible with respect to some distribution. It is much easier to check the detailed balance equation than to compute the stationary distribution directly. Moreover, reversible markov chains can be analyzed using spectral methods and we can find good bounds on their mixing time.</p>
+<section id="reversibility-and-symmetry" class="level3" data-number="A.7.1">
+<h3 data-number="A.7.1" class="anchored" data-anchor-id="reversibility-and-symmetry"><span class="header-section-number">A.7.1</span> Reversibility and Symmetry</h3>
+<div id="thm-reversibility-symmetry" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.5</strong></span> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then the matrix</p>
+<p><span class="math display">\[
+Q = \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}})
+\]</span></p>
+<p>is symmetric. In particular, <span class="math inline">\(P\)</span> is similar to the symmetric matrix <span class="math inline">\(Q\)</span> and hence has real eigenvalues.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>This is because</p>
+<p><span class="math display">\[
+\begin{aligned}
+Q(i, j)
+&amp;= \sqrt{\pi_i} P(i, j) \sqrt{\pi_j^{-1}} \\
+&amp;= \sqrt{\pi_i} \dfrac{\pi_j P(j, i)}{\pi_i} \sqrt{\pi_j^{-1}} \\
+&amp;= \sqrt{\pi_j} P(j, i) \sqrt{\pi_i^{-1}} \\
+&amp;= Q(j, i).
+\end{aligned}
+\]</span></p>
+<p>Similarly, <span class="math inline">\(Q(j, i) = \pi_j P(j, i)\)</span>. As the Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>, we get <span class="math inline">\(Q(i, j) = Q(j, i)\)</span>. Thus, <span class="math inline">\(Q\)</span> is symmetric.</p>
+</div>
+<p>Now suppose <span class="math inline">\(\textbf{v}\)</span> is a left eigenvector of <span class="math inline">\(Q\)</span> with eigenvalue <span class="math inline">\(\lambda\)</span>. Then,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\textbf{v} Q &amp;= \lambda \textbf{v} \\
+\textbf{v} \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}}) &amp;= \lambda \textbf{v} \\
+\implies \textbf{v} \text{diag}(\sqrt{\pi}) \: P &amp;= \lambda \textbf{v} \: \text{diag}(\sqrt{\pi}).
+\end{aligned}
+\]</span></p>
+<p>Hence, <span class="math inline">\(\text{diag}(\sqrt{\pi}) \textbf{v}\)</span> will be an eigenvector of <span class="math inline">\(P\)</span> with the same eigenvalue. As <span class="math inline">\(Q\)</span> is symmetric, it has real eigenvalues and orthogonal eigenvectors. It is easier to do spectral analysis of <span class="math inline">\(Q\)</span> and use that to deduce properties of <span class="math inline">\(P\)</span>. For example, we can find the eigenvector corresponding to the largest eigenvalue of <span class="math inline">\(Q\)</span> by solving the optimization problem</p>
+<p><span class="math display">\[
+\mathbf{v} = \underset{\mathbf{x} \neq 0}{\text{arg max}} \dfrac{\mathbf{x}^T Q \mathbf{x}}{\mathbf{x}^T \mathbf{x}}.
+\]</span></p>
+<p>Multiplying the above vector <span class="math inline">\(\mathbf{v}\)</span> by <span class="math inline">\(\text{diag}(\sqrt{\pi})\)</span> gives us the stationary distribution for <span class="math inline">\(P\)</span>.</p>
+</section>
+</section>
+<section id="transition-kernels" class="level2" data-number="A.8">
+<h2 data-number="A.8" class="anchored" data-anchor-id="transition-kernels"><span class="header-section-number">A.8</span> Transition Kernels</h2>
+<p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability of transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the <strong>density</strong> of the distribution at that point. The transition kernel satisfies the equation:</p>
+<p><span class="math display">\[\begin{align*}
+\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.
+\end{align*}\]</span></p>
+<p>All the properties of Markov Chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov Chains becomes</p>
+<div id="thm-fundamental-theorem-kernels" class="theorem">
+<p><span class="theorem-title"><strong>Theorem A.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov Chain with transition kernel <span class="math inline">\(K\)</span> is</p>
+<ol type="1">
+<li><strong>Irreducible</strong>: For all <span class="math inline">\(x, y\)</span>, there exists <span class="math inline">\(n\)</span> such that <span class="math inline">\(K^n(x, y) &gt; 0\)</span>.</li>
+<li><strong>Positive recurrent</strong>: The expected return time to a state is finite.</li>
+<li><strong>Aperiodic</strong>: For all <span class="math inline">\(x\)</span>, <span class="math inline">\(\gcd\{n : K^n(x, x) &gt; 0\} = 1\)</span>.</li>
+</ol>
+<p>Then, the Markov Chain has a unique stationary distribution <span class="math inline">\(\Pi\)</span> and for all initial distributions <span class="math inline">\(\pi_0\)</span>,</p>
+<p><span class="math display">\[\begin{align*}
+\int \pi_0(x) K^n(x, y) \, dx \xrightarrow[TV]{} \Pi(y) \quad \text{as } n \to \infty.
+\end{align*}\]</span></p>
+</div>
+</section>
+<section id="analyzing-convergence-of-markov-chains" class="level2" data-number="A.9">
+<h2 data-number="A.9" class="anchored" data-anchor-id="analyzing-convergence-of-markov-chains"><span class="header-section-number">A.9</span> Analyzing Convergence of Markov Chains</h2>
+<p>In practice we need to decide how many samples to burn and how many samples to generate. We use various heuristics to decide this.</p>
+<section id="trace-plots" class="level3" data-number="A.9.1">
+<h3 data-number="A.9.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">A.9.1</span> Trace Plots</h3>
+<p>A trace plot is simply a scatter plot of the samples generated by the Markov Chain. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the trace plot should look like a cloud of points. If the Markov Chain has not converged, the trace plot will show a trend.</p>
+<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the chain does not look uniform even after a 1000 samples but after 5000 samples it is starting to look uniform.</p>
+<div id="aec788e1" class="cell" data-fold="true" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-6-output-1.png" width="756" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="running-average" class="level3" data-number="A.9.2">
+<h3 data-number="A.9.2" class="anchored" data-anchor-id="running-average"><span class="header-section-number">A.9.2</span> Running Average</h3>
+<p>The running average is the average of the first <span class="math inline">\(n\)</span> samples. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the running average should stabilize around the true mean. If the Markov Chain has not converged, the running average will show a trend.</p>
+<p>Below is the running average plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the running average is stabilizing around the true mean around 3000 samples.</p>
+<p>Running averages can be deceptive and show stability even when the Markov Chain has not converged. It is better to use multiple diagnostics to check for convergence. They are better at telling when the Markov Chain has <strong>not</strong> converged than when it has converged.</p>
+<div id="5e050030" class="cell" data-fold="true" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-7-output-1.png" width="756" height="374" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="autocorrelation-function" class="level3" data-number="A.9.3">
+<h3 data-number="A.9.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">A.9.3</span> Autocorrelation Function</h3>
+<p>One method for finding the burn-in period is to use the autocorrelation function. The <strong>autocorrelation function</strong> of a sequence of numbers <span class="math inline">\(x = (x_0, x_1, \dots, x_n)\)</span> at lag <span class="math inline">\(k\)</span> is defined as</p>
+<p><span class="math display">\[
+\text{ACF}(k) = \text{Corr}(x[k: \:], x[\: :-k])
+\]</span></p>
+<p>where by <span class="math inline">\(x[k:]\)</span> we mean the subsequence <span class="math inline">\(x_k, x_{k+1}, \dots, x_n\)</span> and by <span class="math inline">\(x[:-k]\)</span> we mean the subsequence <span class="math inline">\(x_0, x_1, \dots, x_{n-k}\)</span>. It is the correlation between the sequence <span class="math inline">\(x\)</span> and the same sequence shifted by <span class="math inline">\(k\)</span>. One way to choose a burn-in period is to pick a threshold <span class="math inline">\(\epsilon\)</span> and find the smallest <span class="math inline">\(T\)</span> such that <span class="math inline">\(\text{ACF}(T) &lt; \epsilon\)</span>. Then to be conservative choose a burn-in period of <span class="math inline">\(2T\)</span> or <span class="math inline">\(3T\)</span>.</p>
+<p>Below is the autocorrelation plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and drops below <span class="math inline">\(0.1\)</span> around <span class="math inline">\(17\)</span>. So a burn-in period of <span class="math inline">\(40\)</span> is a good conservative choice.</p>
+<p>This is just one way to choose the burn-in period. There are many other methods and the choice depends on the application. We will stick to this method for the rest of the course.</p>
+<div id="03659195" class="cell" data-fold="true" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-8-output-1.png" width="589" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../appendices/hidden_markov.html" class="pagination-link" aria-label="Hidden Markov Chains">
+        <span class="nav-page-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Copyright 2025, Apurva Nakade</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

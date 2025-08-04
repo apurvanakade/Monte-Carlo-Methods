@@ -1,0 +1,455 @@
+---
+title: "Ising Model"
+date: 2025-03-11
+toc: true
+
+execute:
+  echo: false
+---
+
+```{python}
+import numpy as np 
+import matplotlib.pyplot as plt
+```
+
+## The Physical Ising Model
+
+The Ising model is a simple model of ferromagnetism from statistical mechanics. The setup is as follows:
+
+1. **Particles**: 
+   We have a lattice of $N$ particles, each of which can be have one of two states of magnetization: spin up ($X = 1$) or spin down ($X = -1$). For simplicity, we assume the grid is "wrapped" so that the top and bottom edges are connected, and the left and right edges are connected. **This means that each site has four neighbors.** Such a grid is called a torus.
+2. **Coupling constant**: 
+   Two adjacent particles have a tendency to have spins aligned. This tendency is quantified by a coupling constant $J$. If two adjacent particles have the same spin, the energy of the system is lowered by $-J$, and if they have opposite spins, the energy is raised by $J$. Any physical system tends to minimize its energy, so the system will tend to have neighboring particles with the same spin.
+3. **External magnetic field**: 
+   For the same of simplicity we'll assume that there is no external force field. 
+4. **Temperature**:
+   Temperature adds randomness to the system. At 0K, all the particles have their spins aligned. As the temperature increases, the particles start to flip their spins. The higher the temperature, the more likely it is for neighboring particles to have opposite spins.
+5. **Magnetization**: 
+   If the system is in a state where most of the particles have the same spin, the system is said to be magnetized. 
+
+Next we create a mathematical model to describe the system.
+
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_ising_model(spin_grid):
+    """
+    Plots a 2D Ising model with up (red) and down (blue) arrows, tilted to prevent overlap.
+    :param spin_grid: 2D numpy array of spins (+1 or -1)
+    """
+    Lx, Ly = spin_grid.shape
+    x, y = np.meshgrid(range(Lx), range(Ly), indexing='ij')
+    
+    plt.figure(figsize=(6,6))
+    
+    for i in range(Lx):
+        for j in range(Ly):
+            color = 'red' if spin_grid[i, j] == 1 else 'blue'
+            angle = 30 if spin_grid[i, j] == 1 else -150  # Tilt angle to prevent overlap
+            dx = 0.5 * np.sin(np.radians(angle))
+            dy = 0.5 * np.cos(np.radians(angle))
+            plt.arrow(j, -i, dx, dy,
+                      head_width=0.2, head_length=0.2, fc=color, ec=color)
+    
+    # Draw faint grid lines manually
+    for i in range(Lx + 1):
+        plt.hlines(-i, -0.5, Ly - 0.5, colors='gray', linestyles='--', linewidth=0.5, alpha=0.3)
+    for j in range(Ly + 1):
+        plt.vlines(j, -Lx + 0.5, 0.5, colors='gray', linestyles='--', linewidth=0.5, alpha=0.3)
+    
+    plt.xlim(-0.5, Ly - 0.5)
+    plt.ylim(-Lx + 0.5, 0.5)
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
+# Example: Generate a random Ising model grid
+np.random.seed(42)
+L = 10  # Grid size
+ising_grid = np.random.choice([-1, 1], size=(L, L))
+plot_ising_model(ising_grid)
+```
+
+## The Mathematical Ising Model
+
+We model the system using $N^2$ random variables $X_{i, j}$. Each $X_{i, j}$ is a binary random variable that takes the value $1$ or $-1$. The configuration of the system is given by the $N^2$ length vector $\mathbf{X} = (X_{1, 1}, X_{1, 2}, \ldots, X_{N, N})$. There are $2^{N^2}$ possible configurations of the system i.e. the state space has size $2^{N^2}$. We can imagine each configuration as being the vertex of a hypercube in $N^2$ dimensions with vertices $(\pm 1, \pm 1, \ldots, \pm 1)$. We'll let the variable $\sigma$ denote a configuration of the system. So $\sigma$ is a vector of length $N^2$ with entries in $\{-1, 1\}$.
+
+
+In order to describe the system mathematically, we need to provide the joint probability distribution of the random variables $X_{i, j}$. This is done using the Hamiltonian of the system and the Boltzmann distribution.
+
+### Hamiltonian
+
+The Hamiltonian of the system is given by
+
+$$
+H(\sigma) = -J \sum \limits_{(i, j) \text{ and } (i', j') \text{ are neighbors}} X_{i, j} X_{i', j'}
+$$
+
+where the sum is over all pairs of neighboring particles. The Hamiltonian is just a measure of the energy of the system. Note that because $J$ is positive, the energy is minimized when neighboring particles have the same spin.
+
+### Boltzmann Distribution
+
+The probability of the system being in a particular configuration $\sigma$ is given by the Boltzmann distribution:
+
+$$
+f(\sigma) = \frac{e^{-H(\sigma)/T}}{Z}
+$$
+
+where $T$ is the temperature, and $Z$ is the normalization constant called the partition function.
+This is the joint probability mass function of the random variables $X_{i, j}$. The partition function $Z$ is not easy to compute, but thankfully we do not need it to sample from the joint distribution.
+
+### Low Temperature
+
+If we plugin the partition function explicitly, we can see that the probability distribution becomes
+
+$$
+f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum \limits_{\sigma'}e^{-H(\sigma')/T}}.
+$$
+
+As $T \to 0$, the term with the highest value of $-H(\sigma)$ will dominate the sum in the denominator. But the term with the highest value of $-H(\sigma)$ is the one that minimizes $H(\sigma)$. So,
+
+$$
+\lim \limits_{T \to \infty} f(\sigma) = \lim \limits_{T \to \infty}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to \infty}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
+$$
+
+If $H(\sigma)_{\min} = H(\sigma)$, then the probability of the system being in that state is $1$ and $0$ otherwise. This means that at low temperatures, the system will be in a state that minimizes the energy. But as $T$ increases, more and more high energy states become probable. So temperature can be thought of as adding variability to the system.
+
+### Magnetization
+
+The magnetization of the system is given by
+
+$$
+M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
+$$
+
+If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
+
+## Gibbs Sampling
+
+There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we'll use Gibbs sampling.
+
+
+### Conditional Distribution
+
+Consider a single spin $X_{i, j}$. Let $\hat{X}_{i, j}$ denote the set of spins at all sites except $(i, j)$. We want to find the conditional distribution of $X_{i, j}$ given $\hat{X}_{i, j}$. 
+We'll assume the following result without proof:
+
+$$
+\begin{aligned}
+P(X_{i, j} = 1 | \hat{X}_{i, j}) &= \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}, \\
+P(X_{i, j} = -1 | \hat{X}_{i, j}) &= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
+\end{aligned}
+$$ {#eq-conditional}
+
+where $T$ is the temperature of the system and $h_{i, j}$ is the effective field at site $(i, j)$, given by
+
+$$
+\begin{aligned}
+h_{i, j} 
+&= J \sum_{(i', j') \in \text{neighbors}(i, j)} X_{i', j'} \\
+&= J \left( X_{i-1, j} + X_{i+1, j} + X_{i, j-1} + X_{i, j+1} \right)
+\end{aligned}
+$$
+
+The conditional distribution in @eq-conditional is a logistic function. When $h_{i, j}$ is positive, the probability of $X_{i, j}$ being $1$ is greater than $0.5$, and when $h_{i, j}$ is negative, the probability of $X_{i, j}$ being $1$ is less than $0.5$. This makes sense because if the effective field is positive, most of the neighbors of $(i, j)$ have spin $1$, so it is likely that $(i, j)$ will also have spin $1$ and if the effective field is negative, most of the neighbors of $(i, j)$ have spin $-1$, so it is likely that $(i, j)$ will also have spin $-1$.
+
+
+
+```{python}
+# draw graph of logistic function 
+
+x = np.linspace(-10, 10, 100)
+y = 1 / (1 + np.exp(-x))
+
+plt.plot(x, y)
+plt.axhline(0.5, color='red', linestyle='--', label='x=0.5, y=0.5')
+plt.xlabel('x')
+plt.ylabel('1 / (1 + exp(-x))')
+plt.title('Logistic function')
+plt.legend()
+plt.grid()
+plt.show()
+```
+
+### The Algorithm
+
+1. Initialize the grid of spins $X_i$ for $i = 1$ to $N$ randomly.
+2. For $i = 1$ to $N$
+   1. For $j = 1$ to $N$
+      1. Compute the effective field $h_{i, j}$.
+      2. Generate a random number $u$ from a uniform distribution.
+      3. Set $X_{i, j}$ to $1$ if $u < \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}$ and $-1$ otherwise.
+3. Compute the magnetization of the system.
+4. Repeat steps 2 and 3.
+
+**Equilibrium/Mixing Time:**
+
+Even when the grid size is modest, the dimensions of the state space is quite large, $2^{N^2}$. This means that the Markov chain will take a long time to mix. Practically, this means that the initial configuration might be far from the stationary distribution i.e. the system has not reached thermal equilibrium. In this case it is important to discard the initial samples to not skew the magnetization estimate.
+
+One simple way to this is to run the Gibbs sampler until the running average of the magnetization stabilizes. At that point, we can start using the samples to estimate the magnetization.
+
+
+## Phase Transitions
+
+It was discovered that the Ising model for a 2D grid exhibits a phenomenon called **phase transition**. 
+If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the **critical temperature**.
+
+
+It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice $\to \infty$. This limiting critical temperature for a square lattice is given by
+
+$$
+T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
+$$
+
+Of course, in our simulation, we'll be using finite sized lattices so we should expect some deviation from this result.
+
+## Simulation
+
+Below are the results of simulating the Ising model on a $20 \times 20$ grid for $J = 1$. The predicted critical temperature is $T_c = 2.269$. 
+
+We can see that at $T=1.5$, the system is magnetized and the magnetization is more or less constant and close to 1 or -1 over various runs. At $T=2.5$, the system is not magnetized and the average magnetization is close to 0. It fluctuates wildly over various runs.
+
+If we gradually increase the temperature from $T=1$ to $T=3$, we can see that the magnetization decreases smoothly until $T=2$ after which it drops suddenly. This is the phase transition.
+Below the graph are the snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def initialize_lattice(L):
+    """Initialize an LxL lattice with random spins (+1 or -1)."""
+    return np.random.choice([-1, 1], size=(L, L))
+
+def magnetization(lattice):
+    """Compute the magnetization of the lattice."""
+    return np.sum(lattice) / lattice.size
+
+def gibbs_step(lattice, beta, J=1):
+    """Perform a single Gibbs sampling step."""
+    L = lattice.shape[0]
+    for i in range(L):
+        for j in range(L):
+            neighbors = lattice[(i+1)%L, j] + lattice[(i-1)%L, j] + \
+                        lattice[i, (j+1)%L] + lattice[i, (j-1)%L]
+            h = J * neighbors
+            P_up = 1 / (1 + np.exp(-2 * beta * h))
+            lattice[i, j] = 1 if np.random.rand() < P_up else -1
+
+def simulate_ising_gibbs(L, T_start, T_end, steps, snapshots=16):
+    """Simulate the Ising model using Gibbs sampling with temperature annealing."""
+    lattice = initialize_lattice(L)
+    magnetizations = {}
+    saved_lattices = []
+    snapshot_interval = steps // snapshots  # Save states evenly over time
+    
+    # add some equilibrium time
+    for _ in range(steps // 10):
+        gibbs_step(lattice, 1 / T_start)
+    
+    for step in range(steps):
+        T = T_start + (T_end - T_start) * (step / steps)  # Linearly varying temperature
+        beta = 1 / T
+        gibbs_step(lattice, beta)
+        
+        # if step % (steps // 100) == 0:
+        magnetizations[T] = magnetization(lattice)
+        if step % snapshot_interval == 0 and len(saved_lattices) < snapshots:
+            saved_lattices.append(np.copy(lattice))
+    
+    return lattice, magnetizations, saved_lattices
+
+# Parameters
+L = 20  # Lattice size
+T_start = 1.4  # Initial temperature (highly disordered state)
+T_end = 3.0  # Final temperature (more ordered state)
+steps = 10000  # Number of Gibbs steps
+snapshots = 8  # Number of snapshots to capture
+
+# Critical Temperature for 2D Ising Model
+Tc = 2 / np.log(1 + np.sqrt(2))  # ~2.269
+
+# Run simulation with cooling schedule
+final_lattice, magnetizations, saved_lattices = simulate_ising_gibbs(L, T_start, T_end, steps, snapshots)
+```
+
+```{python}
+
+# Convert magnetizations dictionary to a list of values sorted by temperature
+plt.figure(figsize=(10, 5))
+sorted_temperatures = sorted(magnetizations.keys())
+sorted_magnetizations = [magnetizations[T] for T in sorted_temperatures]
+plt.plot(sorted_temperatures[::100], sorted_magnetizations[::100], label='Magnetization')
+plt.axvline(x=Tc, color='r', linestyle='--', label=f'Limiting Critical T={Tc:.3f}')
+plt.ylim(-1, 1)
+plt.axhline(0, color='gray', linewidth=0.5)
+plt.xlabel('Temperature')
+plt.ylabel('Magnetization')
+plt.title('Magnetization vs Temperature')
+plt.legend()
+plt.show()
+
+# Visualization of Spin Evolution
+fig, axes = plt.subplots(2, 4, figsize=(10, 5))
+for i, ax in enumerate(axes.flat):
+    T_current = T_start + (T_end - T_start) * (i / snapshots)
+    T_rounded = round(T_current, 4)  # Round to match the keys in the dictionary
+    
+    # find closest temperature in the dictionary
+    closest_T = min(magnetizations.keys(), key=lambda x: abs(x - T_current))
+    ax.imshow(saved_lattices[i], cmap='gray')
+    ax.set_title(f'T={T_current:.2f}, ' + f'M={magnetizations[closest_T]:.2f}')
+    ax.axis('off')
+plt.suptitle('Evolution of Spins Over Cooling')
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def initialize_lattice(L):
+    """Initialize an LxL lattice with random spins (+1 or -1)."""
+    return np.random.choice([-1, 1], size=(L, L))
+
+def magnetization(lattice):
+    """Compute the magnetization of the lattice."""
+    return np.sum(lattice) / lattice.size
+
+def gibbs_step(lattice, beta, J=1):
+    """Perform a single Gibbs sampling step."""
+    L = lattice.shape[0]
+    for i in range(L):
+        for j in range(L):
+            neighbors = lattice[(i+1)%L, j] + lattice[(i-1)%L, j] + \
+                        lattice[i, (j+1)%L] + lattice[i, (j-1)%L]
+            h = J * neighbors
+            P_up = 1 / (1 + np.exp(-2 * beta * h))
+            lattice[i, j] = 1 if np.random.rand() < P_up else -1
+
+def simulate_ising_gibbs(L, T, steps):
+    """Simulate the Ising model using Gibbs sampling with magnetization tracking."""
+    beta = 1 / T
+    lattice = initialize_lattice(L)
+    magnetizations = []
+    
+    for _ in range(steps):
+        gibbs_step(lattice, beta)
+        if _ % (steps // 100) == 0:  # Sample magnetization every 1% of the steps
+            magnetizations.append(magnetization(lattice))
+    
+    return lattice, magnetizations
+
+# Parameters
+L = 20  # Lattice size
+T = 2.0  # Temperature
+steps = 5000  # Number of Gibbs steps
+
+# Run simulation
+final_lattice, magnetizations = simulate_ising_gibbs(L, T, steps)
+
+```
+
+```{python}
+# Visualization
+plt.figure(figsize=(10,4))
+plt.subplot(1, 2, 1)
+plt.imshow(final_lattice, cmap='gray')
+plt.title(f'Ising Model at T={T}')
+
+plt.subplot(1, 2, 2)
+plt.ylim(-1, 1)
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.plot(magnetizations)
+plt.xlabel('Sample Step')
+plt.ylabel('Magnetization')
+plt.title('Magnetization Over Time with Mean {:.2f}'.format(np.mean(magnetizations)))
+
+plt.tight_layout()
+plt.show()
+
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+def initialize_lattice(L):
+    """Initialize a random LxL lattice with spins +/-1."""
+    return np.random.choice([-1, 1], size=(L, L))
+
+def energy(lattice, J=1):
+    """Compute the total energy of the lattice."""
+    L = lattice.shape[0]
+    E = 0
+    for i in range(L):
+        for j in range(L):
+            S = lattice[i, j]
+            neighbors = lattice[(i+1)%L, j] + lattice[i, (j+1)%L] + \
+                        lattice[(i-1)%L, j] + lattice[i, (j-1)%L]
+            E += -J * S * neighbors
+    return E / 2  # Each pair counted twice
+
+def monte_carlo_step(lattice, beta, J=1):
+    """Perform a single Monte Carlo step using the Metropolis algorithm."""
+    L = lattice.shape[0]
+    for _ in range(L*L):
+        i, j = np.random.randint(0, L, size=2)
+        S = lattice[i, j]
+        neighbors = lattice[(i+1)%L, j] + lattice[i, (j+1)%L] + \
+                    lattice[(i-1)%L, j] + lattice[i, (j-1)%L]
+        dE = 2 * J * S * neighbors
+        if dE < 0 or np.random.rand() < np.exp(-beta * dE):
+            lattice[i, j] *= -1
+
+def magnetization(lattice):
+    """Compute the magnetization of the lattice."""
+    return np.sum(lattice) / lattice.size
+
+def simulate_ising(L, T, steps):
+    """Simulate the 2D Ising model for a given temperature and steps."""
+    beta = 1 / T
+    lattice = initialize_lattice(L)
+    magnetizations = []
+    
+    for _ in range(steps):
+        monte_carlo_step(lattice, beta)
+        if _ % (steps // 100) == 0:  # Sample magnetization every 1% of the steps
+            magnetizations.append(magnetization(lattice))
+    return lattice, magnetizations
+
+# Parameters
+L = 20  # Lattice size
+T = 2.5  # Temperature
+steps = 5000  # Number of Monte Carlo steps
+
+# Run simulation
+final_lattice, magnetizations = simulate_ising(L, T, steps)
+
+```
+
+```{python}
+
+# Visualization
+plt.figure(figsize=(10,4))
+plt.subplot(1, 2, 1)
+plt.imshow(final_lattice, cmap='gray')
+plt.title(f'Ising Model at T={T}')
+
+plt.subplot(1, 2, 2)
+plt.ylim(-1, 1)
+plt.axhline(0, color='black', lw=0.5, ls='--')
+plt.plot(magnetizations)
+plt.xlabel('Sample Step')
+plt.ylabel('Magnetization')
+plt.title('Magnetization Over Time with Mean {:.2f}'.format(np.mean(magnetizations)))
+
+plt.tight_layout()
+plt.show()
+```
+
+## Final Remarks
+
+Not all graphs show a phase transition. The Ising model in 1D has no phase transition at any temperature. It was conjectured that the Ising model in 2D has no phase transition either, but this was proven wrong when an analytical solution was found by Lars Onsager in 1944. The Ising model in 3D also has a phase transition, but the critical temperature is not known exactly. Most critical temperatures are only known for limiting cases when the size of the lattice goes to infinity. For finite cases, Monte Carlo simulations are the only way to estimate the critical temperature.

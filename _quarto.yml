@@ -1,0 +1,54 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Monte Carlo Methods"
+  author: "Apurva Nakade"
+  navbar:
+    search: true
+  open-graph: true
+  chapters:
+    - index.qmd
+    - chapters/intro.qmd
+    - part: chapters/sampling/index.qmd
+      chapters:
+        - chapters/sampling/rng.qmd
+        - chapters/sampling/discrete.qmd
+        - chapters/sampling/inverse_transform.qmd
+        - chapters/sampling/other_distributions.qmd
+        - chapters/sampling/accept_reject.qmd
+        - chapters/sampling/gibbs_2d.qmd
+        - chapters/sampling/mh.qmd
+    - part: "Applications"
+      chapters:
+        - chapters/applications/SDE.qmd
+        - chapters/applications/ising.qmd
+        - chapters/applications/mmn.qmd
+        - chapters/applications/bootstrap.qmd
+    - part: "Advanced Topics"
+      chapters:
+        - chapters/advanced/variance_reduction.qmd
+        - chapters/advanced/kalman.qmd
+    - chapters/references.qmd
+  appendices:
+    - appendices/markov_chains.qmd
+    - appendices/hidden_markov.qmd
+  page-footer: "Copyright 2025, Apurva Nakade" 
+
+
+bibliography:
+  references.bib
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+  pdf:
+    documentclass: scrreprt
+
+execute:
+  echo: false
+  freeze: auto  # re-render only when source changes
+  cache: true

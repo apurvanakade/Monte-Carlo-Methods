@@ -1,0 +1,6 @@
+/.quarto/
+*.swp
+.DS_Store
+/_book/
+/_freeze/
+/.jupyter_cache/
