@@ -1,0 +1,65 @@
+---
+title: Estimating $\pi$
+date: 2025-08-04 00:38:57
+author: Apurva Nakade
+toc: true  
+execute:
+  echo: false
+---
+
+
+We'll start with a standard application of Monte Carlo methods: estimating the value of $\pi$.
+
+
+The area of a circle is given by $A = \pi r^2$. The area of a square that circumscribes the circle is given by $4r^2$. The ratio of the area of the circle to the area of the square is $\pi/4$.
+
+If we randomly select $N$ points in the square, the fraction of points that fall inside the circle will be equal to the ratio of the area of the circle to the area of the square. We can use this fact to estimate the value of $\pi.$
+
+```{python}
+#| label: fig-estimate-pi
+#| fig-cap: "Estimating pi by randomly selecting points in the square"
+import numpy as np
+import matplotlib.pyplot as plt
+
+seed = 0          # seed for the random number generator
+r = 1             # radius of the circle
+N = 1000          # number of random points
+
+np.random.seed(seed)
+
+# generate n random points in the square [-r, r] x [-r, r]
+X = np.random.uniform(-r, r, N)
+Y = np.random.uniform(-r, r, N)
+
+# select points inside the circle
+I = np.where(X**2 + Y**2 < r**2, "r", "b")
+
+# draw the circle
+theta = np.linspace(0, 2*np.pi, 100) 
+plt.plot(r*np.cos(theta), r*np.sin(theta), 'k-')
+
+# draw the square 
+plt.plot([-r, -r, r, r, -r], [-r, r, r, -r, -r], 'k-')
+
+# plot the points
+plt.scatter(X, Y, c=I, s=1)
+
+# count the number of points inside the circle
+n_in = np.sum(I == "r")
+
+# estimate the value of pi
+pi = 4*n_in/N
+
+# print the estimate of pi
+plt.title(f"Estimated value of pi: {pi}")
+
+# set the aspect of the plot to be equal
+plt.axis('equal')
+
+plt.show()
+```
+
+## Questions
+
+- How accurate is this estimate of $\pi$ in terms of $N$?
+- Can we improve the estimate by choosing a different sampling technique (other than uniformly sampling on the square)?

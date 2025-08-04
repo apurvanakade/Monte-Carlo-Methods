@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 book:
-  title: "Monte Carlo Methods"
+  title: "Monte Carlo Methods Lecture Notes"
   author: "Apurva Nakade"
   navbar:
     search: true
@@ -11,6 +11,11 @@ book:
   chapters:
     - index.qmd
     - chapters/intro.qmd
+    - part: chapters/estimation/index.qmd
+      chapters:
+        - chapters/estimation/estimating_pi.qmd
+        - chapters/estimation/integrals.qmd
+        - chapters/estimation/variance_reduction.qmd
     - part: chapters/sampling/index.qmd
       chapters:
         - chapters/sampling/rng.qmd
@@ -28,13 +33,19 @@ book:
         - chapters/applications/bootstrap.qmd
     - part: "Advanced Topics"
       chapters:
-        - chapters/advanced/variance_reduction.qmd
-        - chapters/advanced/kalman.qmd
+        - chapters/dynamical/kalman_filters.qmd
+        - chapters/dynamical/particle_filters.qmd
+    - part: "Optimization"
+      chapters:
+        - chapters/optimization/index.qmd
+        - chapters/optimization/simulated_annealing.qmd
+        - chapters/optimization/cross_entropy.qmd
     - chapters/references.qmd
   appendices:
+    - appendices/probability.qmd
     - appendices/markov_chains.qmd
     - appendices/hidden_markov.qmd
-  page-footer: "Copyright 2025, Apurva Nakade" 
+  page-footer: "© 2025 Apurva Nakade. All rights reserved."
 
 
 bibliography:

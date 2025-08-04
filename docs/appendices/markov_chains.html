@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-02-23">
 
-<title>Appendix A — Markov Chains – Monte Carlo Methods</title>
+<title>Appendix B — Markov Chains – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../appendices/hidden_markov.html" rel="next">
-<link href="../chapters/references.html" rel="prev">
+<link href="../appendices/probability.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -102,10 +102,10 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="Appendix A — Markov Chains – Monte Carlo Methods">
+<meta property="og:title" content="Appendix B — Markov Chains – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="markov_chains_files/figure-html/cell-3-output-1.png">
-<meta property="og:site_name" content="Monte Carlo Methods">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light">
@@ -116,7 +116,7 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">Monte Carlo Methods</span>
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
@@ -129,7 +129,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/markov_chains.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/probability.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -144,19 +144,19 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sampling Techniques</span></a>
+            <a href="../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -164,52 +164,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  <a href="../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  <a href="../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  <a href="../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  <a href="../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+            <a href="../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -217,26 +199,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  <a href="../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  <a href="../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  <a href="../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  <a href="../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
@@ -244,7 +244,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Advanced Topics</span></a>
+ <span class="menu-text">Applications</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -252,28 +252,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/advanced/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  <a href="../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../chapters/advanced/kalman.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  <a href="../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
   </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
+ <span class="menu-text">Advanced Topics</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -281,14 +287,78 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../appendices/markov_chains.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../appendices/hidden_markov.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
   </div>
 </li>
       </ul>
@@ -303,25 +373,25 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#definitions" id="toc-definitions" class="nav-link active" data-scroll-target="#definitions"><span class="header-section-number">A.1</span> Definitions</a></li>
-  <li><a href="#stationary-distribution" id="toc-stationary-distribution" class="nav-link" data-scroll-target="#stationary-distribution"><span class="header-section-number">A.2</span> Stationary Distribution</a></li>
-  <li><a href="#fundamental-theorem" id="toc-fundamental-theorem" class="nav-link" data-scroll-target="#fundamental-theorem"><span class="header-section-number">A.3</span> Fundamental Theorem</a></li>
-  <li><a href="#random-walk-on-graphs" id="toc-random-walk-on-graphs" class="nav-link" data-scroll-target="#random-walk-on-graphs"><span class="header-section-number">A.4</span> Random Walk on Graphs</a></li>
-  <li><a href="#mixing-time" id="toc-mixing-time" class="nav-link" data-scroll-target="#mixing-time"><span class="header-section-number">A.5</span> Mixing Time</a>
+  <li><a href="#definitions" id="toc-definitions" class="nav-link active" data-scroll-target="#definitions"><span class="header-section-number">B.1</span> Definitions</a></li>
+  <li><a href="#stationary-distribution" id="toc-stationary-distribution" class="nav-link" data-scroll-target="#stationary-distribution"><span class="header-section-number">B.2</span> Stationary Distribution</a></li>
+  <li><a href="#fundamental-theorem" id="toc-fundamental-theorem" class="nav-link" data-scroll-target="#fundamental-theorem"><span class="header-section-number">B.3</span> Fundamental Theorem</a></li>
+  <li><a href="#random-walk-on-graphs" id="toc-random-walk-on-graphs" class="nav-link" data-scroll-target="#random-walk-on-graphs"><span class="header-section-number">B.4</span> Random Walk on Graphs</a></li>
+  <li><a href="#mixing-time" id="toc-mixing-time" class="nav-link" data-scroll-target="#mixing-time"><span class="header-section-number">B.5</span> Mixing Time</a>
   <ul class="collapse">
-  <li><a href="#connection-to-spectral-theory" id="toc-connection-to-spectral-theory" class="nav-link" data-scroll-target="#connection-to-spectral-theory"><span class="header-section-number">A.5.1</span> Connection to Spectral Theory</a></li>
+  <li><a href="#connection-to-spectral-theory" id="toc-connection-to-spectral-theory" class="nav-link" data-scroll-target="#connection-to-spectral-theory"><span class="header-section-number">B.5.1</span> Connection to Spectral Theory</a></li>
   </ul></li>
-  <li><a href="#sampling-from-a-markov-chain" id="toc-sampling-from-a-markov-chain" class="nav-link" data-scroll-target="#sampling-from-a-markov-chain"><span class="header-section-number">A.6</span> Sampling from a Markov Chain</a></li>
-  <li><a href="#reversible-markov-chains" id="toc-reversible-markov-chains" class="nav-link" data-scroll-target="#reversible-markov-chains"><span class="header-section-number">A.7</span> Reversible Markov Chains</a>
+  <li><a href="#sampling-from-a-markov-chain" id="toc-sampling-from-a-markov-chain" class="nav-link" data-scroll-target="#sampling-from-a-markov-chain"><span class="header-section-number">B.6</span> Sampling from a Markov Chain</a></li>
+  <li><a href="#reversible-markov-chains" id="toc-reversible-markov-chains" class="nav-link" data-scroll-target="#reversible-markov-chains"><span class="header-section-number">B.7</span> Reversible Markov Chains</a>
   <ul class="collapse">
-  <li><a href="#reversibility-and-symmetry" id="toc-reversibility-and-symmetry" class="nav-link" data-scroll-target="#reversibility-and-symmetry"><span class="header-section-number">A.7.1</span> Reversibility and Symmetry</a></li>
+  <li><a href="#reversibility-and-symmetry" id="toc-reversibility-and-symmetry" class="nav-link" data-scroll-target="#reversibility-and-symmetry"><span class="header-section-number">B.7.1</span> Reversibility and Symmetry</a></li>
   </ul></li>
-  <li><a href="#transition-kernels" id="toc-transition-kernels" class="nav-link" data-scroll-target="#transition-kernels"><span class="header-section-number">A.8</span> Transition Kernels</a></li>
-  <li><a href="#analyzing-convergence-of-markov-chains" id="toc-analyzing-convergence-of-markov-chains" class="nav-link" data-scroll-target="#analyzing-convergence-of-markov-chains"><span class="header-section-number">A.9</span> Analyzing Convergence of Markov Chains</a>
+  <li><a href="#transition-kernels" id="toc-transition-kernels" class="nav-link" data-scroll-target="#transition-kernels"><span class="header-section-number">B.8</span> Transition Kernels</a></li>
+  <li><a href="#analyzing-convergence-of-markov-chains" id="toc-analyzing-convergence-of-markov-chains" class="nav-link" data-scroll-target="#analyzing-convergence-of-markov-chains"><span class="header-section-number">B.9</span> Analyzing Convergence of Markov Chains</a>
   <ul class="collapse">
-  <li><a href="#trace-plots" id="toc-trace-plots" class="nav-link" data-scroll-target="#trace-plots"><span class="header-section-number">A.9.1</span> Trace Plots</a></li>
-  <li><a href="#running-average" id="toc-running-average" class="nav-link" data-scroll-target="#running-average"><span class="header-section-number">A.9.2</span> Running Average</a></li>
-  <li><a href="#autocorrelation-function" id="toc-autocorrelation-function" class="nav-link" data-scroll-target="#autocorrelation-function"><span class="header-section-number">A.9.3</span> Autocorrelation Function</a></li>
+  <li><a href="#trace-plots" id="toc-trace-plots" class="nav-link" data-scroll-target="#trace-plots"><span class="header-section-number">B.9.1</span> Trace Plots</a></li>
+  <li><a href="#running-average" id="toc-running-average" class="nav-link" data-scroll-target="#running-average"><span class="header-section-number">B.9.2</span> Running Average</a></li>
+  <li><a href="#autocorrelation-function" id="toc-autocorrelation-function" class="nav-link" data-scroll-target="#autocorrelation-function"><span class="header-section-number">B.9.3</span> Autocorrelation Function</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -329,9 +399,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/markov_chains.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/probability.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/markov_chains.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Appendix A — Markov Chains</h1>
+<h1 class="title">Appendix B — Markov Chains</h1>
 </div>
 
 
@@ -360,11 +430,11 @@ window.Quarto = {
 </header>
 
 
-<section id="definitions" class="level2" data-number="A.1">
-<h2 data-number="A.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">A.1</span> Definitions</h2>
+<section id="definitions" class="level2" data-number="B.1">
+<h2 data-number="B.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">B.1</span> Definitions</h2>
 <p>In this module, we will learn about Markov Chains. A Markov Chain is a discrete-time stochastic process that satisfies the Markov property. The Markov property states that the future state of the process depends only on the current state and not on the sequence of events that preceded it. In other words, the future is conditionally independent of the past given the present.</p>
 <div id="def-Markov-Chain" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.1</strong></span> <strong>Markov Chain</strong>: A Markov chain is a sequence of random variables <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> satisfying the following properties:</p>
+<p><span class="theorem-title"><strong>Definition B.1</strong></span> <strong>Markov Chain</strong>: A Markov chain is a sequence of random variables <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> satisfying the following properties:</p>
 <ol type="1">
 <li><strong>State Space</strong>: The random variables <span class="math inline">\(X_i\)</span> take values in a finite set <span class="math inline">\(\Omega\)</span> called the state space.</li>
 <li><strong>Markov Property</strong>: For all <span class="math inline">\(n \geq 0\)</span> and all states <span class="math inline">\(i_0, i_1, \ldots, i_{n+1} \in \Omega\)</span>,</li>
@@ -378,7 +448,7 @@ P(X_{n+1} = i_{n+1} \mid X_0 = i_0, X_1 = i_1, \ldots, X_n = i_n) = P(X_{n+1} = 
 </div>
 <p>The transition matrix of a Markov chain is a square matrix whose <span class="math inline">\((i, j)\)</span>-th entry is the probability of transitioning from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span> in one time step.</p>
 <div id="def-Transition-Matrix" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.2</strong></span> <strong>Transition Matrix</strong>: Let <span class="math inline">\(X_1, X_2, X_3, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span>. The transition matrix <span class="math inline">\(P\)</span> of the Markov chain is an <span class="math inline">\(N \times N\)</span> matrix whose <span class="math inline">\((i, j)\)</span>-th entry is given by</p>
+<p><span class="theorem-title"><strong>Definition B.2</strong></span> <strong>Transition Matrix</strong>: Let <span class="math inline">\(X_1, X_2, X_3, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span>. The transition matrix <span class="math inline">\(P\)</span> of the Markov chain is an <span class="math inline">\(N \times N\)</span> matrix whose <span class="math inline">\((i, j)\)</span>-th entry is given by</p>
 <p><span class="math display">\[\begin{align*}
 P(i, j) = P(X_{n+1} = j \mid X_n = i).
 \end{align*}\]</span></p>
@@ -387,7 +457,7 @@ P(i, j) = P(X_{n+1} = j \mid X_n = i).
 <p>We can represent a Markov chain by a directed graph called a <strong>state diagram</strong>. Each state is represented by a node, and the transition probabilities are represented by directed edges between the nodes. The transition matrix can be derived from the state diagram by assigning the transition probabilities to the corresponding entries of the matrix.</p>
 <p>The probability distribution of the Markov chain at time <span class="math inline">\(n\)</span> is a <em>row vector</em> <span class="math inline">\(\pi_n\)</span> whose <span class="math inline">\(i^{th}\)</span> entry is <span class="math inline">\(\mathbb{P}(X_n = i)\)</span> for each <span class="math inline">\(i \in \Omega\)</span>.</p>
 <div id="thm-probability-distribution" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.1</strong></span> Let <span class="math inline">\(\pi_n\)</span> be the probability distribution of the chain at time <span class="math inline">\(n\)</span>. Then,</p>
+<p><span class="theorem-title"><strong>Theorem B.1</strong></span> Let <span class="math inline">\(\pi_n\)</span> be the probability distribution of the chain at time <span class="math inline">\(n\)</span>. Then,</p>
 <p><span class="math display">\[\begin{align*}
 \pi_{n+1} = \pi_n P.
 \end{align*}\]</span></p>
@@ -405,10 +475,10 @@ P(i, j) = P(X_{n+1} = j \mid X_n = i).
 \end{align*}\]</span></p>
 </div>
 </section>
-<section id="stationary-distribution" class="level2" data-number="A.2">
-<h2 data-number="A.2" class="anchored" data-anchor-id="stationary-distribution"><span class="header-section-number">A.2</span> Stationary Distribution</h2>
+<section id="stationary-distribution" class="level2" data-number="B.2">
+<h2 data-number="B.2" class="anchored" data-anchor-id="stationary-distribution"><span class="header-section-number">B.2</span> Stationary Distribution</h2>
 <div id="def-Stationary-Distribution" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.3</strong></span> A probability distribution <span class="math inline">\(\pi\)</span> is called a <strong>stationary distribution</strong> of a Markov chain with transition matrix <span class="math inline">\(P\)</span> if <span class="math inline">\(\pi = \pi P\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition B.3</strong></span> A probability distribution <span class="math inline">\(\pi\)</span> is called a <strong>stationary distribution</strong> of a Markov chain with transition matrix <span class="math inline">\(P\)</span> if <span class="math inline">\(\pi = \pi P\)</span>.</p>
 </div>
 <p><span class="math inline">\(P\)</span> is guaranteed to have an eigenvalue of 1 because it’s row sum is 1 i.e.&nbsp;</p>
 <p><span class="math display">\[
@@ -430,28 +500,28 @@ P(i, j) = P(X_{n+1} = j \mid X_n = i).
 \]</span></p>
 <p>We are particularly interested in the case when there is exactly one eigenvector with eigenvalue of magnitude 1 which would then be the stationary distribution of the Markov chain.</p>
 </section>
-<section id="fundamental-theorem" class="level2" data-number="A.3">
-<h2 data-number="A.3" class="anchored" data-anchor-id="fundamental-theorem"><span class="header-section-number">A.3</span> Fundamental Theorem</h2>
+<section id="fundamental-theorem" class="level2" data-number="B.3">
+<h2 data-number="B.3" class="anchored" data-anchor-id="fundamental-theorem"><span class="header-section-number">B.3</span> Fundamental Theorem</h2>
 <div id="def-irreducibility" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.4</strong></span> We say that a Markov Chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span> i.e.&nbsp;it is possible to go from any state to any other state in a finite number of steps.</p>
+<p><span class="theorem-title"><strong>Definition B.4</strong></span> We say that a Markov Chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span> i.e.&nbsp;it is possible to go from any state to any other state in a finite number of steps.</p>
 </div>
 <div id="def-aperiodicity" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic.</p>
+<p><span class="theorem-title"><strong>Definition B.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic.</p>
 </div>
 <p>Note that sometimes we add a preliminary requirement that the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is non-empty. This condition is called <strong>positive recurrence</strong>. We’ll assume this as a part of the definition of aperiodicity.</p>
 <div id="def-ergodicity" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.6</strong></span> A Markov chain is called <strong>ergodic</strong> if it is irreducible and aperiodic.</p>
+<p><span class="theorem-title"><strong>Definition B.6</strong></span> A Markov chain is called <strong>ergodic</strong> if it is irreducible and aperiodic.</p>
 </div>
 <div id="thm-fundamental-theorem" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span> i.e.&nbsp;</p>
+<p><span class="theorem-title"><strong>Theorem B.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span> i.e.&nbsp;</p>
 <p><span class="math display">\[\begin{align*}
 \lim_{n \to \infty} \pi_0 P^n = \Pi,
 \end{align*}\]</span></p>
 <p>for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
 </div>
 </section>
-<section id="random-walk-on-graphs" class="level2" data-number="A.4">
-<h2 data-number="A.4" class="anchored" data-anchor-id="random-walk-on-graphs"><span class="header-section-number">A.4</span> Random Walk on Graphs</h2>
+<section id="random-walk-on-graphs" class="level2" data-number="B.4">
+<h2 data-number="B.4" class="anchored" data-anchor-id="random-walk-on-graphs"><span class="header-section-number">B.4</span> Random Walk on Graphs</h2>
 <p>Our main example of a Markov chain is the random walk on a graph. Let <span class="math inline">\(G = (V, E)\)</span> be a graph with vertex set <span class="math inline">\(V\)</span> and edge set <span class="math inline">\(E\)</span>. Suppose you want to move from one vertex to another by following the edges of the graph. At each vertex, you choose an edge uniformly at random and move to the adjacent vertex. This process is called a random walk on the graph.</p>
 <p>The random walk on <span class="math inline">\(G\)</span> is a Markov chain with state space <span class="math inline">\(\Omega = V\)</span> and transition probabilities given by</p>
 <p><span class="math display">\[\begin{align*}
@@ -463,7 +533,7 @@ P(i, j) =
 \end{align*}\]</span></p>
 <p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> i.e.&nbsp;the number of edges incident to <span class="math inline">\(i\)</span>.</p>
 <div id="exm-random-walk" class="theorem example">
-<p><span class="theorem-title"><strong>Example A.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by</p>
+<p><span class="theorem-title"><strong>Example B.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
   P =
   \begin{pmatrix}
@@ -507,7 +577,7 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 </div>
 <p>In HW, you’ll prove the following theorem about ergodicity of random walks on graphs.</p>
 <div id="thm-ergodicity-random-walk" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.3</strong></span> A random walk on a graph is</p>
+<p><span class="theorem-title"><strong>Theorem B.3</strong></span> A random walk on a graph is</p>
 <ol type="1">
 <li>Irreducible if and only if the graph is connected.</li>
 <li>Aperiodic if and only if the graph is not bipartite.</li>
@@ -519,11 +589,11 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 <p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> and <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
 </div>
 </section>
-<section id="mixing-time" class="level2" data-number="A.5">
-<h2 data-number="A.5" class="anchored" data-anchor-id="mixing-time"><span class="header-section-number">A.5</span> Mixing Time</h2>
+<section id="mixing-time" class="level2" data-number="B.5">
+<h2 data-number="B.5" class="anchored" data-anchor-id="mixing-time"><span class="header-section-number">B.5</span> Mixing Time</h2>
 <p>Assume that the Markov chain is ergodic, and hence has a stationary distribution <span class="math inline">\(\Pi\)</span>. We know that any initial distribution <span class="math inline">\(\pi_0\)</span> converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>. The mixing time measures the rate of this convergence.</p>
 <div id="def-total-variation-distance" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition A.7</strong></span> The <strong>total variation distance</strong> between two probability distributions <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> on a finite state space <span class="math inline">\(\Omega\)</span> is defined as</p>
+<p><span class="theorem-title"><strong>Definition B.7</strong></span> The <strong>total variation distance</strong> between two probability distributions <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> on a finite state space <span class="math inline">\(\Omega\)</span> is defined as</p>
 <p><span class="math display">\[\begin{align*}
 \| \mu - \nu \|_{\text{TV}}
 &amp;= \frac{1}{2} \sum_{i \in \Omega} |\mu(i) - \nu(i)| \\
@@ -541,7 +611,7 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 \end{align*}\]</span></p>
 <p>for all <span class="math inline">\(n \geq N\)</span>. The constant <span class="math inline">\(\frac{1}{4}\)</span> is arbitrary and can be replaced by any other constant in <span class="math inline">\((0, 1)\)</span>. This will only change the value of the mixing time by a constant factor and not the order of magnitude.</p>
 <p>When using Markov chains for sampling, we want the mixing time to be as small as possible. This ensures that the distribution of the chain is close to the stationary distribution after a small number of steps. We think of the time before the chain mixes as a transient phase - the chain has not yet reached equilibrium. This is a burn-in period where we discard the samples. The bigger the mixing time, the more the number of wasted samples in the burn-in phase.</p>
-<p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>A.1</span></a> again. If we start at the vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is 4.</p>
+<p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>B.1</span></a> again. If we start at the vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is 4.</p>
 <p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times.</p>
 <p>In practice, we either provide a theoretical bound on the mixing time or “visually” inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.</p>
 <div id="7e73c217" class="cell" data-execution_count="3">
@@ -553,8 +623,8 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 </div>
 </div>
 </div>
-<section id="connection-to-spectral-theory" class="level3" data-number="A.5.1">
-<h3 data-number="A.5.1" class="anchored" data-anchor-id="connection-to-spectral-theory"><span class="header-section-number">A.5.1</span> Connection to Spectral Theory</h3>
+<section id="connection-to-spectral-theory" class="level3" data-number="B.5.1">
+<h3 data-number="B.5.1" class="anchored" data-anchor-id="connection-to-spectral-theory"><span class="header-section-number">B.5.1</span> Connection to Spectral Theory</h3>
 <p>Continuing the example from above, the matrix <span class="math inline">\(I_4 - P\)</span> is called the <strong>normalized Laplacian matrix</strong> of the graph <span class="math inline">\(G\)</span>.</p>
 <p><span class="math display">\[\begin{align*}
 \mathcal{L} = I_4 - P =
@@ -569,8 +639,8 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 <p>Spectral graph theory, in particular Cheeger inequalities, prove that there is an inverse relationship between the spectral gap of the graph and the mixing time of the random walk on the graph. The smaller the spectral gap, the larger the mixing time. You’ll explore this connection in the homework.</p>
 </section>
 </section>
-<section id="sampling-from-a-markov-chain" class="level2" data-number="A.6">
-<h2 data-number="A.6" class="anchored" data-anchor-id="sampling-from-a-markov-chain"><span class="header-section-number">A.6</span> Sampling from a Markov Chain</h2>
+<section id="sampling-from-a-markov-chain" class="level2" data-number="B.6">
+<h2 data-number="B.6" class="anchored" data-anchor-id="sampling-from-a-markov-chain"><span class="header-section-number">B.6</span> Sampling from a Markov Chain</h2>
 <p>The algorithm to generate sample paths of length <span class="math inline">\(n\)</span> of a Markov Chain is simple. Suppose <span class="math inline">\(P\)</span> is the transition matrix of the Markov Chain with mixing time <span class="math inline">\(t\)</span>. The algorithm is as follows:</p>
 <ol type="1">
 <li>Start at some initial state <span class="math inline">\(X_0\)</span>.</li>
@@ -583,7 +653,7 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 <p>We can interpret this algorithm as generating <span class="math inline">\(N-T\)</span> samples from the stationary distribution of the Markov Chain. The number of samples discarded is called the <strong>burn-in period</strong>.</p>
 <p>One big issue with this algorithm is that the samples are highly correlated. If independence is important, selecting every 40th sample may be beneficial. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
 <div id="exm-random-walk-on-graph" class="theorem example">
-<p><span class="theorem-title"><strong>Example A.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\([0, 14]\)</span> by generating a random walk over a cycle of length 15.</p>
+<p><span class="theorem-title"><strong>Example B.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\([0, 14]\)</span> by generating a random walk over a cycle of length 15.</p>
 <p>The autocorrelation plot below shows the correlation between samples at different lags i.e.&nbsp;<span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
 <p>We can either discard the first 40 samples or select every 40-th sample to reduce the correlation. If independence is important, then we should select every 40-th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
 </div>
@@ -604,15 +674,15 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 </div>
 </div>
 </section>
-<section id="reversible-markov-chains" class="level2" data-number="A.7">
-<h2 data-number="A.7" class="anchored" data-anchor-id="reversible-markov-chains"><span class="header-section-number">A.7</span> Reversible Markov Chains</h2>
+<section id="reversible-markov-chains" class="level2" data-number="B.7">
+<h2 data-number="B.7" class="anchored" data-anchor-id="reversible-markov-chains"><span class="header-section-number">B.7</span> Reversible Markov Chains</h2>
 <p>A Markov Chain is <strong>reversible</strong> with respect to a distribution <span class="math inline">\(\pi\)</span> if the following holds:</p>
 <p><span id="eq-reversible"><span class="math display">\[
 \pi_i P(i, j) = \pi_j P(j, i) \quad \text{for all } i, j.
-\tag{A.1}\]</span></span></p>
-<p>This is saying that the probability of transitioning from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> is the same as the probability of transitioning from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. <a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>A.1</span></a> is known as the <strong>detailed balance equation</strong>.</p>
+\tag{B.1}\]</span></span></p>
+<p>This is saying that the probability of transitioning from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> is the same as the probability of transitioning from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. <a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>B.1</span></a> is known as the <strong>detailed balance equation</strong>.</p>
 <div id="thm-detailed-balance" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.4</strong></span> <strong>(Detailed Balance Equation).</strong> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then <span class="math inline">\(\pi\)</span> is a stationary distribution of the Markov Chain.</p>
+<p><span class="theorem-title"><strong>Theorem B.4</strong></span> <strong>(Detailed Balance Equation).</strong> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then <span class="math inline">\(\pi\)</span> is a stationary distribution of the Markov Chain.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>Suppose the Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Then,</p>
@@ -626,10 +696,10 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 \]</span></p>
 <p>Thus, <span class="math inline">\(\pi\)</span> is the stationary distribution of the Markov Chain.</p>
 </div>
-<p><a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>A.1</span></a> is a sufficient but not necessary condition for <span class="math inline">\(\pi\)</span> to be the stationary distribution of the Markov Chain. You can have a Markov Chain with a stationary distribution that is not reversible.</p>
+<p><a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>B.1</span></a> is a sufficient but not necessary condition for <span class="math inline">\(\pi\)</span> to be the stationary distribution of the Markov Chain. You can have a Markov Chain with a stationary distribution that is not reversible.</p>
 <p>Note that we did not use any properties of the Markov Chain in the proof of the theorem, except that the row sum of the transition matrix is <span class="math inline">\(1\)</span>. A better way to phrase this theorem would be to say that “if the row sum of the transition matrix is <span class="math inline">\(1\)</span> and the detailed balance equation holds, then <span class="math inline">\(\pi\)</span> is an eigenvector of the transition matrix with eigenvalue <span class="math inline">\(1\)</span>.”</p>
 <div id="exm-random-walks-on-graphs" class="theorem example">
-<p><span class="theorem-title"><strong>Example A.3</strong></span> <strong>Random Walks on Graphs.</strong> Consider a graph <span class="math inline">\(G = (V, E)\)</span> with vertices <span class="math inline">\(V\)</span> and edges <span class="math inline">\(E\)</span>. Let <span class="math inline">\(P(i, j) = 1/d(i)\)</span> if <span class="math inline">\((i, j) \in E\)</span> and <span class="math inline">\(0\)</span> otherwise, where <span class="math inline">\(d(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>. Then, the stationary distribution of the Markov Chain is <span class="math inline">\(\pi_i = d(i)/2|E|\)</span>, where <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+<p><span class="theorem-title"><strong>Example B.3</strong></span> <strong>Random Walks on Graphs.</strong> Consider a graph <span class="math inline">\(G = (V, E)\)</span> with vertices <span class="math inline">\(V\)</span> and edges <span class="math inline">\(E\)</span>. Let <span class="math inline">\(P(i, j) = 1/d(i)\)</span> if <span class="math inline">\((i, j) \in E\)</span> and <span class="math inline">\(0\)</span> otherwise, where <span class="math inline">\(d(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>. Then, the stationary distribution of the Markov Chain is <span class="math inline">\(\pi_i = d(i)/2|E|\)</span>, where <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
 <p>The Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Consider two vertices <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. If <span class="math inline">\((i, j) \in E\)</span>, then</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -642,10 +712,10 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 <p>If <span class="math inline">\((i, j) \notin E\)</span>, then <span class="math inline">\(\pi_i P(i, j) = \pi_j P(j, i) = 0\)</span>.</p>
 </div>
 <p>Many Markov chains encountered in practice are reversible with respect to some distribution. It is much easier to check the detailed balance equation than to compute the stationary distribution directly. Moreover, reversible markov chains can be analyzed using spectral methods and we can find good bounds on their mixing time.</p>
-<section id="reversibility-and-symmetry" class="level3" data-number="A.7.1">
-<h3 data-number="A.7.1" class="anchored" data-anchor-id="reversibility-and-symmetry"><span class="header-section-number">A.7.1</span> Reversibility and Symmetry</h3>
+<section id="reversibility-and-symmetry" class="level3" data-number="B.7.1">
+<h3 data-number="B.7.1" class="anchored" data-anchor-id="reversibility-and-symmetry"><span class="header-section-number">B.7.1</span> Reversibility and Symmetry</h3>
 <div id="thm-reversibility-symmetry" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.5</strong></span> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then the matrix</p>
+<p><span class="theorem-title"><strong>Theorem B.5</strong></span> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then the matrix</p>
 <p><span class="math display">\[
 Q = \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}})
 \]</span></p>
@@ -679,15 +749,15 @@ Q(i, j)
 <p>Multiplying the above vector <span class="math inline">\(\mathbf{v}\)</span> by <span class="math inline">\(\text{diag}(\sqrt{\pi})\)</span> gives us the stationary distribution for <span class="math inline">\(P\)</span>.</p>
 </section>
 </section>
-<section id="transition-kernels" class="level2" data-number="A.8">
-<h2 data-number="A.8" class="anchored" data-anchor-id="transition-kernels"><span class="header-section-number">A.8</span> Transition Kernels</h2>
+<section id="transition-kernels" class="level2" data-number="B.8">
+<h2 data-number="B.8" class="anchored" data-anchor-id="transition-kernels"><span class="header-section-number">B.8</span> Transition Kernels</h2>
 <p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability of transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the <strong>density</strong> of the distribution at that point. The transition kernel satisfies the equation:</p>
 <p><span class="math display">\[\begin{align*}
 \mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.
 \end{align*}\]</span></p>
 <p>All the properties of Markov Chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov Chains becomes</p>
 <div id="thm-fundamental-theorem-kernels" class="theorem">
-<p><span class="theorem-title"><strong>Theorem A.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov Chain with transition kernel <span class="math inline">\(K\)</span> is</p>
+<p><span class="theorem-title"><strong>Theorem B.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov Chain with transition kernel <span class="math inline">\(K\)</span> is</p>
 <ol type="1">
 <li><strong>Irreducible</strong>: For all <span class="math inline">\(x, y\)</span>, there exists <span class="math inline">\(n\)</span> such that <span class="math inline">\(K^n(x, y) &gt; 0\)</span>.</li>
 <li><strong>Positive recurrent</strong>: The expected return time to a state is finite.</li>
@@ -699,13 +769,13 @@ Q(i, j)
 \end{align*}\]</span></p>
 </div>
 </section>
-<section id="analyzing-convergence-of-markov-chains" class="level2" data-number="A.9">
-<h2 data-number="A.9" class="anchored" data-anchor-id="analyzing-convergence-of-markov-chains"><span class="header-section-number">A.9</span> Analyzing Convergence of Markov Chains</h2>
+<section id="analyzing-convergence-of-markov-chains" class="level2" data-number="B.9">
+<h2 data-number="B.9" class="anchored" data-anchor-id="analyzing-convergence-of-markov-chains"><span class="header-section-number">B.9</span> Analyzing Convergence of Markov Chains</h2>
 <p>In practice we need to decide how many samples to burn and how many samples to generate. We use various heuristics to decide this.</p>
-<section id="trace-plots" class="level3" data-number="A.9.1">
-<h3 data-number="A.9.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">A.9.1</span> Trace Plots</h3>
+<section id="trace-plots" class="level3" data-number="B.9.1">
+<h3 data-number="B.9.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">B.9.1</span> Trace Plots</h3>
 <p>A trace plot is simply a scatter plot of the samples generated by the Markov Chain. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the trace plot should look like a cloud of points. If the Markov Chain has not converged, the trace plot will show a trend.</p>
-<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the chain does not look uniform even after a 1000 samples but after 5000 samples it is starting to look uniform.</p>
+<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after a 1000 samples but after 5000 samples it is starting to look uniform.</p>
 <div id="aec788e1" class="cell" data-fold="true" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
@@ -716,10 +786,10 @@ Q(i, j)
 </div>
 </div>
 </section>
-<section id="running-average" class="level3" data-number="A.9.2">
-<h3 data-number="A.9.2" class="anchored" data-anchor-id="running-average"><span class="header-section-number">A.9.2</span> Running Average</h3>
+<section id="running-average" class="level3" data-number="B.9.2">
+<h3 data-number="B.9.2" class="anchored" data-anchor-id="running-average"><span class="header-section-number">B.9.2</span> Running Average</h3>
 <p>The running average is the average of the first <span class="math inline">\(n\)</span> samples. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the running average should stabilize around the true mean. If the Markov Chain has not converged, the running average will show a trend.</p>
-<p>Below is the running average plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the running average is stabilizing around the true mean around 3000 samples.</p>
+<p>Below is the running average plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the running average is stabilizing around the true mean around 3000 samples.</p>
 <p>Running averages can be deceptive and show stability even when the Markov Chain has not converged. It is better to use multiple diagnostics to check for convergence. They are better at telling when the Markov Chain has <strong>not</strong> converged than when it has converged.</p>
 <div id="5e050030" class="cell" data-fold="true" data-execution_count="6">
 <div class="cell-output cell-output-display">
@@ -731,14 +801,14 @@ Q(i, j)
 </div>
 </div>
 </section>
-<section id="autocorrelation-function" class="level3" data-number="A.9.3">
-<h3 data-number="A.9.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">A.9.3</span> Autocorrelation Function</h3>
+<section id="autocorrelation-function" class="level3" data-number="B.9.3">
+<h3 data-number="B.9.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">B.9.3</span> Autocorrelation Function</h3>
 <p>One method for finding the burn-in period is to use the autocorrelation function. The <strong>autocorrelation function</strong> of a sequence of numbers <span class="math inline">\(x = (x_0, x_1, \dots, x_n)\)</span> at lag <span class="math inline">\(k\)</span> is defined as</p>
 <p><span class="math display">\[
 \text{ACF}(k) = \text{Corr}(x[k: \:], x[\: :-k])
 \]</span></p>
 <p>where by <span class="math inline">\(x[k:]\)</span> we mean the subsequence <span class="math inline">\(x_k, x_{k+1}, \dots, x_n\)</span> and by <span class="math inline">\(x[:-k]\)</span> we mean the subsequence <span class="math inline">\(x_0, x_1, \dots, x_{n-k}\)</span>. It is the correlation between the sequence <span class="math inline">\(x\)</span> and the same sequence shifted by <span class="math inline">\(k\)</span>. One way to choose a burn-in period is to pick a threshold <span class="math inline">\(\epsilon\)</span> and find the smallest <span class="math inline">\(T\)</span> such that <span class="math inline">\(\text{ACF}(T) &lt; \epsilon\)</span>. Then to be conservative choose a burn-in period of <span class="math inline">\(2T\)</span> or <span class="math inline">\(3T\)</span>.</p>
-<p>Below is the autocorrelation plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>A.2</span></a>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and drops below <span class="math inline">\(0.1\)</span> around <span class="math inline">\(17\)</span>. So a burn-in period of <span class="math inline">\(40\)</span> is a good conservative choice.</p>
+<p>Below is the autocorrelation plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and drops below <span class="math inline">\(0.1\)</span> around <span class="math inline">\(17\)</span>. So a burn-in period of <span class="math inline">\(40\)</span> is a good conservative choice.</p>
 <p>This is just one way to choose the burn-in period. There are many other methods and the choice depends on the application. We will stick to this method for the rest of the course.</p>
 <div id="03659195" class="cell" data-fold="true" data-execution_count="7">
 <div class="cell-output cell-output-display">
@@ -1156,13 +1226,13 @@ Q(i, j)
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span>
+      <a href="../appendices/probability.html" class="pagination-link" aria-label="Review of Probability Theory">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../appendices/hidden_markov.html" class="pagination-link" aria-label="Hidden Markov Chains">
-        <span class="nav-page-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1173,7 +1243,7 @@ Q(i, j)
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Copyright 2025, Apurva Nakade</p>
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;

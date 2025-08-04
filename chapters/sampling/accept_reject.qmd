@@ -394,6 +394,6 @@ Adaptive rejection sampling is another method that tries to find a good proposal
 The method works for log-concave densities but has been extended to more general densities. This would be a good topic for a project.
 
 
-![Gilks, W. R., & Wild, P. (1992). Adaptive Rejection Sampling for Gibbs Sampling. Journal of the Royal Statistical Society. Series C (Applied Statistics), 41(2), 337–348. https://doi.org/10.2307/2347565](images/adaptive.png)
+![Gilks, W. R., & Wild, P. (1992). Adaptive Rejection Sampling for Gibbs Sampling. Journal of the Royal Statistical Society. Series C (Applied Statistics), 41(2), 337–348. https://doi.org/10.2307/2347565](../images/adaptive.png)
 
 

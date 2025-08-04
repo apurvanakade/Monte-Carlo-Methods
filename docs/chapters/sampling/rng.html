@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>2&nbsp; Random Number Generators – Monte Carlo Methods</title>
+<title>7&nbsp; Random Number Generators – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -100,10 +100,10 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="2&nbsp; Random Number Generators – Monte Carlo Methods">
+<meta property="og:title" content="7&nbsp; Random Number Generators – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="images/lava-lamps.jpg">
-<meta property="og:site_name" content="Monte Carlo Methods">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light">
@@ -114,7 +114,7 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Monte Carlo Methods</span>
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
@@ -127,7 +127,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -142,19 +142,19 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sampling Techniques</span></a>
+            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -162,52 +162,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Gibbs 2D</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -215,26 +197,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
@@ -242,7 +242,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Advanced Topics</span></a>
+ <span class="menu-text">Applications</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -250,28 +250,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/kalman.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
   </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
+ <span class="menu-text">Advanced Topics</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -279,14 +285,78 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/markov_chains.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/hidden_markov.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/hidden_markov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
   </div>
 </li>
       </ul>
@@ -301,18 +371,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#pseudo-random-number-generators" id="toc-pseudo-random-number-generators" class="nav-link active" data-scroll-target="#pseudo-random-number-generators"><span class="header-section-number">2.1</span> Pseudo-random number generators</a>
+  <li><a href="#pseudo-random-number-generators" id="toc-pseudo-random-number-generators" class="nav-link active" data-scroll-target="#pseudo-random-number-generators"><span class="header-section-number">7.1</span> Pseudo-random number generators</a>
   <ul class="collapse">
-  <li><a href="#cycle-length" id="toc-cycle-length" class="nav-link" data-scroll-target="#cycle-length"><span class="header-section-number">2.1.1</span> Cycle length</a></li>
-  <li><a href="#linear-congruential-generator" id="toc-linear-congruential-generator" class="nav-link" data-scroll-target="#linear-congruential-generator"><span class="header-section-number">2.1.2</span> Linear Congruential Generator</a></li>
+  <li><a href="#cycle-length" id="toc-cycle-length" class="nav-link" data-scroll-target="#cycle-length"><span class="header-section-number">7.1.1</span> Cycle length</a></li>
+  <li><a href="#linear-congruential-generator" id="toc-linear-congruential-generator" class="nav-link" data-scroll-target="#linear-congruential-generator"><span class="header-section-number">7.1.2</span> Linear Congruential Generator</a></li>
   </ul></li>
-  <li><a href="#statistical-test-of-randomness" id="toc-statistical-test-of-randomness" class="nav-link" data-scroll-target="#statistical-test-of-randomness"><span class="header-section-number">2.2</span> Statistical test of randomness</a>
+  <li><a href="#statistical-test-of-randomness" id="toc-statistical-test-of-randomness" class="nav-link" data-scroll-target="#statistical-test-of-randomness"><span class="header-section-number">7.2</span> Statistical test of randomness</a>
   <ul class="collapse">
-  <li><a href="#chi-square-test" id="toc-chi-square-test" class="nav-link" data-scroll-target="#chi-square-test"><span class="header-section-number">2.2.1</span> Chi-square test</a></li>
-  <li><a href="#mono-bit-test" id="toc-mono-bit-test" class="nav-link" data-scroll-target="#mono-bit-test"><span class="header-section-number">2.2.2</span> Mono-bit test</a></li>
-  <li><a href="#runs-test" id="toc-runs-test" class="nav-link" data-scroll-target="#runs-test"><span class="header-section-number">2.2.3</span> Runs test</a></li>
-  <li><a href="#spectral-test" id="toc-spectral-test" class="nav-link" data-scroll-target="#spectral-test"><span class="header-section-number">2.2.4</span> Spectral test</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">2.2.5</span> Final remarks</a></li>
+  <li><a href="#chi-square-test" id="toc-chi-square-test" class="nav-link" data-scroll-target="#chi-square-test"><span class="header-section-number">7.2.1</span> Chi-square test</a></li>
+  <li><a href="#mono-bit-test" id="toc-mono-bit-test" class="nav-link" data-scroll-target="#mono-bit-test"><span class="header-section-number">7.2.2</span> Mono-bit test</a></li>
+  <li><a href="#runs-test" id="toc-runs-test" class="nav-link" data-scroll-target="#runs-test"><span class="header-section-number">7.2.3</span> Runs test</a></li>
+  <li><a href="#spectral-test" id="toc-spectral-test" class="nav-link" data-scroll-target="#spectral-test"><span class="header-section-number">7.2.4</span> Spectral test</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">7.2.5</span> Final remarks</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -320,9 +390,9 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></h1>
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></h1>
 </div>
 
 
@@ -346,8 +416,8 @@ window.Quarto = {
 <li>It is not enough to find the mean of the distribution. We also need to <strong>estimate the uncertainty</strong> in our estimate. A large uncertainty means that we need to run the simulation multiple times to get a reliable estimate.</li>
 </ol>
 <p>We will keep these principles in mind and revisit them from time to time as we explore more advanced Monte Carlo simulations. For now, let’s focus on the first principle: generating random numbers.</p>
-<section id="pseudo-random-number-generators" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="pseudo-random-number-generators"><span class="header-section-number">2.1</span> Pseudo-random number generators</h2>
+<section id="pseudo-random-number-generators" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="pseudo-random-number-generators"><span class="header-section-number">7.1</span> Pseudo-random number generators</h2>
 <p>A <strong>random number generator</strong> is a function that produces a sequence of numbers that meet certain statistical requirements for randomness. <em>True</em> random number generators are based on physical processes that are fundamentally random, such as radioactive decay or thermal noise. Such systems are useful in cryptography and other applications where true randomness is important for security.</p>
 <p>Below is an example of a true random number generator based on lava lamps called the “wall of entropy”. The lava lamps are used to generate random bits, which are then combined to generate random keys for encryption.</p>
 <p><img src="images/lava-lamps.jpg" width="600"></p>
@@ -369,15 +439,15 @@ window.Quarto = {
 <li>The <strong>Mersenne Twister</strong> is a widely-used PRNG that is fast and has good statistical properties. It is the default PRNG in many programming languages, including Python. However, it is not suitable for cryptographic applications.</li>
 <li><strong>Cryptographically secure PRNGs</strong> are designed to be secure against cryptographic attacks. They are slower than other PRNGs, but they are necessary for applications where security is important.</li>
 </ol>
-<section id="cycle-length" class="level3" data-number="2.1.1">
-<h3 data-number="2.1.1" class="anchored" data-anchor-id="cycle-length"><span class="header-section-number">2.1.1</span> Cycle length</h3>
+<section id="cycle-length" class="level3" data-number="7.1.1">
+<h3 data-number="7.1.1" class="anchored" data-anchor-id="cycle-length"><span class="header-section-number">7.1.1</span> Cycle length</h3>
 <p>In practice, PRNGs generate a random integer between 0 and <span class="math inline">\(M\)</span> for some large number <span class="math inline">\(M\)</span>, and then divide by <span class="math inline">\(M\)</span> to get a random number between 0 and 1. The <strong>period</strong> or <strong>cycle length</strong> of a PRNG is the number of random numbers it can generate before it starts repeating itself. A good PRNG should have a long cycle length.</p>
 <p>However, relying solely on the cycle length to determine the quality of a PRNG is a mistake. A PRNG can have a long cycle length and still have poor statistical properties. For example, a PRNG that generates the sequence</p>
 <p><span class="math display">\[1, 2, 3, 4, 5, \ldots, M-1, M, 1, 2, 3, 4, 5,\]</span></p>
 <p>has a cycle length of <span class="math inline">\(M\)</span>, but it is a terrible PRNG!</p>
 </section>
-<section id="linear-congruential-generator" class="level3" data-number="2.1.2">
-<h3 data-number="2.1.2" class="anchored" data-anchor-id="linear-congruential-generator"><span class="header-section-number">2.1.2</span> Linear Congruential Generator</h3>
+<section id="linear-congruential-generator" class="level3" data-number="7.1.2">
+<h3 data-number="7.1.2" class="anchored" data-anchor-id="linear-congruential-generator"><span class="header-section-number">7.1.2</span> Linear Congruential Generator</h3>
 <p>A <strong>linear congruential generator (LCG)</strong> is an algorithm that yields a sequence of pseudo-randomized <em>integers</em> using a simple recurrence relation. The generator is defined by the recurrence relation:</p>
 <p><span class="math display">\[\begin{equation}
 X_{n+1} = (aX_n + c) \mod m
@@ -406,8 +476,8 @@ X_{n+1} = (aX_n + 1) \mod 2^b,
 <p>with <span class="math inline">\(a \equiv 1 \mod 4\)</span>.</p>
 </section>
 </section>
-<section id="statistical-test-of-randomness" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="statistical-test-of-randomness"><span class="header-section-number">2.2</span> Statistical test of randomness</h2>
+<section id="statistical-test-of-randomness" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="statistical-test-of-randomness"><span class="header-section-number">7.2</span> Statistical test of randomness</h2>
 <p>As mentioned earlier, we test the quality of a PRNG by running statistical tests on the sequence of numbers it generates. The more tests a PRNG passes, the better it is. There exist many “tests suites” that are used to evaluate the quality of PRNGs such as the Diehard tests, the TestU01 suite, and the NIST Statistical Test Suite.</p>
 <p>We’ll look at the following three simple statistical tests of randomness from the NIST Statistical Test Suite:</p>
 <ol type="1">
@@ -421,8 +491,8 @@ X_{n+1} = (aX_n + 1) \mod 2^b,
 <li><span class="math inline">\(H_1\)</span>: The sequence is not random.</li>
 </ul>
 <p>We’ll use the p-value to determine whether to reject the null hypothesis. If the p-value is less than the significance level <span class="math inline">\(\alpha\)</span>, we reject the null hypothesis. If the p-value is greater than <span class="math inline">\(\alpha\)</span>, we fail to reject the null hypothesis.</p>
-<section id="chi-square-test" class="level3" data-number="2.2.1">
-<h3 data-number="2.2.1" class="anchored" data-anchor-id="chi-square-test"><span class="header-section-number">2.2.1</span> Chi-square test</h3>
+<section id="chi-square-test" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="chi-square-test"><span class="header-section-number">7.2.1</span> Chi-square test</h3>
 <p>The chi-square test is a one-sided statistical test that measures how well a sample of data matches a theoretical distribution. The chi-square test is used to test whether the observed data is consistent with the expected data. The test statistic is given by:</p>
 <p><span class="math display">\[\begin{equation}
 \chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}
@@ -446,8 +516,8 @@ If your chi-square value is greater than the critical value, you can reject the 
 </div>
 </div>
 </section>
-<section id="mono-bit-test" class="level3" data-number="2.2.2">
-<h3 data-number="2.2.2" class="anchored" data-anchor-id="mono-bit-test"><span class="header-section-number">2.2.2</span> Mono-bit test</h3>
+<section id="mono-bit-test" class="level3" data-number="7.2.2">
+<h3 data-number="7.2.2" class="anchored" data-anchor-id="mono-bit-test"><span class="header-section-number">7.2.2</span> Mono-bit test</h3>
 <p>The mono-bit test is a two-sided statistical test that checks whether the number of 0s and 1s in the sequence is approximately equal. In a uniform binary sequence, roughly half the bits are 0s and half the bits are 1s.</p>
 <p>Let <span class="math inline">\(X_i\)</span> be the <span class="math inline">\(i\)</span>-th bit in the sequence. Then <span class="math inline">\(X_i\)</span> is a Bernoulli random variable with probability <span class="math inline">\(p = 0.5\)</span>. Because the rv’s <span class="math inline">\(X_i\)</span> are i.i.d., by the , their average</p>
 <p><span class="math display">\[\begin{equation}
@@ -472,8 +542,8 @@ If your z-score is outside of the critical values, you can reject the null hypot
 </div>
 </div>
 </section>
-<section id="runs-test" class="level3" data-number="2.2.3">
-<h3 data-number="2.2.3" class="anchored" data-anchor-id="runs-test"><span class="header-section-number">2.2.3</span> Runs test</h3>
+<section id="runs-test" class="level3" data-number="7.2.3">
+<h3 data-number="7.2.3" class="anchored" data-anchor-id="runs-test"><span class="header-section-number">7.2.3</span> Runs test</h3>
 <p>The Wald-Wolfowitz runs test is a two-sided statistical test that checks whether the number of runs of 0s and 1s in the sequence is consistent with a random sequence. A run is a sequence of consecutive 0s or 1s. In a random sequence, the number of runs of 0s and 1s should be consistent with a random sequence.</p>
 <p>For example, in the sequence 0011100110, there are 5 runs: 00, 111, 00, 11, 0. The runs test checks whether the number of runs of 0s and 1s is consistent with a random sequence.</p>
 <p>Consider a binary sequence of length <span class="math inline">\(k\)</span>. Define a random variable</p>
@@ -501,12 +571,12 @@ If your z-score is outside of the critical values, you can reject the null hypot
 \end{equation}\]</span></p>
 <p>We reject the null hypothesis if <span class="math inline">\(Z &gt; z_{\alpha/2}\)</span> or <span class="math inline">\(Z &lt; -z_{\alpha/2}\)</span> where <span class="math inline">\(z_{\alpha/2}\)</span> is the critical value of the z-test statistic at the significance level <span class="math inline">\(\alpha/2\)</span>. Note that here we use <span class="math inline">\(\alpha/2\)</span> instead of <span class="math inline">\(\alpha\)</span> because this is a two-sided test.</p>
 </section>
-<section id="spectral-test" class="level3" data-number="2.2.4">
-<h3 data-number="2.2.4" class="anchored" data-anchor-id="spectral-test"><span class="header-section-number">2.2.4</span> Spectral test</h3>
+<section id="spectral-test" class="level3" data-number="7.2.4">
+<h3 data-number="7.2.4" class="anchored" data-anchor-id="spectral-test"><span class="header-section-number">7.2.4</span> Spectral test</h3>
 <p>The previous tests fail to detect some of the problems with generating vectors using LCGs. One test for detecting these problems is the spectral test. The spectral test uses the Fast Fourier Transform (FFT) to analyze the spectral properties of the sequence. This test is beyond the scope of this class but you can see some examples in the homework. (This would be a good topic for a project!)</p>
 </section>
-<section id="final-remarks" class="level3" data-number="2.2.5">
-<h3 data-number="2.2.5" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">2.2.5</span> Final remarks</h3>
+<section id="final-remarks" class="level3" data-number="7.2.5">
+<h3 data-number="7.2.5" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">7.2.5</span> Final remarks</h3>
 <p>Note that <em>by definition</em>, a PRNG is not “random” in an absolute sense. The PRNG used in Python, the Mersenne Twister, is sufficiently random for most applications involving simulations. However, it is not suitable for cryptographic applications as it is possible to predict the entire sequence of numbers if you know a limited set of numbers. For cryptographic applications, you should use a cryptographically secure PRNG whose future numbers cannot be predicted easily from past numbers.</p>
 
 
@@ -921,7 +991,7 @@ If your z-score is outside of the critical values, you can reject the null hypot
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/sampling/discrete.html" class="pagination-link" aria-label="Discrete Distributions">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -932,7 +1002,7 @@ If your z-score is outside of the critical values, you can reject the null hypot
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Copyright 2025, Apurva Nakade</p>
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;

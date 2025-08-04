@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-02-09">
 
-<title>6&nbsp; Rejection Sampling – Monte Carlo Methods</title>
+<title>11&nbsp; Rejection Sampling – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -102,10 +102,10 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="6&nbsp; Rejection Sampling – Monte Carlo Methods">
+<meta property="og:title" content="11&nbsp; Rejection Sampling – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="accept_reject_files/figure-html/cell-2-output-1.png">
-<meta property="og:site_name" content="Monte Carlo Methods">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light">
@@ -116,7 +116,7 @@ window.Quarto = {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">Monte Carlo Methods</span>
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
@@ -129,7 +129,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/accept_reject.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/accept_reject.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -144,19 +144,19 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Preface</span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Sampling Techniques</span></a>
+            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -164,52 +164,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -217,26 +199,44 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
@@ -244,7 +244,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Advanced Topics</span></a>
+ <span class="menu-text">Applications</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -252,28 +252,34 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/kalman.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
   </li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">References</span></span></a>
-  </div>
-</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
+ <span class="menu-text">Advanced Topics</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -281,14 +287,78 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/markov_chains.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/hidden_markov.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/hidden_markov.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
   </div>
 </li>
       </ul>
@@ -303,22 +373,22 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#accept-reject-method-v1" id="toc-accept-reject-method-v1" class="nav-link active" data-scroll-target="#accept-reject-method-v1"><span class="header-section-number">6.1</span> Accept-Reject Method v1</a>
+  <li><a href="#accept-reject-method-v1" id="toc-accept-reject-method-v1" class="nav-link active" data-scroll-target="#accept-reject-method-v1"><span class="header-section-number">11.1</span> Accept-Reject Method v1</a>
   <ul class="collapse">
-  <li><a href="#efficiency" id="toc-efficiency" class="nav-link" data-scroll-target="#efficiency"><span class="header-section-number">6.1.1</span> Efficiency</a></li>
+  <li><a href="#efficiency" id="toc-efficiency" class="nav-link" data-scroll-target="#efficiency"><span class="header-section-number">11.1.1</span> Efficiency</a></li>
   </ul></li>
-  <li><a href="#accept-reject-method-v2" id="toc-accept-reject-method-v2" class="nav-link" data-scroll-target="#accept-reject-method-v2"><span class="header-section-number">6.2</span> Accept-Reject Method v2</a></li>
-  <li><a href="#normalizing-constant" id="toc-normalizing-constant" class="nav-link" data-scroll-target="#normalizing-constant"><span class="header-section-number">6.3</span> Normalizing Constant</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">6.4</span> Final remarks</a></li>
+  <li><a href="#accept-reject-method-v2" id="toc-accept-reject-method-v2" class="nav-link" data-scroll-target="#accept-reject-method-v2"><span class="header-section-number">11.2</span> Accept-Reject Method v2</a></li>
+  <li><a href="#normalizing-constant" id="toc-normalizing-constant" class="nav-link" data-scroll-target="#normalizing-constant"><span class="header-section-number">11.3</span> Normalizing Constant</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">11.4</span> Final remarks</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/accept_reject.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/accept_reject.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></h1>
+<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></h1>
 </div>
 
 
@@ -364,13 +434,13 @@ f_{X|Y}(x|y) = \mathbb{P}(X=x|Y=y) = \frac{f_{X,Y}(x,y)}{f_Y(y)}.
 <p>When <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are continuous random variables, the definitions are similar, but we replace the probability mass functions with probability density functions.</p>
 <p>The <strong>accept-reject method</strong> is based on the following theorem:</p>
 <div id="thm-marginal-of-uniform" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 6.1</strong></span> <strong>Theorem (Marginal of Uniform):</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
+<p><span class="theorem-title"><strong>Theorem 11.1</strong></span> <strong>Theorem (Marginal of Uniform):</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
 <p><span id="eq-uniform-joint-distribution"><span class="math display">\[
 f_{X,Y}(x,y) = \begin{cases}
 1, &amp; \text{if } 0 \leq y \leq p(x), \\
 0, &amp; \text{otherwise}.
 \end{cases}
-\tag{6.1}\]</span></span></p>
+\tag{11.1}\]</span></span></p>
 <p>Then the marginal distribution of <span class="math inline">\(X\)</span> is given by <span class="math inline">\(p(x)\)</span>.</p>
 </div>
 <div class="proof">
@@ -380,9 +450,9 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} dy = p(x).
 \end{align*}\]</span></p>
 <p><span class="math inline">\(\blacksquare\)</span></p>
 </div>
-<p>Thus in order to sample from a distribution <span class="math inline">\(p(x)\)</span>, we want to come up with a way to sample from the joint distribution given by (<a href="#eq-uniform-joint-distribution" class="quarto-xref">Equation&nbsp;<span>6.1</span></a>). The accept-reject method is a way to do this.</p>
-<section id="accept-reject-method-v1" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="accept-reject-method-v1"><span class="header-section-number">6.1</span> Accept-Reject Method v1</h2>
+<p>Thus in order to sample from a distribution <span class="math inline">\(p(x)\)</span>, we want to come up with a way to sample from the joint distribution given by (<a href="#eq-uniform-joint-distribution" class="quarto-xref">Equation&nbsp;<span>11.1</span></a>). The accept-reject method is a way to do this.</p>
+<section id="accept-reject-method-v1" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="accept-reject-method-v1"><span class="header-section-number">11.1</span> Accept-Reject Method v1</h2>
 <p>Suppose <span class="math inline">\(p(x)\)</span> is a probability distribution from which we want to sample. Suppose further that <span class="math inline">\(p(x)\)</span> is supported over the interval <span class="math inline">\([a, b]\)</span> and is bounded by <span class="math inline">\(M\)</span>, i.e., <span class="math inline">\(p(x) \leq M\)</span> for all <span class="math inline">\(x \in [a, b]\)</span>.</p>
 <p>The simplest version of the accept-reject method is as follows:</p>
 <ol type="1">
@@ -391,17 +461,17 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} dy = p(x).
 <li>If <span class="math inline">\(y \leq p(x)\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
 </ol>
 <div id="exm-triangular-distribution" class="theorem example">
-<p><span class="theorem-title"><strong>Example 6.1</strong></span> Consider the triangular distribution</p>
+<p><span class="theorem-title"><strong>Example 11.1</strong></span> Consider the triangular distribution</p>
 <p><span id="eq-triangular-distribution"><span class="math display">\[
 p(x) = \begin{cases}
 4x, &amp; \text{if } 0 \leq x \leq 0.5, \\
 4(1-x), &amp; \text{if } 0.5 \leq x \leq 1 \\
 0, &amp; \text{otherwise}.
 \end{cases}
-\tag{6.2}\]</span></span></p>
+\tag{11.2}\]</span></span></p>
 <p>We can use the accept-reject method to sample from this distribution. The density function is supported over <span class="math inline">\([0, 1]\)</span> and is bounded by <span class="math inline">\(M = 2\)</span>.</p>
 </div>
-<div id="2b63c71b" class="cell" data-execution_count="1">
+<div id="19fe2041" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -410,7 +480,7 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="5ad6ea5d" class="cell" data-execution_count="2">
+<div id="0899caea" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -419,7 +489,7 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="f7d7de1e" class="cell" data-execution_count="3">
+<div id="33cc8d1e" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -428,8 +498,8 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<section id="efficiency" class="level3" data-number="6.1.1">
-<h3 data-number="6.1.1" class="anchored" data-anchor-id="efficiency"><span class="header-section-number">6.1.1</span> Efficiency</h3>
+<section id="efficiency" class="level3" data-number="11.1.1">
+<h3 data-number="11.1.1" class="anchored" data-anchor-id="efficiency"><span class="header-section-number">11.1.1</span> Efficiency</h3>
 <p>Note that unlike the methods we have seen so far, the accept-reject method is probabilistic. The method generates uniformly distributed samples in the rectangle of area <span class="math inline">\(M(b-a)\)</span>, where <span class="math inline">\(M\)</span> is the bound on <span class="math inline">\(p(x)\)</span> and <span class="math inline">\([a, b]\)</span> is the support of <span class="math inline">\(p(x)\)</span>. But because <span class="math inline">\(p(x)\)</span> is a probability distribution, the area under the curve is 1. Thus the efficiency of the accept-reject method is given by</p>
 <p><span class="math display">\[\begin{align*}
 \text{Efficiency} = \frac{1}{M(b-a)}.
@@ -437,20 +507,20 @@ p(x) = \begin{cases}
 <p>If <span class="math inline">\(M\)</span> is large i.e.&nbsp;the probability distribution has a large peak, then the efficiency of the accept-reject method is low.</p>
 </section>
 </section>
-<section id="accept-reject-method-v2" class="level2" data-number="6.2">
-<h2 data-number="6.2" class="anchored" data-anchor-id="accept-reject-method-v2"><span class="header-section-number">6.2</span> Accept-Reject Method v2</h2>
+<section id="accept-reject-method-v2" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="accept-reject-method-v2"><span class="header-section-number">11.2</span> Accept-Reject Method v2</h2>
 <p>A better version of the accept-reject method is obtained by replacing the enveloping rectangle with a enveloping curve. The closer the enveloping curve is to the distribution, the higher the efficiency of the method.</p>
 <div id="def-majorizing-function" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 6.1</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. A function <span class="math inline">\(g(x)\)</span> is said to majorize <span class="math inline">\(p(x)\)</span> if <span class="math inline">\(g(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 11.1</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. A function <span class="math inline">\(g(x)\)</span> is said to majorize <span class="math inline">\(p(x)\)</span> if <span class="math inline">\(g(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>.</p>
 <p>In the accept-reject jargon, we call <span class="math inline">\(p(x)\)</span> the <strong>target distribution</strong> and <span class="math inline">\(g(x)\)</span> the <strong>proposal distribution</strong>. Note that a probability distribution can never majorize another probability distribution as the area under the curve is 1. But we can scale the proposal distribution by a constant <span class="math inline">\(M\)</span> such that <span class="math inline">\(Mg(x)\)</span> majorizes <span class="math inline">\(p(x)\)</span>.</p>
 </div>
 <div id="exm-majorizing-function" class="theorem example">
-<p><span class="theorem-title"><strong>Example 6.2</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>6.2</span></a>). We saw that we can use the enveloping rectangle with <span class="math inline">\(M = 2\)</span> to sample from this distribution. The Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution with constant <span class="math inline">\(M = 4/3\)</span>.</p>
+<p><span class="theorem-title"><strong>Example 11.2</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>11.2</span></a>). We saw that we can use the enveloping rectangle with <span class="math inline">\(M = 2\)</span> to sample from this distribution. The Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution with constant <span class="math inline">\(M = 4/3\)</span>.</p>
 <p><span class="math display">\[\begin{align}
 \mathrm{Beta}(2, 2) = 6x(1-x), \quad x \in [0, 1].
 \end{align}\]</span></p>
 </div>
-<div id="16c439bf" class="cell" data-execution_count="4">
+<div id="93f26b6a" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -461,7 +531,7 @@ p(x) = \begin{cases}
 </div>
 <p>In order to run the accept-reject method, we need to sample uniformly from the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis. This can be done using the following theorem:</p>
 <div id="thm-majorizing-function" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 6.2</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(g(x)\)</span> be a probability distribution and let <span class="math inline">\(M\)</span> be a constant. Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables such that <span class="math inline">\(X \sim g(x)\)</span> and <span class="math inline">\((Y | X = x)\sim U(0, Mg(x))\)</span>. Then the joint distribution of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is uniform over the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis.</p>
+<p><span class="theorem-title"><strong>Theorem 11.2</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(g(x)\)</span> be a probability distribution and let <span class="math inline">\(M\)</span> be a constant. Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables such that <span class="math inline">\(X \sim g(x)\)</span> and <span class="math inline">\((Y | X = x)\sim U(0, Mg(x))\)</span>. Then the joint distribution of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is uniform over the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>The conditional probability of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X\)</span> is given by</p>
@@ -497,9 +567,9 @@ f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 <li>If <span class="math inline">\(\log(u) \leq \log(p(x)) - \log(Mg(x))\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
 </ol>
 <div id="exm-majorizing-function" class="theorem example">
-<p><span class="theorem-title"><strong>Example 6.3</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>6.2</span></a>). We saw that the Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution. We can use the accept-reject method to sample from the triangular distribution using the Beta distribution as the proposal distribution. This improves the efficiency of the method from <span class="math inline">\(1/2\)</span> to <span class="math inline">\(3/4\)</span>.</p>
+<p><span class="theorem-title"><strong>Example 11.3</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>11.2</span></a>). We saw that the Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution. We can use the accept-reject method to sample from the triangular distribution using the Beta distribution as the proposal distribution. This improves the efficiency of the method from <span class="math inline">\(1/2\)</span> to <span class="math inline">\(3/4\)</span>.</p>
 </div>
-<div id="43b0e696" class="cell" data-execution_count="5">
+<div id="14723a91" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -508,25 +578,25 @@ f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="1e6909cf" class="cell" data-execution_count="6">
+<div id="1d9d3c00" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="accept_reject_files/figure-html/cell-7-output-1.png" width="579" height="431" class="figure-img"></p>
+<p><img src="accept_reject_files/figure-html/cell-7-output-1.png" width="571" height="431" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="normalizing-constant" class="level2" data-number="6.3">
-<h2 data-number="6.3" class="anchored" data-anchor-id="normalizing-constant"><span class="header-section-number">6.3</span> Normalizing Constant</h2>
+<section id="normalizing-constant" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="normalizing-constant"><span class="header-section-number">11.3</span> Normalizing Constant</h2>
 <p>We often find ourselves in a situation where we know the probability density function <span class="math inline">\(f\)</span> up to a normalizing constant. For example, the gamma distribution has the density function</p>
 <p><span class="math display">\[\begin{align}
 p(x) = c x^{\alpha - 1} e^{-x/\beta},
 \end{align}\]</span></p>
 <p>where <span class="math inline">\(c\)</span> is a normalizing constant. We can compute <span class="math inline">\(c\)</span> by integrating <span class="math inline">\(p(x)\)</span> and setting the integral to 1. But as it turns out we do not need to know <span class="math inline">\(c\)</span> to sample from the distribution. We can use the accept-reject method to sample from the distribution without knowing the normalizing constant. For this we need the following theorem:</p>
 <div id="thm-normalizing-constant" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 6.3</strong></span> <strong>Normalizing Constant:</strong> Let <span class="math inline">\(p(x)\)</span> be any function with a finite integral <span class="math inline">\(c\)</span>. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
+<p><span class="theorem-title"><strong>Theorem 11.3</strong></span> <strong>Normalizing Constant:</strong> Let <span class="math inline">\(p(x)\)</span> be any function with a finite integral <span class="math inline">\(c\)</span>. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
 <p><span class="math display">\[\begin{align}
 f_{X,Y}(x,y) = \begin{cases}
 \frac{1}{c}, &amp; \text{if } 0 \leq y \leq p(x), \\
@@ -549,14 +619,14 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} d
 \end{align*}\]</span></p>
 <p>Note that there is no loss in efficiency due to the unknown normalizing constant as if we can majorize <span class="math inline">\(p(x)\)</span> with <span class="math inline">\(Mg(x)\)</span>, we can majorize the normalized proposal density <span class="math inline">\(p(x)/c\)</span> by <span class="math inline">\(Mg(x)/c\)</span>, giving us the same efficiency.</p>
 </section>
-<section id="final-remarks" class="level2" data-number="6.4">
-<h2 data-number="6.4" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">6.4</span> Final remarks</h2>
+<section id="final-remarks" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">11.4</span> Final remarks</h2>
 <p>If the proposal distribution is not close to the target distribution, then the efficiency of the method is low. In higher dimensions, it is difficult to come up with a good proposal distribution.</p>
 <p>In higher dimensions, we need more sophisticated methods to sample from the target distribution such as Markov Chain Monte Carlo (MCMC) methods. We’ll see some of these methods such as Metropolis-Hastings and Gibbs sampling in the future.</p>
 <p>Adaptive rejection sampling is another method that tries to find a good proposal distribution by using the samples generated so far. The idea is to use the samples to build a piecewise linear majorizing function. This function is then used as the proposal distribution for the accept-reject method. Because the cdf of a piecewise linear function is a quadratic function, it can be inverted easily. The method works for log-concave densities but has been extended to more general densities. This would be a good topic for a project.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/adaptive.png" class="img-fluid figure-img"></p>
+<p><img src="../images/adaptive.png" class="img-fluid figure-img"></p>
 <figcaption>Gilks, W. R., &amp; Wild, P. (1992). Adaptive Rejection Sampling for Gibbs Sampling. Journal of the Royal Statistical Society. Series C (Applied Statistics), 41(2), 337–348. https://doi.org/10.2307/2347565</figcaption>
 </figure>
 </div>
@@ -967,12 +1037,12 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} d
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../../chapters/sampling/other_distributions.html" class="pagination-link" aria-label="Other Distributions">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Other Distributions</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/sampling/gibbs_2d.html" class="pagination-link" aria-label="Gibbs Sampling">
-        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -983,7 +1053,7 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} d
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Copyright 2025, Apurva Nakade</p>
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
 </div>
     <div class="nav-footer-right">
       &nbsp;

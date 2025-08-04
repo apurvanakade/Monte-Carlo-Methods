@@ -1,0 +1,33 @@
+---
+title: "Estimating Integrals"
+
+execute:
+  echo: false
+---
+
+A very common application of Monte Carlo methods is to estimate integrals. The integral 
+$$
+\ell = \int_a^b f(x) dx
+$$
+of a function $f(x)$ over the interval $[a, b]$ can be estimated using the estimator:
+$$
+\hat{\ell} = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i),
+$$
+
+where $X_i$ are i.i.d. samples from the uniform distribution on $[a, b]$. One can check that this is an unbiased estimator,
+
+$$
+\begin{aligned}
+E[\hat{\ell}]
+&= \frac{b - a}{N} \sum_{i=1}^{N} E[f(X_i)] \\
+&= \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} dx \\
+&= \frac{1}{N} \sum_{i=1}^{N} \ell \\
+&= \ell.
+\end{aligned}
+$$
+
+The variance of this estimator is given by
+$$
+\text{Var}(\hat{\ell}) = \frac{(b - a)^2}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) = \frac{(b - a)^2}{N} \cdot \sigma^2(f(X)),
+$$
+where $\sigma^2(f(X))$ is the variance of $f(X)$, and $N$ is the number of samples. 

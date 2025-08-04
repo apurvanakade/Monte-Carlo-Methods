@@ -1,0 +1,35 @@
+---
+title: "Estimation Techniques"
+
+execute:
+  echo: false
+---
+
+An estimator is a function of the data that is used to estimate an unknown parameter. The common situation is when $\ell$ is the expectation of a function of a random variable $X$, i.e., $\ell = E[f(X)]$. A simple estimator of $\ell$ is the sample mean, which is given by
+$$
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i),
+$$ {#eq-crude-estimator}
+
+where $X_1, X_2, \ldots, X_N$ are independent and identically distributed (i.i.d.) samples from the distribution of $X$. The sample mean $\hat{\ell}$ is an unbiased estimator of $\ell$, meaning that $E[\hat{\ell}] = \ell$. By the central limit theorem, as $N$ increases, the distribution of $\hat{\ell}$ approaches a normal distribution with mean $\ell$ and variance $\sigma^2(\hat{\ell}) = \sigma^2(X)/N$, where $\sigma^2(X)$ is the variance of $f(X)$ and $N$ is the number of samples.
+
+## Confidence Intervals
+
+The confidence interval (CI) for $\ell$ is given by
+$$
+\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S}{\sqrt{N}}, \hat{\ell} + z_{1-\alpha/2} \frac{S}{\sqrt{N}} \right],
+$$
+
+where $z_{1-\alpha/2}$ is the critical value from the standard normal distribution corresponding to a significance level of $\alpha$, and $S$ is the sample standard deviation of $f(X)$. The width of the confidence interval is given by
+$$
+\text{Width of CI} = 2z_{1-\alpha/2} \frac{S}{\sqrt{N}}.
+$$
+
+### Relative Confidence Intervals
+
+It is common practice in simulation to use and report the relative widths of the confidence interval, defined as
+$$
+\text{Relative Width} = \frac{\text{Width of CI}}{\hat{\ell}} = 2z_{1-\alpha/2} \frac{S}{\hat{\ell}\sqrt{N}}.
+$$
+
+The relative width of the confidence interval is a measure of the precision of the estimate.
+
