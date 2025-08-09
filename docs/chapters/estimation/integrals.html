@@ -484,12 +484,12 @@ Key Properties
 <p>Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.</p>
 <section id="example-low-vs.-high-frequency-functions" class="level3" data-number="6.3.1">
 <h3 data-number="6.3.1" class="anchored" data-anchor-id="example-low-vs.-high-frequency-functions"><span class="header-section-number">6.3.1</span> Example: Low vs.&nbsp;High Frequency Functions</h3>
-<p>The following example integrates two sine functions over the interval <span class="math inline">\([0, \pi]\)</span>:</p>
+<p>The following example integrates two functions over the interval <span class="math inline">\([0, 2\pi]\)</span>:</p>
 <ul>
-<li><strong>Low frequency</strong>: <span class="math inline">\(f_1(x) = \sin(2x)\)</span> - smooth with few oscillations</li>
-<li><strong>High frequency</strong>: <span class="math inline">\(f_2(x) = \sin(100x)\)</span> - rapidly oscillating with many periods</li>
+<li><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = e^{-x/3}\)</span> — a smooth, slowly varying function</li>
+<li><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = \sin(50x)\)</span> — a rapidly oscillating function with many periods</li>
 </ul>
-<div id="7060c6c2" class="cell" data-execution_count="1">
+<div id="7060c6c2" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -549,7 +549,7 @@ Variance ratio (Osc/Smooth): 2.9x higher</code></pre>
 <section id="example-gaussian-like-function-in-multiple-dimensions" class="level3" data-number="6.4.2">
 <h3 data-number="6.4.2" class="anchored" data-anchor-id="example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">6.4.2</span> Example: Gaussian-like Function in Multiple Dimensions</h3>
 <p>The following example demonstrates Monte Carlo integration of the function <span class="math inline">\(f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}\)</span> over the unit hypercube <span class="math inline">\([0,1]^d\)</span> for dimensions <span class="math inline">\(d = 1, 2, 3, 4, 5\)</span>.</p>
-<div id="cell-fig-multidimensional" class="cell" data-execution_count="2">
+<div id="cell-fig-multidimensional" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div id="fig-multidimensional" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
