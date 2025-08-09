@@ -484,27 +484,18 @@ Key Properties
 <p>Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.</p>
 <section id="example-low-vs.-high-frequency-functions" class="level3" data-number="6.3.1">
 <h3 data-number="6.3.1" class="anchored" data-anchor-id="example-low-vs.-high-frequency-functions"><span class="header-section-number">6.3.1</span> Example: Low vs.&nbsp;High Frequency Functions</h3>
-<p>The following example integrates two functions over the interval <span class="math inline">\([0, 2\pi]\)</span>:</p>
+<p>The following example integrates two functions over the interval <span class="math inline">\([0, \pi]\)</span>:</p>
 <ul>
-<li><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = e^{-x/3}\)</span> — a smooth, slowly varying function</li>
-<li><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = \sin(50x)\)</span> — a rapidly oscillating function with many periods</li>
+<li><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = \sin(x)\)</span> — a smooth, slowly varying function</li>
+<li><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = 25*\sin(25x)\)</span> — a rapidly oscillating function with many periods</li>
 </ul>
-<div id="7060c6c2" class="cell" data-execution_count="2">
+<div id="607c8a04" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="integrals_files/figure-html/cell-2-output-1.png" width="1141" height="753" class="figure-img"></p>
+<p><img src="integrals_files/figure-html/cell-2-output-1.png" width="1145" height="755" class="figure-img"></p>
 </figure>
 </div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Monte Carlo Results (1000 samples, 50 runs each):
-Function     True Value   Mean Est     Std Dev      Error       
------------------------------------------------------------------
-Smooth       2.630566     2.631755     0.046838     0.001189    
-Oscillatory  0.000000     0.001093     0.136233     0.001093    
-
-Variance ratio (Osc/Smooth): 2.9x higher</code></pre>
 </div>
 </div>
 </section>
@@ -512,9 +503,8 @@ Variance ratio (Osc/Smooth): 2.9x higher</code></pre>
 <h3 data-number="6.3.2" class="anchored" data-anchor-id="explanation-of-results"><span class="header-section-number">6.3.2</span> Explanation of Results</h3>
 <p>The comparison reveals several important insights about Monte Carlo integration performance:</p>
 <ol type="1">
-<li><p><strong>Function Visualization (Top Panels)</strong>: The stark contrast between the smooth <span class="math inline">\(\sin(2x)\)</span> and rapidly oscillating <span class="math inline">\(\sin(100x)\)</span> immediately suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.</p></li>
-<li><p><strong>Convergence Behavior (Bottom Left)</strong>: Both functions eventually converge to their true values (shown as dashed horizontal lines), but the high-frequency function exhibits much more erratic convergence with larger fluctuations around the true value.</p></li>
-<li><p><strong>Error Analysis (Bottom Right)</strong>: The log-log error plot reveals that while both functions follow the expected <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.</p></li>
+<li><p><strong>Function Visualization (Top Panels)</strong>: The contrast between the smooth <span class="math inline">\(\sin(x)\)</span> and rapidly oscillating <span class="math inline">\(25\sin(25x)\)</span> suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.</p></li>
+<li><p><strong>Error Analysis</strong>: The log-log error plot reveals that while both functions follow the expected <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.</p></li>
 <li><p><strong>Statistical Summary</strong>: The numerical results quantify the performance difference:</p>
 <ul>
 <li>The low-frequency function achieves good accuracy with relatively few samples</li>
@@ -564,13 +554,13 @@ Figure&nbsp;6.1: Monte Carlo advantage in higher dimensions
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Multidimensional Integration Results From 5000 samples:
+Multidimensional Integration Results From 2500 samples:
  Dimension  Estimate  Std Error  Rel Error
-         1  0.746787   0.002663   0.003566
-         2  0.558120   0.002912   0.005218
-         3  0.416152   0.002850   0.006847
-         4  0.311272   0.002507   0.008055
-         5  0.232565   0.001850   0.007955</code></pre>
+         1  0.747218   0.004232   0.005663
+         2  0.557682   0.004197   0.007526
+         3  0.416811   0.003557   0.008533
+         4  0.311421   0.003541   0.011369
+         5  0.232332   0.003099   0.013337</code></pre>
 </div>
 </div>
 </section>

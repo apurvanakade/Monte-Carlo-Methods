@@ -61,18 +61,19 @@ Monte Carlo integration's performance can vary significantly depending on the ch
 Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.
 
 ### Example: Low vs. High Frequency Functions
-The following example integrates two functions over the interval $[0, 2\pi]$:
+The following example integrates two functions over the interval $[0, \pi]$:
 
-- **Smooth decay**: $f_1(x) = e^{-x/3}$ — a smooth, slowly varying function
-- **Oscillatory**: $f_2(x) = \sin(50x)$ — a rapidly oscillating function with many periods
+- **Smooth decay**: $f_1(x) = \sin(x)$ — a smooth, slowly varying function
+- **Oscillatory**: $f_2(x) = 25*\sin(25x)$ — a rapidly oscillating function with many periods
 
 ```{python}
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
 import pandas as pd
+import seaborn as sns
 
-np.random.seed(42)
+np.random.seed(0)
 
 def monte_carlo_integrate(func, a, b, n_samples):
     x_samples = np.random.uniform(a, b, n_samples)
@@ -80,34 +81,35 @@ def monte_carlo_integrate(func, a, b, n_samples):
 
 # Two contrasting functions
 def smooth(x):
-    return np.exp(-x/3)  # Smooth decay
+    return np.sin(x)  # Smooth oscillation
 
 def oscillatory(x):
-    return np.sin(50*x)  # Rapid oscillations
+    return 25*np.sin(25*x)  # Rapid oscillations
 
 # True values
-a, b = 0, 2*np.pi
-true_smooth, _ = integrate.quad(smooth, a, b)
-true_osc, _ = integrate.quad(oscillatory, a, b)
+a, b = 0, np.pi
+true_smooth = 2 #integrate.quad(smooth, a, b)
+true_osc = 2 #integrate.quad(oscillatory, a, b)
 
 # Visualization
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
 
-x = np.linspace(a, b, 1000)
+x = np.linspace(a, b, 10000)
 
 # Functions
-ax1.plot(x, smooth(x), 'b-', linewidth=2)
-ax1.fill_between(x, 0, smooth(x), alpha=0.3)
-ax1.set_title(r'Smooth: $e^{-x/3}$')
+sns.lineplot(x=x, y=smooth(x), ax=ax1, color='b', linewidth=2)
+ax1.fill_between(x, 0, smooth(x), alpha=0.3, color='b')
+ax1.set_title(r'Smooth: $\sin(x)$')
 ax1.grid(True, alpha=0.3)
 
-ax2.plot(x, oscillatory(x), 'r-', linewidth=2)
-ax2.fill_between(x, 0, oscillatory(x), alpha=0.3)
-ax2.set_title(r'Oscillatory: $\sin(50x)$')
+
+sns.lineplot(x=x, y=oscillatory(x), ax=ax2, color='r', linewidth=2)
+ax2.fill_between(x, 0, oscillatory(x), alpha=0.3, color='r')
+ax2.set_title(r'Oscillatory: $25\sin(25x)$')
 ax2.grid(True, alpha=0.3)
 
 # Convergence
-samples = np.logspace(2, 4, 20).astype(int)
+samples = np.logspace(2, 5, 20).astype(int)
 errors_smooth = [abs(monte_carlo_integrate(smooth, a, b, n) - true_smooth) for n in samples]
 errors_osc = [abs(monte_carlo_integrate(oscillatory, a, b, n) - true_osc) for n in samples]
 
@@ -120,41 +122,46 @@ ax3.legend()
 ax3.grid(True, alpha=0.3)
 
 # Multiple estimates at fixed sample size
-n_test = 1000
-estimates_smooth = [monte_carlo_integrate(smooth, a, b, n_test) for _ in range(50)]
-estimates_osc = [monte_carlo_integrate(oscillatory, a, b, n_test) for _ in range(50)]
+n_test = 10000
+estimates_smooth = [monte_carlo_integrate(smooth, a, b, n_test) for _ in range(25)]
+estimates_osc = [monte_carlo_integrate(oscillatory, a, b, n_test) for _ in range(25)]
 
-ax4.hist(estimates_smooth, bins=15, alpha=0.7, color='blue', label='Smooth')
-ax4.hist(estimates_osc, bins=15, alpha=0.7, color='red', label='Oscillatory')
-ax4.axvline(true_smooth, color='blue', linestyle='--', linewidth=2)
-ax4.axvline(true_osc, color='red', linestyle='--', linewidth=2)
-ax4.set_xlabel('Estimate Value')
-ax4.set_title(f'Distribution of Estimates (n={n_test})')
-ax4.legend()
+# Numerical comparison table as image in ax4
+# Prepare table data
+table_data = [
+    ["Function", "True Value", "Mean Est", "Std Dev", "Error"],
+    ["Smooth", f"{true_smooth:.6f}", f"{np.mean(estimates_smooth):.6f}", f"{np.std(estimates_smooth):.6f}", f"{abs(np.mean(estimates_smooth) - true_smooth):.6f}"],
+    ["Oscillatory", f"{true_osc:.6f}", f"{np.mean(estimates_osc):.6f}", f"{np.std(estimates_osc):.6f}", f"{abs(np.mean(estimates_osc) - true_osc):.6f}"],
+]
+variance_ratio = np.std(estimates_osc)/np.std(estimates_smooth)
+
+# Create table
+ax4.axis('off')
+table = ax4.table(cellText=table_data,
+                  cellLoc='center',
+                  loc='center',
+                  colWidths=[0.18]*5)
+table.auto_set_font_size(False)
+table.set_fontsize(12)
+table.scale(1.2, 1.2)
+
+ax4.set_title(f"Variance ratio (Osc/Smooth): {variance_ratio:.1f}x higher", fontsize=13)
 
 plt.tight_layout()
 plt.show()
 
-# Numerical comparison
-print("Monte Carlo Results (1000 samples, 50 runs each):")
-print(f"{'Function':<12} {'True Value':<12} {'Mean Est':<12} {'Std Dev':<12} {'Error':<12}")
-print("-" * 65)
-print(f"{'Smooth':<12} {true_smooth:<12.6f} {np.mean(estimates_smooth):<12.6f} {np.std(estimates_smooth):<12.6f} {abs(np.mean(estimates_smooth) - true_smooth):<12.6f}")
-print(f"{'Oscillatory':<12} {true_osc:<12.6f} {np.mean(estimates_osc):<12.6f} {np.std(estimates_osc):<12.6f} {abs(np.mean(estimates_osc) - true_osc):<12.6f}")
-print(f"\nVariance ratio (Osc/Smooth): {np.std(estimates_osc)/np.std(estimates_smooth):.1f}x higher")
+
 ```
 
 ### Explanation of Results
 
 The comparison reveals several important insights about Monte Carlo integration performance:
 
-1. **Function Visualization (Top Panels)**: The stark contrast between the smooth $\sin(2x)$ and rapidly oscillating $\sin(100x)$ immediately suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
+1. **Function Visualization (Top Panels)**: The contrast between the smooth $\sin(x)$ and rapidly oscillating $25\sin(25x)$ suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
 
-2. **Convergence Behavior (Bottom Left)**: Both functions eventually converge to their true values (shown as dashed horizontal lines), but the high-frequency function exhibits much more erratic convergence with larger fluctuations around the true value.
+2. **Error Analysis**: The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.
 
-3. **Error Analysis (Bottom Right)**: The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.
-
-4. **Statistical Summary**: The numerical results quantify the performance difference:
+3. **Statistical Summary**: The numerical results quantify the performance difference:
    - The low-frequency function achieves good accuracy with relatively few samples
    - The high-frequency function requires significantly more samples to achieve comparable accuracy
    - Standard errors are notably larger for the oscillatory function, indicating higher variance in estimates
@@ -196,7 +203,7 @@ def multidimensional_example():
         return np.exp(-np.sum(points**2, axis=1))
     
     dimensions = [1, 2, 3, 4, 5]
-    n_samples = 5000
+    n_samples = 2500
     
     results = []
     
@@ -242,7 +249,7 @@ def multidimensional_example():
     plt.tight_layout()
     plt.show()
     
-    print("\nMultidimensional Integration Results From 5000 samples:")
+    print("\nMultidimensional Integration Results From 2500 samples:")
     print(df.to_string(index=False, float_format='%.6f'))
     
     # # Show the actual estimates from one run to see the variation
