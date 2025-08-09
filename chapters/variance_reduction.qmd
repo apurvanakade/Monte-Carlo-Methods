@@ -7,7 +7,6 @@ execute:
   echo: false
 ---
 
-In this notebook we will discuss two methods of variance reduction: **importance sampling** and **antithetic variates**. These methods are used to reduce the variance of an estimator, which can lead to more accurate and efficient estimates. We'll start by reviewing the basic concepts of estimation theory.
 
 
 ### Markov Chain Monte Carlo (MCMC)

@@ -5,6 +5,8 @@ project:
 book:
   title: "Monte Carlo Methods Lecture Notes"
   author: "Apurva Nakade"
+  sidebar:
+    style: docked
   navbar:
     search: true
   open-graph: true
@@ -15,7 +17,6 @@ book:
       chapters:
         - chapters/estimation/estimating_pi.qmd
         - chapters/estimation/integrals.qmd
-        - chapters/estimation/variance_reduction.qmd
     - part: chapters/sampling/index.qmd
       chapters:
         - chapters/sampling/rng.qmd
@@ -25,6 +26,7 @@ book:
         - chapters/sampling/accept_reject.qmd
         - chapters/sampling/gibbs_2d.qmd
         - chapters/sampling/mh.qmd
+    - chapters/variance_reduction.qmd
     - part: "Applications"
       chapters:
         - chapters/applications/SDE.qmd
@@ -56,6 +58,8 @@ format:
     theme:
       - cosmo
       - brand
+    css: 
+      - style.css
   pdf:
     documentclass: scrreprt
 

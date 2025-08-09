@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -101,13 +101,14 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="../../style.css">
 <meta property="og:title" content="5&nbsp; Variance Reduction – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="variance_reduction_files/figure-html/cell-4-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -128,7 +129,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Estimation Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/variance_reduction.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/variance_reduction.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -137,7 +138,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -155,7 +156,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -382,7 +383,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Estimation Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/variance_reduction.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/variance_reduction.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></h1>
 </div>
@@ -454,7 +455,7 @@ window.Quarto = {
 <p><strong>Definition: Importance Sampling.</strong> Let <span class="math inline">\(X\)</span> be a random variable with probability density function (pdf) <span class="math inline">\(p(x)\)</span>, and let <span class="math inline">\(q(x)\)</span> be a proposal pdf such that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>. The importance sampling estimator of <span class="math inline">\(\ell = E[f(X)]\)</span> is given by <span class="math display">\[
 \hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
 \]</span> where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are i.i.d. samples from the distribution with pdf <span class="math inline">\(q(x)\)</span>.</p>
-<p>For clarity, we’ll denote the estimator in <a href="index.html#eq-crude-estimator" class="quarto-xref">Equation&nbsp;<span>1</span></a> as <span class="math inline">\(\hat{\ell}_{crude}\)</span> and the importance sampling estimator as <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
+<p>For clarity, we’ll denote the estimator in <span class="quarto-unresolved-ref">?eq-crude-estimator</span> as <span class="math inline">\(\hat{\ell}_{crude}\)</span> and the importance sampling estimator as <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
 </div>
 <p>Suppose <span class="math inline">\(N = 1\)</span> so that the estimator is given by <span class="math display">\[
 \hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)}.

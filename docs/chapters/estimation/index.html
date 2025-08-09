@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Estimation Techniques – Monte Carlo Methods Lecture Notes</title>
+<title>Monte Carlo Estimation – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -100,12 +100,13 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="Estimation Techniques – Monte Carlo Methods Lecture Notes">
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="Monte Carlo Estimation – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -126,7 +127,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Estimation Techniques</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -135,7 +136,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -153,7 +154,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -171,12 +172,6 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -191,47 +186,53 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
@@ -364,10 +365,10 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#confidence-intervals" id="toc-confidence-intervals" class="nav-link active" data-scroll-target="#confidence-intervals">Confidence Intervals</a>
-  <ul class="collapse">
-  <li><a href="#relative-confidence-intervals" id="toc-relative-confidence-intervals" class="nav-link" data-scroll-target="#relative-confidence-intervals">Relative Confidence Intervals</a></li>
-  </ul></li>
+  <li><a href="#types-of-estimation-problems" id="toc-types-of-estimation-problems" class="nav-link active" data-scroll-target="#types-of-estimation-problems">Types of Estimation Problems</a></li>
+  <li><a href="#the-monte-carlo-estimation-strategy" id="toc-the-monte-carlo-estimation-strategy" class="nav-link" data-scroll-target="#the-monte-carlo-estimation-strategy">The Monte Carlo Estimation Strategy</a></li>
+  <li><a href="#why-this-works" id="toc-why-this-works" class="nav-link" data-scroll-target="#why-this-works">Why This Works</a></li>
+  <li><a href="#whats-next" id="toc-whats-next" class="nav-link" data-scroll-target="#whats-next">What’s Next</a></li>
   </ul>
 </nav>
     </div>
@@ -376,7 +377,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Estimation Techniques</h1>
+<h1 class="title">Monte Carlo Estimation</h1>
 </div>
 
 
@@ -393,27 +394,67 @@ window.Quarto = {
 </header>
 
 
-<p>An estimator is a function of the data that is used to estimate an unknown parameter. The common situation is when <span class="math inline">\(\ell\)</span> is the expectation of a function of a random variable <span class="math inline">\(X\)</span>, i.e., <span class="math inline">\(\ell = E[f(X)]\)</span>. A simple estimator of <span class="math inline">\(\ell\)</span> is the sample mean, which is given by <span id="eq-crude-estimator"><span class="math display">\[
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i),
-\tag{1}\]</span></span></p>
-<p>where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are independent and identically distributed (i.i.d.) samples from the distribution of <span class="math inline">\(X\)</span>. The sample mean <span class="math inline">\(\hat{\ell}\)</span> is an unbiased estimator of <span class="math inline">\(\ell\)</span>, meaning that <span class="math inline">\(E[\hat{\ell}] = \ell\)</span>. By the central limit theorem, as <span class="math inline">\(N\)</span> increases, the distribution of <span class="math inline">\(\hat{\ell}\)</span> approaches a normal distribution with mean <span class="math inline">\(\ell\)</span> and variance <span class="math inline">\(\sigma^2(\hat{\ell}) = \sigma^2(X)/N\)</span>, where <span class="math inline">\(\sigma^2(X)\)</span> is the variance of <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(N\)</span> is the number of samples.</p>
-<section id="confidence-intervals" class="level2">
-<h2 class="anchored" data-anchor-id="confidence-intervals">Confidence Intervals</h2>
-<p>The confidence interval (CI) for <span class="math inline">\(\ell\)</span> is given by <span class="math display">\[
-\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S}{\sqrt{N}}, \hat{\ell} + z_{1-\alpha/2} \frac{S}{\sqrt{N}} \right],
-\]</span></p>
-<p>where <span class="math inline">\(z_{1-\alpha/2}\)</span> is the critical value from the standard normal distribution corresponding to a significance level of <span class="math inline">\(\alpha\)</span>, and <span class="math inline">\(S\)</span> is the sample standard deviation of <span class="math inline">\(f(X)\)</span>. The width of the confidence interval is given by <span class="math display">\[
-\text{Width of CI} = 2z_{1-\alpha/2} \frac{S}{\sqrt{N}}.
-\]</span></p>
-<section id="relative-confidence-intervals" class="level3">
-<h3 class="anchored" data-anchor-id="relative-confidence-intervals">Relative Confidence Intervals</h3>
-<p>It is common practice in simulation to use and report the relative widths of the confidence interval, defined as <span class="math display">\[
-\text{Relative Width} = \frac{\text{Width of CI}}{\hat{\ell}} = 2z_{1-\alpha/2} \frac{S}{\hat{\ell}\sqrt{N}}.
-\]</span></p>
-<p>The relative width of the confidence interval is a measure of the precision of the estimate.</p>
-
-
+<p>One of the most fundamental applications of Monte Carlo methods is <strong>estimation</strong> — using random sampling to approximate unknown quantities. This approach is remarkably versatile, applying equally well to inherently random phenomena and deterministic mathematical problems.</p>
+<section id="types-of-estimation-problems" class="level2">
+<h2 class="anchored" data-anchor-id="types-of-estimation-problems">Types of Estimation Problems</h2>
+<p>Monte Carlo estimation addresses two distinct categories of problems:</p>
+<p><strong>Stochastic quantities</strong>: Values that are naturally random or uncertain</p>
+<ul>
+<li>Future stock prices</li>
+<li>Weather predictions<br>
+</li>
+<li>System reliability measures</li>
+<li>Risk assessments</li>
+</ul>
+<p><strong>Deterministic quantities</strong>: Fixed mathematical values that are difficult to compute directly</p>
+<ul>
+<li>The value of <span class="math inline">\(\pi\)</span></li>
+<li>Complex integrals</li>
+<li>Solutions to differential equations</li>
+<li>High-dimensional optimization problems</li>
+</ul>
 </section>
+<section id="the-monte-carlo-estimation-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="the-monte-carlo-estimation-strategy">The Monte Carlo Estimation Strategy</h2>
+<p>The key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Core Monte Carlo Principle
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To estimate any quantity θ, we:</p>
+<ol type="1">
+<li><strong>Construct</strong> a random variable <span class="math inline">\(X\)</span> such that <span class="math inline">\(\mathbb{E}[X] = \theta\)</span></li>
+<li><strong>Generate</strong> independent samples <span class="math inline">\(x_1, x_2, \ldots, x_n\)</span> from the distribution of <span class="math inline">\(X\)</span><br>
+</li>
+<li><strong>Estimate</strong> θ using the sample average: <span class="math display">\[\hat{\theta} = \frac{1}{n}\sum_{i=1}^{n} x_i\]</span></li>
+</ol>
+</div>
+</div>
+<p>For more details, see <a href="../../appendices/probability.html#sec-estimation-theory" class="quarto-xref"><span>Estimation Theory</span></a>.</p>
+</section>
+<section id="why-this-works" class="level2">
+<h2 class="anchored" data-anchor-id="why-this-works">Why This Works</h2>
+<p>This approach leverages the <strong>Law of Large Numbers</strong>: as the sample size <span class="math inline">\(n\)</span> increases, our estimate <span class="math inline">\(\hat{\theta}\)</span> converges to the true expected value <span class="math inline">\(\theta\)</span>. The beauty lies in converting complex analytical problems into straightforward sampling and averaging procedures.</p>
+</section>
+<section id="whats-next" class="level2">
+<h2 class="anchored" data-anchor-id="whats-next">What’s Next</h2>
+<p>In the following sections, we’ll see:</p>
+<ul>
+<li>Concrete examples demonstrating this estimation framework</li>
+<li>How to construct appropriate random variables <span class="math inline">\(X\)</span> for different problems<br>
+</li>
+<li>Methods for assessing and improving estimation accuracy</li>
+<li>Advanced sampling techniques for enhanced efficiency</li>
+</ul>
+<p>The examples will illustrate how this simple yet powerful principle enables us to tackle problems that would otherwise require sophisticated analytical techniques or be computationally intractable.</p>
+
+
 </section>
 
 </main> <!-- /main -->

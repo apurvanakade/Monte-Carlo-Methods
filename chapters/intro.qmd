@@ -5,29 +5,46 @@ execute:
   echo: false
 ---
 
-## Introduction
+<!-- ![](images/flowchart.png) -->
 
-What are Monte Carlo methods?
+Monte Carlo methods are a powerful class of computational algorithms that harness the power of random sampling to solve complex numerical problems. Named after the famous Monte Carlo Casino in Monaco, these methods transform deterministic problems into probabilistic ones, allowing us to approximate solutions through statistical simulation.
 
+## What are Monte Carlo Methods?
 
-Monte Carlo methods are a broad class of computational algorithms that rely on repeated random sampling to obtain numerical results. Monte Carlo methods are mainly used in three problem classes: 
+At their core, Monte Carlo methods rely on **repeated random sampling** to obtain numerical results for problems that might be difficult or impossible to solve analytically. By generating large numbers of random samples and analyzing their statistical properties, we can approximate solutions with quantifiable uncertainty.
 
+## Key Application Areas
 
-- numerical integration and estimation,
+Monte Carlo methods excel in three primary problem domains:
 
-- simulating physical and mathematical systems,
+::: {.callout-note}
+## Core Applications
+- **Numerical integration and estimation** — Computing integrals, expected values, and other mathematical quantities
+- **Physical and mathematical system simulation** — Modeling complex systems with inherent randomness
+- **Optimization** — Finding optimal solutions in high-dimensional or complex parameter spaces
+:::
 
-- optimization.
+## The Monte Carlo Workflow
 
-![Monte Carlo](images/flowchart.png)
+A typical Monte Carlo analysis follows this systematic approach:
 
-A typical application of MC consists of
+1. **Model formulation**: Develop a mathematical representation of the real-world system, explicitly incorporating relevant random variables
 
-1. Forming a mathematical model for a real world system, usually involving some random variables.
-2. Determining the distribution of the random variables, either completely or partially.
-3. Generating samples from the proposed distribution to run simulations.
-4. Compare results from simulated data with real world observations to update the model.
+2. **Distribution specification**: Determine the probability distributions governing the random variables, using available data, theoretical knowledge, or expert judgment
 
+3. **Simulation**: Generate representative samples from the specified distributions and execute computational experiments
 
+4. **Validation and refinement**: Compare simulation results with empirical observations to assess model adequacy and guide iterative improvements
+
+## Why Monte Carlo Methods Matter
+
+These methods are particularly valuable when dealing with:
+
+- High-dimensional problems where traditional numerical methods become computationally prohibitive
+- Systems with complex, nonlinear relationships
+- Problems involving uncertainty quantification
+- Situations where analytical solutions are intractable
+
+Throughout these notes, we'll explore how Monte Carlo methods provide both theoretical insights and practical solutions across diverse fields, from finance and physics to machine learning and engineering.
 <!-- ![Topics](images/topics.png) -->
 

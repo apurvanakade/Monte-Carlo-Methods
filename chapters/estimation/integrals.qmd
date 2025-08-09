@@ -5,29 +5,295 @@ execute:
   echo: false
 ---
 
-A very common application of Monte Carlo methods is to estimate integrals. The integral 
-$$
-\ell = \int_a^b f(x) dx
-$$
-of a function $f(x)$ over the interval $[a, b]$ can be estimated using the estimator:
-$$
-\hat{\ell} = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i),
-$$
 
-where $X_i$ are i.i.d. samples from the uniform distribution on $[a, b]$. One can check that this is an unbiased estimator,
+Monte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.
 
-$$
-\begin{aligned}
-E[\hat{\ell}]
-&= \frac{b - a}{N} \sum_{i=1}^{N} E[f(X_i)] \\
-&= \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} dx \\
-&= \frac{1}{N} \sum_{i=1}^{N} \ell \\
-&= \ell.
-\end{aligned}
-$$
+# Mathematical Foundation
 
-The variance of this estimator is given by
-$$
-\text{Var}(\hat{\ell}) = \frac{(b - a)^2}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) = \frac{(b - a)^2}{N} \cdot \sigma^2(f(X)),
-$$
-where $\sigma^2(f(X))$ is the variance of $f(X)$, and $N$ is the number of samples. 
+## Problem Setup
+
+We want to estimate the integral:
+$$\ell = \int_a^b f(x) \, dx$$
+
+## The Monte Carlo Estimator
+
+**Key insight**: Rewrite the integral as an expectation. If $X \sim \text{Uniform}(a, b)$:
+
+$$\int_a^b f(x) \, dx = (b-a) \mathbb{E}[f(X)]$$
+
+**Estimator**: Given $N$ samples $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$:
+
+$$\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)$$
+
+::: {.callout-note}
+## Geometric Interpretation
+We're approximating the area under $f(x)$ by averaging function values at random points and scaling by interval width.
+:::
+
+# Theoretical Properties
+
+## Unbiasedness
+
+$$\begin{aligned}
+\mathbb{E}[\hat{\ell}_N] &= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] \\
+&= \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx \\
+&= \frac{1}{N} \sum_{i=1}^{N} \ell = \ell
+\end{aligned}$$
+
+## Variance
+
+$$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$
+
+where $\sigma^2_f = \text{Var}(f(X))$ is the variance of $f(X)$ under uniform distribution.
+
+::: {.callout-important}
+## Key Properties
+- **Standard Error**: $\text{SE} = \frac{(b-a)\sigma_f}{\sqrt{N}}$
+- **Convergence Rate**: $O(1/\sqrt{N})$ regardless of dimension
+- **CLT**: $\sqrt{N}(\hat{\ell}_N - \ell) \xrightarrow{d} \mathcal{N}(0, (b-a)^2\sigma^2_f)$
+:::
+
+
+## Example: Polynomial Integration
+
+Monte Carlo integration's performance can vary significantly depending on the characteristics of the function being integrated. While the method's convergence rate is theoretically independent of function complexity, practical performance depends heavily on the function's smoothness and oscillatory behavior. 
+
+Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.
+
+### Example: Low vs. High Frequency Functions
+
+The following example integrates two sine functions over the interval $[0, \pi]$:
+
+- **Low frequency**: $f_1(x) = \sin(2x)$ - smooth with few oscillations
+- **High frequency**: $f_2(x) = \sin(100x)$ - rapidly oscillating with many periods
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import integrate
+import pandas as pd
+
+np.random.seed(42)
+
+def monte_carlo_integrate(func, a, b, n_samples):
+    x_samples = np.random.uniform(a, b, n_samples)
+    return (b - a) * np.mean(func(x_samples))
+
+# Two contrasting functions
+def smooth(x):
+    return np.exp(-x/3)  # Smooth decay
+
+def oscillatory(x):
+    return np.sin(50*x)  # Rapid oscillations
+
+# True values
+a, b = 0, 2*np.pi
+true_smooth, _ = integrate.quad(smooth, a, b)
+true_osc, _ = integrate.quad(oscillatory, a, b)
+
+# Visualization
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
+
+x = np.linspace(a, b, 1000)
+
+# Functions
+ax1.plot(x, smooth(x), 'b-', linewidth=2)
+ax1.fill_between(x, 0, smooth(x), alpha=0.3)
+ax1.set_title(r'Smooth: $e^{-x/3}$')
+ax1.grid(True, alpha=0.3)
+
+ax2.plot(x, oscillatory(x), 'r-', linewidth=2)
+ax2.fill_between(x, 0, oscillatory(x), alpha=0.3)
+ax2.set_title(r'Oscillatory: $\sin(50x)$')
+ax2.grid(True, alpha=0.3)
+
+# Convergence
+samples = np.logspace(2, 4, 20).astype(int)
+errors_smooth = [abs(monte_carlo_integrate(smooth, a, b, n) - true_smooth) for n in samples]
+errors_osc = [abs(monte_carlo_integrate(oscillatory, a, b, n) - true_osc) for n in samples]
+
+ax3.loglog(samples, errors_smooth, 'b-o', label='Smooth', linewidth=2)
+ax3.loglog(samples, errors_osc, 'r-s', label='Oscillatory', linewidth=2)
+ax3.set_xlabel('Sample Size')
+ax3.set_ylabel('Absolute Error')
+ax3.set_title('Error vs Sample Size')
+ax3.legend()
+ax3.grid(True, alpha=0.3)
+
+# Multiple estimates at fixed sample size
+n_test = 1000
+estimates_smooth = [monte_carlo_integrate(smooth, a, b, n_test) for _ in range(50)]
+estimates_osc = [monte_carlo_integrate(oscillatory, a, b, n_test) for _ in range(50)]
+
+ax4.hist(estimates_smooth, bins=15, alpha=0.7, color='blue', label='Smooth')
+ax4.hist(estimates_osc, bins=15, alpha=0.7, color='red', label='Oscillatory')
+ax4.axvline(true_smooth, color='blue', linestyle='--', linewidth=2)
+ax4.axvline(true_osc, color='red', linestyle='--', linewidth=2)
+ax4.set_xlabel('Estimate Value')
+ax4.set_title(f'Distribution of Estimates (n={n_test})')
+ax4.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Numerical comparison
+print("Monte Carlo Results (1000 samples, 50 runs each):")
+print(f"{'Function':<12} {'True Value':<12} {'Mean Est':<12} {'Std Dev':<12} {'Error':<12}")
+print("-" * 65)
+print(f"{'Smooth':<12} {true_smooth:<12.6f} {np.mean(estimates_smooth):<12.6f} {np.std(estimates_smooth):<12.6f} {abs(np.mean(estimates_smooth) - true_smooth):<12.6f}")
+print(f"{'Oscillatory':<12} {true_osc:<12.6f} {np.mean(estimates_osc):<12.6f} {np.std(estimates_osc):<12.6f} {abs(np.mean(estimates_osc) - true_osc):<12.6f}")
+print(f"\nVariance ratio (Osc/Smooth): {np.std(estimates_osc)/np.std(estimates_smooth):.1f}x higher")
+```
+
+### Explanation of Results
+
+The comparison reveals several important insights about Monte Carlo integration performance:
+
+1. **Function Visualization (Top Panels)**: The stark contrast between the smooth $\sin(2x)$ and rapidly oscillating $\sin(100x)$ immediately suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
+
+2. **Convergence Behavior (Bottom Left)**: Both functions eventually converge to their true values (shown as dashed horizontal lines), but the high-frequency function exhibits much more erratic convergence with larger fluctuations around the true value.
+
+3. **Error Analysis (Bottom Right)**: The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.
+
+4. **Statistical Summary**: The numerical results quantify the performance difference:
+   - The low-frequency function achieves good accuracy with relatively few samples
+   - The high-frequency function requires significantly more samples to achieve comparable accuracy
+   - Standard errors are notably larger for the oscillatory function, indicating higher variance in estimates
+
+### Key Takeaways
+
+- **Smooth functions** are well-suited for Monte Carlo integration, converging quickly with relatively few samples
+- **Highly oscillatory functions** present challenges, requiring larger sample sizes and exhibiting higher variance
+- For oscillatory integrals, consider **alternative approaches** such as:
+  - Stratified sampling to ensure adequate coverage of oscillation periods
+  - Importance sampling with distributions that account for function behavior
+  - Specialized quadrature methods designed for oscillatory integrals
+  - Transformation techniques to reduce oscillations
+
+This example demonstrates why understanding your function's characteristics is crucial for effective Monte Carlo integration.
+
+
+## Multidimensional Integration
+
+### Introduction
+
+One of Monte Carlo integration's greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson's rule) suffer from the "curse of dimensionality"—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their $O(1/\sqrt{n})$ convergence rate regardless of dimension.
+
+In $d$ dimensions, a grid-based method with $m$ points per dimension requires $m^d$ total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.
+
+### Example: Gaussian-like Function in Multiple Dimensions
+
+The following example demonstrates Monte Carlo integration of the function $f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}$ over the unit hypercube $[0,1]^d$ for dimensions $d = 1, 2, 3, 4, 5$. 
+
+```{python}
+#| label: fig-multidimensional
+#| fig-cap: "Monte Carlo advantage in higher dimensions"
+
+def multidimensional_example():
+    """Demonstrate MC integration in higher dimensions"""
+    
+    # Function: exp(-||x||²) over unit hypercube
+    def f_nd(points):
+        return np.exp(-np.sum(points**2, axis=1))
+    
+    dimensions = [1, 2, 3, 4, 5]
+    n_samples = 5000
+    
+    results = []
+    
+    for dim in dimensions:
+        estimates = []
+        for _ in range(100):  # Multiple runs
+            # Sample points in [0,1]^d
+            points = np.random.uniform(0, 1, (n_samples, dim))
+            f_values = f_nd(points)
+            estimate = np.mean(f_values)  # Volume of unit cube is 1
+            estimates.append(estimate)
+        
+        mean_est = np.mean(estimates)
+        std_est = np.std(estimates)
+        
+        results.append({
+            'Dimension': dim,
+            'Estimate': mean_est,
+            'Std Error': std_est,
+            'Rel Error': std_est/mean_est if mean_est > 0 else np.inf
+        })
+    
+    df = pd.DataFrame(results)
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+    
+    # Estimates by dimension with error bars
+    ax1.errorbar(df['Dimension'], df['Estimate'], 
+                yerr=df['Std Error'], 
+                fmt='bo-', linewidth=2, markersize=8, capsize=5, capthick=2)
+    ax1.set_xlabel('Dimension')
+    ax1.set_ylabel('Integral Estimate')
+    ax1.set_title('Integration by Dimension')
+    ax1.grid(True, alpha=0.3)
+    
+    # Relative error with error bars showing uncertainty in the error estimate
+    ax2.semilogy(df['Dimension'], df['Rel Error'], 'ro-', linewidth=2, markersize=8)
+    ax2.set_xlabel('Dimension')
+    ax2.set_ylabel('Relative Error')
+    ax2.set_title('Relative Error vs Dimension')
+    ax2.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    print("\nMultidimensional Integration Results From 5000 samples:")
+    print(df.to_string(index=False, float_format='%.6f'))
+    
+    # # Show the actual estimates from one run to see the variation
+    # print(f"\nSample of estimates for dimension 3 (first 10 runs):")
+    # points_3d = [np.random.uniform(0, 1, (n_samples, 3)) for _ in range(10)]
+    # estimates_3d = [np.mean(f_nd(points)) for points in points_3d]
+    # for i, est in enumerate(estimates_3d):
+    #     print(f"Run {i+1}: {est:.6f}")
+    # print(f"Standard deviation: {np.std(estimates_3d):.6f}")
+
+multidimensional_example()
+```
+
+### Explanation of Results
+
+The example reveals several key insights about multidimensional integration:
+
+1. **Decreasing Integral Values**: As dimension increases, the integral value decreases rapidly. This occurs because the function $e^{-\|\mathbf{x}\|^2}$ decays exponentially with distance from the origin, and in higher dimensions, most of the unit hypercube's volume lies far from the origin.
+
+2. **Stable Relative Error**: Despite the changing integral magnitudes, the relative error remains relatively stable across dimensions. This demonstrates Monte Carlo's dimension-independent convergence behavior—a crucial advantage over grid-based methods.
+
+3. **Computational Efficiency**: Each dimension uses exactly the same number of function evaluations (5,000), showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods.
+
+This behavior makes Monte Carlo integration indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling, where traditional quadrature rules become computationally infeasible.
+
+# Key Insights
+
+::: {.callout-tip}
+## When to Use Monte Carlo Integration
+
+**Advantages:**
+
+- **High dimensions**: Performance doesn't degrade with dimension
+- **Complex domains**: Easy to handle irregular integration regions
+- **Rough functions**: Works with discontinuous or highly oscillatory functions
+
+**Disadvantages:**
+
+- **Slow convergence**: $O(1/\sqrt{N})$ rate
+- **Random error**: Introduces stochastic uncertainty
+- **Low dimensions**: Often outperformed by deterministic methods
+:::
+
+## Practical Considerations
+
+1. **Sample size**: Need large $N$ for high precision
+2. **Function smoothness**: Smoother functions → lower variance → better estimates
+3. **Variance reduction**: Techniques like antithetic variables can improve efficiency
+4. **Error estimation**: Use sample variance to estimate uncertainty
+
+# Conclusion
+
+Monte Carlo integration transforms integration into a sampling problem, making it invaluable for high-dimensional problems where traditional quadrature fails. While it converges slowly, its dimension-independent performance and ability to handle complex functions make it essential for modern computational statistics and machine learning applications.

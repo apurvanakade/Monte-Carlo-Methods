@@ -4,3 +4,202 @@ title: "Review of Probability Theory"
 execute:
   echo: false
 ---
+
+
+This appendix reviews core probability and estimation concepts needed for Monte Carlo methods, including probability spaces, random variables, unbiased estimation, and the Law of Large Numbers and Central Limit Theorem.
+
+## Random Variables and Probability Theory
+
+### Probability Spaces
+
+A **probability space** is a triple $(\Omega, \mathcal{F}, P)$ where:
+
+- $\Omega$ is the sample space (set of all possible outcomes)
+- $\mathcal{F}$ is a $\sigma$-algebra on $\Omega$ (collection of measurable events)
+- $P: \mathcal{F} \to [0,1]$ is a probability measure satisfying Kolmogorov's axioms
+
+### Random Variables and Distributions
+
+A **random variable** is a measurable function $X: \Omega \to \mathbb{R}$ such that $\{X \leq x\} \in \mathcal{F}$ for all $x \in \mathbb{R}$.
+
+The **cumulative distribution function (CDF)** of $X$ is:
+$$F_X(x) = P(X \leq x) = P(\{\omega \in \Omega : X(\omega) \leq x\})$$
+
+**Continuous random variables** have a **probability density function (PDF)** $f_X(x)$ such that:
+$$F_X(x) = \int_{-\infty}^{x} f_X(t) \, dt \quad \text{and} \quad f_X(x) = \frac{dF_X(x)}{dx}$$
+
+**Discrete random variables** with support $\{x_1, x_2, \ldots\}$ satisfy:
+$$P(X = x_i) = p_i \quad \text{where} \quad \sum_{i} p_i = 1$$
+
+### Moments
+
+For a random variable $X$:
+
+**Expected value**:
+$$\mathbb{E}[X] = \begin{cases} 
+\sum_{i} x_i \cdot P(X = x_i) & \text{if } X \text{ is discrete} \\
+\int_{-\infty}^{\infty} x \cdot f_X(x) \, dx & \text{if } X \text{ is continuous}
+\end{cases}$$
+
+**Variance**:
+$$\text{Var}(X) = \mathbb{E}[(X - \mathbb{E}[X])^2] = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$$
+
+## Estimation Theory {#sec-estimation-theory}
+
+### Problem Setup
+
+Consider i.i.d. observations $X_1, \ldots, X_N$ with common distribution $F$. We seek to estimate $\theta = \mathbb{E}[g(X)]$ for some measurable function $g: \mathbb{R} \to \mathbb{R}$.
+
+The **sample mean estimator** is:
+$$\hat{\theta}_N = \frac{1}{N} \sum_{i=1}^{N} g(X_i)$$ {#eq-sample-mean}
+
+### Properties of the Sample Mean Estimator
+
+::: {.callout-note}
+## Fundamental Properties
+
+**Unbiasedness**: $\mathbb{E}[\hat{\theta}_N] = \theta$
+
+**Variance**: $\text{Var}(\hat{\theta}_N) = \frac{\sigma^2}{N}$ where $\sigma^2 = \text{Var}(g(X))$
+
+**Standard Error**: $\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N}$
+:::
+
+### Asymptotic Theory
+
+::: {.callout-important}
+## Fundamental Limit Theorems
+
+**Strong Law of Large Numbers**: If $\mathbb{E}[|g(X)|] < \infty$, then
+$$\hat{\theta}_N \xrightarrow{a.s.} \theta \quad \text{as } N \to \infty$$
+
+**Central Limit Theorem**: If $\sigma^2 = \text{Var}(g(X)) < \infty$, then
+$$\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2) \quad \text{as } N \to \infty$$
+:::
+
+### Bias and Mean Squared Error
+
+For any estimator $\hat{\theta}$ of parameter $\theta$:
+
+- **Bias**: $\text{Bias}(\hat{\theta}) = \mathbb{E}[\hat{\theta}] - \theta$
+- **Mean Squared Error**: $\text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \text{Var}(\hat{\theta}) + \text{Bias}^2(\hat{\theta})$
+
+The sample mean estimator is unbiased with $\text{MSE}(\hat{\theta}_N) = \text{Var}(\hat{\theta}_N) = \sigma^2/N$.
+
+### Consistency
+
+An estimator sequence $\{\hat{\theta}_N\}$ is:
+
+- **Consistent** if $\hat{\theta}_N \xrightarrow{P} \theta$ as $N \to \infty$
+- **Strongly consistent** if $\hat{\theta}_N \xrightarrow{a.s.} \theta$ as $N \to \infty$
+- **Asymptotically normal** if $\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \tau^2)$ for some $\tau^2 > 0$
+
+## Confidence Intervals
+
+### Construction
+
+Let $S_N^2 = \frac{1}{N-1}\sum_{i=1}^{N}(g(X_i) - \hat{\theta}_N)^2$ be the sample variance. By the CLT:
+$$\frac{\hat{\theta}_N - \theta}{S_N/\sqrt{N}} \xrightarrow{d} \mathcal{N}(0,1)$$
+
+An asymptotic $(1-\alpha)$-level confidence interval is:
+$$\left[ \hat{\theta}_N - z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}, \quad \hat{\theta}_N + z_{1-\alpha/2} \frac{S_N}{\sqrt{N}} \right]$$
+
+where $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$ and $\Phi$ is the standard normal CDF.
+
+### Width Analysis
+
+**Absolute width**:
+$$\text{Width} = 2z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}$$
+
+**Relative width**:
+$$\text{RW}_N = \frac{2z_{1-\alpha/2} S_N}{|\hat{\theta}_N|\sqrt{N}}$$
+
+### Convergence Rate
+
+The **convergence rate** of an estimator describes how quickly the estimation error decreases as sample size increases. For the sample mean estimator, the standard error decreases as $O(N^{-1/2})$, meaning:
+
+$$\text{SE}(\hat{\theta}_N) = \frac{\sigma}{\sqrt{N}} = O(N^{-1/2})$$
+
+This rate is independent of the dimension of the integration domain, which is the key advantage of Monte Carlo methods over deterministic quadrature rules in high-dimensional problems.
+
+::: {.callout-tip}
+## Monte Carlo Convergence Properties
+
+1. **Square Root Law**: To halve the confidence interval width, need four times as many samples
+
+2. **Dimension Independence**: For **independent samples**, the standard error decreases as $O(N^{-1/2})$, independent of problem dimension. This is the fundamental advantage over deterministic methods.
+
+3. **MCMC Caveat**: When independent sampling is impossible and MCMC is used, high-dimensional problems can suffer from poor mixing and high autocorrelation, effectively reducing the number of independent samples.
+
+4. **Scale Invariance**: Relative width provides scale-invariant precision measure
+:::
+
+## Fundamental Limit Theorems
+
+The theoretical foundation of Monte Carlo methods rests on two cornerstone results from probability theory: the Law of Large Numbers and the Central Limit Theorem.
+
+### Law of Large Numbers (LLN)
+
+The Law of Large Numbers justifies why sample averages converge to expected values.
+
+::: {.callout-note}
+## Weak Law of Large Numbers (WLLN)
+Let $X_1, X_2, \ldots$ be i.i.d. random variables with $\mathbb{E}[X_i] = \mu$ and $\text{Var}(X_i) = \sigma^2 < \infty$. Then:
+$$\frac{1}{N}\sum_{i=1}^{N} X_i \xrightarrow{P} \mu \quad \text{as } N \to \infty$$
+:::
+
+::: {.callout-note}
+## Strong Law of Large Numbers (SLLN)
+Under the same conditions, we have the stronger result:
+$$\frac{1}{N}\sum_{i=1}^{N} X_i \xrightarrow{a.s.} \mu \quad \text{as } N \to \infty$$
+:::
+
+**Convergence notation:**
+
+- $\xrightarrow{P}$: convergence in probability
+- $\xrightarrow{a.s.}$: almost sure convergence (stronger than convergence in probability)
+
+**Monte Carlo implication:** For our estimator $\hat{\theta}_N = \frac{1}{N}\sum_{i=1}^{N} g(X_i)$, the SLLN guarantees that $\hat{\theta}_N \to \theta$ almost surely, providing the **consistency** of our estimator.
+
+### Central Limit Theorem (CLT)
+
+While the LLN tells us that sample averages converge to the true mean, the CLT describes the **rate and distribution** of this convergence.
+
+::: {.callout-important}
+## Central Limit Theorem
+Let $X_1, X_2, \ldots$ be i.i.d. random variables with $\mathbb{E}[X_i] = \mu$ and $0 < \text{Var}(X_i) = \sigma^2 < \infty$. Then:
+$$\frac{\sqrt{N}(\bar{X}_N - \mu)}{\sigma} \xrightarrow{d} \mathcal{N}(0,1) \quad \text{as } N \to \infty$$
+
+where $\bar{X}_N = \frac{1}{N}\sum_{i=1}^{N} X_i$ and $\xrightarrow{d}$ denotes convergence in distribution.
+:::
+
+**Equivalent formulations:**
+$$\sqrt{N}(\bar{X}_N - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2)$$
+$$\bar{X}_N \xrightarrow{d} \mathcal{N}\left(\mu, \frac{\sigma^2}{N}\right) \quad \text{(approximately, for large } N\text{)}$$
+
+### Monte Carlo Applications
+
+**For our estimator** $\hat{\theta}_N = \frac{1}{N}\sum_{i=1}^{N} g(X_i)$ where $\theta = \mathbb{E}[g(X)]$:
+
+1. **Consistency** (from SLLN): $\hat{\theta}_N \xrightarrow{a.s.} \theta$
+
+2. **Asymptotic normality** (from CLT): 
+   $$\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2)$$
+   where $\sigma^2 = \text{Var}(g(X))$
+
+3. **Standard error**: $\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N}$
+
+4. **Confidence intervals**: For large $N$,
+   $$P\left(\theta \in \left[\hat{\theta}_N \pm z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}\right]\right) \approx 1-\alpha$$
+
+::: {.callout-warning}
+## Conditions for CLT/LLN
+Both theorems require:
+
+- **Independence**: Samples must be independent (or satisfy weaker mixing conditions)
+- **Identical distribution**: Samples from the same distribution
+- **Finite moments**: Finite mean for LLN, finite variance for CLT
+
+When using MCMC, the independence assumption is violated, requiring more sophisticated analysis of the effective sample size.
+:::
+

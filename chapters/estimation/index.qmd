@@ -1,35 +1,57 @@
 ---
-title: "Estimation Techniques"
+title: "Monte Carlo Estimation"
 
 execute:
   echo: false
 ---
 
-An estimator is a function of the data that is used to estimate an unknown parameter. The common situation is when $\ell$ is the expectation of a function of a random variable $X$, i.e., $\ell = E[f(X)]$. A simple estimator of $\ell$ is the sample mean, which is given by
-$$
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i),
-$$ {#eq-crude-estimator}
+One of the most fundamental applications of Monte Carlo methods is **estimation** — using random sampling to approximate unknown quantities. This approach is remarkably versatile, applying equally well to inherently random phenomena and deterministic mathematical problems.
 
-where $X_1, X_2, \ldots, X_N$ are independent and identically distributed (i.i.d.) samples from the distribution of $X$. The sample mean $\hat{\ell}$ is an unbiased estimator of $\ell$, meaning that $E[\hat{\ell}] = \ell$. By the central limit theorem, as $N$ increases, the distribution of $\hat{\ell}$ approaches a normal distribution with mean $\ell$ and variance $\sigma^2(\hat{\ell}) = \sigma^2(X)/N$, where $\sigma^2(X)$ is the variance of $f(X)$ and $N$ is the number of samples.
+## Types of Estimation Problems
 
-## Confidence Intervals
+Monte Carlo estimation addresses two distinct categories of problems:
 
-The confidence interval (CI) for $\ell$ is given by
-$$
-\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S}{\sqrt{N}}, \hat{\ell} + z_{1-\alpha/2} \frac{S}{\sqrt{N}} \right],
-$$
+**Stochastic quantities**: Values that are naturally random or uncertain
 
-where $z_{1-\alpha/2}$ is the critical value from the standard normal distribution corresponding to a significance level of $\alpha$, and $S$ is the sample standard deviation of $f(X)$. The width of the confidence interval is given by
-$$
-\text{Width of CI} = 2z_{1-\alpha/2} \frac{S}{\sqrt{N}}.
-$$
+- Future stock prices
+- Weather predictions  
+- System reliability measures
+- Risk assessments
 
-### Relative Confidence Intervals
+**Deterministic quantities**: Fixed mathematical values that are difficult to compute directly
 
-It is common practice in simulation to use and report the relative widths of the confidence interval, defined as
-$$
-\text{Relative Width} = \frac{\text{Width of CI}}{\hat{\ell}} = 2z_{1-\alpha/2} \frac{S}{\hat{\ell}\sqrt{N}}.
-$$
+- The value of $\pi$
+- Complex integrals
+- Solutions to differential equations
+- High-dimensional optimization problems
 
-The relative width of the confidence interval is a measure of the precision of the estimate.
+## The Monte Carlo Estimation Strategy
 
+The key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.
+
+::: {.callout-important}
+## Core Monte Carlo Principle
+To estimate any quantity θ, we:
+
+1. **Construct** a random variable $X$ such that $\mathbb{E}[X] = \theta$
+2. **Generate** independent samples $x_1, x_2, \ldots, x_n$ from the distribution of $X$  
+3. **Estimate** θ using the sample average:
+   $$\hat{\theta} = \frac{1}{n}\sum_{i=1}^{n} x_i$$
+:::
+
+For more details, see @sec-estimation-theory.
+
+## Why This Works
+
+This approach leverages the **Law of Large Numbers**: as the sample size $n$ increases, our estimate $\hat{\theta}$ converges to the true expected value $\theta$. The beauty lies in converting complex analytical problems into straightforward sampling and averaging procedures.
+
+## What's Next
+
+In the following sections, we'll see:
+
+- Concrete examples demonstrating this estimation framework
+- How to construct appropriate random variables $X$ for different problems  
+- Methods for assessing and improving estimation accuracy
+- Advanced sampling techniques for enhanced efficiency
+
+The examples will illustrate how this simple yet powerful principle enables us to tackle problems that would otherwise require sophisticated analytical techniques or be computationally intractable.
