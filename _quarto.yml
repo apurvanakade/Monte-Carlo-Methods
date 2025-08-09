@@ -65,5 +65,5 @@ format:
 
 execute:
   echo: false
-  freeze: auto  # re-render only when source changes
+  # freeze: auto  # re-render only when source changes
   cache: true
