@@ -8,7 +8,6 @@ execute:
 
 Monte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.
 
-# Mathematical Foundation
 
 ## Problem Setup
 
@@ -30,7 +29,6 @@ $$\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)$$
 We're approximating the area under $f(x)$ by averaging function values at random points and scaling by interval width.
 :::
 
-# Theoretical Properties
 
 ## Unbiasedness
 
@@ -153,20 +151,13 @@ plt.show()
 
 ```
 
-### Explanation of Results
+The contrast between the smooth $\sin(x)$ and rapidly oscillating $25\sin(25x)$ suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
 
-The comparison reveals several important insights about Monte Carlo integration performance:
+The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.
 
-1. **Function Visualization (Top Panels)**: The contrast between the smooth $\sin(x)$ and rapidly oscillating $25\sin(25x)$ suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
+The variance ratio indicates that the oscillatory function's variance is around 75x higher than the smooth function's variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.
 
-2. **Error Analysis**: The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.
-
-3. **Statistical Summary**: The numerical results quantify the performance difference:
-   - The low-frequency function achieves good accuracy with relatively few samples
-   - The high-frequency function requires significantly more samples to achieve comparable accuracy
-   - Standard errors are notably larger for the oscillatory function, indicating higher variance in estimates
-
-### Key Takeaways
+### Remarks
 
 - **Smooth functions** are well-suited for Monte Carlo integration, converging quickly with relatively few samples
 - **Highly oscillatory functions** present challenges, requiring larger sample sizes and exhibiting higher variance
@@ -180,8 +171,6 @@ This example demonstrates why understanding your function's characteristics is c
 
 
 ## Multidimensional Integration
-
-### Introduction
 
 One of Monte Carlo integration's greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson's rule) suffer from the "curse of dimensionality"—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their $O(1/\sqrt{n})$ convergence rate regardless of dimension.
 
@@ -263,8 +252,6 @@ def multidimensional_example():
 multidimensional_example()
 ```
 
-### Explanation of Results
-
 The example reveals several key insights about multidimensional integration:
 
 1. **Decreasing Integral Values**: As dimension increases, the integral value decreases rapidly. This occurs because the function $e^{-\|\mathbf{x}\|^2}$ decays exponentially with distance from the origin, and in higher dimensions, most of the unit hypercube's volume lies far from the origin.
@@ -274,8 +261,6 @@ The example reveals several key insights about multidimensional integration:
 3. **Computational Efficiency**: Each dimension uses exactly the same number of function evaluations (5,000), showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods.
 
 This behavior makes Monte Carlo integration indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling, where traditional quadrature rules become computationally infeasible.
-
-# Key Insights
 
 ::: {.callout-tip}
 ## When to Use Monte Carlo Integration
@@ -291,14 +276,16 @@ This behavior makes Monte Carlo integration indispensable for high-dimensional p
 - **Slow convergence**: $O(1/\sqrt{N})$ rate
 - **Random error**: Introduces stochastic uncertainty
 - **Low dimensions**: Often outperformed by deterministic methods
+
+**Practical Considerations**
+
+- **Sample size**: Need large $N$ for high precision
+- **Function smoothness**: Smoother functions → lower variance → better estimates
+- **Variance reduction**: Techniques like antithetic variables can improve efficiency
+- **Error estimation**: Use sample variance to estimate uncertainty
+
 :::
 
-## Practical Considerations
-
-1. **Sample size**: Need large $N$ for high precision
-2. **Function smoothness**: Smoother functions → lower variance → better estimates
-3. **Variance reduction**: Techniques like antithetic variables can improve efficiency
-4. **Error estimation**: Use sample variance to estimate uncertainty
 
 # Conclusion
 

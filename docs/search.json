@@ -34,7 +34,7 @@
     "href": "chapters/estimation/estimating_pi.html",
     "title": "3  Estimating \\(\\pi\\)",
     "section": "",
-    "text": "4 The Geometric Method\nWe begin with a classic Monte Carlo application: estimating the value of \\(\\pi\\) using geometric probability. This example beautifully illustrates the core principles of Monte Carlo simulation while providing an intuitive geometric interpretation.",
+    "text": "3.1 Problem Setup\nWe begin with a classic Monte Carlo application: estimating the value of \\(\\pi\\) using geometric probability. This example beautifully illustrates the core principles of Monte Carlo simulation while providing an intuitive geometric interpretation.\nConsider a unit circle inscribed in a square with side length 2, both centered at the origin:\nThis geometric probability provides our pathway to estimating \\(\\pi\\).\nFigure 3.1: Estimating π using Monte Carlo method with different sample sizes\n\n\n\n\n\nMonte Carlo π Estimation Results\n==================================================\nSample Size Points Inside π Estimate Absolute Error Standard Error\n        100            80     3.2000         0.0584         0.1600\n     10,000         7,763     3.1052         0.0364         0.0167",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -713,7 +713,7 @@
     "href": "chapters/estimation/integrals.html",
     "title": "4  Estimating Integrals",
     "section": "",
-    "text": "5 Mathematical Foundation\nMonte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.",
+    "text": "4.1 Problem Setup\nMonte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.\nWe want to estimate the integral: \\[\\ell = \\int_a^b f(x) \\, dx\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -956,8 +956,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#problem-setup",
     "href": "chapters/estimation/estimating_pi.html#problem-setup",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "4.1 Problem Setup",
-    "text": "4.1 Problem Setup\nConsider a unit circle inscribed in a square with side length 2, both centered at the origin:\n\n\n\n\n\n\nKey Geometric Relationships\n\n\n\n\nCircle: radius \\(r = 1\\), area \\(A_{\\text{circle}} = \\pi r^2 = \\pi\\)\nSquare: side length \\(2r = 2\\), area \\(A_{\\text{square}} = (2r)^2 = 4\\)\nArea ratio: \\(\\frac{A_{\\text{circle}}}{A_{\\text{square}}} = \\frac{\\pi}{4}\\)",
+    "section": "",
+    "text": "Geometric Relationships\n\n\n\n\nCircle: radius \\(r = 1\\), area \\(A_{\\text{circle}} = \\pi r^2 = \\pi\\)\nSquare: side length \\(2r = 2\\), area \\(A_{\\text{square}} = (2r)^2 = 4\\)\nArea ratio: \\(\\frac{A_{\\text{circle}}}{A_{\\text{square}}} = \\frac{\\pi}{4}\\)\n\n\n\n\n\n\n\n\n\nMonte Carlo Estimation\n\n\n\nIf we randomly sample points uniformly within the square, the probability that any point falls inside the inscribed circle equals the ratio of their areas: \\(\\pi/4\\).",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -967,8 +967,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#the-monte-carlo-insight",
     "href": "chapters/estimation/estimating_pi.html#the-monte-carlo-insight",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "4.2 The Monte Carlo Insight",
-    "text": "4.2 The Monte Carlo Insight\nKey insight: If we randomly sample points uniformly within the square, the probability that any point falls inside the inscribed circle equals the ratio of their areas: \\(\\pi/4\\).\nThis geometric probability provides our pathway to estimating \\(\\pi\\).\n\n\n\n\n\n\n\n\nFigure 4.1: Estimating π using Monte Carlo method with different sample sizes\n\n\n\n\n\nMonte Carlo π Estimation Results\n==================================================\nSample Size Points Inside π Estimate Absolute Error Standard Error\n        100            80     3.2000         0.0584         0.1600\n     10,000         7,763     3.1052         0.0364         0.0167",
+    "section": "3.2 The Monte Carlo Insight",
+    "text": "3.2 The Monte Carlo Insight\nKey insight: If we randomly sample points uniformly within the square, the probability that any point falls inside the inscribed circle equals the ratio of their areas: \\(\\pi/4\\).\nThis geometric probability provides our pathway to estimating \\(\\pi\\).\n\n\n\n\n\n\n\n\nFigure 3.1: Estimating π using Monte Carlo method with different sample sizes\n\n\n\n\n\nMonte Carlo π Estimation Results\n==================================================\nSample Size Points Inside π Estimate Absolute Error Standard Error\n        100            80     3.2000         0.0584         0.1600\n     10,000         7,763     3.1052         0.0364         0.0167",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -978,8 +978,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#random-variable-definition",
     "href": "chapters/estimation/estimating_pi.html#random-variable-definition",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "5.1 Random Variable Definition",
-    "text": "5.1 Random Variable Definition\nTo apply Monte Carlo estimation, we formulate this as an expectation problem:\nSetup: Let \\((X, Y)\\) be uniformly distributed on \\([-1, 1] \\times [-1, 1]\\).\nDefine the indicator random variable: \\[I(X, Y) = \\mathbf{1}_{\\{X^2 + Y^2 \\leq 1\\}} = \\begin{cases}\n1 & \\text{if } X^2 + Y^2 \\leq 1 \\text{ (inside circle)} \\\\\n0 & \\text{if } X^2 + Y^2 &gt; 1 \\text{ (outside circle)}\n\\end{cases}\\]",
+    "section": "3.2 Random Variable Definition",
+    "text": "3.2 Random Variable Definition\nTo apply Monte Carlo estimation, we formulate this as an expectation problem:\nSetup: Let \\((X, Y)\\) be uniformly distributed on \\([-1, 1] \\times [-1, 1]\\).\nDefine the indicator random variable: \\[I(X, Y) = \\mathbf{1}_{\\{X^2 + Y^2 \\leq 1\\}} = \\begin{cases}\n1 & \\text{if } X^2 + Y^2 \\leq 1 \\text{ (inside circle)} \\\\\n0 & \\text{if } X^2 + Y^2 &gt; 1 \\text{ (outside circle)}\n\\end{cases}\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -989,8 +989,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#the-expectation",
     "href": "chapters/estimation/estimating_pi.html#the-expectation",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "5.2 The Expectation",
-    "text": "5.2 The Expectation\nThe expected value of our indicator function gives us the desired probability:\n\\[\\mathbb{E}[I(X, Y)] = P(X^2 + Y^2 \\leq 1) = \\frac{\\text{Area of unit circle}}{\\text{Area of square}} = \\frac{\\pi}{4}\\]\nTherefore: \\(\\pi = 4\\mathbb{E}[I(X, Y)]\\)",
+    "section": "3.3 The Expectation",
+    "text": "3.3 The Expectation\nThe expected value of our indicator function gives us the desired probability:\n\\[\\mathbb{E}[I(X, Y)] = P(X^2 + Y^2 \\leq 1) = \\frac{\\text{Area of unit circle}}{\\text{Area of square}} = \\frac{\\pi}{4}\\]\nTherefore: \\(\\pi = 4\\mathbb{E}[I(X, Y)]\\)",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -1000,8 +1000,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#monte-carlo-estimator",
     "href": "chapters/estimation/estimating_pi.html#monte-carlo-estimator",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "5.3 Monte Carlo Estimator",
-    "text": "5.3 Monte Carlo Estimator\nGiven \\(N\\) independent samples \\((X_1, Y_1), \\ldots, (X_N, Y_N)\\), our estimator is:\n\\[\\hat{\\pi}_N = 4 \\cdot \\frac{1}{N}\\sum_{i=1}^{N} I(X_i, Y_i) = \\frac{4 \\cdot \\text{(number of points inside circle)}}{N}\\]",
+    "section": "3.4 Monte Carlo Estimator",
+    "text": "3.4 Monte Carlo Estimator\nGiven \\(N\\) independent samples \\((X_1, Y_1), \\ldots, (X_N, Y_N)\\), our estimator is:\n\\[\\hat{\\pi}_N = 4 \\cdot \\frac{1}{N}\\sum_{i=1}^{N} I(X_i, Y_i) = \\frac{4 \\cdot \\text{(number of points inside circle)}}{N}\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -1011,8 +1011,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#unbiasedness",
     "href": "chapters/estimation/estimating_pi.html#unbiasedness",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "6.1 Unbiasedness",
-    "text": "6.1 Unbiasedness\nOur estimator is unbiased: \\[\\mathbb{E}[\\hat{\\pi}_N] = 4\\mathbb{E}\\left[\\frac{1}{N}\\sum_{i=1}^{N} I_i\\right] = 4\\mathbb{E}[I] = 4 \\cdot \\frac{\\pi}{4} = \\pi\\]",
+    "section": "3.5 Unbiasedness",
+    "text": "3.5 Unbiasedness\nOur estimator is unbiased: \\[\\mathbb{E}[\\hat{\\pi}_N] = 4\\mathbb{E}\\left[\\frac{1}{N}\\sum_{i=1}^{N} I_i\\right] = 4\\mathbb{E}[I] = 4 \\cdot \\frac{\\pi}{4} = \\pi\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -1022,8 +1022,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#variance-analysis",
     "href": "chapters/estimation/estimating_pi.html#variance-analysis",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "6.2 Variance Analysis",
-    "text": "6.2 Variance Analysis\nSince \\(I \\sim \\text{Bernoulli}(p)\\) with \\(p = \\pi/4\\):\n\nVariance of indicator: \\(\\text{Var}(I) = p(1-p) = \\frac{\\pi}{4}\\left(1 - \\frac{\\pi}{4}\\right) = \\frac{\\pi(4-\\pi)}{16}\\)\nVariance of estimator: \\(\\text{Var}(\\hat{\\pi}_N) = 16 \\cdot \\frac{\\text{Var}(I)}{N} = \\frac{\\pi(4-\\pi)}{N}\\)\nStandard error: \\(\\text{SE}(\\hat{\\pi}_N) = \\sqrt{\\frac{\\pi(4-\\pi)}{N}} \\approx \\frac{1.64}{\\sqrt{N}}\\)\n\n\n\n\n\n\n\nConvergence Rate\n\n\n\nThe standard error decreases as \\(O(1/\\sqrt{N})\\), which is the typical Monte Carlo convergence rate. To gain one decimal place of accuracy, we need approximately 100 times more samples.",
+    "section": "3.6 Variance Analysis",
+    "text": "3.6 Variance Analysis\nSince \\(I \\sim \\text{Bernoulli}(p)\\) with \\(p = \\pi/4\\):\n\nVariance of indicator: \\(\\text{Var}(I) = p(1-p) = \\frac{\\pi}{4}\\left(1 - \\frac{\\pi}{4}\\right) = \\frac{\\pi(4-\\pi)}{16}\\)\nVariance of estimator: \\(\\text{Var}(\\hat{\\pi}_N) = 16 \\cdot \\frac{\\text{Var}(I)}{N} = \\frac{\\pi(4-\\pi)}{N}\\)\nStandard error: \\(\\text{SE}(\\hat{\\pi}_N) = \\sqrt{\\frac{\\pi(4-\\pi)}{N}} \\approx \\frac{1.64}{\\sqrt{N}}\\)\n\n\n\n\n\n\n\nConvergence Rate\n\n\n\nThe standard error decreases as \\(O(1/\\sqrt{N})\\), which is the typical Monte Carlo convergence rate. To gain one decimal place of accuracy, we need approximately 100 times more samples.",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -1033,8 +1033,8 @@
     "objectID": "chapters/estimation/estimating_pi.html#asymptotic-distribution",
     "href": "chapters/estimation/estimating_pi.html#asymptotic-distribution",
     "title": "3  Estimating \\(\\pi\\)",
-    "section": "6.3 Asymptotic Distribution",
-    "text": "6.3 Asymptotic Distribution\nBy the Central Limit Theorem: \\[\\sqrt{N}(\\hat{\\pi}_N - \\pi) \\xrightarrow{d} \\mathcal{N}(0, \\pi(4-\\pi))\\]\nThis gives us approximate confidence intervals for large \\(N\\): \\[\\hat{\\pi}_N \\pm z_{\\alpha/2} \\sqrt{\\frac{\\pi(4-\\pi)}{N}}\\]",
+    "section": "3.7 Asymptotic Distribution",
+    "text": "3.7 Asymptotic Distribution\nBy the Central Limit Theorem: \\[\\sqrt{N}(\\hat{\\pi}_N - \\pi) \\xrightarrow{d} \\mathcal{N}(0, \\pi(4-\\pi))\\]\nThis gives us approximate confidence intervals for large \\(N\\): \\[\\hat{\\pi}_N \\pm z_{\\alpha/2} \\sqrt{\\frac{\\pi(4-\\pi)}{N}}\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>Estimating $\\pi$</span>"
@@ -1085,8 +1085,8 @@
     "objectID": "chapters/estimation/integrals.html#the-monte-carlo-estimator",
     "href": "chapters/estimation/integrals.html#the-monte-carlo-estimator",
     "title": "4  Estimating Integrals",
-    "section": "5.2 The Monte Carlo Estimator",
-    "text": "5.2 The Monte Carlo Estimator\nKey insight: Rewrite the integral as an expectation. If \\(X \\sim \\text{Uniform}(a, b)\\):\n\\[\\int_a^b f(x) \\, dx = (b-a) \\mathbb{E}[f(X)]\\]\nEstimator: Given \\(N\\) samples \\(X_1, \\ldots, X_N \\sim \\text{Uniform}(a, b)\\):\n\\[\\hat{\\ell}_N = \\frac{b - a}{N} \\sum_{i=1}^{N} f(X_i)\\]\n\n\n\n\n\n\nGeometric Interpretation\n\n\n\nWe’re approximating the area under \\(f(x)\\) by averaging function values at random points and scaling by interval width.",
+    "section": "4.2 The Monte Carlo Estimator",
+    "text": "4.2 The Monte Carlo Estimator\nKey insight: Rewrite the integral as an expectation. If \\(X \\sim \\text{Uniform}(a, b)\\):\n\\[\\int_a^b f(x) \\, dx = (b-a) \\mathbb{E}[f(X)]\\]\nEstimator: Given \\(N\\) samples \\(X_1, \\ldots, X_N \\sim \\text{Uniform}(a, b)\\):\n\\[\\hat{\\ell}_N = \\frac{b - a}{N} \\sum_{i=1}^{N} f(X_i)\\]\n\n\n\n\n\n\nGeometric Interpretation\n\n\n\nWe’re approximating the area under \\(f(x)\\) by averaging function values at random points and scaling by interval width.",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -1096,8 +1096,8 @@
     "objectID": "chapters/estimation/integrals.html#unbiasedness",
     "href": "chapters/estimation/integrals.html#unbiasedness",
     "title": "4  Estimating Integrals",
-    "section": "6.1 Unbiasedness",
-    "text": "6.1 Unbiasedness\n\\[\\begin{aligned}\n\\mathbb{E}[\\hat{\\ell}_N] &= \\frac{b - a}{N} \\sum_{i=1}^{N} \\mathbb{E}[f(X_i)] \\\\\n&= \\frac{b - a}{N} \\sum_{i=1}^{N} \\int_a^b f(x) \\frac{1}{b - a} \\, dx \\\\\n&= \\frac{1}{N} \\sum_{i=1}^{N} \\ell = \\ell\n\\end{aligned}\\]",
+    "section": "4.3 Unbiasedness",
+    "text": "4.3 Unbiasedness\n\\[\\begin{aligned}\n\\mathbb{E}[\\hat{\\ell}_N] &= \\frac{b - a}{N} \\sum_{i=1}^{N} \\mathbb{E}[f(X_i)] \\\\\n&= \\frac{b - a}{N} \\sum_{i=1}^{N} \\int_a^b f(x) \\frac{1}{b - a} \\, dx \\\\\n&= \\frac{1}{N} \\sum_{i=1}^{N} \\ell = \\ell\n\\end{aligned}\\]",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -1107,8 +1107,8 @@
     "objectID": "chapters/estimation/integrals.html#variance",
     "href": "chapters/estimation/integrals.html#variance",
     "title": "4  Estimating Integrals",
-    "section": "6.2 Variance",
-    "text": "6.2 Variance\n\\[\\text{Var}(\\hat{\\ell}_N) = \\frac{(b - a)^2}{N} \\cdot \\sigma^2_f\\]\nwhere \\(\\sigma^2_f = \\text{Var}(f(X))\\) is the variance of \\(f(X)\\) under uniform distribution.\n\n\n\n\n\n\nKey Properties\n\n\n\n\nStandard Error: \\(\\text{SE} = \\frac{(b-a)\\sigma_f}{\\sqrt{N}}\\)\nConvergence Rate: \\(O(1/\\sqrt{N})\\) regardless of dimension\nCLT: \\(\\sqrt{N}(\\hat{\\ell}_N - \\ell) \\xrightarrow{d} \\mathcal{N}(0, (b-a)^2\\sigma^2_f)\\)",
+    "section": "4.4 Variance",
+    "text": "4.4 Variance\n\\[\\text{Var}(\\hat{\\ell}_N) = \\frac{(b - a)^2}{N} \\cdot \\sigma^2_f\\]\nwhere \\(\\sigma^2_f = \\text{Var}(f(X))\\) is the variance of \\(f(X)\\) under uniform distribution.\n\n\n\n\n\n\nKey Properties\n\n\n\n\nStandard Error: \\(\\text{SE} = \\frac{(b-a)\\sigma_f}{\\sqrt{N}}\\)\nConvergence Rate: \\(O(1/\\sqrt{N})\\) regardless of dimension\nCLT: \\(\\sqrt{N}(\\hat{\\ell}_N - \\ell) \\xrightarrow{d} \\mathcal{N}(0, (b-a)^2\\sigma^2_f)\\)",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -1118,8 +1118,8 @@
     "objectID": "chapters/estimation/integrals.html#example-polynomial-integration",
     "href": "chapters/estimation/integrals.html#example-polynomial-integration",
     "title": "4  Estimating Integrals",
-    "section": "6.3 Example: Polynomial Integration",
-    "text": "6.3 Example: Polynomial Integration\nMonte Carlo integration’s performance can vary significantly depending on the characteristics of the function being integrated. While the method’s convergence rate is theoretically independent of function complexity, practical performance depends heavily on the function’s smoothness and oscillatory behavior.\nFunctions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.\n\n6.3.1 Example: Low vs. High Frequency Functions\nThe following example integrates two functions over the interval \\([0, \\pi]\\):\n\nSmooth decay: \\(f_1(x) = \\sin(x)\\) — a smooth, slowly varying function\nOscillatory: \\(f_2(x) = 25*\\sin(25x)\\) — a rapidly oscillating function with many periods\n\n\n\n\n\n\n\n\n\n\n\n\n6.3.2 Explanation of Results\nThe comparison reveals several important insights about Monte Carlo integration performance:\n\nFunction Visualization (Top Panels): The contrast between the smooth \\(\\sin(x)\\) and rapidly oscillating \\(25\\sin(25x)\\) suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.\nError Analysis: The log-log error plot reveals that while both functions follow the expected \\(O(1/\\sqrt{n})\\) convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.\nStatistical Summary: The numerical results quantify the performance difference:\n\nThe low-frequency function achieves good accuracy with relatively few samples\nThe high-frequency function requires significantly more samples to achieve comparable accuracy\nStandard errors are notably larger for the oscillatory function, indicating higher variance in estimates\n\n\n\n\n6.3.3 Key Takeaways\n\nSmooth functions are well-suited for Monte Carlo integration, converging quickly with relatively few samples\nHighly oscillatory functions present challenges, requiring larger sample sizes and exhibiting higher variance\nFor oscillatory integrals, consider alternative approaches such as:\n\nStratified sampling to ensure adequate coverage of oscillation periods\nImportance sampling with distributions that account for function behavior\nSpecialized quadrature methods designed for oscillatory integrals\nTransformation techniques to reduce oscillations\n\n\nThis example demonstrates why understanding your function’s characteristics is crucial for effective Monte Carlo integration.",
+    "section": "4.5 Example: Polynomial Integration",
+    "text": "4.5 Example: Polynomial Integration\nMonte Carlo integration’s performance can vary significantly depending on the characteristics of the function being integrated. While the method’s convergence rate is theoretically independent of function complexity, practical performance depends heavily on the function’s smoothness and oscillatory behavior.\nFunctions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.\n\n4.5.1 Example: Low vs. High Frequency Functions\nThe following example integrates two functions over the interval \\([0, \\pi]\\):\n\nSmooth decay: \\(f_1(x) = \\sin(x)\\) — a smooth, slowly varying function\nOscillatory: \\(f_2(x) = 25*\\sin(25x)\\) — a rapidly oscillating function with many periods\n\n\n\n\n\n\n\n\n\n\nThe contrast between the smooth \\(\\sin(x)\\) and rapidly oscillating \\(25\\sin(25x)\\) suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.\nThe log-log error plot reveals that while both functions follow the expected \\(O(1/\\sqrt{n})\\) convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.\nThe variance ratio indicates that the oscillatory function’s variance is around 75x higher than the smooth function’s variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.\n\n\n4.5.2 Remarks\n\nSmooth functions are well-suited for Monte Carlo integration, converging quickly with relatively few samples\nHighly oscillatory functions present challenges, requiring larger sample sizes and exhibiting higher variance\nFor oscillatory integrals, consider alternative approaches such as:\n\nStratified sampling to ensure adequate coverage of oscillation periods\nImportance sampling with distributions that account for function behavior\nSpecialized quadrature methods designed for oscillatory integrals\nTransformation techniques to reduce oscillations\n\n\nThis example demonstrates why understanding your function’s characteristics is crucial for effective Monte Carlo integration.",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -1140,8 +1140,8 @@
     "objectID": "chapters/estimation/integrals.html#multidimensional-integration",
     "href": "chapters/estimation/integrals.html#multidimensional-integration",
     "title": "4  Estimating Integrals",
-    "section": "6.4 Multidimensional Integration",
-    "text": "6.4 Multidimensional Integration\n\n6.4.1 Introduction\nOne of Monte Carlo integration’s greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson’s rule) suffer from the “curse of dimensionality”—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their \\(O(1/\\sqrt{n})\\) convergence rate regardless of dimension.\nIn \\(d\\) dimensions, a grid-based method with \\(m\\) points per dimension requires \\(m^d\\) total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.\n\n\n6.4.2 Example: Gaussian-like Function in Multiple Dimensions\nThe following example demonstrates Monte Carlo integration of the function \\(f(\\mathbf{x}) = e^{-\\|\\mathbf{x}\\|^2}\\) over the unit hypercube \\([0,1]^d\\) for dimensions \\(d = 1, 2, 3, 4, 5\\).\n\n\n\n\n\n\n\n\nFigure 6.1: Monte Carlo advantage in higher dimensions\n\n\n\n\n\n\nMultidimensional Integration Results From 2500 samples:\n Dimension  Estimate  Std Error  Rel Error\n         1  0.747218   0.004232   0.005663\n         2  0.557682   0.004197   0.007526\n         3  0.416811   0.003557   0.008533\n         4  0.311421   0.003541   0.011369\n         5  0.232332   0.003099   0.013337\n\n\n\n\n6.4.3 Explanation of Results\nThe example reveals several key insights about multidimensional integration:\n\nDecreasing Integral Values: As dimension increases, the integral value decreases rapidly. This occurs because the function \\(e^{-\\|\\mathbf{x}\\|^2}\\) decays exponentially with distance from the origin, and in higher dimensions, most of the unit hypercube’s volume lies far from the origin.\nStable Relative Error: Despite the changing integral magnitudes, the relative error remains relatively stable across dimensions. This demonstrates Monte Carlo’s dimension-independent convergence behavior—a crucial advantage over grid-based methods.\nComputational Efficiency: Each dimension uses exactly the same number of function evaluations (5,000), showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods.\n\nThis behavior makes Monte Carlo integration indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling, where traditional quadrature rules become computationally infeasible.",
+    "section": "4.6 Multidimensional Integration",
+    "text": "4.6 Multidimensional Integration\nOne of Monte Carlo integration’s greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson’s rule) suffer from the “curse of dimensionality”—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their \\(O(1/\\sqrt{n})\\) convergence rate regardless of dimension.\nIn \\(d\\) dimensions, a grid-based method with \\(m\\) points per dimension requires \\(m^d\\) total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.\n\n4.6.1 Example: Gaussian-like Function in Multiple Dimensions\nThe following example demonstrates Monte Carlo integration of the function \\(f(\\mathbf{x}) = e^{-\\|\\mathbf{x}\\|^2}\\) over the unit hypercube \\([0,1]^d\\) for dimensions \\(d = 1, 2, 3, 4, 5\\).\n\n\n\n\n\n\n\n\nFigure 4.1: Monte Carlo advantage in higher dimensions\n\n\n\n\n\n\nMultidimensional Integration Results From 2500 samples:\n Dimension  Estimate  Std Error  Rel Error\n         1  0.747218   0.004232   0.005663\n         2  0.557682   0.004197   0.007526\n         3  0.416811   0.003557   0.008533\n         4  0.311421   0.003541   0.011369\n         5  0.232332   0.003099   0.013337\n\n\nThe example reveals several key insights about multidimensional integration:\n\nDecreasing Integral Values: As dimension increases, the integral value decreases rapidly. This occurs because the function \\(e^{-\\|\\mathbf{x}\\|^2}\\) decays exponentially with distance from the origin, and in higher dimensions, most of the unit hypercube’s volume lies far from the origin.\nStable Relative Error: Despite the changing integral magnitudes, the relative error remains relatively stable across dimensions. This demonstrates Monte Carlo’s dimension-independent convergence behavior—a crucial advantage over grid-based methods.\nComputational Efficiency: Each dimension uses exactly the same number of function evaluations (5,000), showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods.\n\nThis behavior makes Monte Carlo integration indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling, where traditional quadrature rules become computationally infeasible.\n\n\n\n\n\n\nWhen to Use Monte Carlo Integration\n\n\n\nAdvantages:\n\nHigh dimensions: Performance doesn’t degrade with dimension\nComplex domains: Easy to handle irregular integration regions\nRough functions: Works with discontinuous or highly oscillatory functions\n\nDisadvantages:\n\nSlow convergence: \\(O(1/\\sqrt{N})\\) rate\nRandom error: Introduces stochastic uncertainty\nLow dimensions: Often outperformed by deterministic methods\n\nPractical Considerations\n\nSample size: Need large \\(N\\) for high precision\nFunction smoothness: Smoother functions → lower variance → better estimates\nVariance reduction: Techniques like antithetic variables can improve efficiency\nError estimation: Use sample variance to estimate uncertainty",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"
@@ -1151,8 +1151,8 @@
     "objectID": "chapters/estimation/integrals.html#practical-considerations",
     "href": "chapters/estimation/integrals.html#practical-considerations",
     "title": "4  Estimating Integrals",
-    "section": "7.1 Practical Considerations",
-    "text": "7.1 Practical Considerations\n\nSample size: Need large \\(N\\) for high precision\nFunction smoothness: Smoother functions → lower variance → better estimates\nVariance reduction: Techniques like antithetic variables can improve efficiency\nError estimation: Use sample variance to estimate uncertainty",
+    "section": "4.7 Practical Considerations",
+    "text": "4.7 Practical Considerations\n\nSample size: Need large \\(N\\) for high precision\nFunction smoothness: Smoother functions → lower variance → better estimates\nVariance reduction: Techniques like antithetic variables can improve efficiency\nError estimation: Use sample variance to estimate uncertainty",
     "crumbs": [
       "Monte Carlo Estimation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Estimating Integrals</span>"

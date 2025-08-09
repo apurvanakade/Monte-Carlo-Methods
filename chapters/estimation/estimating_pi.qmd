@@ -9,22 +9,22 @@ execute:
 
 We begin with a classic Monte Carlo application: estimating the value of $\pi$ using geometric probability. This example beautifully illustrates the core principles of Monte Carlo simulation while providing an intuitive geometric interpretation.
 
-# The Geometric Method
 
 ## Problem Setup
 
 Consider a unit circle inscribed in a square with side length 2, both centered at the origin:
 
 ::: {.callout-note}
-## Key Geometric Relationships
+## Geometric Relationships
 - **Circle**: radius $r = 1$, area $A_{\text{circle}} = \pi r^2 = \pi$
 - **Square**: side length $2r = 2$, area $A_{\text{square}} = (2r)^2 = 4$
 - **Area ratio**: $\frac{A_{\text{circle}}}{A_{\text{square}}} = \frac{\pi}{4}$
 :::
 
-## The Monte Carlo Insight
-
-**Key insight**: If we randomly sample points uniformly within the square, the probability that any point falls inside the inscribed circle equals the ratio of their areas: $\pi/4$.
+::: {.callout-tip}
+## Monte Carlo Estimation
+If we randomly sample points uniformly within the square, the probability that any point falls inside the inscribed circle equals the ratio of their areas: $\pi/4$.
+:::
 
 This geometric probability provides our pathway to estimating $\pi$.
 
@@ -101,8 +101,6 @@ print(df.to_string(index=False))
 ```
 
 
-# Mathematical Formulation
-
 ## Random Variable Definition
 
 To apply Monte Carlo estimation, we formulate this as an expectation problem:
@@ -128,8 +126,6 @@ Therefore: $\pi = 4\mathbb{E}[I(X, Y)]$
 Given $N$ independent samples $(X_1, Y_1), \ldots, (X_N, Y_N)$, our estimator is:
 
 $$\hat{\pi}_N = 4 \cdot \frac{1}{N}\sum_{i=1}^{N} I(X_i, Y_i) = \frac{4 \cdot \text{(number of points inside circle)}}{N}$$
-
-# Theoretical Properties
 
 ## Unbiasedness
 
