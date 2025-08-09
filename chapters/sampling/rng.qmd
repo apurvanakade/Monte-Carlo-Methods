@@ -19,7 +19,7 @@ A **random number generator** is a function that produces a sequence of numbers 
 
 Below is an example of a true random number generator based on lava lamps called the "wall of entropy". The lava lamps are used to generate random bits, which are then combined to generate random keys for encryption.
 
-<img src="images/lava-lamps.jpg" width="600">
+<img src="../images/lava-lamps.jpg" width="600">
 
 There are less exotic ways to generate random numbers. Computer chips have a hardware random number generator that uses thermal noise to generate random bits.
 
