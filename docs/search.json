@@ -796,7 +796,7 @@
     "href": "chapters/estimation/index.html#the-monte-carlo-estimation-strategy",
     "title": "Monte Carlo Estimation",
     "section": "The Monte Carlo Estimation Strategy",
-    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nFor more details, see Estimation Theory.",
+    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nIn fact, we do not even need \\(\\mathbb{E}[X] = \\theta\\). It suffices that \\(\\lim_{n \\to \\infty} \\hat{\\theta} = \\theta\\) with high probability. For details, see Estimation Theory.",
     "crumbs": [
       "Monte Carlo Estimation"
     ]

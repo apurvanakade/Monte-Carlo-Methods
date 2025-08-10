@@ -39,7 +39,8 @@ To estimate any quantity θ, we:
    $$\hat{\theta} = \frac{1}{n}\sum_{i=1}^{n} x_i$$
 :::
 
-For more details, see @sec-estimation-theory.
+In fact, we do not even need $\mathbb{E}[X] = \theta$. It suffices that $\lim_{n \to \infty} \hat{\theta} = \theta$ with high probability.
+For details, see @sec-estimation-theory.
 
 ## Why This Works
 
