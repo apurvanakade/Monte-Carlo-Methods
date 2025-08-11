@@ -181,7 +181,7 @@
     "href": "chapters/sampling/index.html",
     "title": "Sampling Techniques",
     "section": "",
-    "text": "In this module, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning.\nWe’ll use this week to review many of the standard probability distributions and how to sample from them. We’ll also discuss the concept of the cumulative distribution function (CDF) and how it can be used to sample from a probability distribution using the inverse transform sampling method.\nFrom now on, we’ll assume that we have a reliable way to generate random numbers from the uniform distribution \\(U(0, 1)\\).\nTo understand what it means to sample from a probability distribution, let’s consider a simple example. Let \\(X\\) be a discrete random variable that takes values \\(1, 2, \\ldots, n\\) with probabilities \\(p_1, p_2, \\ldots, p_n\\). To sample from this distribution, we want to generate a random variable \\(X\\) such that \\(\\mathbb{P}(X = i) = p_i\\) for all \\(i = 1, 2, \\ldots, n\\) i.e. we want to select a random integer \\(i\\) with probability \\(p_i\\). If we generate enough samples \\(x_1, x_2, \\ldots, x_N\\) from this distribution, then the fraction of samples that are equal to \\(i\\) will be approximately equal to \\(p_i\\) for large \\(N\\).",
+    "text": "In this chapter, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning.\nTo understand what it means to sample from a probability distribution, let’s consider a simple example. Let \\(X\\) be a discrete random variable that takes values \\(1, 2, \\ldots, n\\) with probabilities \\(p_1, p_2, \\ldots, p_n\\). To sample from this distribution, we want to generate a random variable \\(X\\) such that \\(\\mathbb{P}(X = i) = p_i\\) for all \\(i = 1, 2, \\ldots, n\\) i.e. we want to select a random integer \\(i\\) with probability \\(p_i\\). If we generate enough samples \\(x_1, x_2, \\ldots, x_N\\) from this distribution, then the fraction of samples that are equal to \\(i\\) will be approximately equal to \\(p_i\\) for large \\(N\\).\nMore formally, let \\((\\Omega, \\mathcal{F}, P)\\) be a probability space and let \\(X: \\Omega \\to \\mathcal{X}\\) be a random variable with distribution \\(P_X\\). Sampling from the distribution of \\(X\\) means generating independent realizations \\(x_1, x_2, \\ldots, x_n\\) such that each \\(x_i\\) has the same distribution as \\(X\\). By the strong law of large numbers, we have\n\\[\\lim_{n \\to \\infty} \\frac{1}{n} \\sum_{j=1}^{n} f(x_j) = \\mathbb{E}[f(X)]\\]\nalmost surely for any measurable function \\(f\\) such that \\(\\mathbb{E}[|f(X)|] &lt; \\infty\\).\nThe fundamental challenge in sampling is transforming uniform random numbers, which are readily available from pseudorandom number generators, into samples from arbitrary probability distributions. Most computational environments provide uniform random number generators that produce sequences \\(U_1, U_2, \\ldots\\) where each \\(U_i\\) is approximately uniformly distributed on \\([0,1]\\) and the sequence has good statistical properties.\nFor discrete distributions, if \\(X\\) takes values \\(\\{x_1, x_2, \\ldots, x_k\\}\\) with probabilities \\(\\{p_1, p_2, \\ldots, p_k\\}\\), then one approach is to partition the interval \\([0,1]\\) into subintervals of lengths \\(p_1, p_2, \\ldots, p_k\\) and return \\(x_i\\) if the uniform random number falls in the \\(i\\)-th subinterval.\nFor continuous distributions with cumulative distribution function \\(F(x) = \\mathbb{P}(X \\leq x)\\), the inverse transform method provides an elegant solution when \\(F^{-1}\\) exists and is computable. If \\(U \\sim \\text{Uniform}(0,1)\\), then \\(X = F^{-1}(U)\\) has distribution function \\(F\\). This follows because \\[\\mathbb{P}(F^{-1}(U) \\leq x) = \\mathbb{P}(U \\leq F(x)) = F(x)\\] for any \\(x\\) in the support of \\(X\\).\nWhen direct transformation methods are not available, more sophisticated techniques are required. Rejection sampling generates candidates from a proposal distribution and accepts them with a probability proportional to the target density. Markov chain Monte Carlo methods construct a Markov chain whose stationary distribution is the target distribution. Importance sampling generates samples from one distribution but weights them to approximate expectations under another distribution.\nThe quality of sampling algorithms is measured by several criteria. Correctness ensures that the generated samples actually follow the target distribution. Efficiency measures the computational cost per sample. For iterative methods like MCMC, convergence properties determine how quickly the algorithm approaches the target distribution. The choice of sampling method depends on the specific distribution, the required accuracy, and computational constraints.\nIn the following chapters, we will examine these sampling techniques in detail, providing both theoretical foundations and practical algorithms for implementation.",
     "crumbs": [
       "Sampling Techniques"
     ]
@@ -906,6 +906,66 @@
     "crumbs": [
       "Appendices",
       "<span class='chapter-number'>A</span>  <span class='chapter-title'>Review of Probability Theory</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#introduction",
+    "href": "chapters/sampling/index.html#introduction",
+    "title": "Sampling Techniques",
+    "section": "7.1 Introduction",
+    "text": "7.1 Introduction\nIn this chapter, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning.\nTo understand what it means to sample from a probability distribution, let’s consider a simple example. Let \\(X\\) be a discrete random variable that takes values \\(1, 2, \\ldots, n\\) with probabilities \\(p_1, p_2, \\ldots, p_n\\). To sample from this distribution, we want to generate a random variable \\(X\\) such that \\(\\mathbb{P}(X = i) = p_i\\) for all \\(i = 1, 2, \\ldots, n\\) i.e. we want to select a random integer \\(i\\) with probability \\(p_i\\). If we generate enough samples \\(x_1, x_2, \\ldots, x_N\\) from this distribution, then the fraction of samples that are equal to \\(i\\) will be approximately equal to \\(p_i\\) for large \\(N\\).",
+    "crumbs": [
+      "Sampling Techniques"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#mathematical-formulation",
+    "href": "chapters/sampling/index.html#mathematical-formulation",
+    "title": "Sampling Techniques",
+    "section": "7.2 Mathematical Formulation",
+    "text": "7.2 Mathematical Formulation\nMore formally, sampling from a probability distribution means generating independent and identically distributed (i.i.d.) random variables that follow a specified distribution. For a discrete random variable \\(X\\) with probability mass function \\(p(x)\\), we want to generate samples \\(x_1, x_2, \\ldots, x_N\\) such that:\n\\[\\lim_{N \\to \\infty} \\frac{1}{N} \\sum_{j=1}^{N} \\mathbf{1}_{x = x_i} = p(x_i)\\]\nwhere \\(\\mathbf{1}_{x = x_i}\\) is an indicator function that equals 1 if \\(x = x_i\\) and 0 otherwise.\nFor continuous random variables with probability density function \\(f(x)\\), sampling means generating values such that the empirical distribution converges to the true distribution as the number of samples increases.",
+    "crumbs": [
+      "Sampling Techniques"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#the-fundamental-challenge",
+    "href": "chapters/sampling/index.html#the-fundamental-challenge",
+    "title": "Sampling Techniques",
+    "section": "7.3 The Fundamental Challenge",
+    "text": "7.3 The Fundamental Challenge\nThe core challenge in sampling is that computers are deterministic machines, yet we need to generate random numbers that follow specific probability distributions. Most programming environments provide basic uniform random number generators that produce values uniformly distributed on \\([0,1]\\). The problem then becomes: how do we transform these uniform random numbers into samples from arbitrary probability distributions?\nThis transformation problem has different levels of difficulty depending on the target distribution:\n\nSome distributions have simple, direct transformation formulas\nOthers require iterative algorithms or approximation methods\n\nComplex multivariate distributions may need sophisticated techniques",
+    "crumbs": [
+      "Sampling Techniques"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#types-of-sampling-problems",
+    "href": "chapters/sampling/index.html#types-of-sampling-problems",
+    "title": "Sampling Techniques",
+    "section": "7.4 Types of Sampling Problems",
+    "text": "7.4 Types of Sampling Problems\n\n7.4.1 Standard Distributions\nMany common distributions (normal, exponential, gamma, etc.) have well-established sampling algorithms that are implemented in statistical software packages. These form the building blocks for more complex sampling tasks.\n\n\n7.4.2 Custom Distributions\nWhen working with non-standard distributions or distributions defined through computational models, we need general-purpose sampling techniques that can handle arbitrary probability distributions.\n\n\n7.4.3 High-Dimensional Sampling\nSampling from multivariate distributions introduces additional complexity due to dependencies between variables and the curse of dimensionality. Special techniques are required to handle these cases efficiently.\n\n\n7.4.4 Conditional Sampling\nIn many applications, we need to sample from conditional distributions \\(p(x|y)\\) where the conditioning variable \\(y\\) may change. This requires adaptive sampling strategies.",
+    "crumbs": [
+      "Sampling Techniques"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#quality-of-samples",
+    "href": "chapters/sampling/index.html#quality-of-samples",
+    "title": "Sampling Techniques",
+    "section": "7.5 Quality of Samples",
+    "text": "7.5 Quality of Samples\nThe quality of generated samples can be evaluated through several criteria:\nCorrectness: Do the samples actually follow the target distribution? This can be assessed through statistical tests comparing the empirical distribution to the theoretical one.\nEfficiency: How many computational operations are required per sample? This becomes crucial when millions of samples are needed.\nIndependence: Are the generated samples truly independent, or do they exhibit unwanted correlations? Some sampling methods produce correlated samples that may require additional processing.",
+    "crumbs": [
+      "Sampling Techniques"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/index.html#overview-of-sampling-methods",
+    "href": "chapters/sampling/index.html#overview-of-sampling-methods",
+    "title": "Sampling Techniques",
+    "section": "7.6 Overview of Sampling Methods",
+    "text": "7.6 Overview of Sampling Methods\nThe following chapters will cover the major classes of sampling algorithms:\nChapter 8: Direct Methods covers techniques like inverse transform sampling and the Box-Muller transform that directly convert uniform random numbers into samples from target distributions.\nChapter 9: Rejection Sampling discusses acceptance-rejection methods that generate samples by proposing candidates and accepting them with certain probabilities.\nChapter 10: Importance Sampling introduces methods for sampling from one distribution while targeting another, with applications to rare event simulation and integration.\nChapter 11: Markov Chain Monte Carlo covers iterative methods that construct Markov chains converging to target distributions, including Metropolis-Hastings and Gibbs sampling.\nChapter 12: Advanced Topics discusses specialized techniques for high-dimensional problems, including Hamiltonian Monte Carlo and variational methods.\nEach method has its own strengths, limitations, and appropriate use cases. Understanding when and how to apply each technique is essential for effective statistical computation and machine learning applications.",
+    "crumbs": [
+      "Sampling Techniques"
     ]
   }
 ]
