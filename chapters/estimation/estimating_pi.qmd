@@ -80,10 +80,6 @@ print(df.to_string(index=False))
 ```
 
 
-Here's a revised version that reads more like a math textbook with consolidated sections and smoother flow:
-
----
-
 We begin with a classic Monte Carlo application: estimating the value of $\pi$ using geometric probability. This example illustrates the core principles of Monte Carlo simulation while providing an intuitive geometric interpretation.
 
 Consider a unit circle inscribed in a square with side length 2, both centered at the origin. The circle has radius $r = 1$ and area $A_{\text{circle}} = \pi$, while the square has area $A_{\text{square}} = 4$. The ratio of these areas is $\pi/4$.
