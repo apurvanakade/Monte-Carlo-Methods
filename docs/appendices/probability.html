@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -365,32 +365,13 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#random-variables-and-probability-theory" id="toc-random-variables-and-probability-theory" class="nav-link active" data-scroll-target="#random-variables-and-probability-theory"><span class="header-section-number">A.1</span> Random Variables and Probability Theory</a>
+  <li><a href="#probability-spaces-and-random-variables" id="toc-probability-spaces-and-random-variables" class="nav-link active" data-scroll-target="#probability-spaces-and-random-variables"><span class="header-section-number">A.1</span> Probability Spaces and Random Variables</a></li>
+  <li><a href="#statistical-estimation-and-the-sample-mean" id="toc-statistical-estimation-and-the-sample-mean" class="nav-link" data-scroll-target="#statistical-estimation-and-the-sample-mean"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</a></li>
+  <li><a href="#fundamental-limit-theorems" id="toc-fundamental-limit-theorems" class="nav-link" data-scroll-target="#fundamental-limit-theorems"><span class="header-section-number">A.3</span> Fundamental Limit Theorems</a>
   <ul class="collapse">
-  <li><a href="#probability-spaces" id="toc-probability-spaces" class="nav-link" data-scroll-target="#probability-spaces"><span class="header-section-number">A.1.1</span> Probability Spaces</a></li>
-  <li><a href="#random-variables-and-distributions" id="toc-random-variables-and-distributions" class="nav-link" data-scroll-target="#random-variables-and-distributions"><span class="header-section-number">A.1.2</span> Random Variables and Distributions</a></li>
-  <li><a href="#moments" id="toc-moments" class="nav-link" data-scroll-target="#moments"><span class="header-section-number">A.1.3</span> Moments</a></li>
+  <li><a href="#monte-carlo-implications" id="toc-monte-carlo-implications" class="nav-link" data-scroll-target="#monte-carlo-implications"><span class="header-section-number">A.3.1</span> Monte Carlo Implications</a></li>
   </ul></li>
-  <li><a href="#sec-estimation-theory" id="toc-sec-estimation-theory" class="nav-link" data-scroll-target="#sec-estimation-theory"><span class="header-section-number">A.2</span> Estimation Theory</a>
-  <ul class="collapse">
-  <li><a href="#problem-setup" id="toc-problem-setup" class="nav-link" data-scroll-target="#problem-setup"><span class="header-section-number">A.2.1</span> Problem Setup</a></li>
-  <li><a href="#properties-of-the-sample-mean-estimator" id="toc-properties-of-the-sample-mean-estimator" class="nav-link" data-scroll-target="#properties-of-the-sample-mean-estimator"><span class="header-section-number">A.2.2</span> Properties of the Sample Mean Estimator</a></li>
-  <li><a href="#asymptotic-theory" id="toc-asymptotic-theory" class="nav-link" data-scroll-target="#asymptotic-theory"><span class="header-section-number">A.2.3</span> Asymptotic Theory</a></li>
-  <li><a href="#bias-and-mean-squared-error" id="toc-bias-and-mean-squared-error" class="nav-link" data-scroll-target="#bias-and-mean-squared-error"><span class="header-section-number">A.2.4</span> Bias and Mean Squared Error</a></li>
-  <li><a href="#consistency" id="toc-consistency" class="nav-link" data-scroll-target="#consistency"><span class="header-section-number">A.2.5</span> Consistency</a></li>
-  </ul></li>
-  <li><a href="#confidence-intervals" id="toc-confidence-intervals" class="nav-link" data-scroll-target="#confidence-intervals"><span class="header-section-number">A.3</span> Confidence Intervals</a>
-  <ul class="collapse">
-  <li><a href="#construction" id="toc-construction" class="nav-link" data-scroll-target="#construction"><span class="header-section-number">A.3.1</span> Construction</a></li>
-  <li><a href="#width-analysis" id="toc-width-analysis" class="nav-link" data-scroll-target="#width-analysis"><span class="header-section-number">A.3.2</span> Width Analysis</a></li>
-  <li><a href="#convergence-rate" id="toc-convergence-rate" class="nav-link" data-scroll-target="#convergence-rate"><span class="header-section-number">A.3.3</span> Convergence Rate</a></li>
-  </ul></li>
-  <li><a href="#fundamental-limit-theorems-1" id="toc-fundamental-limit-theorems-1" class="nav-link" data-scroll-target="#fundamental-limit-theorems-1"><span class="header-section-number">A.4</span> Fundamental Limit Theorems</a>
-  <ul class="collapse">
-  <li><a href="#law-of-large-numbers-lln" id="toc-law-of-large-numbers-lln" class="nav-link" data-scroll-target="#law-of-large-numbers-lln"><span class="header-section-number">A.4.1</span> Law of Large Numbers (LLN)</a></li>
-  <li><a href="#central-limit-theorem-clt" id="toc-central-limit-theorem-clt" class="nav-link" data-scroll-target="#central-limit-theorem-clt"><span class="header-section-number">A.4.2</span> Central Limit Theorem (CLT)</a></li>
-  <li><a href="#monte-carlo-applications" id="toc-monte-carlo-applications" class="nav-link" data-scroll-target="#monte-carlo-applications"><span class="header-section-number">A.4.3</span> Monte Carlo Applications</a></li>
-  </ul></li>
+  <li><a href="#confidence-intervals-and-convergence-analysis" id="toc-confidence-intervals-and-convergence-analysis" class="nav-link" data-scroll-target="#confidence-intervals-and-convergence-analysis"><span class="header-section-number">A.4</span> Confidence Intervals and Convergence Analysis</a></li>
   </ul>
 </nav>
     </div>
@@ -416,223 +397,145 @@ window.Quarto = {
 </header>
 
 
-<p>This appendix reviews core probability and estimation concepts needed for Monte Carlo methods, including probability spaces, random variables, unbiased estimation, and the Law of Large Numbers and Central Limit Theorem.</p>
-<section id="random-variables-and-probability-theory" class="level2" data-number="A.1">
-<h2 data-number="A.1" class="anchored" data-anchor-id="random-variables-and-probability-theory"><span class="header-section-number">A.1</span> Random Variables and Probability Theory</h2>
-<section id="probability-spaces" class="level3" data-number="A.1.1">
-<h3 data-number="A.1.1" class="anchored" data-anchor-id="probability-spaces"><span class="header-section-number">A.1.1</span> Probability Spaces</h3>
-<p>A <strong>probability space</strong> is a triple <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> where:</p>
-<ul>
-<li><span class="math inline">\(\Omega\)</span> is the sample space (set of all possible outcomes)</li>
-<li><span class="math inline">\(\mathcal{F}\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra on <span class="math inline">\(\Omega\)</span> (collection of measurable events)</li>
-<li><span class="math inline">\(P: \mathcal{F} \to [0,1]\)</span> is a probability measure satisfying Kolmogorov’s axioms</li>
-</ul>
-</section>
-<section id="random-variables-and-distributions" class="level3" data-number="A.1.2">
-<h3 data-number="A.1.2" class="anchored" data-anchor-id="random-variables-and-distributions"><span class="header-section-number">A.1.2</span> Random Variables and Distributions</h3>
-<p>A <strong>random variable</strong> is a measurable function <span class="math inline">\(X: \Omega \to \mathbb{R}\)</span> such that <span class="math inline">\(\{X \leq x\} \in \mathcal{F}\)</span> for all <span class="math inline">\(x \in \mathbb{R}\)</span>.</p>
-<p>The <strong>cumulative distribution function (CDF)</strong> of <span class="math inline">\(X\)</span> is: <span class="math display">\[F_X(x) = P(X \leq x) = P(\{\omega \in \Omega : X(\omega) \leq x\})\]</span></p>
+<p>This appendix reviews the mathematical foundations underlying Monte Carlo methods, covering probability spaces, random variables, estimation theory, and the fundamental limit theorems that justify Monte Carlo inference.</p>
+<section id="probability-spaces-and-random-variables" class="level2" data-number="A.1">
+<h2 data-number="A.1" class="anchored" data-anchor-id="probability-spaces-and-random-variables"><span class="header-section-number">A.1</span> Probability Spaces and Random Variables</h2>
+<p>A <strong>probability space</strong> is a triple <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> where <span class="math inline">\(\Omega\)</span> is the sample space, <span class="math inline">\(\mathcal{F}\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra on <span class="math inline">\(\Omega\)</span>, and <span class="math inline">\(P: \mathcal{F} \to [0,1]\)</span> is a probability measure satisfying Kolmogorov’s axioms.</p>
+<p>A <strong>random variable</strong> is a measurable function <span class="math inline">\(X: \Omega \to \mathbb{R}\)</span> such that <span class="math inline">\(\{X \leq x\} \in \mathcal{F}\)</span> for all <span class="math inline">\(x \in \mathbb{R}\)</span>. The <strong>cumulative distribution function (CDF)</strong> of <span class="math inline">\(X\)</span> is: <span class="math display">\[F_X(x) = P(X \leq x) = P(\{\omega \in \Omega : X(\omega) \leq x\})\]</span></p>
 <p><strong>Continuous random variables</strong> have a <strong>probability density function (PDF)</strong> <span class="math inline">\(f_X(x)\)</span> such that: <span class="math display">\[F_X(x) = \int_{-\infty}^{x} f_X(t) \, dt \quad \text{and} \quad f_X(x) = \frac{dF_X(x)}{dx}\]</span></p>
-<p><strong>Discrete random variables</strong> with support <span class="math inline">\(\{x_1, x_2, \ldots\}\)</span> satisfy: <span class="math display">\[P(X = x_i) = p_i \quad \text{where} \quad \sum_{i} p_i = 1\]</span></p>
-</section>
-<section id="moments" class="level3" data-number="A.1.3">
-<h3 data-number="A.1.3" class="anchored" data-anchor-id="moments"><span class="header-section-number">A.1.3</span> Moments</h3>
+<p><strong>Discrete random variables</strong> with support <span class="math inline">\(\{x_1, x_2, \ldots\}\)</span> satisfy <span class="math inline">\(P(X = x_i) = p_i\)</span> where <span class="math inline">\(\sum_{i} p_i = 1\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Definition</strong> (Moments)
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>For a random variable <span class="math inline">\(X\)</span>:</p>
 <p><strong>Expected value</strong>: <span class="math display">\[\mathbb{E}[X] = \begin{cases}
 \sum_{i} x_i \cdot P(X = x_i) &amp; \text{if } X \text{ is discrete} \\
 \int_{-\infty}^{\infty} x \cdot f_X(x) \, dx &amp; \text{if } X \text{ is continuous}
 \end{cases}\]</span></p>
 <p><strong>Variance</strong>: <span class="math display">\[\text{Var}(X) = \mathbb{E}[(X - \mathbb{E}[X])^2] = \mathbb{E}[X^2] - (\mathbb{E}[X])^2\]</span></p>
-</section>
-</section>
-<section id="sec-estimation-theory" class="level2" data-number="A.2">
-<h2 data-number="A.2" class="anchored" data-anchor-id="sec-estimation-theory"><span class="header-section-number">A.2</span> Estimation Theory</h2>
-<section id="problem-setup" class="level3" data-number="A.2.1">
-<h3 data-number="A.2.1" class="anchored" data-anchor-id="problem-setup"><span class="header-section-number">A.2.1</span> Problem Setup</h3>
-<p>Consider i.i.d. observations <span class="math inline">\(X_1, \ldots, X_N\)</span> with common distribution <span class="math inline">\(F\)</span>. We seek to estimate <span class="math inline">\(\theta = \mathbb{E}[g(X)]\)</span> for some measurable function <span class="math inline">\(g: \mathbb{R} \to \mathbb{R}\)</span>.</p>
-<p>The <strong>sample mean estimator</strong> is: <span id="eq-sample-mean"><span class="math display">\[\hat{\theta}_N = \frac{1}{N} \sum_{i=1}^{N} g(X_i) \tag{A.1}\]</span></span></p>
-</section>
-<section id="properties-of-the-sample-mean-estimator" class="level3" data-number="A.2.2">
-<h3 data-number="A.2.2" class="anchored" data-anchor-id="properties-of-the-sample-mean-estimator"><span class="header-section-number">A.2.2</span> Properties of the Sample Mean Estimator</h3>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Fundamental Properties
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>Unbiasedness</strong>: <span class="math inline">\(\mathbb{E}[\hat{\theta}_N] = \theta\)</span></p>
-<p><strong>Variance</strong>: <span class="math inline">\(\text{Var}(\hat{\theta}_N) = \frac{\sigma^2}{N}\)</span> where <span class="math inline">\(\sigma^2 = \text{Var}(g(X))\)</span></p>
-<p><strong>Standard Error</strong>: <span class="math inline">\(\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N}\)</span></p>
 </div>
 </div>
 </section>
-<section id="asymptotic-theory" class="level3" data-number="A.2.3">
-<h3 data-number="A.2.3" class="anchored" data-anchor-id="asymptotic-theory"><span class="header-section-number">A.2.3</span> Asymptotic Theory</h3>
+<section id="statistical-estimation-and-the-sample-mean" class="level2" data-number="A.2">
+<h2 data-number="A.2" class="anchored" data-anchor-id="statistical-estimation-and-the-sample-mean"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</h2>
+<p>Consider i.i.d. observations <span class="math inline">\(X_1, \ldots, X_N\)</span> with common distribution <span class="math inline">\(F\)</span>. We seek to estimate <span class="math inline">\(\theta = \mathbb{E}[g(X)]\)</span> for some measurable function <span class="math inline">\(g: \mathbb{R} \to \mathbb{R}\)</span> using the <strong>sample mean estimator</strong>: <span id="eq-sample-mean"><span class="math display">\[\hat{\theta}_N = \frac{1}{N} \sum_{i=1}^{N} g(X_i) \tag{A.1}\]</span></span></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Fundamental Limit Theorems
+<strong>Theorem</strong> (Properties of the Sample Mean Estimator)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Strong Law of Large Numbers</strong>: If <span class="math inline">\(\mathbb{E}[|g(X)|] &lt; \infty\)</span>, then <span class="math display">\[\hat{\theta}_N \xrightarrow{a.s.} \theta \quad \text{as } N \to \infty\]</span></p>
-<p><strong>Central Limit Theorem</strong>: If <span class="math inline">\(\sigma^2 = \text{Var}(g(X)) &lt; \infty\)</span>, then <span class="math display">\[\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2) \quad \text{as } N \to \infty\]</span></p>
+<p>The sample mean estimator <span class="math inline">\(\hat{\theta}_N\)</span> satisfies:</p>
+<ol type="1">
+<li><strong>Unbiasedness</strong>: <span class="math inline">\(\mathbb{E}[\hat{\theta}_N] = \theta\)</span></li>
+<li><strong>Variance</strong>: <span class="math inline">\(\text{Var}(\hat{\theta}_N) = \frac{\sigma^2}{N}\)</span> where <span class="math inline">\(\sigma^2 = \text{Var}(g(X))\)</span></li>
+<li><strong>Standard Error</strong>: <span class="math inline">\(\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N}\)</span></li>
+<li><strong>Mean Squared Error</strong>: <span class="math inline">\(\text{MSE}(\hat{\theta}_N) = \sigma^2/N\)</span></li>
+</ol>
 </div>
 </div>
-</section>
-<section id="bias-and-mean-squared-error" class="level3" data-number="A.2.4">
-<h3 data-number="A.2.4" class="anchored" data-anchor-id="bias-and-mean-squared-error"><span class="header-section-number">A.2.4</span> Bias and Mean Squared Error</h3>
-<p>For any estimator <span class="math inline">\(\hat{\theta}\)</span> of parameter <span class="math inline">\(\theta\)</span>:</p>
+<p>For any estimator <span class="math inline">\(\hat{\theta}\)</span> of parameter <span class="math inline">\(\theta\)</span>, we define:</p>
 <ul>
 <li><strong>Bias</strong>: <span class="math inline">\(\text{Bias}(\hat{\theta}) = \mathbb{E}[\hat{\theta}] - \theta\)</span></li>
 <li><strong>Mean Squared Error</strong>: <span class="math inline">\(\text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \text{Var}(\hat{\theta}) + \text{Bias}^2(\hat{\theta})\)</span></li>
 </ul>
-<p>The sample mean estimator is unbiased with <span class="math inline">\(\text{MSE}(\hat{\theta}_N) = \text{Var}(\hat{\theta}_N) = \sigma^2/N\)</span>.</p>
+<p>An estimator sequence <span class="math inline">\(\{\hat{\theta}_N\}\)</span> is <strong>consistent</strong> if <span class="math inline">\(\hat{\theta}_N \xrightarrow{P} \theta\)</span> as <span class="math inline">\(N \to \infty\)</span>, and <strong>strongly consistent</strong> if <span class="math inline">\(\hat{\theta}_N \xrightarrow{a.s.} \theta\)</span> as <span class="math inline">\(N \to \infty\)</span>.</p>
 </section>
-<section id="consistency" class="level3" data-number="A.2.5">
-<h3 data-number="A.2.5" class="anchored" data-anchor-id="consistency"><span class="header-section-number">A.2.5</span> Consistency</h3>
-<p>An estimator sequence <span class="math inline">\(\{\hat{\theta}_N\}\)</span> is:</p>
-<ul>
-<li><strong>Consistent</strong> if <span class="math inline">\(\hat{\theta}_N \xrightarrow{P} \theta\)</span> as <span class="math inline">\(N \to \infty\)</span></li>
-<li><strong>Strongly consistent</strong> if <span class="math inline">\(\hat{\theta}_N \xrightarrow{a.s.} \theta\)</span> as <span class="math inline">\(N \to \infty\)</span></li>
-<li><strong>Asymptotically normal</strong> if <span class="math inline">\(\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \tau^2)\)</span> for some <span class="math inline">\(\tau^2 &gt; 0\)</span></li>
-</ul>
-</section>
-</section>
-<section id="confidence-intervals" class="level2" data-number="A.3">
-<h2 data-number="A.3" class="anchored" data-anchor-id="confidence-intervals"><span class="header-section-number">A.3</span> Confidence Intervals</h2>
-<section id="construction" class="level3" data-number="A.3.1">
-<h3 data-number="A.3.1" class="anchored" data-anchor-id="construction"><span class="header-section-number">A.3.1</span> Construction</h3>
-<p>Let <span class="math inline">\(S_N^2 = \frac{1}{N-1}\sum_{i=1}^{N}(g(X_i) - \hat{\theta}_N)^2\)</span> be the sample variance. By the CLT: <span class="math display">\[\frac{\hat{\theta}_N - \theta}{S_N/\sqrt{N}} \xrightarrow{d} \mathcal{N}(0,1)\]</span></p>
-<p>An asymptotic <span class="math inline">\((1-\alpha)\)</span>-level confidence interval is: <span class="math display">\[\left[ \hat{\theta}_N - z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}, \quad \hat{\theta}_N + z_{1-\alpha/2} \frac{S_N}{\sqrt{N}} \right]\]</span></p>
-<p>where <span class="math inline">\(z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)\)</span> and <span class="math inline">\(\Phi\)</span> is the standard normal CDF.</p>
-</section>
-<section id="width-analysis" class="level3" data-number="A.3.2">
-<h3 data-number="A.3.2" class="anchored" data-anchor-id="width-analysis"><span class="header-section-number">A.3.2</span> Width Analysis</h3>
-<p><strong>Absolute width</strong>: <span class="math display">\[\text{Width} = 2z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}\]</span></p>
-<p><strong>Relative width</strong>: <span class="math display">\[\text{RW}_N = \frac{2z_{1-\alpha/2} S_N}{|\hat{\theta}_N|\sqrt{N}}\]</span></p>
-</section>
-<section id="convergence-rate" class="level3" data-number="A.3.3">
-<h3 data-number="A.3.3" class="anchored" data-anchor-id="convergence-rate"><span class="header-section-number">A.3.3</span> Convergence Rate</h3>
-<p>The <strong>convergence rate</strong> of an estimator describes how quickly the estimation error decreases as sample size increases. For the sample mean estimator, the standard error decreases as <span class="math inline">\(O(N^{-1/2})\)</span>, meaning:</p>
-<p><span class="math display">\[\text{SE}(\hat{\theta}_N) = \frac{\sigma}{\sqrt{N}} = O(N^{-1/2})\]</span></p>
-<p>This rate is independent of the dimension of the integration domain, which is the key advantage of Monte Carlo methods over deterministic quadrature rules in high-dimensional problems.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Monte Carlo Convergence Properties
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li><p><strong>Square Root Law</strong>: To halve the confidence interval width, need four times as many samples</p></li>
-<li><p><strong>Dimension Independence</strong>: For <strong>independent samples</strong>, the standard error decreases as <span class="math inline">\(O(N^{-1/2})\)</span>, independent of problem dimension. This is the fundamental advantage over deterministic methods.</p></li>
-<li><p><strong>MCMC Caveat</strong>: When independent sampling is impossible and MCMC is used, high-dimensional problems can suffer from poor mixing and high autocorrelation, effectively reducing the number of independent samples.</p></li>
-<li><p><strong>Scale Invariance</strong>: Relative width provides scale-invariant precision measure</p></li>
-</ol>
-</div>
-</div>
-</section>
-</section>
-<section id="fundamental-limit-theorems-1" class="level2" data-number="A.4">
-<h2 data-number="A.4" class="anchored" data-anchor-id="fundamental-limit-theorems-1"><span class="header-section-number">A.4</span> Fundamental Limit Theorems</h2>
-<p>The theoretical foundation of Monte Carlo methods rests on two cornerstone results from probability theory: the Law of Large Numbers and the Central Limit Theorem.</p>
-<section id="law-of-large-numbers-lln" class="level3" data-number="A.4.1">
-<h3 data-number="A.4.1" class="anchored" data-anchor-id="law-of-large-numbers-lln"><span class="header-section-number">A.4.1</span> Law of Large Numbers (LLN)</h3>
-<p>The Law of Large Numbers justifies why sample averages converge to expected values.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Weak Law of Large Numbers (WLLN)
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Let <span class="math inline">\(X_1, X_2, \ldots\)</span> be i.i.d. random variables with <span class="math inline">\(\mathbb{E}[X_i] = \mu\)</span> and <span class="math inline">\(\text{Var}(X_i) = \sigma^2 &lt; \infty\)</span>. Then: <span class="math display">\[\frac{1}{N}\sum_{i=1}^{N} X_i \xrightarrow{P} \mu \quad \text{as } N \to \infty\]</span></p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Strong Law of Large Numbers (SLLN)
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Under the same conditions, we have the stronger result: <span class="math display">\[\frac{1}{N}\sum_{i=1}^{N} X_i \xrightarrow{a.s.} \mu \quad \text{as } N \to \infty\]</span></p>
-</div>
-</div>
-<p><strong>Convergence notation:</strong></p>
-<ul>
-<li><span class="math inline">\(\xrightarrow{P}\)</span>: convergence in probability</li>
-<li><span class="math inline">\(\xrightarrow{a.s.}\)</span>: almost sure convergence (stronger than convergence in probability)</li>
-</ul>
-<p><strong>Monte Carlo implication:</strong> For our estimator <span class="math inline">\(\hat{\theta}_N = \frac{1}{N}\sum_{i=1}^{N} g(X_i)\)</span>, the SLLN guarantees that <span class="math inline">\(\hat{\theta}_N \to \theta\)</span> almost surely, providing the <strong>consistency</strong> of our estimator.</p>
-</section>
-<section id="central-limit-theorem-clt" class="level3" data-number="A.4.2">
-<h3 data-number="A.4.2" class="anchored" data-anchor-id="central-limit-theorem-clt"><span class="header-section-number">A.4.2</span> Central Limit Theorem (CLT)</h3>
-<p>While the LLN tells us that sample averages converge to the true mean, the CLT describes the <strong>rate and distribution</strong> of this convergence.</p>
+<section id="fundamental-limit-theorems" class="level2" data-number="A.3">
+<h2 data-number="A.3" class="anchored" data-anchor-id="fundamental-limit-theorems"><span class="header-section-number">A.3</span> Fundamental Limit Theorems</h2>
+<p>The theoretical foundation of Monte Carlo methods rests on two cornerstone results from probability theory.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Central Limit Theorem
+<strong>Theorem</strong> (Strong Law of Large Numbers)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Let <span class="math inline">\(X_1, X_2, \ldots\)</span> be i.i.d. random variables with <span class="math inline">\(\mathbb{E}[X_i] = \mu\)</span> and <span class="math inline">\(0 &lt; \text{Var}(X_i) = \sigma^2 &lt; \infty\)</span>. Then: <span class="math display">\[\frac{\sqrt{N}(\bar{X}_N - \mu)}{\sigma} \xrightarrow{d} \mathcal{N}(0,1) \quad \text{as } N \to \infty\]</span></p>
-<p>where <span class="math inline">\(\bar{X}_N = \frac{1}{N}\sum_{i=1}^{N} X_i\)</span> and <span class="math inline">\(\xrightarrow{d}\)</span> denotes convergence in distribution.</p>
+<p>Let <span class="math inline">\(X_1, X_2, \ldots\)</span> be i.i.d. random variables with <span class="math inline">\(\mathbb{E}[|X_i|] &lt; \infty\)</span> and <span class="math inline">\(\mathbb{E}[X_i] = \mu\)</span>. Then: <span class="math display">\[\frac{1}{N}\sum_{i=1}^{N} X_i \xrightarrow{a.s.} \mu \quad \text{as } N \to \infty\]</span></p>
 </div>
 </div>
-<p><strong>Equivalent formulations:</strong> <span class="math display">\[\sqrt{N}(\bar{X}_N - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2)\]</span> <span class="math display">\[\bar{X}_N \xrightarrow{d} \mathcal{N}\left(\mu, \frac{\sigma^2}{N}\right) \quad \text{(approximately, for large } N\text{)}\]</span></p>
-</section>
-<section id="monte-carlo-applications" class="level3" data-number="A.4.3">
-<h3 data-number="A.4.3" class="anchored" data-anchor-id="monte-carlo-applications"><span class="header-section-number">A.4.3</span> Monte Carlo Applications</h3>
-<p><strong>For our estimator</strong> <span class="math inline">\(\hat{\theta}_N = \frac{1}{N}\sum_{i=1}^{N} g(X_i)\)</span> where <span class="math inline">\(\theta = \mathbb{E}[g(X)]\)</span>:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Theorem</strong> (Central Limit Theorem)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(X_1, X_2, \ldots\)</span> be i.i.d. random variables with <span class="math inline">\(\mathbb{E}[X_i] = \mu\)</span> and <span class="math inline">\(0 &lt; \text{Var}(X_i) = \sigma^2 &lt; \infty\)</span>. Then: <span class="math display">\[\frac{\sqrt{N}(\bar{X}_N - \mu)}{\sigma} \xrightarrow{d} \mathcal{N}(0,1) \quad \text{as } N \to \infty\]</span> where <span class="math inline">\(\bar{X}_N = \frac{1}{N}\sum_{i=1}^{N} X_i\)</span> and <span class="math inline">\(\xrightarrow{d}\)</span> denotes convergence in distribution.</p>
+</div>
+</div>
+<p><strong>Convergence notation</strong>: <span class="math inline">\(\xrightarrow{P}\)</span> denotes convergence in probability, <span class="math inline">\(\xrightarrow{a.s.}\)</span> denotes almost sure convergence, and <span class="math inline">\(\xrightarrow{d}\)</span> denotes convergence in distribution.</p>
+<section id="monte-carlo-implications" class="level3" data-number="A.3.1">
+<h3 data-number="A.3.1" class="anchored" data-anchor-id="monte-carlo-implications"><span class="header-section-number">A.3.1</span> Monte Carlo Implications</h3>
+<p>For our estimator <span class="math inline">\(\hat{\theta}_N = \frac{1}{N}\sum_{i=1}^{N} g(X_i)\)</span> where <span class="math inline">\(\theta = \mathbb{E}[g(X)]\)</span>:</p>
 <ol type="1">
-<li><p><strong>Consistency</strong> (from SLLN): <span class="math inline">\(\hat{\theta}_N \xrightarrow{a.s.} \theta\)</span></p></li>
-<li><p><strong>Asymptotic normality</strong> (from CLT): <span class="math display">\[\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2)\]</span> where <span class="math inline">\(\sigma^2 = \text{Var}(g(X))\)</span></p></li>
-<li><p><strong>Standard error</strong>: <span class="math inline">\(\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N}\)</span></p></li>
-<li><p><strong>Confidence intervals</strong>: For large <span class="math inline">\(N\)</span>, <span class="math display">\[P\left(\theta \in \left[\hat{\theta}_N \pm z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}\right]\right) \approx 1-\alpha\]</span></p></li>
+<li><strong>Consistency</strong> (from SLLN): <span class="math inline">\(\hat{\theta}_N \xrightarrow{a.s.} \theta\)</span></li>
+<li><strong>Asymptotic normality</strong> (from CLT): <span class="math inline">\(\sqrt{N}(\hat{\theta}_N - \theta) \xrightarrow{d} \mathcal{N}(0, \sigma^2)\)</span> where <span class="math inline">\(\sigma^2 = \text{Var}(g(X))\)</span></li>
 </ol>
+</section>
+</section>
+<section id="confidence-intervals-and-convergence-analysis" class="level2" data-number="A.4">
+<h2 data-number="A.4" class="anchored" data-anchor-id="confidence-intervals-and-convergence-analysis"><span class="header-section-number">A.4</span> Confidence Intervals and Convergence Analysis</h2>
+<p>Let <span class="math inline">\(S_N^2 = \frac{1}{N-1}\sum_{i=1}^{N}(g(X_i) - \hat{\theta}_N)^2\)</span> be the sample variance. By the CLT: <span class="math display">\[\frac{\hat{\theta}_N - \theta}{S_N/\sqrt{N}} \xrightarrow{d} \mathcal{N}(0,1)\]</span></p>
+<p>An asymptotic <span class="math inline">\((1-\alpha)\)</span>-level confidence interval is: <span class="math display">\[\left[ \hat{\theta}_N - z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}, \quad \hat{\theta}_N + z_{1-\alpha/2} \frac{S_N}{\sqrt{N}} \right]\]</span> where <span class="math inline">\(z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)\)</span> and <span class="math inline">\(\Phi\)</span> is the standard normal CDF.</p>
+<p>The <strong>absolute width</strong> is <span class="math inline">\(2z_{1-\alpha/2} \frac{S_N}{\sqrt{N}}\)</span> and the <strong>relative width</strong> is <span class="math inline">\(\frac{2z_{1-\alpha/2} S_N}{|\hat{\theta}_N|\sqrt{N}}\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Remark</strong> (Monte Carlo Convergence Properties)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The sample mean estimator has standard error <span class="math inline">\(\text{SE}(\hat{\theta}_N) = \sigma/\sqrt{N} = O(N^{-1/2})\)</span>, leading to several key properties:</p>
+<ol type="1">
+<li><strong>Square Root Law</strong>: To halve the confidence interval width requires four times as many samples</li>
+<li><strong>Dimension Independence</strong>: The <span class="math inline">\(O(N^{-1/2})\)</span> convergence rate is independent of problem dimension for independent samples</li>
+<li><strong>MCMC Caveat</strong>: When using MCMC, dependence between samples can effectively reduce the number of independent observations, particularly in high dimensions</li>
+</ol>
+</div>
+</div>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Conditions for CLT/LLN
+<strong>Conditions for Limit Theorems</strong>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Both theorems require:</p>
+<p>Both the Law of Large Numbers and Central Limit Theorem require:</p>
 <ul>
 <li><strong>Independence</strong>: Samples must be independent (or satisfy weaker mixing conditions)</li>
-<li><strong>Identical distribution</strong>: Samples from the same distribution</li>
+<li><strong>Identical distribution</strong>: Samples from the same distribution<br>
+</li>
 <li><strong>Finite moments</strong>: Finite mean for LLN, finite variance for CLT</li>
 </ul>
-<p>When using MCMC, the independence assumption is violated, requiring more sophisticated analysis of the effective sample size.</p>
+<p>When using MCMC, the independence assumption is violated, requiring analysis of effective sample size.</p>
 </div>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

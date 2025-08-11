@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2025-03-11">
 
-<title>15&nbsp; Ising Model – Monte Carlo Methods Lecture Notes</title>
+<title>14&nbsp; Ising Model – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -101,13 +101,14 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="15&nbsp; Ising Model – Monte Carlo Methods Lecture Notes">
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="14&nbsp; Ising Model – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="ising_files/figure-html/cell-3-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -128,7 +129,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/ising.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/ising.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -137,7 +138,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -155,7 +156,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -170,19 +171,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
       </ul>
@@ -199,47 +188,53 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
@@ -252,25 +247,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
@@ -287,13 +282,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -310,19 +305,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -330,7 +325,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -372,31 +367,31 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-physical-ising-model" id="toc-the-physical-ising-model" class="nav-link active" data-scroll-target="#the-physical-ising-model"><span class="header-section-number">15.1</span> The Physical Ising Model</a></li>
-  <li><a href="#the-mathematical-ising-model" id="toc-the-mathematical-ising-model" class="nav-link" data-scroll-target="#the-mathematical-ising-model"><span class="header-section-number">15.2</span> The Mathematical Ising Model</a>
+  <li><a href="#the-physical-ising-model" id="toc-the-physical-ising-model" class="nav-link active" data-scroll-target="#the-physical-ising-model"><span class="header-section-number">14.1</span> The Physical Ising Model</a></li>
+  <li><a href="#the-mathematical-ising-model" id="toc-the-mathematical-ising-model" class="nav-link" data-scroll-target="#the-mathematical-ising-model"><span class="header-section-number">14.2</span> The Mathematical Ising Model</a>
   <ul class="collapse">
-  <li><a href="#hamiltonian" id="toc-hamiltonian" class="nav-link" data-scroll-target="#hamiltonian"><span class="header-section-number">15.2.1</span> Hamiltonian</a></li>
-  <li><a href="#boltzmann-distribution" id="toc-boltzmann-distribution" class="nav-link" data-scroll-target="#boltzmann-distribution"><span class="header-section-number">15.2.2</span> Boltzmann Distribution</a></li>
-  <li><a href="#low-temperature" id="toc-low-temperature" class="nav-link" data-scroll-target="#low-temperature"><span class="header-section-number">15.2.3</span> Low Temperature</a></li>
-  <li><a href="#magnetization" id="toc-magnetization" class="nav-link" data-scroll-target="#magnetization"><span class="header-section-number">15.2.4</span> Magnetization</a></li>
+  <li><a href="#hamiltonian" id="toc-hamiltonian" class="nav-link" data-scroll-target="#hamiltonian"><span class="header-section-number">14.2.1</span> Hamiltonian</a></li>
+  <li><a href="#boltzmann-distribution" id="toc-boltzmann-distribution" class="nav-link" data-scroll-target="#boltzmann-distribution"><span class="header-section-number">14.2.2</span> Boltzmann Distribution</a></li>
+  <li><a href="#low-temperature" id="toc-low-temperature" class="nav-link" data-scroll-target="#low-temperature"><span class="header-section-number">14.2.3</span> Low Temperature</a></li>
+  <li><a href="#magnetization" id="toc-magnetization" class="nav-link" data-scroll-target="#magnetization"><span class="header-section-number">14.2.4</span> Magnetization</a></li>
   </ul></li>
-  <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link" data-scroll-target="#gibbs-sampling"><span class="header-section-number">15.3</span> Gibbs Sampling</a>
+  <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link" data-scroll-target="#gibbs-sampling"><span class="header-section-number">14.3</span> Gibbs Sampling</a>
   <ul class="collapse">
-  <li><a href="#conditional-distribution" id="toc-conditional-distribution" class="nav-link" data-scroll-target="#conditional-distribution"><span class="header-section-number">15.3.1</span> Conditional Distribution</a></li>
-  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm"><span class="header-section-number">15.3.2</span> The Algorithm</a></li>
+  <li><a href="#conditional-distribution" id="toc-conditional-distribution" class="nav-link" data-scroll-target="#conditional-distribution"><span class="header-section-number">14.3.1</span> Conditional Distribution</a></li>
+  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm"><span class="header-section-number">14.3.2</span> The Algorithm</a></li>
   </ul></li>
-  <li><a href="#phase-transitions" id="toc-phase-transitions" class="nav-link" data-scroll-target="#phase-transitions"><span class="header-section-number">15.4</span> Phase Transitions</a></li>
-  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">15.5</span> Simulation</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">15.6</span> Final Remarks</a></li>
+  <li><a href="#phase-transitions" id="toc-phase-transitions" class="nav-link" data-scroll-target="#phase-transitions"><span class="header-section-number">14.4</span> Phase Transitions</a></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">14.5</span> Simulation</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">14.6</span> Final Remarks</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/ising.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/ising.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></h1>
+<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></h1>
 </div>
 
 
@@ -419,8 +414,8 @@ window.Quarto = {
 </header>
 
 
-<section id="the-physical-ising-model" class="level2" data-number="15.1">
-<h2 data-number="15.1" class="anchored" data-anchor-id="the-physical-ising-model"><span class="header-section-number">15.1</span> The Physical Ising Model</h2>
+<section id="the-physical-ising-model" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="the-physical-ising-model"><span class="header-section-number">14.1</span> The Physical Ising Model</h2>
 <p>The Ising model is a simple model of ferromagnetism from statistical mechanics. The setup is as follows:</p>
 <ol type="1">
 <li><strong>Particles</strong>: We have a lattice of <span class="math inline">\(N\)</span> particles, each of which can be have one of two states of magnetization: spin up (<span class="math inline">\(X = 1\)</span>) or spin down (<span class="math inline">\(X = -1\)</span>). For simplicity, we assume the grid is “wrapped” so that the top and bottom edges are connected, and the left and right edges are connected. <strong>This means that each site has four neighbors.</strong> Such a grid is called a torus.</li>
@@ -430,7 +425,7 @@ window.Quarto = {
 <li><strong>Magnetization</strong>: If the system is in a state where most of the particles have the same spin, the system is said to be magnetized.</li>
 </ol>
 <p>Next we create a mathematical model to describe the system.</p>
-<div id="f3916c33" class="cell" data-execution_count="2">
+<div id="ff9388f6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -440,28 +435,28 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="the-mathematical-ising-model" class="level2" data-number="15.2">
-<h2 data-number="15.2" class="anchored" data-anchor-id="the-mathematical-ising-model"><span class="header-section-number">15.2</span> The Mathematical Ising Model</h2>
+<section id="the-mathematical-ising-model" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="the-mathematical-ising-model"><span class="header-section-number">14.2</span> The Mathematical Ising Model</h2>
 <p>We model the system using <span class="math inline">\(N^2\)</span> random variables <span class="math inline">\(X_{i, j}\)</span>. Each <span class="math inline">\(X_{i, j}\)</span> is a binary random variable that takes the value <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The configuration of the system is given by the <span class="math inline">\(N^2\)</span> length vector <span class="math inline">\(\mathbf{X} = (X_{1, 1}, X_{1, 2}, \ldots, X_{N, N})\)</span>. There are <span class="math inline">\(2^{N^2}\)</span> possible configurations of the system i.e.&nbsp;the state space has size <span class="math inline">\(2^{N^2}\)</span>. We can imagine each configuration as being the vertex of a hypercube in <span class="math inline">\(N^2\)</span> dimensions with vertices <span class="math inline">\((\pm 1, \pm 1, \ldots, \pm 1)\)</span>. We’ll let the variable <span class="math inline">\(\sigma\)</span> denote a configuration of the system. So <span class="math inline">\(\sigma\)</span> is a vector of length <span class="math inline">\(N^2\)</span> with entries in <span class="math inline">\(\{-1, 1\}\)</span>.</p>
 <p>In order to describe the system mathematically, we need to provide the joint probability distribution of the random variables <span class="math inline">\(X_{i, j}\)</span>. This is done using the Hamiltonian of the system and the Boltzmann distribution.</p>
-<section id="hamiltonian" class="level3" data-number="15.2.1">
-<h3 data-number="15.2.1" class="anchored" data-anchor-id="hamiltonian"><span class="header-section-number">15.2.1</span> Hamiltonian</h3>
+<section id="hamiltonian" class="level3" data-number="14.2.1">
+<h3 data-number="14.2.1" class="anchored" data-anchor-id="hamiltonian"><span class="header-section-number">14.2.1</span> Hamiltonian</h3>
 <p>The Hamiltonian of the system is given by</p>
 <p><span class="math display">\[
 H(\sigma) = -J \sum \limits_{(i, j) \text{ and } (i', j') \text{ are neighbors}} X_{i, j} X_{i', j'}
 \]</span></p>
 <p>where the sum is over all pairs of neighboring particles. The Hamiltonian is just a measure of the energy of the system. Note that because <span class="math inline">\(J\)</span> is positive, the energy is minimized when neighboring particles have the same spin.</p>
 </section>
-<section id="boltzmann-distribution" class="level3" data-number="15.2.2">
-<h3 data-number="15.2.2" class="anchored" data-anchor-id="boltzmann-distribution"><span class="header-section-number">15.2.2</span> Boltzmann Distribution</h3>
+<section id="boltzmann-distribution" class="level3" data-number="14.2.2">
+<h3 data-number="14.2.2" class="anchored" data-anchor-id="boltzmann-distribution"><span class="header-section-number">14.2.2</span> Boltzmann Distribution</h3>
 <p>The probability of the system being in a particular configuration <span class="math inline">\(\sigma\)</span> is given by the Boltzmann distribution:</p>
 <p><span class="math display">\[
 f(\sigma) = \frac{e^{-H(\sigma)/T}}{Z}
 \]</span></p>
 <p>where <span class="math inline">\(T\)</span> is the temperature, and <span class="math inline">\(Z\)</span> is the normalization constant called the partition function. This is the joint probability mass function of the random variables <span class="math inline">\(X_{i, j}\)</span>. The partition function <span class="math inline">\(Z\)</span> is not easy to compute, but thankfully we do not need it to sample from the joint distribution.</p>
 </section>
-<section id="low-temperature" class="level3" data-number="15.2.3">
-<h3 data-number="15.2.3" class="anchored" data-anchor-id="low-temperature"><span class="header-section-number">15.2.3</span> Low Temperature</h3>
+<section id="low-temperature" class="level3" data-number="14.2.3">
+<h3 data-number="14.2.3" class="anchored" data-anchor-id="low-temperature"><span class="header-section-number">14.2.3</span> Low Temperature</h3>
 <p>If we plugin the partition function explicitly, we can see that the probability distribution becomes</p>
 <p><span class="math display">\[
 f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum \limits_{\sigma'}e^{-H(\sigma')/T}}.
@@ -472,8 +467,8 @@ f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum \limits_{\sigma'}e^{-H(\sigma')/T}}.
 \]</span></p>
 <p>If <span class="math inline">\(H(\sigma)_{\min} = H(\sigma)\)</span>, then the probability of the system being in that state is <span class="math inline">\(1\)</span> and <span class="math inline">\(0\)</span> otherwise. This means that at low temperatures, the system will be in a state that minimizes the energy. But as <span class="math inline">\(T\)</span> increases, more and more high energy states become probable. So temperature can be thought of as adding variability to the system.</p>
 </section>
-<section id="magnetization" class="level3" data-number="15.2.4">
-<h3 data-number="15.2.4" class="anchored" data-anchor-id="magnetization"><span class="header-section-number">15.2.4</span> Magnetization</h3>
+<section id="magnetization" class="level3" data-number="14.2.4">
+<h3 data-number="14.2.4" class="anchored" data-anchor-id="magnetization"><span class="header-section-number">14.2.4</span> Magnetization</h3>
 <p>The magnetization of the system is given by</p>
 <p><span class="math display">\[
 M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
@@ -481,18 +476,18 @@ M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
 <p>If the system is magnetized, then <span class="math inline">\(M(\sigma)\)</span> will be close to <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution <span class="math inline">\(f(\sigma)\)</span> and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.</p>
 </section>
 </section>
-<section id="gibbs-sampling" class="level2" data-number="15.3">
-<h2 data-number="15.3" class="anchored" data-anchor-id="gibbs-sampling"><span class="header-section-number">15.3</span> Gibbs Sampling</h2>
+<section id="gibbs-sampling" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="gibbs-sampling"><span class="header-section-number">14.3</span> Gibbs Sampling</h2>
 <p>There are two natural ways of sampling from the distribution <span class="math inline">\(f(\sigma)\)</span>: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we’ll use Gibbs sampling.</p>
-<section id="conditional-distribution" class="level3" data-number="15.3.1">
-<h3 data-number="15.3.1" class="anchored" data-anchor-id="conditional-distribution"><span class="header-section-number">15.3.1</span> Conditional Distribution</h3>
+<section id="conditional-distribution" class="level3" data-number="14.3.1">
+<h3 data-number="14.3.1" class="anchored" data-anchor-id="conditional-distribution"><span class="header-section-number">14.3.1</span> Conditional Distribution</h3>
 <p>Consider a single spin <span class="math inline">\(X_{i, j}\)</span>. Let <span class="math inline">\(\hat{X}_{i, j}\)</span> denote the set of spins at all sites except <span class="math inline">\((i, j)\)</span>. We want to find the conditional distribution of <span class="math inline">\(X_{i, j}\)</span> given <span class="math inline">\(\hat{X}_{i, j}\)</span>. We’ll assume the following result without proof:</p>
 <p><span id="eq-conditional"><span class="math display">\[
 \begin{aligned}
 P(X_{i, j} = 1 | \hat{X}_{i, j}) &amp;= \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}, \\
 P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 \end{aligned}
-\tag{15.1}\]</span></span></p>
+\tag{14.1}\]</span></span></p>
 <p>where <span class="math inline">\(T\)</span> is the temperature of the system and <span class="math inline">\(h_{i, j}\)</span> is the effective field at site <span class="math inline">\((i, j)\)</span>, given by</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -501,8 +496,8 @@ h_{i, j}
 &amp;= J \left( X_{i-1, j} + X_{i+1, j} + X_{i, j-1} + X_{i, j+1} \right)
 \end{aligned}
 \]</span></p>
-<p>The conditional distribution in <a href="#eq-conditional" class="quarto-xref">Equation&nbsp;<span>15.1</span></a> is a logistic function. When <span class="math inline">\(h_{i, j}\)</span> is positive, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is greater than <span class="math inline">\(0.5\)</span>, and when <span class="math inline">\(h_{i, j}\)</span> is negative, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is less than <span class="math inline">\(0.5\)</span>. This makes sense because if the effective field is positive, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(1\)</span> and if the effective field is negative, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(-1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(-1\)</span>.</p>
-<div id="258394d9" class="cell" data-execution_count="3">
+<p>The conditional distribution in <a href="#eq-conditional" class="quarto-xref">Equation&nbsp;<span>14.1</span></a> is a logistic function. When <span class="math inline">\(h_{i, j}\)</span> is positive, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is greater than <span class="math inline">\(0.5\)</span>, and when <span class="math inline">\(h_{i, j}\)</span> is negative, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is less than <span class="math inline">\(0.5\)</span>. This makes sense because if the effective field is positive, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(1\)</span> and if the effective field is negative, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(-1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(-1\)</span>.</p>
+<div id="d06be51f" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -512,8 +507,8 @@ h_{i, j}
 </div>
 </div>
 </section>
-<section id="the-algorithm" class="level3" data-number="15.3.2">
-<h3 data-number="15.3.2" class="anchored" data-anchor-id="the-algorithm"><span class="header-section-number">15.3.2</span> The Algorithm</h3>
+<section id="the-algorithm" class="level3" data-number="14.3.2">
+<h3 data-number="14.3.2" class="anchored" data-anchor-id="the-algorithm"><span class="header-section-number">14.3.2</span> The Algorithm</h3>
 <ol type="1">
 <li>Initialize the grid of spins <span class="math inline">\(X_i\)</span> for <span class="math inline">\(i = 1\)</span> to <span class="math inline">\(N\)</span> randomly.</li>
 <li>For <span class="math inline">\(i = 1\)</span> to <span class="math inline">\(N\)</span>
@@ -533,8 +528,8 @@ h_{i, j}
 <p>One simple way to this is to run the Gibbs sampler until the running average of the magnetization stabilizes. At that point, we can start using the samples to estimate the magnetization.</p>
 </section>
 </section>
-<section id="phase-transitions" class="level2" data-number="15.4">
-<h2 data-number="15.4" class="anchored" data-anchor-id="phase-transitions"><span class="header-section-number">15.4</span> Phase Transitions</h2>
+<section id="phase-transitions" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="phase-transitions"><span class="header-section-number">14.4</span> Phase Transitions</h2>
 <p>It was discovered that the Ising model for a 2D grid exhibits a phenomenon called <strong>phase transition</strong>. If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the <strong>critical temperature</strong>.</p>
 <p>It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice <span class="math inline">\(\to \infty\)</span>. This limiting critical temperature for a square lattice is given by</p>
 <p><span class="math display">\[
@@ -542,12 +537,12 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 \]</span></p>
 <p>Of course, in our simulation, we’ll be using finite sized lattices so we should expect some deviation from this result.</p>
 </section>
-<section id="simulation" class="level2" data-number="15.5">
-<h2 data-number="15.5" class="anchored" data-anchor-id="simulation"><span class="header-section-number">15.5</span> Simulation</h2>
+<section id="simulation" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="simulation"><span class="header-section-number">14.5</span> Simulation</h2>
 <p>Below are the results of simulating the Ising model on a <span class="math inline">\(20 \times 20\)</span> grid for <span class="math inline">\(J = 1\)</span>. The predicted critical temperature is <span class="math inline">\(T_c = 2.269\)</span>.</p>
 <p>We can see that at <span class="math inline">\(T=1.5\)</span>, the system is magnetized and the magnetization is more or less constant and close to 1 or -1 over various runs. At <span class="math inline">\(T=2.5\)</span>, the system is not magnetized and the average magnetization is close to 0. It fluctuates wildly over various runs.</p>
 <p>If we gradually increase the temperature from <span class="math inline">\(T=1\)</span> to <span class="math inline">\(T=3\)</span>, we can see that the magnetization decreases smoothly until <span class="math inline">\(T=2\)</span> after which it drops suddenly. This is the phase transition. Below the graph are the snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.</p>
-<div id="b7f7103a" class="cell" data-execution_count="5">
+<div id="f06a2c94" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -563,7 +558,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="7c023dcc" class="cell" data-execution_count="7">
+<div id="dc66829a" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -572,7 +567,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="342770ce" class="cell" data-execution_count="9">
+<div id="daee6d10" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -582,8 +577,8 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </section>
-<section id="final-remarks" class="level2" data-number="15.6">
-<h2 data-number="15.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">15.6</span> Final Remarks</h2>
+<section id="final-remarks" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">14.6</span> Final Remarks</h2>
 <p>Not all graphs show a phase transition. The Ising model in 1D has no phase transition at any temperature. It was conjectured that the Ising model in 2D has no phase transition either, but this was proven wrong when an analytical solution was found by Lars Onsager in 1944. The Ising model in 3D also has a phase transition, but the critical temperature is not known exactly. Most critical temperatures are only known for limiting cases when the size of the lattice goes to infinity. For finite cases, Monte Carlo simulations are the only way to estimate the critical temperature.</p>
 
 
@@ -992,12 +987,12 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../../chapters/applications/SDE.html" class="pagination-link" aria-label="Stochastic Differential Equations">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/applications/mmn.html" class="pagination-link" aria-label="M/M/n Queue">
-        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -497,7 +497,7 @@ X_{n+1} = (aX_n + 1) \mod 2^b,
 <p>The chi-square test is used to test the null hypothesis that the observed data is consistent with the expected data. If the chi-square test statistic is large, then the null hypothesis is rejected.</p>
 <p>The critical value of the chi-square test statistic depends on the number of degrees of freedom. The degrees of freedom is given by <span class="math inline">\(k-1\)</span>. In python, you can use the <code>scipy.stats.chi2.ppf</code> function to perform the chi-square test.</p>
 <p>The chi-square test is sensitive to the number of bins <span class="math inline">\(k\)</span>. If <span class="math inline">\(k\)</span> is too small, then the test may not be sensitive enough to detect deviations from the expected distribution. If <span class="math inline">\(k\)</span> is too large, then the test may be too sensitive and may detect deviations that are not significant.</p>
-<div id="a80d82b8" class="cell" data-execution_count="1">
+<div id="c9bda08e" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-stdout">
 <pre><code>To find the critical value, we find $x$ such that $P(X &gt; x) = 0.05$ for a chi-square distribution with 3 degrees of freedom. In the figure below, this is the area to the right of the green dashed line.
 If your chi-square value is greater than the critical value, you can reject the null hypothesis.</code></pre>
@@ -523,7 +523,7 @@ If your chi-square value is greater than the critical value, you can reject the 
   Z = \dfrac{X - 0.5}{\sqrt{1/(4k)}}.
 \end{equation}\]</span></p>
 <p>The critical value of the z-test statistic depends on the significance level <span class="math inline">\(\alpha\)</span>. In python, you can use the <code>scipy.stats.norm.ppf</code> function to perform the z-test. Note that because this is a two-sided test, we reject the null hypothesis if <span class="math inline">\(Z &gt; z_{\alpha/2}\)</span> or <span class="math inline">\(Z &lt; -z_{\alpha/2}\)</span> where <span class="math inline">\(z_{\alpha/2}\)</span> is the critical value of the z-test statistic at the significance level <span class="math inline">\(\alpha/2\)</span>.</p>
-<div id="829d97fb" class="cell" data-execution_count="2">
+<div id="9b6ad82c" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stdout">
 <pre><code>To find the critical value, we find $x$ such that $P(-x &lt; X &lt; x) = 0.95$ for a standard normal distribution. In the figure below, this is the area between the green dashed lines.
 If your z-score is outside of the critical values, you can reject the null hypothesis.</code></pre>

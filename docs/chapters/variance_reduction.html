@@ -42,7 +42,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -493,7 +493,7 @@ q(x) \propto p(x) |f(x)|
 q(x) = \lambda e^{-\lambda (x-2)}, \quad x \ge 2.
 \]</span> The plots below show the running averages of the crude and importance sampling estimators for <span class="math inline">\(N = 2000\)</span> samples. The importance sampling estimator is much more stable and converges to the true value of <span class="math inline">\(\ell\)</span> much faster than the crude estimator.</p>
 </div>
-<div id="a8b60bc3" class="cell" data-execution_count="4">
+<div id="6ee3f7ff" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -503,9 +503,9 @@ q(x) = \lambda e^{-\lambda (x-2)}, \quad x \ge 2.
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Variance of Importance Sampling Estimate: 0.00000
-Relative Error of Importance Sampling Estimate: 0.01247
+Relative Error of Importance Sampling Estimate: 0.01217
 Variance of Crude Monte Carlo Estimate: 0.00001
-Relative Error of Crude Monte Carlo Estimate: 0.09231</code></pre>
+Relative Error of Crude Monte Carlo Estimate: 0.10030</code></pre>
 </div>
 </div>
 <section id="remarks" class="level3" data-number="12.1.1">
@@ -542,7 +542,7 @@ Relative Error of Crude Monte Carlo Estimate: 0.09231</code></pre>
 <div id="exm-antithetic-variables" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Example: Antithetic Variates.</strong> Consider the problem of estimating the integral <span class="math inline">\(\ell = \int_0^1 (1 + x^2)^{-1} dx\)</span> using antithetic variates. The plots below show the running averages of the crude and antithetic variate estimators for <span class="math inline">\(N = 100\)</span> samples. The antithetic variate estimator achieves a <span class="math inline">\(50x\)</span> reduction in variance compared to the crude estimator.</p>
 </div>
-<div id="130c824c" class="cell" data-execution_count="6">
+<div id="164c4904" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -551,11 +551,11 @@ Relative Error of Crude Monte Carlo Estimate: 0.09231</code></pre>
 </div>
 </div>
 </div>
-<div id="6e069168" class="cell" data-execution_count="7">
+<div id="eb01fe1e" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-stdout">
-<pre><code>Standard Monte Carlo Estimate: 0.770064, Variance: 1.180981e-04
-Antithetic Variates Estimate: 0.787292, Variance: 1.917273e-06
-Variance Reduction Factor: 61.60x</code></pre>
+<pre><code>Standard Monte Carlo Estimate: 0.780552, Variance: 1.322585e-04
+Antithetic Variates Estimate: 0.786733, Variance: 1.947892e-06
+Variance Reduction Factor: 67.90x</code></pre>
 </div>
 </div>
 </section>

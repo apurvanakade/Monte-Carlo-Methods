@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -366,20 +366,17 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#problem-setup" id="toc-problem-setup" class="nav-link active" data-scroll-target="#problem-setup"><span class="header-section-number">4.1</span> Problem Setup</a></li>
-  <li><a href="#the-monte-carlo-estimator" id="toc-the-monte-carlo-estimator" class="nav-link" data-scroll-target="#the-monte-carlo-estimator"><span class="header-section-number">4.2</span> The Monte Carlo Estimator</a></li>
-  <li><a href="#unbiasedness" id="toc-unbiasedness" class="nav-link" data-scroll-target="#unbiasedness"><span class="header-section-number">4.3</span> Unbiasedness</a></li>
-  <li><a href="#variance" id="toc-variance" class="nav-link" data-scroll-target="#variance"><span class="header-section-number">4.4</span> Variance</a></li>
-  <li><a href="#example-polynomial-integration" id="toc-example-polynomial-integration" class="nav-link" data-scroll-target="#example-polynomial-integration"><span class="header-section-number">4.5</span> Example: Polynomial Integration</a>
+  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a></li>
+  <li><a href="#function-characteristics-and-performance" id="toc-function-characteristics-and-performance" class="nav-link" data-scroll-target="#function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</a>
   <ul class="collapse">
-  <li><a href="#example-low-vs.-high-frequency-functions" id="toc-example-low-vs.-high-frequency-functions" class="nav-link" data-scroll-target="#example-low-vs.-high-frequency-functions"><span class="header-section-number">4.5.1</span> Example: Low vs.&nbsp;High Frequency Functions</a></li>
-  <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">4.5.2</span> Remarks</a></li>
+  <li><a href="#example-low-vs.-high-frequency-functions" id="toc-example-low-vs.-high-frequency-functions" class="nav-link" data-scroll-target="#example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</a></li>
+  <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">4.2.2</span> Remarks</a></li>
   </ul></li>
-  <li><a href="#multidimensional-integration" id="toc-multidimensional-integration" class="nav-link" data-scroll-target="#multidimensional-integration"><span class="header-section-number">4.6</span> Multidimensional Integration</a>
+  <li><a href="#multidimensional-integration" id="toc-multidimensional-integration" class="nav-link" data-scroll-target="#multidimensional-integration"><span class="header-section-number">4.3</span> Multidimensional Integration</a>
   <ul class="collapse">
-  <li><a href="#example-gaussian-like-function-in-multiple-dimensions" id="toc-example-gaussian-like-function-in-multiple-dimensions" class="nav-link" data-scroll-target="#example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.6.1</span> Example: Gaussian-like Function in Multiple Dimensions</a></li>
+  <li><a href="#example-gaussian-like-function-in-multiple-dimensions" id="toc-example-gaussian-like-function-in-multiple-dimensions" class="nav-link" data-scroll-target="#example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.3.1</span> Example: Gaussian-like Function in Multiple Dimensions</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">5</span> Conclusion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">4.4</span> Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -406,16 +403,8 @@ window.Quarto = {
 
 
 <p>Monte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.</p>
-<section id="problem-setup" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="problem-setup"><span class="header-section-number">4.1</span> Problem Setup</h2>
-<p>We want to estimate the integral: <span class="math display">\[\ell = \int_a^b f(x) \, dx\]</span></p>
-</section>
-<section id="the-monte-carlo-estimator" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="the-monte-carlo-estimator"><span class="header-section-number">4.2</span> The Monte Carlo Estimator</h2>
-<p><strong>Key insight</strong>: Rewrite the integral as an expectation. If <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>:</p>
-<p><span class="math display">\[\int_a^b f(x) \, dx = (b-a) \mathbb{E}[f(X)]\]</span></p>
-<p><strong>Estimator</strong>: Given <span class="math inline">\(N\)</span> samples <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>:</p>
-<p><span class="math display">\[\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)\]</span></p>
+<p>Consider the problem of estimating the integral <span class="math inline">\(\ell = \int_a^b f(x) \, dx\)</span>. The key insight is to rewrite this integral as an expectation. If <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>, then: <span class="math display">\[\int_a^b f(x) \, dx = (b-a) \mathbb{E}[f(X)]\]</span></p>
+<p>This reformulation allows us to estimate the integral using sample averages. Given <span class="math inline">\(N\)</span> independent samples <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>, our Monte Carlo estimator is: <span class="math display">\[\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)\]</span></p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -429,19 +418,12 @@ Geometric Interpretation
 <p>We’re approximating the area under <span class="math inline">\(f(x)\)</span> by averaging function values at random points and scaling by interval width.</p>
 </div>
 </div>
-</section>
-<section id="unbiasedness" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="unbiasedness"><span class="header-section-number">4.3</span> Unbiasedness</h2>
-<p><span class="math display">\[\begin{aligned}
-\mathbb{E}[\hat{\ell}_N] &amp;= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] \\
-&amp;= \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx \\
-&amp;= \frac{1}{N} \sum_{i=1}^{N} \ell = \ell
+<section id="statistical-properties" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</h2>
+<p>The Monte Carlo integration estimator possesses several important statistical properties. First, it is unbiased: <span class="math display">\[\begin{aligned}
+\mathbb{E}[\hat{\ell}_N] &amp;= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
 \end{aligned}\]</span></p>
-</section>
-<section id="variance" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="variance"><span class="header-section-number">4.4</span> Variance</h2>
-<p><span class="math display">\[\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f\]</span></p>
-<p>where <span class="math inline">\(\sigma^2_f = \text{Var}(f(X))\)</span> is the variance of <span class="math inline">\(f(X)\)</span> under uniform distribution.</p>
+<p>The variance of our estimator is: <span class="math display">\[\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f\]</span> where <span class="math inline">\(\sigma^2_f = \text{Var}(f(X))\)</span> is the variance of <span class="math inline">\(f(X)\)</span> under the uniform distribution.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -453,43 +435,47 @@ Key Properties
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><strong>Standard Error</strong>: <span class="math inline">\(\text{SE} = \frac{(b-a)\sigma_f}{\sqrt{N}}\)</span></li>
-<li><strong>Convergence Rate</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> regardless of dimension</li>
-<li><strong>CLT</strong>: <span class="math inline">\(\sqrt{N}(\hat{\ell}_N - \ell) \xrightarrow{d} \mathcal{N}(0, (b-a)^2\sigma^2_f)\)</span></li>
+<li><p><strong>Standard Error</strong>: <span class="math inline">\(\text{SE} = \frac{(b-a)\sigma_f}{\sqrt{N}}\)</span></p></li>
+<li><p><strong>Convergence Rate</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> regardless of dimension</p></li>
+<li><p><strong>CLT</strong>: <span class="math inline">\(\sqrt{N}(\hat{\ell}_N - \ell) \xrightarrow{d} \mathcal{N}(0, (b-a)^2\sigma^2_f)\)</span></p></li>
 </ul>
 </div>
 </div>
 </section>
-<section id="example-polynomial-integration" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="example-polynomial-integration"><span class="header-section-number">4.5</span> Example: Polynomial Integration</h2>
-<p>Monte Carlo integration’s performance can vary significantly depending on the characteristics of the function being integrated. While the method’s convergence rate is theoretically independent of function complexity, practical performance depends heavily on the function’s smoothness and oscillatory behavior.</p>
+<section id="function-characteristics-and-performance" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</h2>
+<p>Monte Carlo integration’s performance depends heavily on the function’s characteristics. While the convergence rate is theoretically independent of function complexity, practical performance varies significantly with function smoothness and oscillatory behavior.</p>
 <p>Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.</p>
-<section id="example-low-vs.-high-frequency-functions" class="level3" data-number="4.5.1">
-<h3 data-number="4.5.1" class="anchored" data-anchor-id="example-low-vs.-high-frequency-functions"><span class="header-section-number">4.5.1</span> Example: Low vs.&nbsp;High Frequency Functions</h3>
+<section id="example-low-vs.-high-frequency-functions" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</h3>
 <p>The following example integrates two functions over the interval <span class="math inline">\([0, \pi]\)</span>:</p>
 <ul>
-<li><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = \sin(x)\)</span> — a smooth, slowly varying function</li>
-<li><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = 25*\sin(25x)\)</span> — a rapidly oscillating function with many periods</li>
+<li><p><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = \sin(x)\)</span> — a smooth, slowly varying function</p></li>
+<li><p><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = 25\sin(25x)\)</span> — a rapidly oscillating function with many periods</p></li>
 </ul>
-<div id="607c8a04" class="cell" data-execution_count="2">
+<div id="d5158849" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="integrals_files/figure-html/cell-2-output-1.png" width="1145" height="755" class="figure-img"></p>
+<p><img src="integrals_files/figure-html/cell-2-output-1.png" width="1142" height="755" class="figure-img"></p>
 </figure>
 </div>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Function  True Value  Mean Est   Error  Std Dev  Std Ratio
+0       Smooth         2.0    2.0008  0.0008   0.0086          -
+1  Oscillatory         2.0    1.9919  0.0081   0.6073  71.006457</code></pre>
 </div>
-<p>The contrast between the smooth <span class="math inline">\(\sin(x)\)</span> and rapidly oscillating <span class="math inline">\(25\sin(25x)\)</span> suggests why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.</p>
-<p>The log-log error plot reveals that while both functions follow the expected <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes.</p>
-<p>The variance ratio indicates that the oscillatory function’s variance is around 75x higher than the smooth function’s variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.</p>
+</div>
+<p>The contrast between the smooth <span class="math inline">\(\sin(x)\)</span> and rapidly oscillating <span class="math inline">\(25\sin(25x)\)</span> demonstrates why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.</p>
+<p>The log-log error plot reveals that while both functions follow the expected <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes. The variance ratio indicates that the oscillatory function’s variance is around 70 times higher than the smooth function’s variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.</p>
 </section>
-<section id="remarks" class="level3" data-number="4.5.2">
-<h3 data-number="4.5.2" class="anchored" data-anchor-id="remarks"><span class="header-section-number">4.5.2</span> Remarks</h3>
+<section id="remarks" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="remarks"><span class="header-section-number">4.2.2</span> Remarks</h3>
 <ul>
-<li><strong>Smooth functions</strong> are well-suited for Monte Carlo integration, converging quickly with relatively few samples</li>
-<li><strong>Highly oscillatory functions</strong> present challenges, requiring larger sample sizes and exhibiting higher variance</li>
-<li>For oscillatory integrals, consider <strong>alternative approaches</strong> such as:
+<li><p><strong>Smooth functions</strong> are well-suited for Monte Carlo integration, converging quickly with relatively few samples</p></li>
+<li><p><strong>Highly oscillatory functions</strong> present challenges, requiring larger sample sizes and exhibiting higher variance</p></li>
+<li><p>For oscillatory integrals, consider <strong>alternative approaches</strong> such as:</p>
 <ul>
 <li>Stratified sampling to ensure adequate coverage of oscillation periods</li>
 <li>Importance sampling with distributions that account for function behavior</li>
@@ -500,19 +486,19 @@ Key Properties
 <p>This example demonstrates why understanding your function’s characteristics is crucial for effective Monte Carlo integration.</p>
 </section>
 </section>
-<section id="multidimensional-integration" class="level2" data-number="4.6">
-<h2 data-number="4.6" class="anchored" data-anchor-id="multidimensional-integration"><span class="header-section-number">4.6</span> Multidimensional Integration</h2>
+<section id="multidimensional-integration" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="multidimensional-integration"><span class="header-section-number">4.3</span> Multidimensional Integration</h2>
 <p>One of Monte Carlo integration’s greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson’s rule) suffer from the “curse of dimensionality”—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate regardless of dimension.</p>
 <p>In <span class="math inline">\(d\)</span> dimensions, a grid-based method with <span class="math inline">\(m\)</span> points per dimension requires <span class="math inline">\(m^d\)</span> total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.</p>
-<section id="example-gaussian-like-function-in-multiple-dimensions" class="level3" data-number="4.6.1">
-<h3 data-number="4.6.1" class="anchored" data-anchor-id="example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.6.1</span> Example: Gaussian-like Function in Multiple Dimensions</h3>
+<section id="example-gaussian-like-function-in-multiple-dimensions" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.3.1</span> Example: Gaussian-like Function in Multiple Dimensions</h3>
 <p>The following example demonstrates Monte Carlo integration of the function <span class="math inline">\(f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}\)</span> over the unit hypercube <span class="math inline">\([0,1]^d\)</span> for dimensions <span class="math inline">\(d = 1, 2, 3, 4, 5\)</span>.</p>
 <div id="cell-fig-multidimensional" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div id="fig-multidimensional" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-multidimensional-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="integrals_files/figure-html/fig-multidimensional-output-1.png" width="950" height="374" class="figure-img">
+<img src="integrals_files/figure-html/fig-multidimensional-output-1.png" width="949" height="468" class="figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multidimensional-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;4.1: Monte Carlo advantage in higher dimensions
@@ -520,24 +506,15 @@ Figure&nbsp;4.1: Monte Carlo advantage in higher dimensions
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Multidimensional Integration Results From 2500 samples:
- Dimension  Estimate  Std Error  Rel Error
-         1  0.747218   0.004232   0.005663
-         2  0.557682   0.004197   0.007526
-         3  0.416811   0.003557   0.008533
-         4  0.311421   0.003541   0.011369
-         5  0.232332   0.003099   0.013337</code></pre>
 </div>
-</div>
-<p>The example reveals several key insights about multidimensional integration:</p>
+<p>The example reveals several important properties of multidimensional integration:</p>
 <ol type="1">
-<li><p><strong>Decreasing Integral Values</strong>: As dimension increases, the integral value decreases rapidly. This occurs because the function <span class="math inline">\(e^{-\|\mathbf{x}\|^2}\)</span> decays exponentially with distance from the origin, and in higher dimensions, most of the unit hypercube’s volume lies far from the origin.</p></li>
-<li><p><strong>Stable Relative Error</strong>: Despite the changing integral magnitudes, the relative error remains relatively stable across dimensions. This demonstrates Monte Carlo’s dimension-independent convergence behavior—a crucial advantage over grid-based methods.</p></li>
-<li><p><strong>Computational Efficiency</strong>: Each dimension uses exactly the same number of function evaluations (5,000), showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods.</p></li>
+<li><p><strong>Dimension-Independent Convergence</strong>: The relative error plots show that Monte Carlo integration maintains similar convergence behavior across all dimensions. While there may be slight variations in the error magnitudes, the overall convergence rate (slope on the log-log plot) remains consistent, demonstrating Monte Carlo’s fundamental advantage over grid-based methods that suffer from the curse of dimensionality.</p></li>
+<li><p><strong>Standard Deviation Scaling</strong>: The standard deviation plot confirms the theoretical <span class="math inline">\(1/\sqrt{n}\)</span> convergence rate across all dimensions. The dashed reference line shows this theoretical scaling, and we can observe that all dimensions follow approximately the same convergence pattern, regardless of the integral’s magnitude or the problem’s dimensionality.</p></li>
+<li><p><strong>Computational Efficiency</strong>: Each dimension uses exactly the same number of function evaluations at each sample size, showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods. While a grid-based approach would require <span class="math inline">\(n^d\)</span> evaluations (where <span class="math inline">\(d\)</span> is the dimension), Monte Carlo maintains constant computational cost per sample regardless of dimension.</p></li>
+<li><p><strong>Robust Performance</strong>: The similar behavior across dimensions demonstrates that Monte Carlo integration remains reliable and predictable even as the problem complexity increases, making it indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling.</p></li>
 </ol>
-<p>This behavior makes Monte Carlo integration indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling, where traditional quadrature rules become computationally infeasible.</p>
+<p>This dimension-independent behavior makes Monte Carlo integration the method of choice when traditional quadrature rules become computationally infeasible in high-dimensional spaces.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -550,29 +527,29 @@ When to Use Monte Carlo Integration
 <div class="callout-body-container callout-body">
 <p><strong>Advantages:</strong></p>
 <ul>
-<li><strong>High dimensions</strong>: Performance doesn’t degrade with dimension</li>
-<li><strong>Complex domains</strong>: Easy to handle irregular integration regions</li>
-<li><strong>Rough functions</strong>: Works with discontinuous or highly oscillatory functions</li>
+<li><p><strong>High dimensions</strong>: Performance doesn’t degrade with dimension</p></li>
+<li><p><strong>Complex domains</strong>: Easy to handle irregular integration regions</p></li>
+<li><p><strong>Rough functions</strong>: Works with discontinuous or highly oscillatory functions</p></li>
 </ul>
 <p><strong>Disadvantages:</strong></p>
 <ul>
-<li><strong>Slow convergence</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> rate</li>
-<li><strong>Random error</strong>: Introduces stochastic uncertainty</li>
-<li><strong>Low dimensions</strong>: Often outperformed by deterministic methods</li>
+<li><p><strong>Slow convergence</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> rate</p></li>
+<li><p><strong>Random error</strong>: Introduces stochastic uncertainty</p></li>
+<li><p><strong>Low dimensions</strong>: Often outperformed by deterministic methods</p></li>
 </ul>
-<p><strong>Practical Considerations</strong></p>
+<p><strong>Practical Considerations:</strong></p>
 <ul>
-<li><strong>Sample size</strong>: Need large <span class="math inline">\(N\)</span> for high precision</li>
-<li><strong>Function smoothness</strong>: Smoother functions → lower variance → better estimates</li>
-<li><strong>Variance reduction</strong>: Techniques like antithetic variables can improve efficiency</li>
-<li><strong>Error estimation</strong>: Use sample variance to estimate uncertainty</li>
+<li><p><strong>Sample size</strong>: Need large <span class="math inline">\(N\)</span> for high precision</p></li>
+<li><p><strong>Function smoothness</strong>: Smoother functions → lower variance → better estimates</p></li>
+<li><p><strong>Variance reduction</strong>: Techniques like antithetic variables can improve efficiency</p></li>
+<li><p><strong>Error estimation</strong>: Use sample variance to estimate uncertainty</p></li>
 </ul>
 </div>
 </div>
 </section>
 </section>
-<section id="conclusion" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Conclusion</h1>
+<section id="conclusion" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4.4</span> Conclusion</h2>
 <p>Monte Carlo integration transforms integration into a sampling problem, making it invaluable for high-dimensional problems where traditional quadrature fails. While it converges slowly, its dimension-independent performance and ability to handle complex functions make it essential for modern computational statistics and machine learning applications.</p>
 
 

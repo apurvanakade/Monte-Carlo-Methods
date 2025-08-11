@@ -9,7 +9,7 @@
 <meta name="author" content="Unknown Author">
 <meta name="dcterms.date" content="2025-06-18">
 
-<title>12&nbsp; Gibbs Sampling – Monte Carlo Methods Lecture Notes</title>
+<title>10&nbsp; Gibbs Sampling – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -102,13 +102,14 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="12&nbsp; Gibbs Sampling – Monte Carlo Methods Lecture Notes">
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="10&nbsp; Gibbs Sampling – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="gibbs_2d_files/figure-html/cell-5-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -129,7 +130,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/gibbs_2d.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/gibbs_2d.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -138,7 +139,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -156,7 +157,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -171,19 +172,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
       </ul>
@@ -200,47 +189,53 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
@@ -253,25 +248,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
@@ -288,13 +283,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -311,19 +306,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -331,7 +326,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -373,18 +368,18 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#joint-exponential-distribution" id="toc-joint-exponential-distribution" class="nav-link active" data-scroll-target="#joint-exponential-distribution"><span class="header-section-number">12.0.1</span> Joint Exponential Distribution</a></li>
-  <li><a href="#bivariate-normal-distribution" id="toc-bivariate-normal-distribution" class="nav-link" data-scroll-target="#bivariate-normal-distribution"><span class="header-section-number">12.0.2</span> Bivariate Normal Distribution</a></li>
-  <li><a href="#sec-gibbs-markov-chain" id="toc-sec-gibbs-markov-chain" class="nav-link" data-scroll-target="#sec-gibbs-markov-chain"><span class="header-section-number">12.1</span> Markov Chain</a></li>
+  <li><a href="#joint-exponential-distribution" id="toc-joint-exponential-distribution" class="nav-link active" data-scroll-target="#joint-exponential-distribution"><span class="header-section-number">10.0.1</span> Joint Exponential Distribution</a></li>
+  <li><a href="#bivariate-normal-distribution" id="toc-bivariate-normal-distribution" class="nav-link" data-scroll-target="#bivariate-normal-distribution"><span class="header-section-number">10.0.2</span> Bivariate Normal Distribution</a></li>
+  <li><a href="#sec-gibbs-markov-chain" id="toc-sec-gibbs-markov-chain" class="nav-link" data-scroll-target="#sec-gibbs-markov-chain"><span class="header-section-number">10.1</span> Markov Chain</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/gibbs_2d.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/gibbs_2d.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></h1>
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></h1>
 </div>
 
 
@@ -424,9 +419,9 @@ window.Quarto = {
 </ol></li>
 <li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
 </ol>
-<p>The algorithm generates a sample path of length <span class="math inline">\(N\)</span> of the Markov Chain as described in <a href="#sec-gibbs-markov-chain" class="quarto-xref"><span>Section 12.1</span></a>. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.</p>
-<section id="joint-exponential-distribution" class="level3" data-number="12.0.1">
-<h3 data-number="12.0.1" class="anchored" data-anchor-id="joint-exponential-distribution"><span class="header-section-number">12.0.1</span> Joint Exponential Distribution</h3>
+<p>The algorithm generates a sample path of length <span class="math inline">\(N\)</span> of the Markov Chain as described in <a href="#sec-gibbs-markov-chain" class="quarto-xref"><span>Section 10.1</span></a>. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.</p>
+<section id="joint-exponential-distribution" class="level3" data-number="10.0.1">
+<h3 data-number="10.0.1" class="anchored" data-anchor-id="joint-exponential-distribution"><span class="header-section-number">10.0.1</span> Joint Exponential Distribution</h3>
 <p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables with the truncated exponential distribution:</p>
 <p><span class="math display">\[
 f_{X,Y}(x, y) = c e^{-\lambda xy} \text{ for } 0 \le x \le D_1, 0 \le y \le D_2,
@@ -448,7 +443,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </ol></li>
 <li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
 </ol>
-<div id="bcea3f0e" class="cell" data-execution_count="4">
+<div id="dacdfb26" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -457,7 +452,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="0f3cc734" class="cell" data-fig-width="7" data-execution_count="6">
+<div id="a07f442d" class="cell" data-fig-width="7" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -467,8 +462,8 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </section>
-<section id="bivariate-normal-distribution" class="level3" data-number="12.0.2">
-<h3 data-number="12.0.2" class="anchored" data-anchor-id="bivariate-normal-distribution"><span class="header-section-number">12.0.2</span> Bivariate Normal Distribution</h3>
+<section id="bivariate-normal-distribution" class="level3" data-number="10.0.2">
+<h3 data-number="10.0.2" class="anchored" data-anchor-id="bivariate-normal-distribution"><span class="header-section-number">10.0.2</span> Bivariate Normal Distribution</h3>
 <p>Suppose <span class="math inline">\((X, Y)\)</span> has a bivariate normal distribution with mean <span class="math inline">\((0, 0)\)</span> and covariance matrix <span class="math inline">\(\Sigma = \begin{pmatrix} 1 &amp; \rho \\ \rho &amp; 1 \end{pmatrix}\)</span>. We want to sample from the joint distribution <span class="math inline">\(f_{X, Y}\)</span>. One can show that</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -486,7 +481,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </ol></li>
 <li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
 </ol>
-<div id="01e1420f" class="cell" data-fig-width="7" data-execution_count="7">
+<div id="b4a21137" class="cell" data-fig-width="7" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -495,7 +490,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="878ed135" class="cell" data-fig-width="7" data-execution_count="9">
+<div id="3b2cfa1b" class="cell" data-fig-width="7" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -504,7 +499,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="95c63ce8" class="cell" data-fig-width="7" data-execution_count="10">
+<div id="8fd3dd9b" class="cell" data-fig-width="7" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -514,8 +509,8 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </section>
-<section id="sec-gibbs-markov-chain" class="level2" data-number="12.1">
-<h2 data-number="12.1" class="anchored" data-anchor-id="sec-gibbs-markov-chain"><span class="header-section-number">12.1</span> Markov Chain</h2>
+<section id="sec-gibbs-markov-chain" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="sec-gibbs-markov-chain"><span class="header-section-number">10.1</span> Markov Chain</h2>
 <p>The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables <span class="math inline">\(\Omega = \Omega_X \times \Omega_Y\)</span>. In the above examples, the state space is <span class="math inline">\([0, D_1] \times [0, D_2]\)</span> for the exponential distribution and <span class="math inline">\(\mathbb{R}^2\)</span> for the bivariate normal distribution. The transition matrix of the Markov Chain in discrete case is given by</p>
 <p><span class="math display">\[
 P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' | Y_i = y) \mathbb{P}(Y_{i+1} = y' | X_i = x').
@@ -526,7 +521,7 @@ K \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bma
 = f_{X|Y}(x | y) f_{Y|X}(y | x').
 \]</span></p>
 <div id="thm-Gibbs-Markov-Chain" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 12.1</strong></span> The Gibbs sampling algorithm generates a Markov Chain with the transition matrix <span class="math inline">\(P\)</span> as described above. The joint distribution <span class="math inline">\(f_{X, Y}\)</span> is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to <span class="math inline">\(f_{X, Y}\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 10.1</strong></span> The Gibbs sampling algorithm generates a Markov Chain with the transition matrix <span class="math inline">\(P\)</span> as described above. The joint distribution <span class="math inline">\(f_{X, Y}\)</span> is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to <span class="math inline">\(f_{X, Y}\)</span>.</p>
 </div>
 <p>We’ll provide a proof of the above theorem in the next section.</p>
 
@@ -936,12 +931,12 @@ K \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bma
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../../chapters/sampling/accept_reject.html" class="pagination-link" aria-label="Rejection Sampling">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/sampling/mh.html" class="pagination-link" aria-label="Metropolis--Hastings Algorithm">
-        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
