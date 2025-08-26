@@ -38,10 +38,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ef56b68f8fa1e9d2ba328e99e439f80.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,7 +111,169 @@ window.Quarto = {
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar docked nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -119,6 +285,7 @@ window.Quarto = {
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
           <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
@@ -366,7 +533,10 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a></li>
+  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a>
+  <ul class="collapse">
+  <li><a href="#variance-bounds-using-derivatives" id="toc-variance-bounds-using-derivatives" class="nav-link" data-scroll-target="#variance-bounds-using-derivatives"><span class="header-section-number">4.1.1</span> Variance Bounds Using Derivatives</a></li>
+  </ul></li>
   <li><a href="#function-characteristics-and-performance" id="toc-function-characteristics-and-performance" class="nav-link" data-scroll-target="#function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</a>
   <ul class="collapse">
   <li><a href="#example-low-vs.-high-frequency-functions" id="toc-example-low-vs.-high-frequency-functions" class="nav-link" data-scroll-target="#example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</a></li>
@@ -382,6 +552,7 @@ window.Quarto = {
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
+
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/integrals.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></a></li></ol></nav>
 <div class="quarto-title">
@@ -424,6 +595,30 @@ Geometric Interpretation
 \mathbb{E}[\hat{\ell}_N] &amp;= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
 \end{aligned}\]</span></p>
 <p>The variance of our estimator is: <span class="math display">\[\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f\]</span> where <span class="math inline">\(\sigma^2_f = \text{Var}(f(X))\)</span> is the variance of <span class="math inline">\(f(X)\)</span> under the uniform distribution.</p>
+<section id="variance-bounds-using-derivatives" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="variance-bounds-using-derivatives"><span class="header-section-number">4.1.1</span> Variance Bounds Using Derivatives</h3>
+<p>For smooth functions, we can bound the variance using derivative information.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Variance Bound via Derivatives)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(g\)</span> is differentiable on <span class="math inline">\([a,b]\)</span> with derivative <span class="math inline">\(g'\)</span>, then: <span class="math display">\[\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2\]</span></p>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M = \max_{x \in [a,b]} |g'(x)|\)</span> and <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span>.</p>
+<p>Since <span class="math inline">\(g\)</span> is continuous on the compact interval <span class="math inline">\([a,b]\)</span>, it attains its minimum and maximum values. Let <span class="math inline">\(g_{\min} = \min_{x \in [a,b]} g(x)\)</span> and <span class="math inline">\(g_{\max} = \max_{x \in [a,b]} g(x)\)</span>.</p>
+<p>By the mean value theorem, for any two points in <span class="math inline">\([a,b]\)</span>: <span class="math display">\[g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Since <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span> lies between <span class="math inline">\(g_{\min}\)</span> and <span class="math inline">\(g_{\max}\)</span>, we have for any <span class="math inline">\(x \in [a,b]\)</span>: <span class="math display">\[|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Squaring both sides and taking expectations: <span class="math display">\[\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2\]</span></p>
+<p>This gives us the desired bound.</p>
+</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -442,6 +637,7 @@ Key Properties
 </div>
 </div>
 </section>
+</section>
 <section id="function-characteristics-and-performance" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</h2>
 <p>Monte Carlo integration’s performance depends heavily on the function’s characteristics. While the convergence rate is theoretically independent of function complexity, practical performance varies significantly with function smoothness and oscillatory behavior.</p>
@@ -453,7 +649,7 @@ Key Properties
 <li><p><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = \sin(x)\)</span> — a smooth, slowly varying function</p></li>
 <li><p><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = 25\sin(25x)\)</span> — a rapidly oscillating function with many periods</p></li>
 </ul>
-<div id="d5158849" class="cell" data-execution_count="2">
+<div id="1b1cd2a8" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -479,7 +675,6 @@ Key Properties
 <ul>
 <li>Stratified sampling to ensure adequate coverage of oscillation periods</li>
 <li>Importance sampling with distributions that account for function behavior</li>
-<li>Specialized quadrature methods designed for oscillatory integrals</li>
 <li>Transformation techniques to reduce oscillations</li>
 </ul></li>
 </ul>
@@ -509,12 +704,11 @@ Figure&nbsp;4.1: Monte Carlo advantage in higher dimensions
 </div>
 <p>The example reveals several important properties of multidimensional integration:</p>
 <ol type="1">
-<li><p><strong>Dimension-Independent Convergence</strong>: The relative error plots show that Monte Carlo integration maintains similar convergence behavior across all dimensions. While there may be slight variations in the error magnitudes, the overall convergence rate (slope on the log-log plot) remains consistent, demonstrating Monte Carlo’s fundamental advantage over grid-based methods that suffer from the curse of dimensionality.</p></li>
-<li><p><strong>Standard Deviation Scaling</strong>: The standard deviation plot confirms the theoretical <span class="math inline">\(1/\sqrt{n}\)</span> convergence rate across all dimensions. The dashed reference line shows this theoretical scaling, and we can observe that all dimensions follow approximately the same convergence pattern, regardless of the integral’s magnitude or the problem’s dimensionality.</p></li>
-<li><p><strong>Computational Efficiency</strong>: Each dimension uses exactly the same number of function evaluations at each sample size, showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods. While a grid-based approach would require <span class="math inline">\(n^d\)</span> evaluations (where <span class="math inline">\(d\)</span> is the dimension), Monte Carlo maintains constant computational cost per sample regardless of dimension.</p></li>
-<li><p><strong>Robust Performance</strong>: The similar behavior across dimensions demonstrates that Monte Carlo integration remains reliable and predictable even as the problem complexity increases, making it indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling.</p></li>
+<li><p><strong>Dimension-Independent Convergence</strong>: The relative error plots demonstrate Monte Carlo’s key advantage - convergence behavior remains consistent across all dimensions, avoiding the curse of dimensionality that plagues grid-based methods.</p></li>
+<li><p><strong>Theoretical Validation</strong>: The standard deviation follows the expected <span class="math inline">\(1/\sqrt{n}\)</span> scaling (shown by the dashed reference line) regardless of dimension, confirming Monte Carlo’s theoretical foundation.</p></li>
+<li><p><strong>Constant Computational Cost</strong>: Unlike deterministic methods requiring <span class="math inline">\(n^d\)</span> evaluations, Monte Carlo uses the same number of function evaluations per sample regardless of dimension.</p></li>
 </ol>
-<p>This dimension-independent behavior makes Monte Carlo integration the method of choice when traditional quadrature rules become computationally infeasible in high-dimensional spaces.</p>
+<p>This dimensional robustness makes Monte Carlo indispensable for high-dimensional applications in physics, statistics, and finance where traditional methods become computationally intractable.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -558,6 +752,19 @@ When to Use Monte Carlo Integration
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
     const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {

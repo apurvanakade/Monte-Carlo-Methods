@@ -29,6 +29,34 @@ The variance of our estimator is:
 $$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$
 where $\sigma^2_f = \text{Var}(f(X))$ is the variance of $f(X)$ under the uniform distribution.
 
+### Variance Bounds Using Derivatives
+
+For smooth functions, we can bound the variance using derivative information. 
+
+::: {.callout-important}
+## Theorem (Variance Bound via Derivatives)
+If $g$ is differentiable on $[a,b]$ with derivative $g'$, then:
+$$\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2$$
+:::
+
+::: {.proof}
+Let $M = \max_{x \in [a,b]} |g'(x)|$ and $\mu = \mathbb{E}[g(X)]$. 
+
+Since $g$ is continuous on the compact interval $[a,b]$, it attains its minimum and maximum values. Let $g_{\min} = \min_{x \in [a,b]} g(x)$ and $g_{\max} = \max_{x \in [a,b]} g(x)$.
+
+By the mean value theorem, for any two points in $[a,b]$:
+$$g_{\max} - g_{\min} \leq M(b - a)$$
+
+Since $\mu = \mathbb{E}[g(X)]$ lies between $g_{\min}$ and $g_{\max}$, we have for any $x \in [a,b]$:
+$$|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)$$
+
+Squaring both sides and taking expectations:
+$$\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2$$
+
+This gives us the desired bound.
+
+:::
+
 ::: {.callout-important}
 ## Key Properties
 
@@ -195,7 +223,6 @@ The log-log error plot reveals that while both functions follow the expected $O(
 - For oscillatory integrals, consider **alternative approaches** such as:
   - Stratified sampling to ensure adequate coverage of oscillation periods
   - Importance sampling with distributions that account for function behavior
-  - Specialized quadrature methods designed for oscillatory integrals
   - Transformation techniques to reduce oscillations
 
 This example demonstrates why understanding your function's characteristics is crucial for effective Monte Carlo integration.
@@ -322,15 +349,13 @@ multidimensional_example()
 
 The example reveals several important properties of multidimensional integration:
 
-1. **Dimension-Independent Convergence**: The relative error plots show that Monte Carlo integration maintains similar convergence behavior across all dimensions. While there may be slight variations in the error magnitudes, the overall convergence rate (slope on the log-log plot) remains consistent, demonstrating Monte Carlo's fundamental advantage over grid-based methods that suffer from the curse of dimensionality.
+1. **Dimension-Independent Convergence**: The relative error plots demonstrate Monte Carlo's key advantage - convergence behavior remains consistent across all dimensions, avoiding the curse of dimensionality that plagues grid-based methods.
 
-2. **Standard Deviation Scaling**: The standard deviation plot confirms the theoretical $1/\sqrt{n}$ convergence rate across all dimensions. The dashed reference line shows this theoretical scaling, and we can observe that all dimensions follow approximately the same convergence pattern, regardless of the integral's magnitude or the problem's dimensionality.
+2. **Theoretical Validation**: The standard deviation follows the expected $1/\sqrt{n}$ scaling (shown by the dashed reference line) regardless of dimension, confirming Monte Carlo's theoretical foundation.
 
-3. **Computational Efficiency**: Each dimension uses exactly the same number of function evaluations at each sample size, showcasing how Monte Carlo avoids the exponential scaling that plagues deterministic methods. While a grid-based approach would require $n^d$ evaluations (where $d$ is the dimension), Monte Carlo maintains constant computational cost per sample regardless of dimension.
+3. **Constant Computational Cost**: Unlike deterministic methods requiring $n^d$ evaluations, Monte Carlo uses the same number of function evaluations per sample regardless of dimension.
 
-4. **Robust Performance**: The similar behavior across dimensions demonstrates that Monte Carlo integration remains reliable and predictable even as the problem complexity increases, making it indispensable for high-dimensional problems in computational physics, Bayesian inference, and financial modeling.
-
-This dimension-independent behavior makes Monte Carlo integration the method of choice when traditional quadrature rules become computationally infeasible in high-dimensional spaces.
+This dimensional robustness makes Monte Carlo indispensable for high-dimensional applications in physics, statistics, and finance where traditional methods become computationally intractable.
 
 ::: {.callout-tip}
 ## When to Use Monte Carlo Integration
