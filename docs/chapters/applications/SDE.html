@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-02-17">
 
-<title>14&nbsp; Stochastic Differential Equations – Monte Carlo Methods Lecture Notes</title>
+<title>13&nbsp; Stochastic Differential Equations – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../chapters/applications/ising.html" rel="next">
-<link href="../../chapters/sampling/mh.html" rel="prev">
+<link href="../../chapters/variance_reduction.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -43,7 +43,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -102,13 +102,14 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="14&nbsp; Stochastic Differential Equations – Monte Carlo Methods Lecture Notes">
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="13&nbsp; Stochastic Differential Equations – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="SDE_files/figure-html/cell-3-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -129,7 +130,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -138,7 +139,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -156,7 +157,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -171,19 +172,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
       </ul>
@@ -200,47 +189,53 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
@@ -253,25 +248,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
@@ -288,13 +283,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -311,19 +306,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -331,7 +326,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -373,31 +368,31 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#stochastic-processes" id="toc-stochastic-processes" class="nav-link active" data-scroll-target="#stochastic-processes"><span class="header-section-number">14.1</span> Stochastic Processes</a>
+  <li><a href="#stochastic-processes" id="toc-stochastic-processes" class="nav-link active" data-scroll-target="#stochastic-processes"><span class="header-section-number">13.1</span> Stochastic Processes</a>
   <ul class="collapse">
-  <li><a href="#wiener-process" id="toc-wiener-process" class="nav-link" data-scroll-target="#wiener-process"><span class="header-section-number">14.1.1</span> Wiener Process</a></li>
+  <li><a href="#wiener-process" id="toc-wiener-process" class="nav-link" data-scroll-target="#wiener-process"><span class="header-section-number">13.1.1</span> Wiener Process</a></li>
   </ul></li>
-  <li><a href="#stochastic-differential-equations" id="toc-stochastic-differential-equations" class="nav-link" data-scroll-target="#stochastic-differential-equations"><span class="header-section-number">14.2</span> Stochastic Differential Equations</a>
+  <li><a href="#stochastic-differential-equations" id="toc-stochastic-differential-equations" class="nav-link" data-scroll-target="#stochastic-differential-equations"><span class="header-section-number">13.2</span> Stochastic Differential Equations</a>
   <ul class="collapse">
-  <li><a href="#ito-vs-stratonovich-interpretation" id="toc-ito-vs-stratonovich-interpretation" class="nav-link" data-scroll-target="#ito-vs-stratonovich-interpretation"><span class="header-section-number">14.2.1</span> Ito vs Stratonovich Interpretation</a></li>
+  <li><a href="#ito-vs-stratonovich-interpretation" id="toc-ito-vs-stratonovich-interpretation" class="nav-link" data-scroll-target="#ito-vs-stratonovich-interpretation"><span class="header-section-number">13.2.1</span> Ito vs Stratonovich Interpretation</a></li>
   </ul></li>
-  <li><a href="#geometric-brownian-motion" id="toc-geometric-brownian-motion" class="nav-link" data-scroll-target="#geometric-brownian-motion"><span class="header-section-number">14.3</span> Geometric Brownian Motion</a></li>
-  <li><a href="#euler-maruyama-method" id="toc-euler-maruyama-method" class="nav-link" data-scroll-target="#euler-maruyama-method"><span class="header-section-number">14.4</span> Euler-Maruyama Method</a></li>
-  <li><a href="#convergence-of-the-euler-maruyama-method" id="toc-convergence-of-the-euler-maruyama-method" class="nav-link" data-scroll-target="#convergence-of-the-euler-maruyama-method"><span class="header-section-number">14.5</span> Convergence of the Euler-Maruyama Method</a>
+  <li><a href="#geometric-brownian-motion" id="toc-geometric-brownian-motion" class="nav-link" data-scroll-target="#geometric-brownian-motion"><span class="header-section-number">13.3</span> Geometric Brownian Motion</a></li>
+  <li><a href="#euler-maruyama-method" id="toc-euler-maruyama-method" class="nav-link" data-scroll-target="#euler-maruyama-method"><span class="header-section-number">13.4</span> Euler-Maruyama Method</a></li>
+  <li><a href="#convergence-of-the-euler-maruyama-method" id="toc-convergence-of-the-euler-maruyama-method" class="nav-link" data-scroll-target="#convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.5</span> Convergence of the Euler-Maruyama Method</a>
   <ul class="collapse">
-  <li><a href="#weak-convergence" id="toc-weak-convergence" class="nav-link" data-scroll-target="#weak-convergence"><span class="header-section-number">14.5.1</span> Weak Convergence</a></li>
-  <li><a href="#strong-convergence" id="toc-strong-convergence" class="nav-link" data-scroll-target="#strong-convergence"><span class="header-section-number">14.5.2</span> Strong Convergence</a></li>
+  <li><a href="#weak-convergence" id="toc-weak-convergence" class="nav-link" data-scroll-target="#weak-convergence"><span class="header-section-number">13.5.1</span> Weak Convergence</a></li>
+  <li><a href="#strong-convergence" id="toc-strong-convergence" class="nav-link" data-scroll-target="#strong-convergence"><span class="header-section-number">13.5.2</span> Strong Convergence</a></li>
   </ul></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">14.6</span> Final remarks</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">13.6</span> Final remarks</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html">Applications</a></li><li class="breadcrumb-item"><a href="../../chapters/applications/SDE.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></h1>
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></h1>
 </div>
 
 
@@ -430,11 +425,11 @@ window.Quarto = {
 <p>Recall that the most basic differential equation, which is at the foundation of theory of ordinary differential equations, is the first order ordinary differential equation (ODE) of the form</p>
 <p><span id="eq-ode"><span class="math display">\[
 \frac{dy}{dt} = \lambda y
-\tag{14.1}\]</span></span></p>
+\tag{13.1}\]</span></span></p>
 <p>where <span class="math inline">\(\lambda\)</span> is a constant. The solution to this ODE is given by <span id="eq-ode_solution"><span class="math display">\[
 y(t) = y(0) e^{\lambda t}.
-\tag{14.2}\]</span></span></p>
-<p>We want to modify the ODE (<a href="#eq-ode" class="quarto-xref">Equation&nbsp;<span>14.1</span></a>) to include noise <span class="math display">\[
+\tag{13.2}\]</span></span></p>
+<p>We want to modify the ODE (<a href="#eq-ode" class="quarto-xref">Equation&nbsp;<span>13.1</span></a>) to include noise <span class="math display">\[
 \frac{dy}{dt} = \lambda y + \text{ noise}.
 \]</span></p>
 <p>To make sense of this, we’ll make two changes:</p>
@@ -442,15 +437,15 @@ y(t) = y(0) e^{\lambda t}.
 <li>We’ll replace the function <span class="math inline">\(y(t)\)</span> with a stochastic process <span class="math inline">\(X(t)\)</span>.</li>
 <li>We’ll model the noise as a Wiener process <span class="math inline">\(W(t)\)</span>.</li>
 </ol>
-<section id="stochastic-processes" class="level2" data-number="14.1">
-<h2 data-number="14.1" class="anchored" data-anchor-id="stochastic-processes"><span class="header-section-number">14.1</span> Stochastic Processes</h2>
+<section id="stochastic-processes" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="stochastic-processes"><span class="header-section-number">13.1</span> Stochastic Processes</h2>
 <p>A stochastic process is a time dependent random variable. More precisely, it is a function of the form</p>
 <p><span class="math display">\[
 X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
 \]</span></p>
 <p>where <span class="math inline">\(\Omega\)</span> is the sample space. For example, if <span class="math inline">\(\Omega\)</span> is the set of gas molecules in a room, then <span class="math inline">\(X(t, i)\)</span> could be the position of the <span class="math inline">\(i\)</span>-th molecule at time <span class="math inline">\(t\)</span>. For at fixed <span class="math inline">\(t\)</span>, <span class="math inline">\(X(t, \cdot)\)</span> is a random variable. For a fixed <span class="math inline">\(\omega\)</span>, <span class="math inline">\(X(\cdot, \omega)\)</span> is a function of time. This function, <span class="math inline">\(X(\cdot, \omega)\)</span> is called a <strong>sample path</strong> of the stochastic process.</p>
-<section id="wiener-process" class="level3" data-number="14.1.1">
-<h3 data-number="14.1.1" class="anchored" data-anchor-id="wiener-process"><span class="header-section-number">14.1.1</span> Wiener Process</h3>
+<section id="wiener-process" class="level3" data-number="13.1.1">
+<h3 data-number="13.1.1" class="anchored" data-anchor-id="wiener-process"><span class="header-section-number">13.1.1</span> Wiener Process</h3>
 <p>A <strong>Wiener process</strong>, <span class="math inline">\(W(t)\)</span>, also known as Brownian motion, is a stochastic process with the following properties:</p>
 <ol type="1">
 <li><span class="math inline">\(W(0) = 0\)</span>.</li>
@@ -459,7 +454,7 @@ X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
 <li>The process is continuous but nowhere differentiable.</li>
 </ol>
 <p>We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time <span class="math inline">\(t\)</span>, the mean of <span class="math inline">\(W(t)\)</span> is <span class="math inline">\(0\)</span>. However the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.</p>
-<div id="12dbad91" class="cell" data-execution_count="2">
+<div id="d7f8b9e6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -468,7 +463,7 @@ X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
 </div>
 </div>
 </div>
-<div id="3348d161" class="cell" data-execution_count="3">
+<div id="48c33c40" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -479,8 +474,8 @@ X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
 </div>
 </section>
 </section>
-<section id="stochastic-differential-equations" class="level2" data-number="14.2">
-<h2 data-number="14.2" class="anchored" data-anchor-id="stochastic-differential-equations"><span class="header-section-number">14.2</span> Stochastic Differential Equations</h2>
+<section id="stochastic-differential-equations" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="stochastic-differential-equations"><span class="header-section-number">13.2</span> Stochastic Differential Equations</h2>
 <p>A <strong>stochastic differential equation</strong> (SDE) is an equation of the form</p>
 <p><span class="math display">\[
 dX(t) = a(X(t), t) dt + b(X(t), t) dW(t)
@@ -490,8 +485,8 @@ dX(t) = a(X(t), t) dt + b(X(t), t) dW(t)
 <p><span class="math display">\[
 X(t) - X(0) = \int_0^t a(X(s), s) ds + \int_0^t b(X(s), s) dW(s).
 \]</span></p>
-<section id="ito-vs-stratonovich-interpretation" class="level3" data-number="14.2.1">
-<h3 data-number="14.2.1" class="anchored" data-anchor-id="ito-vs-stratonovich-interpretation"><span class="header-section-number">14.2.1</span> Ito vs Stratonovich Interpretation</h3>
+<section id="ito-vs-stratonovich-interpretation" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="ito-vs-stratonovich-interpretation"><span class="header-section-number">13.2.1</span> Ito vs Stratonovich Interpretation</h3>
 <p>We can try to define the above integrals in the usual sense using Riemann sums. The first integral can be written as the limit</p>
 <p><span class="math display">\[
 \int_0^t a(X(s), s) ds = \lim_{n \to \infty} \sum_{i=0}^{n-1} a(X(t_i), t_i) \Delta t_i
@@ -509,8 +504,8 @@ X(t) - X(0) = \int_0^t a(X(s), s) ds + \int_0^t b(X(s), s) dW(s).
 <p>It is possible to convert between the two interpretations using the Ito formula. We will assume the Ito interpretation in this module.</p>
 </section>
 </section>
-<section id="geometric-brownian-motion" class="level2" data-number="14.3">
-<h2 data-number="14.3" class="anchored" data-anchor-id="geometric-brownian-motion"><span class="header-section-number">14.3</span> Geometric Brownian Motion</h2>
+<section id="geometric-brownian-motion" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="geometric-brownian-motion"><span class="header-section-number">13.3</span> Geometric Brownian Motion</h2>
 <p>A simple example of a stochastic differential equation is the <strong>geometric Brownian motion</strong>. This is a model for the evolution of stock prices. The equation is</p>
 <p><span class="math display">\[
 dX(t) = \mu X(t) dt + \sigma X(t) dW(t)
@@ -518,9 +513,9 @@ dX(t) = \mu X(t) dt + \sigma X(t) dW(t)
 <p>where <span class="math inline">\(\mu\)</span> is the drift and <span class="math inline">\(\sigma\)</span> is the volatility. This is one of the few SDEs for which we can find an exact solution. The solution to the Ito version of the equation is</p>
 <p><span id="eq-geometric-brownian-motion-solution"><span class="math display">\[
 X(t) = X(0) e^{(\mu - \sigma^2/2)t + \sigma W(t)}.
-\tag{14.3}\]</span></span></p>
-<p>This is a log-normal distribution whose mean is given by <span class="math inline">\(X(0) e^{\mu t}\)</span> and variance is given by <span class="math inline">\(X(0)^2 e^{2\mu t} (e^{\sigma^2 t} - 1)\)</span>. Note that when <span class="math inline">\(\sigma = 0\)</span>, this reduces to a standard ODE. Unlike (<a href="#eq-ode_solution" class="quarto-xref">Equation&nbsp;<span>14.2</span></a>), the solution to the SDE has a quadratic term <span class="math inline">\(\sigma^2/2\)</span> in the exponent. This term appears due to <a href="https://en.wikipedia.org/wiki/It%C3%B4%27s_lemma">Ito’s lemma</a>, which is the stochastic analog of the chain rule.</p>
-<div id="9c4979ae" class="cell" data-execution_count="4">
+\tag{13.3}\]</span></span></p>
+<p>This is a log-normal distribution whose mean is given by <span class="math inline">\(X(0) e^{\mu t}\)</span> and variance is given by <span class="math inline">\(X(0)^2 e^{2\mu t} (e^{\sigma^2 t} - 1)\)</span>. Note that when <span class="math inline">\(\sigma = 0\)</span>, this reduces to a standard ODE. Unlike (<a href="#eq-ode_solution" class="quarto-xref">Equation&nbsp;<span>13.2</span></a>), the solution to the SDE has a quadratic term <span class="math inline">\(\sigma^2/2\)</span> in the exponent. This term appears due to <a href="https://en.wikipedia.org/wiki/It%C3%B4%27s_lemma">Ito’s lemma</a>, which is the stochastic analog of the chain rule.</p>
+<div id="2652a5b8" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -530,8 +525,8 @@ X(t) = X(0) e^{(\mu - \sigma^2/2)t + \sigma W(t)}.
 </div>
 </div>
 </section>
-<section id="euler-maruyama-method" class="level2" data-number="14.4">
-<h2 data-number="14.4" class="anchored" data-anchor-id="euler-maruyama-method"><span class="header-section-number">14.4</span> Euler-Maruyama Method</h2>
+<section id="euler-maruyama-method" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="euler-maruyama-method"><span class="header-section-number">13.4</span> Euler-Maruyama Method</h2>
 <p>Most SDEs do not have analytical solutions. We need to solve them numerically. Similar to ODEs, some simple regularity conditions on the coefficients <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> imply that the SDE has a unique solution. Most common SDEs satisfy these conditions. However, unlike ODEs, the solution to an SDE is a stochastic process. We can’t just evaluate the solution at a few points to get an approximate solution. We need to generate several sample paths of the stochastic process to get an approximate solution.</p>
 <p>The simplest method for solving SDEs is the <strong>Euler-Maruyama method</strong>. This is a stochastic analog of the Euler method for ODEs. The Euler-Maruyama method is a recursive method. Given the value of the stochastic process <span class="math inline">\(X_n\)</span> at time <span class="math inline">\(t_n\)</span>, we can find the value of the process at time <span class="math inline">\(t_{n+1} = t_n + \Delta t\)</span> using the formula</p>
 <p><span class="math display">\[
@@ -548,8 +543,8 @@ X_{n+1} = X_n + a(X_n, t_n) \Delta t + b(X_n, t_n) \Delta W_n
 <li>Return <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span>.</li>
 </ol>
 </section>
-<section id="convergence-of-the-euler-maruyama-method" class="level2" data-number="14.5">
-<h2 data-number="14.5" class="anchored" data-anchor-id="convergence-of-the-euler-maruyama-method"><span class="header-section-number">14.5</span> Convergence of the Euler-Maruyama Method</h2>
+<section id="convergence-of-the-euler-maruyama-method" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.5</span> Convergence of the Euler-Maruyama Method</h2>
 <p>The EM method provides a numerical approximation to the solution of the SDE. We want to understand how good this approximation is.</p>
 <p>Fix a time interval <span class="math inline">\([0, T]\)</span>. Divide the interval <span class="math inline">\([0, T]\)</span> into <span class="math inline">\(N\)</span> subintervals of length <span class="math inline">\(\Delta t = T/N\)</span>. Let <span class="math inline">\(t_i = i \Delta t\)</span> so that <span class="math inline">\(t_0 = 0\)</span> and <span class="math inline">\(t_N = T\)</span>. Let <span class="math inline">\(X(t)\)</span> be the analytical solution to the SDE at time <span class="math inline">\(t\)</span> with initial condition <span class="math inline">\(X(0)\)</span>. We first think of the EM method as generating a sequence of random variables <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span> defined recursively by</p>
 <p><span class="math display">\[\begin{align*}
@@ -562,8 +557,8 @@ X_{i+1} &amp;= X_i + a(X_i, t_i) \Delta t + b(X_i, t_i) \Delta W_i.
 X_i \to X(t_i) \text{ as } \Delta t \to 0.
 \]</span></p>
 <p>However, as <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X(t_i)\)</span> are random variables, we need to be more precise about what we mean by convergence. There are two notions of convergence that we are interested in: weak convergence and strong convergence.</p>
-<section id="weak-convergence" class="level3" data-number="14.5.1">
-<h3 data-number="14.5.1" class="anchored" data-anchor-id="weak-convergence"><span class="header-section-number">14.5.1</span> Weak Convergence</h3>
+<section id="weak-convergence" class="level3" data-number="13.5.1">
+<h3 data-number="13.5.1" class="anchored" data-anchor-id="weak-convergence"><span class="header-section-number">13.5.1</span> Weak Convergence</h3>
 <p>With the setup as above, we say that the EM method converges weakly to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
 <p><span class="math display">\[
 \mathbb{E}[X_i] \to \mathbb{E}[X(t_i)] \text{ as } \Delta t \to 0.
@@ -577,8 +572,8 @@ X_i \to X(t_i) \text{ as } \Delta t \to 0.
 |\mathbb{E}[X_i] - \mathbb{E}[X(t_i)]| = O(\Delta t^p)
 \]</span> to emphasize the rate of convergence.</p>
 </section>
-<section id="strong-convergence" class="level3" data-number="14.5.2">
-<h3 data-number="14.5.2" class="anchored" data-anchor-id="strong-convergence"><span class="header-section-number">14.5.2</span> Strong Convergence</h3>
+<section id="strong-convergence" class="level3" data-number="13.5.2">
+<h3 data-number="13.5.2" class="anchored" data-anchor-id="strong-convergence"><span class="header-section-number">13.5.2</span> Strong Convergence</h3>
 <p>Strong convergence is the convergence of the sample paths. We say that the EM method converges strongly to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
 <p><span class="math display">\[
 X_i \xrightarrow{a.s.} X(t_i) \text{ as } \Delta t \to 0.
@@ -595,8 +590,8 @@ X_i \xrightarrow{a.s.} X(t_i) \text{ as } \Delta t \to 0.
 <p>Also, you’ll only estimate <span class="math inline">\(p\)</span> at the end of the interval i.e.&nbsp;<span class="math inline">\(t = T\)</span>. This is technically not correct. We should find a <span class="math inline">\(p\)</span> that works for each time step <span class="math inline">\(t_i\)</span>. However, this is computationally expensive and the assumption is that error grows with time so that the error at the end of the interval is the largest.</p>
 </section>
 </section>
-<section id="final-remarks" class="level2" data-number="14.6">
-<h2 data-number="14.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">14.6</span> Final remarks</h2>
+<section id="final-remarks" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">13.6</span> Final remarks</h2>
 <p>The EM method has a slower rate of strong convergence compared to weak convergence. This is because even though the EM method is a natural extension of the Euler method for ODEs, there are second order terms in the Ito formula (chain rule for stochastic processes) that contribute to the error. This is fixed in the <a href="https://en.wikipedia.org/wiki/Milstein_method">Milstein method</a>, which is a second order method for solving SDEs. However the Milstein method is more computationally expensive compared to the EM method and has the same weak rate of convergence as the EM method.</p>
 
 
@@ -1004,13 +999,13 @@ X_i \xrightarrow{a.s.} X(t_i) \text{ as } \Delta t \to 0.
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../chapters/sampling/mh.html" class="pagination-link" aria-label="Metropolis--Hastings Algorithm">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span>
+      <a href="../../chapters/variance_reduction.html" class="pagination-link" aria-label="Variance Reduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/applications/ising.html" class="pagination-link" aria-label="Ising Model">
-        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

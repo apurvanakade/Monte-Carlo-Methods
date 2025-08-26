@@ -7,11 +7,26 @@ execute:
 ---
 
 
-In this module, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning. 
+In this chapter, we will discuss how to sample from a probability distribution. Sampling from a probability distribution is a fundamental problem in statistics and machine learning. It is used in various applications like Monte Carlo methods, Bayesian inference, and reinforcement learning.
 
-We'll use this week to review many of the standard probability distributions and how to sample from them. We'll also discuss the concept of the cumulative distribution function (CDF) and how it can be used to sample from a probability distribution using the inverse transform sampling method.
+To understand what it means to sample from a probability distribution, let's consider a simple example. Let $X$ be a discrete random variable that takes values $1, 2, \ldots, n$ with probabilities $p_1, p_2, \ldots, p_n$. To sample from this distribution, we want to generate a random variable $X$ such that $\mathbb{P}(X = i) = p_i$ for all $i = 1, 2, \ldots, n$ i.e. we want to select a random integer $i$ with probability $p_i$. If we generate enough samples $x_1, x_2, \ldots, x_N$ from this distribution, then the fraction of samples that are equal to $i$ will be approximately equal to $p_i$ for large $N$.
 
-From now on, we'll assume that we have a reliable way to generate random numbers from the uniform distribution $U(0, 1)$.
+More formally, let $(\Omega, \mathcal{F}, P)$ be a probability space and let $X: \Omega \to \mathcal{X}$ be a random variable with distribution $P_X$. Sampling from the distribution of $X$ means generating independent realizations $x_1, x_2, \ldots, x_n$ such that each $x_i$ has the same distribution as $X$. By the strong law of large numbers, we have
 
-To understand what it means to sample from a probability distribution, let's consider a simple example. Let $X$ be a discrete random variable that takes values $1, 2, \ldots, n$ with probabilities $p_1, p_2, \ldots, p_n$. To sample from this distribution, we want to generate a random variable $X$ such that $\mathbb{P}(X = i) = p_i$ for all $i = 1, 2, \ldots, n$ i.e. we want to select a random integer $i$ with probability $p_i$. If we generate enough samples $x_1, x_2, \ldots, x_N$ from this distribution, then the fraction of samples that are equal to $i$ will be approximately equal to $p_i$ for large $N$. 
+$$\lim_{n \to \infty} \frac{1}{n} \sum_{j=1}^{n} f(x_j) = \mathbb{E}[f(X)]$$
 
+almost surely for any measurable function $f$ such that $\mathbb{E}[|f(X)|] < \infty$.
+
+The fundamental challenge in sampling is transforming uniform random numbers, which are readily available from pseudorandom number generators, into samples from arbitrary probability distributions. Most computational environments provide uniform random number generators that produce sequences $U_1, U_2, \ldots$ where each $U_i$ is approximately uniformly distributed on $[0,1]$ and the sequence has good statistical properties.
+
+For discrete distributions, if $X$ takes values $\{x_1, x_2, \ldots, x_k\}$ with probabilities $\{p_1, p_2, \ldots, p_k\}$, then one approach is to partition the interval $[0,1]$ into subintervals of lengths $p_1, p_2, \ldots, p_k$ and return $x_i$ if the uniform random number falls in the $i$-th subinterval.
+
+For continuous distributions with cumulative distribution function $F(x) = \mathbb{P}(X \leq x)$, the inverse transform method provides an elegant solution when $F^{-1}$ exists and is computable. If $U \sim \text{Uniform}(0,1)$, then $X = F^{-1}(U)$ has distribution function $F$. This follows because
+$$\mathbb{P}(F^{-1}(U) \leq x) = \mathbb{P}(U \leq F(x)) = F(x)$$
+for any $x$ in the support of $X$.
+
+When direct transformation methods are not available, more sophisticated techniques are required. Rejection sampling generates candidates from a proposal distribution and accepts them with a probability proportional to the target density. Markov chain Monte Carlo methods construct a Markov chain whose stationary distribution is the target distribution. Importance sampling generates samples from one distribution but weights them to approximate expectations under another distribution.
+
+The quality of sampling algorithms is measured by several criteria. Correctness ensures that the generated samples actually follow the target distribution. Efficiency measures the computational cost per sample. For iterative methods like MCMC, convergence properties determine how quickly the algorithm approaches the target distribution. The choice of sampling method depends on the specific distribution, the required accuracy, and computational constraints.
+
+In the following chapters, we will examine these sampling techniques in detail, providing both theoretical foundations and practical algorithms for implementation.

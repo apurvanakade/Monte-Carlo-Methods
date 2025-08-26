@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>10&nbsp; Other Distributions – Monte Carlo Methods Lecture Notes</title>
+<title>8&nbsp; Other Distributions – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -41,7 +41,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-485d01fc63b59abcd3ee1bf1e8e2748d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -100,13 +100,14 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="10&nbsp; Other Distributions – Monte Carlo Methods Lecture Notes">
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="8&nbsp; Other Distributions – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="other_distributions_files/figure-html/cell-2-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -127,7 +128,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/other_distributions.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/other_distributions.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -136,7 +137,7 @@ window.Quarto = {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -154,7 +155,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Estimation Techniques</span></a>
+ <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -169,19 +170,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">integrals.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/expected_value.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">expected_value.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
       </ul>
@@ -198,47 +187,53 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
       </ul>
   </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+  </div>
+</li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
@@ -251,25 +246,25 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
       </ul>
@@ -286,13 +281,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">particle_filters.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -309,19 +304,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
   </div>
 </li>
       </ul>
@@ -329,7 +324,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -371,16 +366,16 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link active" data-scroll-target="#mixture-distributions"><span class="header-section-number">10.1</span> Mixture Distributions</a></li>
+  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link active" data-scroll-target="#mixture-distributions"><span class="header-section-number">8.1</span> Mixture Distributions</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/other_distributions.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/other_distributions.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Other Distributions</span></h1>
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></h1>
 </div>
 
 
@@ -404,10 +399,10 @@ f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
 <p>where <span class="math inline">\(c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}\)</span> is the normalizing constant. (Note that when <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are not integers, we use <span class="math inline">\(\Gamma\)</span> function to as a generalization of the factorial function.)</p>
 <p>This is a simple function supported over the interval <span class="math inline">\([0, 1]\)</span>. The Beta distribution is used as a prior distribution in Bayesian statistics. When <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.</p>
 <div id="def-order-statistics" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 10.1</strong></span> <strong>(Order Statistics)</strong>: Let <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> be independent and identically distributed random variables. The <span class="math inline">\(k\)</span>-th order statistic, denoted <span class="math inline">\(X_{(k)}\)</span>, is the <span class="math inline">\(k\)</span>-th smallest value among <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 8.1</strong></span> <strong>(Order Statistics)</strong>: Let <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> be independent and identically distributed random variables. The <span class="math inline">\(k\)</span>-th order statistic, denoted <span class="math inline">\(X_{(k)}\)</span>, is the <span class="math inline">\(k\)</span>-th smallest value among <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>.</p>
 </div>
 <div id="thm-beta-order-statistics" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 10.1</strong></span> <strong>(Beta-Order Statistics)</strong>: Let <span class="math inline">\(U_1, U_2, \ldots, U_n\)</span> be independent random variables with uniform distribution <span class="math inline">\(U(0, 1)\)</span>. Then the random variable <span class="math inline">\(X = U_{(k)}\)</span> has Beta distribution with parameters <span class="math inline">\(\alpha = k\)</span> and <span class="math inline">\(\beta = n - k + 1\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 8.1</strong></span> <strong>(Beta-Order Statistics)</strong>: Let <span class="math inline">\(U_1, U_2, \ldots, U_n\)</span> be independent random variables with uniform distribution <span class="math inline">\(U(0, 1)\)</span>. Then the random variable <span class="math inline">\(X = U_{(k)}\)</span> has Beta distribution with parameters <span class="math inline">\(\alpha = k\)</span> and <span class="math inline">\(\beta = n - k + 1\)</span>.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>We’ll work out a partial proof of the theorem. Let <span class="math inline">\(X = U_{(k)}\)</span>. The cumulative distribution function of <span class="math inline">\(X\)</span> is given by</p>
@@ -431,8 +426,8 @@ f(x) &amp;= \frac{d}{dx} F(x) \\
 <li>Sort the numbers in increasing order <span class="math inline">\(u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}\)</span>.</li>
 <li>Return <span class="math inline">\(u_{(k)}\)</span>.</li>
 </ol>
-<section id="mixture-distributions" class="level2" data-number="10.1">
-<h2 data-number="10.1" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">10.1</span> Mixture Distributions</h2>
+<section id="mixture-distributions" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">8.1</span> Mixture Distributions</h2>
 <p>A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let <span class="math inline">\(X\)</span> be a random variable that is a mixture of distributions <span class="math inline">\(f_1(x), f_2(x), \ldots, f_n(x)\)</span> with weights <span class="math inline">\(w_1, w_2, \ldots, w_n\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
 f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
@@ -445,7 +440,7 @@ f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
 <li>Return the sample.</li>
 </ol>
 <p>Note that this is not the same as constructing a linear combination of the component distributions. For example, if <span class="math inline">\(X_1 \sim N(\mu_1, \sigma_1^2)\)</span> and <span class="math inline">\(X_2 \sim N(\mu_2, \sigma_2^2)\)</span> are independent, then <span class="math inline">\(w_1 X_1 + w_2 X_2\)</span> is is a normal distribution with mean <span class="math inline">\(w_1 \mu_1 + w_2 \mu_2\)</span> and variance <span class="math inline">\(w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2\)</span>. This is not the same as a mixture of two normal distributions.</p>
-<div id="72f0482c" class="cell" data-execution_count="1">
+<div id="7da93d76" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -861,12 +856,12 @@ f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../../chapters/sampling/inverse_transform.html" class="pagination-link" aria-label="Inverse Transform Sampling">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/sampling/accept_reject.html" class="pagination-link" aria-label="Rejection Sampling">
-        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
