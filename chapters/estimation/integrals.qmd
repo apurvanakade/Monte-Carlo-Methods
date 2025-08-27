@@ -29,33 +29,7 @@ The variance of our estimator is:
 $$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$
 where $\sigma^2_f = \text{Var}(f(X))$ is the variance of $f(X)$ under the uniform distribution.
 
-### Variance Bounds Using Derivatives
 
-For smooth functions, we can bound the variance using derivative information. 
-
-::: {.callout-important}
-## Theorem (Variance Bound via Derivatives)
-If $g$ is differentiable on $[a,b]$ with derivative $g'$, then:
-$$\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2$$
-:::
-
-::: {.proof}
-Let $M = \max_{x \in [a,b]} |g'(x)|$ and $\mu = \mathbb{E}[g(X)]$. 
-
-Since $g$ is continuous on the compact interval $[a,b]$, it attains its minimum and maximum values. Let $g_{\min} = \min_{x \in [a,b]} g(x)$ and $g_{\max} = \max_{x \in [a,b]} g(x)$.
-
-By the mean value theorem, for any two points in $[a,b]$:
-$$g_{\max} - g_{\min} \leq M(b - a)$$
-
-Since $\mu = \mathbb{E}[g(X)]$ lies between $g_{\min}$ and $g_{\max}$, we have for any $x \in [a,b]$:
-$$|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)$$
-
-Squaring both sides and taking expectations:
-$$\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2$$
-
-This gives us the desired bound.
-
-:::
 
 ::: {.callout-important}
 ## Key Properties
@@ -216,16 +190,49 @@ The log-log error plot reveals that while both functions follow the expected $O(
 
 ### Remarks
 
-- **Smooth functions** are well-suited for Monte Carlo integration, converging quickly with relatively few samples
+- **Smooth functions** are well-suited for Monte Carlo integration, converging quickly with relatively few samples.
 
-- **Highly oscillatory functions** present challenges, requiring larger sample sizes and exhibiting higher variance
+- **Highly oscillatory functions** present challenges, requiring larger sample sizes and exhibiting higher variance.
 
 - For oscillatory integrals, consider **alternative approaches** such as:
   - Stratified sampling to ensure adequate coverage of oscillation periods
   - Importance sampling with distributions that account for function behavior
-  - Transformation techniques to reduce oscillations
+  - Transformation techniques to reduce oscillations.
 
 This example demonstrates why understanding your function's characteristics is crucial for effective Monte Carlo integration.
+
+### Variance Bounds Using Derivatives
+
+For smooth functions, we can bound the variance using derivative information. 
+
+::: {.callout-important}
+## Theorem (Variance Bound via Derivatives)
+If $g$ is differentiable on $[a,b]$ with derivative $g'$, then:
+$$\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2$$
+:::
+
+::: {.proof}
+Let $M = \max_{x \in [a,b]} |g'(x)|$ and $\mu = \mathbb{E}[g(X)]$. 
+
+Since $g$ is continuous on the compact interval $[a,b]$, it attains its minimum and maximum values. Let $g_{\min} = \min_{x \in [a,b]} g(x)$ and $g_{\max} = \max_{x \in [a,b]} g(x)$.
+
+By the mean value theorem, for any two points in $[a,b]$:
+$$g_{\max} - g_{\min} \leq M(b - a)$$
+
+Since $\mu = \mathbb{E}[g(X)]$ lies between $g_{\min}$ and $g_{\max}$, we have for any $x \in [a,b]$:
+$$|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)$$
+
+Squaring both sides and taking expectations:
+$$\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2$$
+
+This gives us the desired bound.
+
+:::
+
+<hr/>
+
+
+Note that this is a very weak bound and not useful in practice. There are no universal techniques that give us good bounds on $\text{Var}(g(X))$. In practice, we rely on the heuristic that oscillatory functions are high variance. 
 
 ## Multidimensional Integration
 

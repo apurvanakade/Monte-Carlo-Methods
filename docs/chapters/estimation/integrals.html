@@ -533,14 +533,12 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a>
-  <ul class="collapse">
-  <li><a href="#variance-bounds-using-derivatives" id="toc-variance-bounds-using-derivatives" class="nav-link" data-scroll-target="#variance-bounds-using-derivatives"><span class="header-section-number">4.1.1</span> Variance Bounds Using Derivatives</a></li>
-  </ul></li>
+  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a></li>
   <li><a href="#function-characteristics-and-performance" id="toc-function-characteristics-and-performance" class="nav-link" data-scroll-target="#function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</a>
   <ul class="collapse">
   <li><a href="#example-low-vs.-high-frequency-functions" id="toc-example-low-vs.-high-frequency-functions" class="nav-link" data-scroll-target="#example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</a></li>
   <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">4.2.2</span> Remarks</a></li>
+  <li><a href="#variance-bounds-using-derivatives" id="toc-variance-bounds-using-derivatives" class="nav-link" data-scroll-target="#variance-bounds-using-derivatives"><span class="header-section-number">4.2.3</span> Variance Bounds Using Derivatives</a></li>
   </ul></li>
   <li><a href="#multidimensional-integration" id="toc-multidimensional-integration" class="nav-link" data-scroll-target="#multidimensional-integration"><span class="header-section-number">4.3</span> Multidimensional Integration</a>
   <ul class="collapse">
@@ -595,30 +593,6 @@ Geometric Interpretation
 \mathbb{E}[\hat{\ell}_N] &amp;= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
 \end{aligned}\]</span></p>
 <p>The variance of our estimator is: <span class="math display">\[\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f\]</span> where <span class="math inline">\(\sigma^2_f = \text{Var}(f(X))\)</span> is the variance of <span class="math inline">\(f(X)\)</span> under the uniform distribution.</p>
-<section id="variance-bounds-using-derivatives" class="level3" data-number="4.1.1">
-<h3 data-number="4.1.1" class="anchored" data-anchor-id="variance-bounds-using-derivatives"><span class="header-section-number">4.1.1</span> Variance Bounds Using Derivatives</h3>
-<p>For smooth functions, we can bound the variance using derivative information.</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Theorem (Variance Bound via Derivatives)
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If <span class="math inline">\(g\)</span> is differentiable on <span class="math inline">\([a,b]\)</span> with derivative <span class="math inline">\(g'\)</span>, then: <span class="math display">\[\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2\]</span></p>
-</div>
-</div>
-<div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M = \max_{x \in [a,b]} |g'(x)|\)</span> and <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span>.</p>
-<p>Since <span class="math inline">\(g\)</span> is continuous on the compact interval <span class="math inline">\([a,b]\)</span>, it attains its minimum and maximum values. Let <span class="math inline">\(g_{\min} = \min_{x \in [a,b]} g(x)\)</span> and <span class="math inline">\(g_{\max} = \max_{x \in [a,b]} g(x)\)</span>.</p>
-<p>By the mean value theorem, for any two points in <span class="math inline">\([a,b]\)</span>: <span class="math display">\[g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
-<p>Since <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span> lies between <span class="math inline">\(g_{\min}\)</span> and <span class="math inline">\(g_{\max}\)</span>, we have for any <span class="math inline">\(x \in [a,b]\)</span>: <span class="math display">\[|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
-<p>Squaring both sides and taking expectations: <span class="math display">\[\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2\]</span></p>
-<p>This gives us the desired bound.</p>
-</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -636,7 +610,6 @@ Key Properties
 </ul>
 </div>
 </div>
-</section>
 </section>
 <section id="function-characteristics-and-performance" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</h2>
@@ -669,16 +642,43 @@ Key Properties
 <section id="remarks" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="remarks"><span class="header-section-number">4.2.2</span> Remarks</h3>
 <ul>
-<li><p><strong>Smooth functions</strong> are well-suited for Monte Carlo integration, converging quickly with relatively few samples</p></li>
-<li><p><strong>Highly oscillatory functions</strong> present challenges, requiring larger sample sizes and exhibiting higher variance</p></li>
+<li><p><strong>Smooth functions</strong> are well-suited for Monte Carlo integration, converging quickly with relatively few samples.</p></li>
+<li><p><strong>Highly oscillatory functions</strong> present challenges, requiring larger sample sizes and exhibiting higher variance.</p></li>
 <li><p>For oscillatory integrals, consider <strong>alternative approaches</strong> such as:</p>
 <ul>
 <li>Stratified sampling to ensure adequate coverage of oscillation periods</li>
 <li>Importance sampling with distributions that account for function behavior</li>
-<li>Transformation techniques to reduce oscillations</li>
+<li>Transformation techniques to reduce oscillations.</li>
 </ul></li>
 </ul>
 <p>This example demonstrates why understanding your function’s characteristics is crucial for effective Monte Carlo integration.</p>
+</section>
+<section id="variance-bounds-using-derivatives" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="variance-bounds-using-derivatives"><span class="header-section-number">4.2.3</span> Variance Bounds Using Derivatives</h3>
+<p>For smooth functions, we can bound the variance using derivative information.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem (Variance Bound via Derivatives)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(g\)</span> is differentiable on <span class="math inline">\([a,b]\)</span> with derivative <span class="math inline">\(g'\)</span>, then: <span class="math display">\[\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2\]</span></p>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M = \max_{x \in [a,b]} |g'(x)|\)</span> and <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span>.</p>
+<p>Since <span class="math inline">\(g\)</span> is continuous on the compact interval <span class="math inline">\([a,b]\)</span>, it attains its minimum and maximum values. Let <span class="math inline">\(g_{\min} = \min_{x \in [a,b]} g(x)\)</span> and <span class="math inline">\(g_{\max} = \max_{x \in [a,b]} g(x)\)</span>.</p>
+<p>By the mean value theorem, for any two points in <span class="math inline">\([a,b]\)</span>: <span class="math display">\[g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Since <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span> lies between <span class="math inline">\(g_{\min}\)</span> and <span class="math inline">\(g_{\max}\)</span>, we have for any <span class="math inline">\(x \in [a,b]\)</span>: <span class="math display">\[|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Squaring both sides and taking expectations: <span class="math display">\[\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2\]</span></p>
+<p>This gives us the desired bound.</p>
+</div>
+<hr>
+<p>Note that this is a very weak bound and not useful in practice. There are no universal techniques that give us good bounds on <span class="math inline">\(\text{Var}(g(X))\)</span>. In practice, we rely on the heuristic that oscillatory functions are high variance.</p>
 </section>
 </section>
 <section id="multidimensional-integration" class="level2" data-number="4.3">
