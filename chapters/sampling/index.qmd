@@ -19,14 +19,4 @@ almost surely for any measurable function $f$ such that $\mathbb{E}[|f(X)|] < \i
 
 The fundamental challenge in sampling is transforming uniform random numbers, which are readily available from pseudorandom number generators, into samples from arbitrary probability distributions. Most computational environments provide uniform random number generators that produce sequences $U_1, U_2, \ldots$ where each $U_i$ is approximately uniformly distributed on $[0,1]$ and the sequence has good statistical properties.
 
-For discrete distributions, if $X$ takes values $\{x_1, x_2, \ldots, x_k\}$ with probabilities $\{p_1, p_2, \ldots, p_k\}$, then one approach is to partition the interval $[0,1]$ into subintervals of lengths $p_1, p_2, \ldots, p_k$ and return $x_i$ if the uniform random number falls in the $i$-th subinterval.
-
-For continuous distributions with cumulative distribution function $F(x) = \mathbb{P}(X \leq x)$, the inverse transform method provides an elegant solution when $F^{-1}$ exists and is computable. If $U \sim \text{Uniform}(0,1)$, then $X = F^{-1}(U)$ has distribution function $F$. This follows because
-$$\mathbb{P}(F^{-1}(U) \leq x) = \mathbb{P}(U \leq F(x)) = F(x)$$
-for any $x$ in the support of $X$.
-
-When direct transformation methods are not available, more sophisticated techniques are required. Rejection sampling generates candidates from a proposal distribution and accepts them with a probability proportional to the target density. Markov chain Monte Carlo methods construct a Markov chain whose stationary distribution is the target distribution. Importance sampling generates samples from one distribution but weights them to approximate expectations under another distribution.
-
-The quality of sampling algorithms is measured by several criteria. Correctness ensures that the generated samples actually follow the target distribution. Efficiency measures the computational cost per sample. For iterative methods like MCMC, convergence properties determine how quickly the algorithm approaches the target distribution. The choice of sampling method depends on the specific distribution, the required accuracy, and computational constraints.
-
-In the following chapters, we will examine these sampling techniques in detail, providing both theoretical foundations and practical algorithms for implementation.
+In the following chapters, we will examine several sampling techniques in detail, providing both theoretical foundations and practical algorithms for implementation.

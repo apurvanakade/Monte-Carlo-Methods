@@ -6,6 +6,7 @@ execute:
   echo: false
 ---
 
+For continuous random variables, we can use a powerful and elegant method called **inverse transform sampling** that provides a systematic way to generate samples from any distribution whose cumulative distribution function (CDF) we can compute and invert.
 
 Consider a continuous random variable $X$ with probability density function $f(x)$. Let $U$ be a random variable with uniform distribution $U(0, 1)$. 
 
@@ -35,20 +36,26 @@ The cumulative distribution function of $Y = F^{-1}(U)$ is given by
 
 Thus, $Y$ has the same distribution as $X$. $\blacksquare$
 
+:::
+
+::: {.callout-note}
+## Algorithm
 The inverse transform sampling method can be used to sample from any probability distribution $X$ for which we can compute the cumulative distribution function $F(x)$ and its inverse $F^{-1}(u)$. The algorithm to sample from a probability distribution using the inverse transform sampling method is as follows:
 
 1. Generate a random number $u$ from the uniform distribution $U(0, 1)$.
 2. Compute $x = F^{-1}(u)$.
 3. Return $x$.
+:::
 
+::: {.callout-tip}
+## Generalized Inverse
 Even when $F(x)$ is not strictly increasing, we can still use the inverse transform sampling method by using the generalized inverse of $F(x)$. The generalized inverse of $F(x)$ is defined as
 
 \begin{align*}
 F^{-1}(u) = \inf\{x : F(x) \geq u\}.
 \end{align*}
 
-You can think of $\inf$ as $\min$ for simplicity.
-
+You can think of $\inf$ as $\min$ for simplicity. This is what we are doing in the discrete case!
 :::
 
 ## Exponential Distribution
@@ -56,7 +63,7 @@ You can think of $\inf$ as $\min$ for simplicity.
 Let $X$ be a random variable with exponential distribution with rate parameter $\lambda > 0$. The probability density function of $X$ is given by
 
 \begin{align*}
-\mathrm{Exp}(\lambda) = \lambda e^{-\lambda x}, \quad x \geq 0.
+f(x) = \lambda e^{-\lambda x}, \quad x \geq 0.
 \end{align*}
 
 The cumulative distribution function of $X$ is given by
@@ -65,13 +72,29 @@ The cumulative distribution function of $X$ is given by
 F(x) = 1 - e^{-\lambda x}, \quad x \geq 0.
 \end{align*}
 
-The inverse of the cumulative distribution function is given by
+To find the inverse of the cumulative distribution function, we solve $u = F(x) = 1 - e^{-\lambda x}$ for $x$:
+
+\begin{align*}
+u &= 1 - e^{-\lambda x} \\
+\Rightarrow e^{-\lambda x} &= 1 - u \\
+\Rightarrow -\lambda x &= \log(1 - u) \\
+\Rightarrow x &= -\frac{1}{\lambda} \log(1 - u)
+\end{align*}
+
+Therefore, the inverse of the cumulative distribution function is given by
 
 \begin{align*}
 F^{-1}(u) = -\frac{1}{\lambda} \log(1 - u).
 \end{align*}
 
-Hence, the inverse transform sampling method can be used to sample from the exponential distribution.
+::: {.callout-note}
+## Sampling Algorithm
+To generate an exponential random variable with rate $\lambda$:
+1. Generate $u \sim U(0,1)$
+2. Return $x = -\frac{1}{\lambda} \log(1 - u)$
+
+Note that since $1-u$ is also uniformly distributed on $(0,1)$ when $u \sim U(0,1)$, we can simplify this to $x = -\frac{1}{\lambda} \log(u)$.
+:::
 
 ## Weibull Distribution
 
@@ -81,11 +104,36 @@ The Weibull distribution is a generalization of the exponential distribution. Le
 f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1} e^{-(x/\lambda)^k}, \quad x \geq 0.
 \end{align*}
 
-The inverse transform sampling method can be used to sample from the Weibull distribution.
+The cumulative distribution function is:
+
+\begin{align*}
+F(x) = 1 - e^{-(x/\lambda)^k}
+\end{align*}
+
+Solving for the inverse:
+\begin{align*}
+u &= 1 - e^{-(x/\lambda)^k} \\
+\Rightarrow e^{-(x/\lambda)^k} &= 1 - u \\
+\Rightarrow -(x/\lambda)^k &= \log(1 - u) \\
+\Rightarrow x &= \lambda[-\log(1 - u)]^{1/k}
+\end{align*}
+
+::: {.callout-note}
+## Sampling Algorithm
+To generate a Weibull random variable:
+1. Generate $u \sim U(0,1)$
+2. Return $x = \lambda[-\log(1 - u)]^{1/k}$
+:::
 
 ## Triangular Distribution
 
-Let $X$ be a random variable with triangular distribution supported over the interval $[a,b]$ with maximum value at $c \in [a,b]$. We can use the inverse transform sampling method to sample from the triangular distribution. 
+Let $X$ be a random variable with triangular distribution supported over the interval $[a,b]$ with mode at $c \in [a,b]$. The triangular distribution has a piecewise linear probability density function that increases linearly from $a$ to $c$ and then decreases linearly from $c$ to $b$.
+
+::: {.callout-tip}
+The triangular distribution provides a good example of inverse transform sampling with a piecewise CDF. The inverse function must be computed separately for the two pieces of the distribution, making this a more complex but instructive application of the method.
+:::
+
+The inverse transform sampling method can be used to sample from the triangular distribution, though the derivation involves handling the piecewise nature of both the CDF and its inverse.
 
 
 ```{python}
@@ -121,30 +169,31 @@ plt.show()
 
 ## Normal Distribution
 
-The standard normal distribution with mean $0$ and variance $1$ is given has the probability density function
+The standard normal distribution with mean $0$ and variance $1$ has the probability density function
 
 \begin{align*}
-N(0, 1) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}.
+f(x) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}.
 \end{align*}
 
 It is not possible to sample from the normal distribution using the inverse transform sampling method because the cumulative distribution function of the normal distribution does not have a closed-form inverse. However, there are other methods to sample from the normal distribution. One such method is the Box-Muller transform.
+
 The Box-Muller transform is based on the following idea. Consider a 2D random variable $(X, Y)$ with standard normal distribution. The joint probability density function of $(X, Y)$ is given by
 
 \begin{align*}
 f(x, y) = \frac{1}{2\pi} e^{-(x^2 + y^2)/2}, \quad -\infty < x, y < \infty.
 \end{align*}
 
-Let $R = \sqrt{X^2 + Y^2}$ and $\Theta = \arctan(Y/X)$ be the polar coordinates of $(X, Y)$. Then notice that $\theta$ is uniformly distributed in $[0, 2\pi]$. We can calculate the cdf of $R$ as follows:
+Let $R = \sqrt{X^2 + Y^2}$ and $\Theta = \arctan(Y/X)$ be the polar coordinates of $(X, Y)$. Then notice that $\Theta$ is uniformly distributed in $[0, 2\pi]$. We can calculate the CDF of $R$ as follows:
 
 \begin{align*}
 \mathbb{P}(R \leq r) &= \mathbb{P}(X^2 + Y^2 \leq r^2) \\
 &= \int_{x^2 + y^2 \leq r^2} f(x, y) \, dx \, dy \\
-&= \int_{x^2 + y^2 \leq r^2} e^{-(x^2 + y^2)/2} \, dx \, dy \\
-&= \int_{0}^{2\pi} \int_{0}^{r} \frac{1}{2\pi} e^{-r^2/2} r \, dr \, d\theta \\
+&= \int_{x^2 + y^2 \leq r^2} \frac{1}{2\pi} e^{-(x^2 + y^2)/2} \, dx \, dy \\
+&= \int_{0}^{2\pi} \int_{0}^{r} \frac{1}{2\pi} e^{-\rho^2/2} \rho \, d\rho \, d\theta \\
 &= 1 - e^{-r^2/2}.
 \end{align*}
 
-We can invert this to get the inverse cdf of $R$:
+We can invert this to get the inverse CDF of $R$:
 
 \begin{align*}
 F_R^{-1}(u) = \sqrt{-2 \log(1 - u)}.
@@ -158,8 +207,9 @@ We can summarize the above discussion in the following theorem.
 
 :::
 
+::: {.callout-note}
 Note that we are using $U_1$ instead of $1-U_1$ in the formula for $R$. This is because $1-U_1$ is also uniformly distributed in $[0, 1]$.
-
+:::
 
 This gives us the following algorithm to sample from the normal distribution:
 
@@ -176,22 +226,24 @@ The Poisson distribution with parameter $\lambda > 0$ is a discrete distribution
 \mathrm{Pois}(n) = \frac{e^{-\lambda} \lambda^n}{n!}, \quad n \in \mathbb{N}.
 \end{align*}
 
-The pmf of the Poisson distribution measures the probability of observing $n$ events in time $T$. 
+The PMF of the Poisson distribution measures the probability of observing $n$ events in time $T$. 
 
 ### Relation between Poisson and Binomial Distribution
 
-The Poisson distribution can be approximated by the binomial distribution when the number of trials $n$ is large and the probability of success $p$ is small. Let $X$ be a random variable with binomial distribution with parameters $n$ and $p$. As $n \to \infty$ and $p \to 0$ such that $\lambda = np$ remains constant, the pmf of $X$ converges to the pmf of the Poisson distribution with parameter $\lambda$. This gives us a simple algorithm to sample from the Poisson distribution:
+The Poisson distribution can be approximated by the binomial distribution when the number of trials $n$ is large and the probability of success $p$ is small. Let $X$ be a random variable with binomial distribution with parameters $n$ and $p$. As $n \to \infty$ and $p \to 0$ such that $\lambda = np$ remains constant, the PMF of $X$ converges to the PMF of the Poisson distribution with parameter $\lambda$. This gives us a simple algorithm to sample from the Poisson distribution:
 
 1. Set $X = 0$.
-2. Choose $n$ be a large integer (something like $n > 10\lambda$). 
+2. Choose $n$ to be a large integer (something like $n > 10\lambda$). 
 3. Set $p = \lambda/n$.
-4. Generate a $X$ according to the binomial distribution with parameters $n$ and $p$.
+4. Generate $X$ according to the binomial distribution with parameters $n$ and $p$.
 
-This is a fast method to sample from the Binomial approximation to the Poisson distribution and is good when $\lambda$ is small. For large $\lambda$, the method described below is more efficient as the number of trials $n$ required for the binomial distribution to approximate the Poisson distribution becomes very large.
+::: {.callout-tip}
+This is a fast method to sample from the binomial approximation to the Poisson distribution and is good when $\lambda$ is small. For large $\lambda$, the method described below is more efficient as the number of trials $n$ required for the binomial distribution to approximate the Poisson distribution becomes very large.
+:::
 
 ### Relation between Poisson and Exponential Distribution
 
-We exploit the relation between the Poisson distribution and the exponential distribution to sample from the Poisson distribution. When events occur at a constant rate $\lambda$, the time between events follows an exponential distribution with rate parameter $\lambda$. More precisely,
+We exploit the relation between the Poisson and exponential distributions to sample from the Poisson distribution. When events occur at a constant rate $\lambda$, the time between events follows an exponential distribution with rate parameter $\lambda$. More precisely,
 
 ::: {#thm-poisson-exponential}
 
@@ -208,7 +260,41 @@ Then, $N$ has Poisson distribution with parameter $\lambda$.
 
 :::
 
-The proof of this requires us to understand the relation between exponential and gamma distributions. We will skip the proof for now. The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:
+::: {.proof}
+The key insight is that $N$ counts the number of events (exponential inter-arrival times) that occur within a unit time interval. Let $S_n = X_1 + X_2 + \cdots + X_n$ be the time of the $n$-th event. Then:
+
+\begin{align*}
+\mathbb{P}(N = n) &= \mathbb{P}(S_n \leq 1 < S_{n+1}) \\
+&= \mathbb{P}(S_n \leq 1) - \mathbb{P}(S_{n+1} \leq 1)
+\end{align*}
+
+Since the sum of $n$ independent exponential random variables with rate $\lambda$ follows a gamma distribution with shape parameter $n$ and rate parameter $\lambda$, we have $S_n \sim \text{Gamma}(n, \lambda)$ with PDF:
+
+\begin{align*}
+f_{S_n}(t) = \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!}
+\end{align*}
+
+Therefore:
+\begin{align*}
+\mathbb{P}(S_n \leq 1) = \int_0^1 \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!} dt
+\end{align*}
+
+Using integration by parts repeatedly (or recognizing this as the CDF of the gamma distribution), we get:
+
+\begin{align*}
+\mathbb{P}(S_n \leq 1) = 1 - e^{-\lambda} \sum_{k=0}^{n-1} \frac{\lambda^k}{k!}
+\end{align*}
+
+Thus:
+\begin{align*}
+\mathbb{P}(N = n) &= \left(1 - e^{-\lambda} \sum_{k=0}^{n-1} \frac{\lambda^k}{k!}\right) - \left(1 - e^{-\lambda} \sum_{k=0}^{n} \frac{\lambda^k}{k!}\right) \\
+&= e^{-\lambda} \frac{\lambda^n}{n!}
+\end{align*}
+
+This is exactly the PMF of the Poisson distribution with parameter $\lambda$. $\blacksquare$
+:::
+
+The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:
 
 1. Set $S = 0$ and $N = 0$.
 2. While True:
@@ -216,115 +302,3 @@ The proof of this requires us to understand the relation between exponential and
     2. Set $S = S + x$.
     3. If $S > 1$, return $N$.
     4. Else, set $N = N + 1$.
-
-## Beta Distribution
-
-The Beta distribution is a continuous distribution defined on the interval $[0, 1]$. Let $X$ be a random variable with Beta distribution with parameters $\alpha > 0$ and $\beta > 0$. The probability density function of $X$ is given by
-
-\begin{align*}
-f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
-\end{align*}
-
-where $c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}$ is the normalizing constant. (Note that when $\alpha$ and $\beta$ are not integers, we use $\Gamma$ function to as a generalization of the factorial function.)
-
-This is a simple function supported over the interval $[0, 1]$. The Beta distribution is used as a prior distribution in Bayesian statistics. When $\alpha$ and $\beta$ are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.
-
-::: {#def-order-statistics}
-
-**(Order Statistics)**: Let $X_1, X_2, \ldots, X_n$ be independent and identically distributed random variables. The $k$-th order statistic, denoted $X_{(k)}$, is the $k$-th smallest value among $X_1, X_2, \ldots, X_n$.
-
-:::
-
-
-::: {#thm-beta-order-statistics}
-
-**(Beta-Order Statistics)**: Let $U_1, U_2, \ldots, U_n$ be independent random variables with uniform distribution $U(0, 1)$. Then the random variable $X = U_{(k)}$ has Beta distribution with parameters $\alpha = k$ and $\beta = n - k + 1$.
-
-:::
-
-::: {.proof}
-
-We'll work out a partial proof of the theorem. Let $X = U_{(k)}$. The cumulative distribution function of $X$ is given by
-
-\begin{align*}
-F(x) 
-&= \mathbb{P}(U_{(k)} \leq x) \\
-&= \mathbb{P}( \text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
-&= \sum_{i=k}^{n} \binom{n}{i} x^i (1-x)^{n-i}.
-\end{align*}
-
-We differentiate both sides to get the probability density function of $X$:
-
-\begin{align*}
-f(x) &= \frac{d}{dx} F(x) \\
-&= \sum_{i=k}^{n} \binom{n}{i} \frac{d}{dx}x^i (1-x)^{n-i} \\
-&= \sum_{i=k}^{n} \binom{n}{i} i x^{i-1} (1-x)^{n-i} - \binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.
-\end{align*}
-
-The rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with $i = k$ remains. $\blacksquare$
-
-::: 
-
-This theorem gives us a simple algorithm to sample from the Beta distribution:
-
-1. Generate $n$ random numbers $u_1, u_2, \ldots, u_n$ from the uniform distribution $U(0, 1)$.
-2. Sort the numbers in increasing order $u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}$.
-3. Return $u_{(k)}$.
-
-## Mixture Distributions
-
-A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let $X$ be a random variable that is a mixture of distributions $f_1(x), f_2(x), \ldots, f_n(x)$ with weights $w_1, w_2, \ldots, w_n$. The probability density function of $X$ is given by
-
-\begin{align*}
-f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
-\end{align*}
-
-Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by sampling from the component distributions and then taking a weighted sum of the samples $X = Y_1$ with probability $w_1$, $X = Y_2$ with probability $w_2$, $\ldots, X = Y_n$ with probability $w_n$.
-
-
-To sample from a mixture distribution, we can use the following algorithm:
-
-1. Sample from the discrete distribution $[w_1, w_2, \ldots, w_n]$ to select a component distribution.
-2. Sample from the selected component distribution.
-3. Return the sample.
-
-Note that this is not the same as constructing a linear combination of the component distributions. For example, if $X_1 \sim N(\mu_1, \sigma_1^2)$ and $X_2 \sim N(\mu_2, \sigma_2^2)$ are independent, then $w_1 X_1 + w_2 X_2$ is is a normal distribution with mean $w_1 \mu_1 + w_2 \mu_2$ and variance $w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2$. This is not the same as a mixture of two normal distributions.
-
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-
-def normal_distribution(x, mu, sigma):
-    return 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
-
-def mixture_of_normals(x, mu1, sigma1, mu2, sigma2, p1):
-    return p1 * normal_distribution(x, mu1, sigma1) + (1 - p1) * normal_distribution(x, mu2, sigma2)
-
-def linear_combination_of_normals(x, mu1, sigma1, mu2, sigma2, p1):
-    return normal_distribution(x, mu1*p1 + mu2*(1-p1), np.sqrt(sigma1**2 * p1 + sigma2**2 * (1-p1)))
-
-x = np.linspace(-5, 5, 100)
-y_mixture = [mixture_of_normals(xi, mu1=-2, sigma1=1, mu2=2, sigma2=0.5, p1=0.7) for xi in x]
-y_linear_comb = [linear_combination_of_normals(xi, mu1=-2, sigma1=1, mu2=2, sigma2=0.5, p1=0.7) for xi in x]
-
-fig, axes = plt.subplots(2, 1, figsize=(8, 8))  # Stack vertically (2 rows, 1 column)
-
-# Mixture of Normals
-axes[0].plot(x, y_mixture)
-axes[0].fill_between(x, y_mixture, color='lightblue', alpha=0.5)
-axes[0].set_xlabel('x')
-axes[0].set_ylabel('f(x)')
-axes[0].set_title('Mixture of N(-2, 1) and N(2, 0.5) with p_1=0.7 and p_2=0.3')
-axes[0].axhline(0, color='black', lw=0.5)
-
-# Linear Combination of Normals
-axes[1].plot(x, y_linear_comb)
-axes[1].fill_between(x, y_linear_comb, color='lightblue', alpha=0.5)
-axes[1].set_xlabel('x')
-axes[1].set_ylabel('f(x)')
-axes[1].set_title('0.7X + 0.3Y with X~N(-2, 1) and Y~N(2, 0.5)')
-axes[1].axhline(0, color='black', lw=0.5)
-
-plt.tight_layout()
-plt.show()
-```

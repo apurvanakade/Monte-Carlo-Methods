@@ -6,8 +6,13 @@ execute:
   echo: false
 ---
 
+Once we have a reliable source of random numbers from a uniform distribution $U(0,1)$, we can use these to generate samples from virtually any probability distribution. This process, known as **random variate generation**, is fundamental to Monte Carlo simulations since most applications require sampling from specific distributions rather than just uniform random numbers.
+
+The key insight is that we can transform uniform random numbers into samples from any target distribution using various mathematical techniques. We'll explore several methods, starting with discrete distributions and then moving to continuous ones.
 
 ## Discrete Case
+
+For discrete random variables, we can partition the unit interval $[0,1]$ according to the probabilities of each outcome and use this to transform uniform random numbers into samples from our target distribution.
 
 Let's consider a simple example where $X$ is a discrete random variable that takes values $1, 2, 3$ with probabilities $0.2, 0.3, 0.5$ respectively. To sample from this distribution, we can use the following algorithm:
 
@@ -17,7 +22,17 @@ Let's consider a simple example where $X$ is a discrete random variable that tak
 4. If $0.5 < u \leq 1$, set $X = 3$.
 5. Return $X$.
 
-This algorithm can be easily extended to the case where $X$ takes $n$ values. This algorithm can be interpreted as a special case of the inverse transform sampling method described below.
+::: {.callout-note}
+## General Algorithm for Discrete Distributions
+For a discrete random variable $X$ that takes values $x_1, x_2, \ldots, x_n$ with probabilities $p_1, p_2, \ldots, p_n$:
+
+1. Compute the cumulative probabilities: $F_1 = p_1$, $F_2 = p_1 + p_2$, ..., $F_n = p_1 + p_2 + \cdots + p_n = 1$
+2. Generate a random number $u$ from $U(0, 1)$
+3. Find the smallest index $i$ such that $u \leq F_i$
+4. Return $X = x_i$
+
+This algorithm can be implemented efficiently using binary search when $n$ is large, reducing the time complexity from $O(n)$ to $O(\log n)$ per sample. This approach is an example of the **inverse transform method** that we'll study in detail next.
+:::
 
 ### Binomial Distribution
 
@@ -27,7 +42,12 @@ Let $X$ be a random variable with binomial distribution with parameters $n$ and 
 \mathrm{Binomial}(x) = \binom{n}{x} p^x (1-p)^{n-x}, \quad x = 0, 1, \ldots, n.
 \end{align*}
 
-One way to sample from the binomial distribution is to treat it as a discrete distribution and use the above algorithm. However, we can use the Bernoulli distribution to sample from the binomial distribution.
+While we could treat the binomial distribution as a general discrete distribution and use the inverse transform method above, there's a more natural approach that exploits the underlying structure of the binomial distribution.
+
+::: {.callout-tip}
+## Exploiting Distribution Structure
+Since a binomial random variable represents the sum of $n$ independent Bernoulli trials, we can generate it by actually performing these trials computationally.
+:::
 
 If $Y_1, Y_2, \ldots, Y_n$ are independent random variables with Bernoulli distribution with parameter $p$, then the random variable $X = Y_1 + Y_2 + \ldots + Y_n$ has binomial distribution with parameters $n$ and $p$. This gives us a simple algorithm to sample from the binomial distribution:
 
@@ -36,3 +56,4 @@ If $Y_1, Y_2, \ldots, Y_n$ are independent random variables with Bernoulli distr
 3. Compute $X = Y_1 + Y_2 + \ldots + Y_n$.
 4. Return $X$.
 
+This method is particularly intuitive and works well when $n$ is not too large. For large $n$, more efficient algorithms exist that avoid generating $n$ uniform random numbers for each binomial sample.

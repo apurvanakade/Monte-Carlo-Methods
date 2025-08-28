@@ -38,10 +38,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ef56b68f8fa1e9d2ba328e99e439f80.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,7 +111,169 @@ window.Quarto = {
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
-<body class="nav-sidebar docked nav-fixed quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -119,6 +285,7 @@ window.Quarto = {
     </a>
   </div>
         <div class="quarto-navbar-tools tools-end">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
           <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
@@ -375,13 +542,12 @@ window.Quarto = {
   <li><a href="#relation-between-poisson-and-binomial-distribution" id="toc-relation-between-poisson-and-binomial-distribution" class="nav-link" data-scroll-target="#relation-between-poisson-and-binomial-distribution"><span class="header-section-number">7.5.1</span> Relation between Poisson and Binomial Distribution</a></li>
   <li><a href="#relation-between-poisson-and-exponential-distribution" id="toc-relation-between-poisson-and-exponential-distribution" class="nav-link" data-scroll-target="#relation-between-poisson-and-exponential-distribution"><span class="header-section-number">7.5.2</span> Relation between Poisson and Exponential Distribution</a></li>
   </ul></li>
-  <li><a href="#beta-distribution" id="toc-beta-distribution" class="nav-link" data-scroll-target="#beta-distribution"><span class="header-section-number">7.6</span> Beta Distribution</a></li>
-  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link" data-scroll-target="#mixture-distributions"><span class="header-section-number">7.7</span> Mixture Distributions</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
+
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/inverse_transform.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></a></li></ol></nav>
 <div class="quarto-title">
@@ -402,6 +568,7 @@ window.Quarto = {
 </header>
 
 
+<p>For continuous random variables, we can use a powerful and elegant method called <strong>inverse transform sampling</strong> that provides a systematic way to generate samples from any distribution whose cumulative distribution function (CDF) we can compute and invert.</p>
 <p>Consider a continuous random variable <span class="math inline">\(X\)</span> with probability density function <span class="math inline">\(f(x)\)</span>. Let <span class="math inline">\(U\)</span> be a random variable with uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</p>
 <div id="thm-inverse-transform-sampling" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 7.1</strong></span> <strong>(Inverse Transform Sampling)</strong>: Let <span class="math inline">\(F(x)\)</span> be the cumulative distribution function of <span class="math inline">\(X\)</span>. If <span class="math inline">\(F(x)\)</span> is strictly increasing and continuous, then the random variable <span class="math inline">\(Y = F^{-1}(U)\)</span> has the same distribution as <span class="math inline">\(X\)</span>.</p>
@@ -419,33 +586,77 @@ window.Quarto = {
 &amp;= F(y).
 \end{align*}\]</span></p>
 <p>Thus, <span class="math inline">\(Y\)</span> has the same distribution as <span class="math inline">\(X\)</span>. <span class="math inline">\(\blacksquare\)</span></p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The inverse transform sampling method can be used to sample from any probability distribution <span class="math inline">\(X\)</span> for which we can compute the cumulative distribution function <span class="math inline">\(F(x)\)</span> and its inverse <span class="math inline">\(F^{-1}(u)\)</span>. The algorithm to sample from a probability distribution using the inverse transform sampling method is as follows:</p>
 <ol type="1">
 <li>Generate a random number <span class="math inline">\(u\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
 <li>Compute <span class="math inline">\(x = F^{-1}(u)\)</span>.</li>
 <li>Return <span class="math inline">\(x\)</span>.</li>
 </ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Generalized Inverse
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Even when <span class="math inline">\(F(x)\)</span> is not strictly increasing, we can still use the inverse transform sampling method by using the generalized inverse of <span class="math inline">\(F(x)\)</span>. The generalized inverse of <span class="math inline">\(F(x)\)</span> is defined as</p>
 <p><span class="math display">\[\begin{align*}
 F^{-1}(u) = \inf\{x : F(x) \geq u\}.
 \end{align*}\]</span></p>
-<p>You can think of <span class="math inline">\(\inf\)</span> as <span class="math inline">\(\min\)</span> for simplicity.</p>
+<p>You can think of <span class="math inline">\(\inf\)</span> as <span class="math inline">\(\min\)</span> for simplicity. This is what we are doing in the discrete case!</p>
+</div>
 </div>
 <section id="exponential-distribution" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="exponential-distribution"><span class="header-section-number">7.1</span> Exponential Distribution</h2>
 <p>Let <span class="math inline">\(X\)</span> be a random variable with exponential distribution with rate parameter <span class="math inline">\(\lambda &gt; 0\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
-\mathrm{Exp}(\lambda) = \lambda e^{-\lambda x}, \quad x \geq 0.
+f(x) = \lambda e^{-\lambda x}, \quad x \geq 0.
 \end{align*}\]</span></p>
 <p>The cumulative distribution function of <span class="math inline">\(X\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
 F(x) = 1 - e^{-\lambda x}, \quad x \geq 0.
 \end{align*}\]</span></p>
-<p>The inverse of the cumulative distribution function is given by</p>
+<p>To find the inverse of the cumulative distribution function, we solve <span class="math inline">\(u = F(x) = 1 - e^{-\lambda x}\)</span> for <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[\begin{align*}
+u &amp;= 1 - e^{-\lambda x} \\
+\Rightarrow e^{-\lambda x} &amp;= 1 - u \\
+\Rightarrow -\lambda x &amp;= \log(1 - u) \\
+\Rightarrow x &amp;= -\frac{1}{\lambda} \log(1 - u)
+\end{align*}\]</span></p>
+<p>Therefore, the inverse of the cumulative distribution function is given by</p>
 <p><span class="math display">\[\begin{align*}
 F^{-1}(u) = -\frac{1}{\lambda} \log(1 - u).
 \end{align*}\]</span></p>
-<p>Hence, the inverse transform sampling method can be used to sample from the exponential distribution.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sampling Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To generate an exponential random variable with rate <span class="math inline">\(\lambda\)</span>: 1. Generate <span class="math inline">\(u \sim U(0,1)\)</span> 2. Return <span class="math inline">\(x = -\frac{1}{\lambda} \log(1 - u)\)</span></p>
+<p>Note that since <span class="math inline">\(1-u\)</span> is also uniformly distributed on <span class="math inline">\((0,1)\)</span> when <span class="math inline">\(u \sim U(0,1)\)</span>, we can simplify this to <span class="math inline">\(x = -\frac{1}{\lambda} \log(u)\)</span>.</p>
+</div>
+</div>
 </section>
 <section id="weibull-distribution" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="weibull-distribution"><span class="header-section-number">7.2</span> Weibull Distribution</h2>
@@ -453,12 +664,48 @@ F^{-1}(u) = -\frac{1}{\lambda} \log(1 - u).
 <p><span class="math display">\[\begin{align*}
 f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1} e^{-(x/\lambda)^k}, \quad x \geq 0.
 \end{align*}\]</span></p>
-<p>The inverse transform sampling method can be used to sample from the Weibull distribution.</p>
+<p>The cumulative distribution function is:</p>
+<p><span class="math display">\[\begin{align*}
+F(x) = 1 - e^{-(x/\lambda)^k}
+\end{align*}\]</span></p>
+<p>Solving for the inverse: <span class="math display">\[\begin{align*}
+u &amp;= 1 - e^{-(x/\lambda)^k} \\
+\Rightarrow e^{-(x/\lambda)^k} &amp;= 1 - u \\
+\Rightarrow -(x/\lambda)^k &amp;= \log(1 - u) \\
+\Rightarrow x &amp;= \lambda[-\log(1 - u)]^{1/k}
+\end{align*}\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sampling Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To generate a Weibull random variable: 1. Generate <span class="math inline">\(u \sim U(0,1)\)</span> 2. Return <span class="math inline">\(x = \lambda[-\log(1 - u)]^{1/k}\)</span></p>
+</div>
+</div>
 </section>
 <section id="triangular-distribution" class="level2" data-number="7.3">
 <h2 data-number="7.3" class="anchored" data-anchor-id="triangular-distribution"><span class="header-section-number">7.3</span> Triangular Distribution</h2>
-<p>Let <span class="math inline">\(X\)</span> be a random variable with triangular distribution supported over the interval <span class="math inline">\([a,b]\)</span> with maximum value at <span class="math inline">\(c \in [a,b]\)</span>. We can use the inverse transform sampling method to sample from the triangular distribution.</p>
-<div id="2409fa5a" class="cell" data-execution_count="1">
+<p>Let <span class="math inline">\(X\)</span> be a random variable with triangular distribution supported over the interval <span class="math inline">\([a,b]\)</span> with mode at <span class="math inline">\(c \in [a,b]\)</span>. The triangular distribution has a piecewise linear probability density function that increases linearly from <span class="math inline">\(a\)</span> to <span class="math inline">\(c\)</span> and then decreases linearly from <span class="math inline">\(c\)</span> to <span class="math inline">\(b\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The triangular distribution provides a good example of inverse transform sampling with a piecewise CDF. The inverse function must be computed separately for the two pieces of the distribution, making this a more complex but instructive application of the method.</p>
+</div>
+</div>
+<p>The inverse transform sampling method can be used to sample from the triangular distribution, though the derivation involves handling the piecewise nature of both the CDF and its inverse.</p>
+<div id="379c0479" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -470,23 +717,24 @@ f(x) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1} e^{-(x/\lambda)^k}
 </section>
 <section id="normal-distribution" class="level2" data-number="7.4">
 <h2 data-number="7.4" class="anchored" data-anchor-id="normal-distribution"><span class="header-section-number">7.4</span> Normal Distribution</h2>
-<p>The standard normal distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(1\)</span> is given has the probability density function</p>
+<p>The standard normal distribution with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(1\)</span> has the probability density function</p>
 <p><span class="math display">\[\begin{align*}
-N(0, 1) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}.
+f(x) = \frac{1}{\sqrt{2\pi}} e^{-x^2/2}.
 \end{align*}\]</span></p>
-<p>It is not possible to sample from the normal distribution using the inverse transform sampling method because the cumulative distribution function of the normal distribution does not have a closed-form inverse. However, there are other methods to sample from the normal distribution. One such method is the Box-Muller transform. The Box-Muller transform is based on the following idea. Consider a 2D random variable <span class="math inline">\((X, Y)\)</span> with standard normal distribution. The joint probability density function of <span class="math inline">\((X, Y)\)</span> is given by</p>
+<p>It is not possible to sample from the normal distribution using the inverse transform sampling method because the cumulative distribution function of the normal distribution does not have a closed-form inverse. However, there are other methods to sample from the normal distribution. One such method is the Box-Muller transform.</p>
+<p>The Box-Muller transform is based on the following idea. Consider a 2D random variable <span class="math inline">\((X, Y)\)</span> with standard normal distribution. The joint probability density function of <span class="math inline">\((X, Y)\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
 f(x, y) = \frac{1}{2\pi} e^{-(x^2 + y^2)/2}, \quad -\infty &lt; x, y &lt; \infty.
 \end{align*}\]</span></p>
-<p>Let <span class="math inline">\(R = \sqrt{X^2 + Y^2}\)</span> and <span class="math inline">\(\Theta = \arctan(Y/X)\)</span> be the polar coordinates of <span class="math inline">\((X, Y)\)</span>. Then notice that <span class="math inline">\(\theta\)</span> is uniformly distributed in <span class="math inline">\([0, 2\pi]\)</span>. We can calculate the cdf of <span class="math inline">\(R\)</span> as follows:</p>
+<p>Let <span class="math inline">\(R = \sqrt{X^2 + Y^2}\)</span> and <span class="math inline">\(\Theta = \arctan(Y/X)\)</span> be the polar coordinates of <span class="math inline">\((X, Y)\)</span>. Then notice that <span class="math inline">\(\Theta\)</span> is uniformly distributed in <span class="math inline">\([0, 2\pi]\)</span>. We can calculate the CDF of <span class="math inline">\(R\)</span> as follows:</p>
 <p><span class="math display">\[\begin{align*}
 \mathbb{P}(R \leq r) &amp;= \mathbb{P}(X^2 + Y^2 \leq r^2) \\
 &amp;= \int_{x^2 + y^2 \leq r^2} f(x, y) \, dx \, dy \\
-&amp;= \int_{x^2 + y^2 \leq r^2} e^{-(x^2 + y^2)/2} \, dx \, dy \\
-&amp;= \int_{0}^{2\pi} \int_{0}^{r} \frac{1}{2\pi} e^{-r^2/2} r \, dr \, d\theta \\
+&amp;= \int_{x^2 + y^2 \leq r^2} \frac{1}{2\pi} e^{-(x^2 + y^2)/2} \, dx \, dy \\
+&amp;= \int_{0}^{2\pi} \int_{0}^{r} \frac{1}{2\pi} e^{-\rho^2/2} \rho \, d\rho \, d\theta \\
 &amp;= 1 - e^{-r^2/2}.
 \end{align*}\]</span></p>
-<p>We can invert this to get the inverse cdf of <span class="math inline">\(R\)</span>:</p>
+<p>We can invert this to get the inverse CDF of <span class="math inline">\(R\)</span>:</p>
 <p><span class="math display">\[\begin{align*}
 F_R^{-1}(u) = \sqrt{-2 \log(1 - u)}.
 \end{align*}\]</span></p>
@@ -494,7 +742,19 @@ F_R^{-1}(u) = \sqrt{-2 \log(1 - u)}.
 <div id="thm-box-muller-transform" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 7.2</strong></span> <strong>(Box-Muller Transform)</strong>: Let <span class="math inline">\(U_1, U_2\)</span> be independent random variables with uniform distribution <span class="math inline">\(U(0, 1)\)</span>. Let <span class="math inline">\(R = \sqrt{-2 \log U_1}\)</span> and <span class="math inline">\(\Theta = 2\pi U_2\)</span>. Then, the random variables <span class="math inline">\(X = R \cos(\Theta)\)</span> and <span class="math inline">\(Y = R \sin(\Theta)\)</span> are independent and have standard normal distribution.</p>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Note that we are using <span class="math inline">\(U_1\)</span> instead of <span class="math inline">\(1-U_1\)</span> in the formula for <span class="math inline">\(R\)</span>. This is because <span class="math inline">\(1-U_1\)</span> is also uniformly distributed in <span class="math inline">\([0, 1]\)</span>.</p>
+</div>
+</div>
 <p>This gives us the following algorithm to sample from the normal distribution:</p>
 <ol type="1">
 <li>Generate two random numbers <span class="math inline">\(u_1, u_2\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
@@ -509,21 +769,33 @@ F_R^{-1}(u) = \sqrt{-2 \log(1 - u)}.
 <p><span class="math display">\[\begin{align*}
 \mathrm{Pois}(n) = \frac{e^{-\lambda} \lambda^n}{n!}, \quad n \in \mathbb{N}.
 \end{align*}\]</span></p>
-<p>The pmf of the Poisson distribution measures the probability of observing <span class="math inline">\(n\)</span> events in time <span class="math inline">\(T\)</span>.</p>
+<p>The PMF of the Poisson distribution measures the probability of observing <span class="math inline">\(n\)</span> events in time <span class="math inline">\(T\)</span>.</p>
 <section id="relation-between-poisson-and-binomial-distribution" class="level3" data-number="7.5.1">
 <h3 data-number="7.5.1" class="anchored" data-anchor-id="relation-between-poisson-and-binomial-distribution"><span class="header-section-number">7.5.1</span> Relation between Poisson and Binomial Distribution</h3>
-<p>The Poisson distribution can be approximated by the binomial distribution when the number of trials <span class="math inline">\(n\)</span> is large and the probability of success <span class="math inline">\(p\)</span> is small. Let <span class="math inline">\(X\)</span> be a random variable with binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>. As <span class="math inline">\(n \to \infty\)</span> and <span class="math inline">\(p \to 0\)</span> such that <span class="math inline">\(\lambda = np\)</span> remains constant, the pmf of <span class="math inline">\(X\)</span> converges to the pmf of the Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>. This gives us a simple algorithm to sample from the Poisson distribution:</p>
+<p>The Poisson distribution can be approximated by the binomial distribution when the number of trials <span class="math inline">\(n\)</span> is large and the probability of success <span class="math inline">\(p\)</span> is small. Let <span class="math inline">\(X\)</span> be a random variable with binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>. As <span class="math inline">\(n \to \infty\)</span> and <span class="math inline">\(p \to 0\)</span> such that <span class="math inline">\(\lambda = np\)</span> remains constant, the PMF of <span class="math inline">\(X\)</span> converges to the PMF of the Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>. This gives us a simple algorithm to sample from the Poisson distribution:</p>
 <ol type="1">
 <li>Set <span class="math inline">\(X = 0\)</span>.</li>
-<li>Choose <span class="math inline">\(n\)</span> be a large integer (something like <span class="math inline">\(n &gt; 10\lambda\)</span>).</li>
+<li>Choose <span class="math inline">\(n\)</span> to be a large integer (something like <span class="math inline">\(n &gt; 10\lambda\)</span>).</li>
 <li>Set <span class="math inline">\(p = \lambda/n\)</span>.</li>
-<li>Generate a <span class="math inline">\(X\)</span> according to the binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>.</li>
+<li>Generate <span class="math inline">\(X\)</span> according to the binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>.</li>
 </ol>
-<p>This is a fast method to sample from the Binomial approximation to the Poisson distribution and is good when <span class="math inline">\(\lambda\)</span> is small. For large <span class="math inline">\(\lambda\)</span>, the method described below is more efficient as the number of trials <span class="math inline">\(n\)</span> required for the binomial distribution to approximate the Poisson distribution becomes very large.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a fast method to sample from the binomial approximation to the Poisson distribution and is good when <span class="math inline">\(\lambda\)</span> is small. For large <span class="math inline">\(\lambda\)</span>, the method described below is more efficient as the number of trials <span class="math inline">\(n\)</span> required for the binomial distribution to approximate the Poisson distribution becomes very large.</p>
+</div>
+</div>
 </section>
 <section id="relation-between-poisson-and-exponential-distribution" class="level3" data-number="7.5.2">
 <h3 data-number="7.5.2" class="anchored" data-anchor-id="relation-between-poisson-and-exponential-distribution"><span class="header-section-number">7.5.2</span> Relation between Poisson and Exponential Distribution</h3>
-<p>We exploit the relation between the Poisson distribution and the exponential distribution to sample from the Poisson distribution. When events occur at a constant rate <span class="math inline">\(\lambda\)</span>, the time between events follows an exponential distribution with rate parameter <span class="math inline">\(\lambda\)</span>. More precisely,</p>
+<p>We exploit the relation between the Poisson and exponential distributions to sample from the Poisson distribution. When events occur at a constant rate <span class="math inline">\(\lambda\)</span>, the time between events follows an exponential distribution with rate parameter <span class="math inline">\(\lambda\)</span>. More precisely,</p>
 <div id="thm-poisson-exponential" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 7.3</strong></span> <strong>(Inter-arrival Times)</strong>:</p>
 <p>Let <span class="math inline">\(X_1, X_2, \ldots\)</span> be independent random variables with exponential distribution with rate parameter <span class="math inline">\(\lambda\)</span>. Define</p>
@@ -532,7 +804,30 @@ N = \max \left\{ n : X_1 + X_2 + \dots + X_n \le 1 \right\}.
 \end{align*}\]</span></p>
 <p>Then, <span class="math inline">\(N\)</span> has Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>.</p>
 </div>
-<p>The proof of this requires us to understand the relation between exponential and gamma distributions. We will skip the proof for now. The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:</p>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>The key insight is that <span class="math inline">\(N\)</span> counts the number of events (exponential inter-arrival times) that occur within a unit time interval. Let <span class="math inline">\(S_n = X_1 + X_2 + \cdots + X_n\)</span> be the time of the <span class="math inline">\(n\)</span>-th event. Then:</p>
+<p><span class="math display">\[\begin{align*}
+\mathbb{P}(N = n) &amp;= \mathbb{P}(S_n \leq 1 &lt; S_{n+1}) \\
+&amp;= \mathbb{P}(S_n \leq 1) - \mathbb{P}(S_{n+1} \leq 1)
+\end{align*}\]</span></p>
+<p>Since the sum of <span class="math inline">\(n\)</span> independent exponential random variables with rate <span class="math inline">\(\lambda\)</span> follows a gamma distribution with shape parameter <span class="math inline">\(n\)</span> and rate parameter <span class="math inline">\(\lambda\)</span>, we have <span class="math inline">\(S_n \sim \text{Gamma}(n, \lambda)\)</span> with PDF:</p>
+<p><span class="math display">\[\begin{align*}
+f_{S_n}(t) = \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!}
+\end{align*}\]</span></p>
+<p>Therefore: <span class="math display">\[\begin{align*}
+\mathbb{P}(S_n \leq 1) = \int_0^1 \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!} dt
+\end{align*}\]</span></p>
+<p>Using integration by parts repeatedly (or recognizing this as the CDF of the gamma distribution), we get:</p>
+<p><span class="math display">\[\begin{align*}
+\mathbb{P}(S_n \leq 1) = 1 - e^{-\lambda} \sum_{k=0}^{n-1} \frac{\lambda^k}{k!}
+\end{align*}\]</span></p>
+<p>Thus: <span class="math display">\[\begin{align*}
+\mathbb{P}(N = n) &amp;= \left(1 - e^{-\lambda} \sum_{k=0}^{n-1} \frac{\lambda^k}{k!}\right) - \left(1 - e^{-\lambda} \sum_{k=0}^{n} \frac{\lambda^k}{k!}\right) \\
+&amp;= e^{-\lambda} \frac{\lambda^n}{n!}
+\end{align*}\]</span></p>
+<p>This is exactly the PMF of the Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>. <span class="math inline">\(\blacksquare\)</span></p>
+</div>
+<p>The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:</p>
 <ol type="1">
 <li>Set <span class="math inline">\(S = 0\)</span> and <span class="math inline">\(N = 0\)</span>.</li>
 <li>While True:
@@ -543,75 +838,27 @@ N = \max \left\{ n : X_1 + X_2 + \dots + X_n \le 1 \right\}.
 <li>Else, set <span class="math inline">\(N = N + 1\)</span>.</li>
 </ol></li>
 </ol>
-</section>
-</section>
-<section id="beta-distribution" class="level2" data-number="7.6">
-<h2 data-number="7.6" class="anchored" data-anchor-id="beta-distribution"><span class="header-section-number">7.6</span> Beta Distribution</h2>
-<p>The Beta distribution is a continuous distribution defined on the interval <span class="math inline">\([0, 1]\)</span>. Let <span class="math inline">\(X\)</span> be a random variable with Beta distribution with parameters <span class="math inline">\(\alpha &gt; 0\)</span> and <span class="math inline">\(\beta &gt; 0\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
-\end{align*}\]</span></p>
-<p>where <span class="math inline">\(c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}\)</span> is the normalizing constant. (Note that when <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are not integers, we use <span class="math inline">\(\Gamma\)</span> function to as a generalization of the factorial function.)</p>
-<p>This is a simple function supported over the interval <span class="math inline">\([0, 1]\)</span>. The Beta distribution is used as a prior distribution in Bayesian statistics. When <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.</p>
-<div id="def-order-statistics" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 7.1</strong></span> <strong>(Order Statistics)</strong>: Let <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> be independent and identically distributed random variables. The <span class="math inline">\(k\)</span>-th order statistic, denoted <span class="math inline">\(X_{(k)}\)</span>, is the <span class="math inline">\(k\)</span>-th smallest value among <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>.</p>
-</div>
-<div id="thm-beta-order-statistics" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 7.4</strong></span> <strong>(Beta-Order Statistics)</strong>: Let <span class="math inline">\(U_1, U_2, \ldots, U_n\)</span> be independent random variables with uniform distribution <span class="math inline">\(U(0, 1)\)</span>. Then the random variable <span class="math inline">\(X = U_{(k)}\)</span> has Beta distribution with parameters <span class="math inline">\(\alpha = k\)</span> and <span class="math inline">\(\beta = n - k + 1\)</span>.</p>
-</div>
-<div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>We’ll work out a partial proof of the theorem. Let <span class="math inline">\(X = U_{(k)}\)</span>. The cumulative distribution function of <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-F(x)
-&amp;= \mathbb{P}(U_{(k)} \leq x) \\
-&amp;= \mathbb{P}( \text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
-&amp;= \sum_{i=k}^{n} \binom{n}{i} x^i (1-x)^{n-i}.
-\end{align*}\]</span></p>
-<p>We differentiate both sides to get the probability density function of <span class="math inline">\(X\)</span>:</p>
-<p><span class="math display">\[\begin{align*}
-f(x) &amp;= \frac{d}{dx} F(x) \\
-&amp;= \sum_{i=k}^{n} \binom{n}{i} \frac{d}{dx}x^i (1-x)^{n-i} \\
-&amp;= \sum_{i=k}^{n} \binom{n}{i} i x^{i-1} (1-x)^{n-i} - \binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.
-\end{align*}\]</span></p>
-<p>The rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with <span class="math inline">\(i = k\)</span> remains. <span class="math inline">\(\blacksquare\)</span></p>
-</div>
-<p>This theorem gives us a simple algorithm to sample from the Beta distribution:</p>
-<ol type="1">
-<li>Generate <span class="math inline">\(n\)</span> random numbers <span class="math inline">\(u_1, u_2, \ldots, u_n\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
-<li>Sort the numbers in increasing order <span class="math inline">\(u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}\)</span>.</li>
-<li>Return <span class="math inline">\(u_{(k)}\)</span>.</li>
-</ol>
-</section>
-<section id="mixture-distributions" class="level2" data-number="7.7">
-<h2 data-number="7.7" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">7.7</span> Mixture Distributions</h2>
-<p>A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let <span class="math inline">\(X\)</span> be a random variable that is a mixture of distributions <span class="math inline">\(f_1(x), f_2(x), \ldots, f_n(x)\)</span> with weights <span class="math inline">\(w_1, w_2, \ldots, w_n\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
-\end{align*}\]</span></p>
-<p>Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by sampling from the component distributions and then taking a weighted sum of the samples <span class="math inline">\(X = Y_1\)</span> with probability <span class="math inline">\(w_1\)</span>, <span class="math inline">\(X = Y_2\)</span> with probability <span class="math inline">\(w_2\)</span>, <span class="math inline">\(\ldots, X = Y_n\)</span> with probability <span class="math inline">\(w_n\)</span>.</p>
-<p>To sample from a mixture distribution, we can use the following algorithm:</p>
-<ol type="1">
-<li>Sample from the discrete distribution <span class="math inline">\([w_1, w_2, \ldots, w_n]\)</span> to select a component distribution.</li>
-<li>Sample from the selected component distribution.</li>
-<li>Return the sample.</li>
-</ol>
-<p>Note that this is not the same as constructing a linear combination of the component distributions. For example, if <span class="math inline">\(X_1 \sim N(\mu_1, \sigma_1^2)\)</span> and <span class="math inline">\(X_2 \sim N(\mu_2, \sigma_2^2)\)</span> are independent, then <span class="math inline">\(w_1 X_1 + w_2 X_2\)</span> is is a normal distribution with mean <span class="math inline">\(w_1 \mu_1 + w_2 \mu_2\)</span> and variance <span class="math inline">\(w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2\)</span>. This is not the same as a mixture of two normal distributions.</p>
-<div id="e0d97e9e" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="inverse_transform_files/figure-html/cell-3-output-1.png" width="758" height="758" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
     const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {
