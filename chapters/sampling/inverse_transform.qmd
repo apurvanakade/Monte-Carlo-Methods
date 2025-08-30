@@ -88,6 +88,7 @@ F^{-1}(u) = -\frac{1}{\lambda} \log(1 - u).
 \end{align*}
 
 ::: {.callout-note}
+
 ## Sampling Algorithm
 To generate an exponential random variable with rate $\lambda$:
 1. Generate $u \sim U(0,1)$
@@ -213,10 +214,15 @@ Note that we are using $U_1$ instead of $1-U_1$ in the formula for $R$. This is 
 
 This gives us the following algorithm to sample from the normal distribution:
 
+::: {.callout-note}
+## Algorithm
+
 1. Generate two random numbers $u_1, u_2$ from the uniform distribution $U(0, 1)$.
 2. Compute $R = \sqrt{-2 \log u_1}$ and $\Theta = 2\pi u_2$.
 3. Compute $X = R \cos(\Theta)$ and $Y = R \sin(\Theta)$.
 4. Return $X$ (or $Y$).
+
+::: 
 
 ## Poisson Distribution
 
@@ -232,10 +238,15 @@ The PMF of the Poisson distribution measures the probability of observing $n$ ev
 
 The Poisson distribution can be approximated by the binomial distribution when the number of trials $n$ is large and the probability of success $p$ is small. Let $X$ be a random variable with binomial distribution with parameters $n$ and $p$. As $n \to \infty$ and $p \to 0$ such that $\lambda = np$ remains constant, the PMF of $X$ converges to the PMF of the Poisson distribution with parameter $\lambda$. This gives us a simple algorithm to sample from the Poisson distribution:
 
+::: {.callout-note}
+## Algorithm
+
 1. Set $X = 0$.
 2. Choose $n$ to be a large integer (something like $n > 10\lambda$). 
 3. Set $p = \lambda/n$.
 4. Generate $X$ according to the binomial distribution with parameters $n$ and $p$.
+
+:::
 
 ::: {.callout-tip}
 This is a fast method to sample from the binomial approximation to the Poisson distribution and is good when $\lambda$ is small. For large $\lambda$, the method described below is more efficient as the number of trials $n$ required for the binomial distribution to approximate the Poisson distribution becomes very large.
@@ -296,9 +307,14 @@ This is exactly the PMF of the Poisson distribution with parameter $\lambda$. $\
 
 The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:
 
+::: {.callout-note}
+## Algorithm
+
 1. Set $S = 0$ and $N = 0$.
 2. While True:
     1. Generate a random number $x \sim \mathrm{Exp}(\lambda)$.
     2. Set $S = S + x$.
     3. If $S > 1$, return $N$.
     4. Else, set $N = N + 1$.
+
+:::

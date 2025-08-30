@@ -756,12 +756,24 @@ Note
 </div>
 </div>
 <p>This gives us the following algorithm to sample from the normal distribution:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Generate two random numbers <span class="math inline">\(u_1, u_2\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
 <li>Compute <span class="math inline">\(R = \sqrt{-2 \log u_1}\)</span> and <span class="math inline">\(\Theta = 2\pi u_2\)</span>.</li>
 <li>Compute <span class="math inline">\(X = R \cos(\Theta)\)</span> and <span class="math inline">\(Y = R \sin(\Theta)\)</span>.</li>
 <li>Return <span class="math inline">\(X\)</span> (or <span class="math inline">\(Y\)</span>).</li>
 </ol>
+</div>
+</div>
 </section>
 <section id="poisson-distribution" class="level2" data-number="7.5">
 <h2 data-number="7.5" class="anchored" data-anchor-id="poisson-distribution"><span class="header-section-number">7.5</span> Poisson Distribution</h2>
@@ -773,12 +785,24 @@ Note
 <section id="relation-between-poisson-and-binomial-distribution" class="level3" data-number="7.5.1">
 <h3 data-number="7.5.1" class="anchored" data-anchor-id="relation-between-poisson-and-binomial-distribution"><span class="header-section-number">7.5.1</span> Relation between Poisson and Binomial Distribution</h3>
 <p>The Poisson distribution can be approximated by the binomial distribution when the number of trials <span class="math inline">\(n\)</span> is large and the probability of success <span class="math inline">\(p\)</span> is small. Let <span class="math inline">\(X\)</span> be a random variable with binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>. As <span class="math inline">\(n \to \infty\)</span> and <span class="math inline">\(p \to 0\)</span> such that <span class="math inline">\(\lambda = np\)</span> remains constant, the PMF of <span class="math inline">\(X\)</span> converges to the PMF of the Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>. This gives us a simple algorithm to sample from the Poisson distribution:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Set <span class="math inline">\(X = 0\)</span>.</li>
 <li>Choose <span class="math inline">\(n\)</span> to be a large integer (something like <span class="math inline">\(n &gt; 10\lambda\)</span>).</li>
 <li>Set <span class="math inline">\(p = \lambda/n\)</span>.</li>
 <li>Generate <span class="math inline">\(X\)</span> according to the binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>.</li>
 </ol>
+</div>
+</div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -828,6 +852,16 @@ f_{S_n}(t) = \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!}
 <p>This is exactly the PMF of the Poisson distribution with parameter <span class="math inline">\(\lambda\)</span>. <span class="math inline">\(\blacksquare\)</span></p>
 </div>
 <p>The Poisson-Exponential connection gives us a simple algorithm to sample from the Poisson distribution:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Set <span class="math inline">\(S = 0\)</span> and <span class="math inline">\(N = 0\)</span>.</li>
 <li>While True:
@@ -838,6 +872,8 @@ f_{S_n}(t) = \frac{\lambda^n t^{n-1} e^{-\lambda t}}{(n-1)!}
 <li>Else, set <span class="math inline">\(N = N + 1\)</span>.</li>
 </ol></li>
 </ol>
+</div>
+</div>
 
 
 </section>

@@ -533,7 +533,8 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link active" data-scroll-target="#mixture-distributions"><span class="header-section-number">8.1</span> Mixture Distributions</a></li>
+  <li><a href="#beta-distribution" id="toc-beta-distribution" class="nav-link active" data-scroll-target="#beta-distribution"><span class="header-section-number">8.1</span> Beta Distribution</a></li>
+  <li><a href="#mixture-distributions" id="toc-mixture-distributions" class="nav-link" data-scroll-target="#mixture-distributions"><span class="header-section-number">8.2</span> Mixture Distributions</a></li>
   </ul>
 </nav>
     </div>
@@ -560,12 +561,14 @@ window.Quarto = {
 </header>
 
 
+<section id="beta-distribution" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="beta-distribution"><span class="header-section-number">8.1</span> Beta Distribution</h2>
 <p>The Beta distribution is a continuous distribution defined on the interval <span class="math inline">\([0, 1]\)</span>. Let <span class="math inline">\(X\)</span> be a random variable with Beta distribution with parameters <span class="math inline">\(\alpha &gt; 0\)</span> and <span class="math inline">\(\beta &gt; 0\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
 f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
 \end{align*}\]</span></p>
-<p>where <span class="math inline">\(c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}\)</span> is the normalizing constant. (Note that when <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are not integers, we use <span class="math inline">\(\Gamma\)</span> function to as a generalization of the factorial function.)</p>
-<p>This is a simple function supported over the interval <span class="math inline">\([0, 1]\)</span>. The Beta distribution is used as a prior distribution in Bayesian statistics. When <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.</p>
+<p>where <span class="math inline">\(c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}\)</span> is the normalizing constant. (Note that when <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are not integers, we use the <span class="math inline">\(\Gamma\)</span> function as a generalization of the factorial function.)</p>
+<p>This is a simple function supported over the interval <span class="math inline">\([0, 1]\)</span>. The Beta distribution is used as a prior distribution in Bayesian statistics. When <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are non-integers, the CDF of the Beta distribution does not have a closed-form expression, making inverse transform sampling impractical. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.</p>
 <div id="def-order-statistics" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition 8.1</strong></span> <strong>(Order Statistics)</strong>: Let <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> be independent and identically distributed random variables. The <span class="math inline">\(k\)</span>-th order statistic, denoted <span class="math inline">\(X_{(k)}\)</span>, is the <span class="math inline">\(k\)</span>-th smallest value among <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span>.</p>
 </div>
@@ -577,7 +580,7 @@ f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
 <p><span class="math display">\[\begin{align*}
 F(x)
 &amp;= \mathbb{P}(U_{(k)} \leq x) \\
-&amp;= \mathbb{P}( \text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
+&amp;= \mathbb{P}(\text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
 &amp;= \sum_{i=k}^{n} \binom{n}{i} x^i (1-x)^{n-i}.
 \end{align*}\]</span></p>
 <p>We differentiate both sides to get the probability density function of <span class="math inline">\(X\)</span>:</p>
@@ -589,26 +592,63 @@ f(x) &amp;= \frac{d}{dx} F(x) \\
 <p>The rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with <span class="math inline">\(i = k\)</span> remains. <span class="math inline">\(\blacksquare\)</span></p>
 </div>
 <p>This theorem gives us a simple algorithm to sample from the Beta distribution:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Generate <span class="math inline">\(n\)</span> random numbers <span class="math inline">\(u_1, u_2, \ldots, u_n\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
 <li>Sort the numbers in increasing order <span class="math inline">\(u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}\)</span>.</li>
 <li>Return <span class="math inline">\(u_{(k)}\)</span>.</li>
 </ol>
-<section id="mixture-distributions" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">8.1</span> Mixture Distributions</h2>
+</div>
+</div>
+</section>
+<section id="mixture-distributions" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="mixture-distributions"><span class="header-section-number">8.2</span> Mixture Distributions</h2>
 <p>A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let <span class="math inline">\(X\)</span> be a random variable that is a mixture of distributions <span class="math inline">\(f_1(x), f_2(x), \ldots, f_n(x)\)</span> with weights <span class="math inline">\(w_1, w_2, \ldots, w_n\)</span>. The probability density function of <span class="math inline">\(X\)</span> is given by</p>
 <p><span class="math display">\[\begin{align*}
 f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
 \end{align*}\]</span></p>
-<p>Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by sampling from the component distributions and then taking a weighted sum of the samples <span class="math inline">\(X = Y_1\)</span> with probability <span class="math inline">\(w_1\)</span>, <span class="math inline">\(X = Y_2\)</span> with probability <span class="math inline">\(w_2\)</span>, <span class="math inline">\(\ldots, X = Y_n\)</span> with probability <span class="math inline">\(w_n\)</span>.</p>
+<p>Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by first selecting which component distribution to sample from (with probabilities given by the weights), then sampling from that selected distribution.</p>
 <p>To sample from a mixture distribution, we can use the following algorithm:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
-<li>Sample from the discrete distribution <span class="math inline">\([w_1, w_2, \ldots, w_n]\)</span> to select a component distribution.</li>
+<li>Sample from the discrete distribution with probabilities <span class="math inline">\([w_1, w_2, \ldots, w_n]\)</span> to select a component distribution.</li>
 <li>Sample from the selected component distribution.</li>
 <li>Return the sample.</li>
 </ol>
-<p>Note that this is not the same as constructing a linear combination of the component distributions. For example, if <span class="math inline">\(X_1 \sim N(\mu_1, \sigma_1^2)\)</span> and <span class="math inline">\(X_2 \sim N(\mu_2, \sigma_2^2)\)</span> are independent, then <span class="math inline">\(w_1 X_1 + w_2 X_2\)</span> is is a normal distribution with mean <span class="math inline">\(w_1 \mu_1 + w_2 \mu_2\)</span> and variance <span class="math inline">\(w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2\)</span>. This is not the same as a mixture of two normal distributions.</p>
-<div id="72f0482c" class="cell" data-execution_count="1">
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Mixture vs Linear Combination
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that this is not the same as constructing a linear combination of the component distributions. For example, if <span class="math inline">\(X_1 \sim N(\mu_1, \sigma_1^2)\)</span> and <span class="math inline">\(X_2 \sim N(\mu_2, \sigma_2^2)\)</span> are independent, then <span class="math inline">\(w_1 X_1 + w_2 X_2\)</span> is a normal distribution with mean <span class="math inline">\(w_1 \mu_1 + w_2 \mu_2\)</span> and variance <span class="math inline">\(w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2\)</span>. This is not the same as a mixture of two normal distributions, which would be bimodal if <span class="math inline">\(\mu_1\)</span> and <span class="math inline">\(\mu_2\)</span> are sufficiently different.</p>
+</div>
+</div>
+<div id="9e0b28d3" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

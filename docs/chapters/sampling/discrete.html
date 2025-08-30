@@ -616,12 +616,24 @@ Exploiting Distribution Structure
 </div>
 </div>
 <p>If <span class="math inline">\(Y_1, Y_2, \ldots, Y_n\)</span> are independent random variables with Bernoulli distribution with parameter <span class="math inline">\(p\)</span>, then the random variable <span class="math inline">\(X = Y_1 + Y_2 + \ldots + Y_n\)</span> has binomial distribution with parameters <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>. This gives us a simple algorithm to sample from the binomial distribution:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm for Binomial Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Generate <span class="math inline">\(n\)</span> random numbers <span class="math inline">\(u_1, u_2, \ldots, u_n\)</span> from the uniform distribution <span class="math inline">\(U(0, 1)\)</span>.</li>
 <li>Set <span class="math inline">\(Y_i = 1\)</span> if <span class="math inline">\(u_i \leq p\)</span> and <span class="math inline">\(Y_i = 0\)</span> otherwise for <span class="math inline">\(i = 1, 2, \ldots, n\)</span>.</li>
 <li>Compute <span class="math inline">\(X = Y_1 + Y_2 + \ldots + Y_n\)</span>.</li>
 <li>Return <span class="math inline">\(X\)</span>.</li>
 </ol>
+</div>
+</div>
 <p>This method is particularly intuitive and works well when <span class="math inline">\(n\)</span> is not too large. For large <span class="math inline">\(n\)</span>, more efficient algorithms exist that avoid generating <span class="math inline">\(n\)</span> uniform random numbers for each binomial sample.</p>
 
 

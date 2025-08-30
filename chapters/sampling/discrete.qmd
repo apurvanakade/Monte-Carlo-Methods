@@ -51,9 +51,13 @@ Since a binomial random variable represents the sum of $n$ independent Bernoulli
 
 If $Y_1, Y_2, \ldots, Y_n$ are independent random variables with Bernoulli distribution with parameter $p$, then the random variable $X = Y_1 + Y_2 + \ldots + Y_n$ has binomial distribution with parameters $n$ and $p$. This gives us a simple algorithm to sample from the binomial distribution:
 
+::: {.callout-note}
+## Algorithm for Binomial Distribution
+
 1. Generate $n$ random numbers $u_1, u_2, \ldots, u_n$ from the uniform distribution $U(0, 1)$.
 2. Set $Y_i = 1$ if $u_i \leq p$ and $Y_i = 0$ otherwise for $i = 1, 2, \ldots, n$.
 3. Compute $X = Y_1 + Y_2 + \ldots + Y_n$.
 4. Return $X$.
+:::
 
 This method is particularly intuitive and works well when $n$ is not too large. For large $n$, more efficient algorithms exist that avoid generating $n$ uniform random numbers for each binomial sample.
