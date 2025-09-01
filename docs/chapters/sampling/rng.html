@@ -543,8 +543,9 @@ window.Quarto = {
   <li><a href="#chi-square-test" id="toc-chi-square-test" class="nav-link" data-scroll-target="#chi-square-test"><span class="header-section-number">5.2.1</span> Chi-square test</a></li>
   <li><a href="#mono-bit-test" id="toc-mono-bit-test" class="nav-link" data-scroll-target="#mono-bit-test"><span class="header-section-number">5.2.2</span> Mono-bit test</a></li>
   <li><a href="#runs-test" id="toc-runs-test" class="nav-link" data-scroll-target="#runs-test"><span class="header-section-number">5.2.3</span> Runs test</a></li>
-  <li><a href="#spectral-test" id="toc-spectral-test" class="nav-link" data-scroll-target="#spectral-test"><span class="header-section-number">5.2.4</span> Spectral test</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">5.2.5</span> Final remarks</a></li>
+  <li><a href="#kolmogorov-smirnov-test" id="toc-kolmogorov-smirnov-test" class="nav-link" data-scroll-target="#kolmogorov-smirnov-test"><span class="header-section-number">5.2.4</span> Kolmogorov-Smirnov test</a></li>
+  <li><a href="#spectral-test" id="toc-spectral-test" class="nav-link" data-scroll-target="#spectral-test"><span class="header-section-number">5.2.5</span> Spectral test</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">5.2.6</span> Final remarks</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -837,8 +838,62 @@ Note
 \end{equation}\]</span></p>
 <p>We reject the null hypothesis if <span class="math inline">\(Z &gt; z_{\alpha/2}\)</span> or <span class="math inline">\(Z &lt; -z_{\alpha/2}\)</span> where <span class="math inline">\(z_{\alpha/2}\)</span> is the critical value of the z-test statistic at the significance level <span class="math inline">\(\alpha/2\)</span>. Note that here we use <span class="math inline">\(\alpha/2\)</span> instead of <span class="math inline">\(\alpha\)</span> because this is a two-sided test.</p>
 </section>
-<section id="spectral-test" class="level3" data-number="5.2.4">
-<h3 data-number="5.2.4" class="anchored" data-anchor-id="spectral-test"><span class="header-section-number">5.2.4</span> Spectral test</h3>
+<section id="kolmogorov-smirnov-test" class="level3" data-number="5.2.4">
+<h3 data-number="5.2.4" class="anchored" data-anchor-id="kolmogorov-smirnov-test"><span class="header-section-number">5.2.4</span> Kolmogorov-Smirnov test</h3>
+<p>The Kolmogorov-Smirnov (KS) test is a non-parametric statistical test that checks whether a sample follows a specified probability distribution by comparing the empirical distribution function with the theoretical cumulative distribution function. For RNG testing, we typically test whether the generated numbers follow a uniform distribution on [0,1].</p>
+<p>Given a sample <span class="math inline">\(U_1, U_2, \ldots, U_n\)</span>, the <strong>empirical distribution function</strong> (EDF) is defined as:</p>
+<p><span class="math display">\[\begin{equation}
+F_n(x) = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}_{U_i \leq x}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{1}_{U_i \leq x}\)</span> is the indicator function that equals 1 if <span class="math inline">\(U_i \leq x\)</span> and 0 otherwise. The EDF represents the proportion of sample values that are less than or equal to <span class="math inline">\(x\)</span>, creating a step function that jumps by <span class="math inline">\(1/n\)</span> at each observed data point.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Constructing the Empirical CDF
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider the sequence 0.23, 0.67, 0.12, 0.89, 0.45. First, we order the values: 0.12, 0.23, 0.45, 0.67, 0.89.</p>
+<p>The empirical CDF is a step function that jumps by 0.2 at each point: - <span class="math inline">\(F_5(x) = 0.2\)</span> for <span class="math inline">\(0.12 \leq x &lt; 0.23\)</span> - <span class="math inline">\(F_5(x) = 0.4\)</span> for <span class="math inline">\(0.23 \leq x &lt; 0.45\)</span><br>
+- <span class="math inline">\(F_5(x) = 0.6\)</span> for <span class="math inline">\(0.45 \leq x &lt; 0.67\)</span> - And so on…</p>
+<p>For a uniform distribution on [0,1], the theoretical CDF is <span class="math inline">\(F(x) = x\)</span>.</p>
+</div>
+</div>
+<p>The <strong>KS test statistic</strong> measures the maximum absolute difference between the empirical and theoretical distribution functions:</p>
+<p><span class="math display">\[\begin{equation}
+D_n = \sup_{x} |F_n(x) - F(x)|
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(F(x)\)</span> is the theoretical CDF under the null hypothesis. For computational purposes, we don’t need to check every possible value of x x. Since the empirical distribution function is a step function that only changes at the observed data points, it suffices to check the maximum difference at each of the sample values. Let <span class="math inline">\(U_{(1)} \leq U_{(2)} \leq \cdots \leq U_{(n)}\)</span> be the order statistics. It is enough to compare the values:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{i}{n} - F(U_{(i)}), \text{ and } F(U_{(i)}) - \frac{i-1}{n}
+\end{equation}\]</span></p>
+<p>The first term <span class="math inline">\(\frac{i}{n} - F(U_{(i)})\)</span> measures the “positive deviation” (empirical CDF above theoretical), while the second term <span class="math inline">\(F(U_{(i)}) - \frac{i-1}{n}\)</span> measures the “negative deviation” (empirical CDF below theoretical).</p>
+<p>Under the null hypothesis that the sample follows the specified continuous distribution <span class="math inline">\(F(x)\)</span>, the test statistic <span class="math inline">\(D_n\)</span> follows the <strong>Kolmogorov distribution</strong> asymptotically. This remarkable result shows that as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to a distribution that is independent of the specific form of <span class="math inline">\(F(x)\)</span>, making the KS test truly distribution-free.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Theorem: Kolmogorov’s Result
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Under <span class="math inline">\(H_0\)</span>, as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to the Kolmogorov distribution with CDF: <span class="math display">\[K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}\]</span></p>
+</div>
+</div>
+<p>For hypothesis testing, we reject the null hypothesis <span class="math inline">\(H_0\)</span> (that the sample follows the specified distribution) if <span class="math inline">\(D_n &gt; D_{\alpha}\)</span> where <span class="math inline">\(D_{\alpha}\)</span> is the critical value at significance level <span class="math inline">\(\alpha\)</span>. For large <span class="math inline">\(n\)</span>, the critical value can be approximated as:</p>
+<p><span class="math display">\[\begin{equation}
+D_{\alpha} \approx \sqrt{-\frac{1}{2n} \ln\left(\frac{\alpha}{2}\right)}
+\end{equation}\]</span></p>
+<p>Common approximations include <span class="math inline">\(D_{0.05} \approx \frac{1.36}{\sqrt{n}}\)</span> for 5% significance level and <span class="math inline">\(D_{0.01} \approx \frac{1.63}{\sqrt{n}}\)</span> for 1% significance level.</p>
+<p>The KS test assumes the theoretical distribution is completely specified (no parameters estimated from data) and works best for detecting differences in location and scale. For small samples (<span class="math inline">\(n &lt; 30\)</span>), exact critical values should be used instead of asymptotic approximations.</p>
+</section>
+<section id="spectral-test" class="level3" data-number="5.2.5">
+<h3 data-number="5.2.5" class="anchored" data-anchor-id="spectral-test"><span class="header-section-number">5.2.5</span> Spectral test</h3>
 <p>The previous tests fail to detect some of the problems with generating vectors using LCGs. One test for detecting these problems is the spectral test. The spectral test uses the Fast Fourier Transform (FFT) to analyze the spectral properties of the sequence. This test is beyond the scope of this class but you can see some examples in the homework.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -854,8 +909,8 @@ Tip
 </div>
 </div>
 </section>
-<section id="final-remarks" class="level3" data-number="5.2.5">
-<h3 data-number="5.2.5" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">5.2.5</span> Final remarks</h3>
+<section id="final-remarks" class="level3" data-number="5.2.6">
+<h3 data-number="5.2.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">5.2.6</span> Final remarks</h3>
 <p>Note that <em>by definition</em>, a PRNG is not “random” in an absolute sense. The PRNG used in Python, the Mersenne Twister, is sufficiently random for most applications involving simulations. However, it is not suitable for cryptographic applications as it is possible to predict the entire sequence of numbers if you know a limited set of numbers.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">

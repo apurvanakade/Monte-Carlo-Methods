@@ -313,6 +313,65 @@ We assume that for large $k$ the number of runs is approximately normally distri
 
 We reject the null hypothesis if $Z > z_{\alpha/2}$ or $Z < -z_{\alpha/2}$ where $z_{\alpha/2}$ is the critical value of the z-test statistic at the significance level $\alpha/2$. Note that here we use $\alpha/2$ instead of $\alpha$ because this is a two-sided test.
 
+### Kolmogorov-Smirnov test
+
+The Kolmogorov-Smirnov (KS) test is a non-parametric statistical test that checks whether a sample follows a specified probability distribution by comparing the empirical distribution function with the theoretical cumulative distribution function. For RNG testing, we typically test whether the generated numbers follow a uniform distribution on [0,1].
+
+Given a sample $U_1, U_2, \ldots, U_n$, the **empirical distribution function** (EDF) is defined as:
+
+\begin{equation}
+F_n(x) = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}_{U_i \leq x}
+\end{equation}
+
+where $\mathbf{1}_{U_i \leq x}$ is the indicator function that equals 1 if $U_i \leq x$ and 0 otherwise. The EDF represents the proportion of sample values that are less than or equal to $x$, creating a step function that jumps by $1/n$ at each observed data point.
+
+::: {.callout-tip}
+## Example: Constructing the Empirical CDF
+Consider the sequence 0.23, 0.67, 0.12, 0.89, 0.45. First, we order the values: 0.12, 0.23, 0.45, 0.67, 0.89.
+
+The empirical CDF is a step function that jumps by 0.2 at each point:
+- $F_5(x) = 0.2$ for $0.12 \leq x < 0.23$
+- $F_5(x) = 0.4$ for $0.23 \leq x < 0.45$  
+- $F_5(x) = 0.6$ for $0.45 \leq x < 0.67$
+- And so on...
+
+For a uniform distribution on [0,1], the theoretical CDF is $F(x) = x$.
+:::
+
+The **KS test statistic** measures the maximum absolute difference between the empirical and theoretical distribution functions:
+
+\begin{equation}
+D_n = \sup_{x} |F_n(x) - F(x)|
+\end{equation}
+
+where $F(x)$ is the theoretical CDF under the null hypothesis. For computational purposes, we don't need to check every possible value of 
+x
+x. Since the empirical distribution function is a step function that only changes at the observed data points, it suffices to check the maximum difference at each of the sample values. Let $U_{(1)} \leq U_{(2)} \leq \cdots \leq U_{(n)}$ be the order statistics. It is enough to compare the values:
+
+\begin{equation}
+\frac{i}{n} - F(U_{(i)}), \text{ and } F(U_{(i)}) - \frac{i-1}{n}
+\end{equation}
+
+The first term $\frac{i}{n} - F(U_{(i)})$ measures the "positive deviation" (empirical CDF above theoretical), while the second term $F(U_{(i)}) - \frac{i-1}{n}$ measures the "negative deviation" (empirical CDF below theoretical).
+
+Under the null hypothesis that the sample follows the specified continuous distribution $F(x)$, the test statistic $D_n$ follows the **Kolmogorov distribution** asymptotically. This remarkable result shows that as $n \to \infty$, the distribution of $\sqrt{n}D_n$ converges to a distribution that is independent of the specific form of $F(x)$, making the KS test truly distribution-free.
+
+::: {.callout-note}
+## Theorem: Kolmogorov's Result
+Under $H_0$, as $n \to \infty$, the distribution of $\sqrt{n}D_n$ converges to the Kolmogorov distribution with CDF:
+$$K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}$$
+:::
+
+For hypothesis testing, we reject the null hypothesis $H_0$ (that the sample follows the specified distribution) if $D_n > D_{\alpha}$ where $D_{\alpha}$ is the critical value at significance level $\alpha$. For large $n$, the critical value can be approximated as:
+
+\begin{equation}
+D_{\alpha} \approx \sqrt{-\frac{1}{2n} \ln\left(\frac{\alpha}{2}\right)}
+\end{equation}
+
+Common approximations include $D_{0.05} \approx \frac{1.36}{\sqrt{n}}$ for 5% significance level and $D_{0.01} \approx \frac{1.63}{\sqrt{n}}$ for 1% significance level.
+
+The KS test assumes the theoretical distribution is completely specified (no parameters estimated from data) and works best for detecting differences in location and scale. For small samples ($n < 30$), exact critical values should be used instead of asymptotic approximations.
+
 ### Spectral test
 
 The previous tests fail to detect some of the problems with generating vectors using LCGs. One test for detecting these problems is the spectral test. The spectral test uses the Fast Fourier Transform (FFT) to analyze the spectral properties of the sequence. This test is beyond the scope of this class but you can see some examples in the homework. 
