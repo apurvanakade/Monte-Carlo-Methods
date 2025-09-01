@@ -330,6 +330,7 @@ where $\mathbf{1}_{U_i \leq x}$ is the indicator function that equals 1 if $U_i 
 Consider the sequence 0.23, 0.67, 0.12, 0.89, 0.45. First, we order the values: 0.12, 0.23, 0.45, 0.67, 0.89.
 
 The empirical CDF is a step function that jumps by 0.2 at each point:
+
 - $F_5(x) = 0.2$ for $0.12 \leq x < 0.23$
 - $F_5(x) = 0.4$ for $0.23 \leq x < 0.45$  
 - $F_5(x) = 0.6$ for $0.45 \leq x < 0.67$
@@ -361,6 +362,43 @@ Under the null hypothesis that the sample follows the specified continuous distr
 Under $H_0$, as $n \to \infty$, the distribution of $\sqrt{n}D_n$ converges to the Kolmogorov distribution with CDF:
 $$K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}$$
 :::
+
+```{python}
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import kstest
+
+# Kolmogorov distribution is not directly available as a PDF in scipy,
+# but we can use the cumulative distribution function (CDF) for visualization.
+from scipy.stats import kstwobign
+
+z = np.linspace(0.01, 2, 500)
+pdf_vals = kstwobign.pdf(z)
+
+plt.figure(figsize=(6,4))
+plt.plot(z, pdf_vals, lw=2, color='red')
+plt.title('PDF of Kolmogorov Distribution')
+plt.xlabel('z')
+plt.ylabel('pdf')
+
+# remove grid
+# Draw vertical and horizontal lines at 0
+plt.axvline(0, color='k', linestyle='-')
+plt.axhline(0, color='k', linestyle='-')
+
+# add a vertical line for 5% critical value
+plt.axvline(x=1.36, color='g', linestyle='--', label='5% Critical Value 1.36')
+plt.legend()
+
+# shade the area under the curve to the right of the critical value
+plt.fill_between(z, pdf_vals, where=(z > 1.36), color='blue', alpha=0.5)
+
+plt.grid(False)
+plt.show()
+
+```
+
 
 For hypothesis testing, we reject the null hypothesis $H_0$ (that the sample follows the specified distribution) if $D_n > D_{\alpha}$ where $D_{\alpha}$ is the critical value at significance level $\alpha$. For large $n$, the critical value can be approximated as:
 

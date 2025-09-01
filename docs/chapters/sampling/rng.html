@@ -738,7 +738,7 @@ Choosing the Number of Bins
 <p>The chi-square test is sensitive to the number of bins <span class="math inline">\(k\)</span>. If <span class="math inline">\(k\)</span> is too small, then the test may not be sensitive enough to detect deviations from the expected distribution. If <span class="math inline">\(k\)</span> is too large, then the test may be too sensitive and may detect deviations that are not significant.</p>
 </div>
 </div>
-<div id="2d25228c" class="cell" data-execution_count="2">
+<div id="e8477570" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -773,7 +773,7 @@ Two-Sided Test
 <p>In Python, you can use the <code>scipy.stats.norm.ppf</code> function to compute the critical values for the z-test.</p>
 </div>
 </div>
-<div id="03354d74" class="cell" data-execution_count="3">
+<div id="84386419" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stdout">
 <pre><code>To find the critical value, we find $x$ such that $P(-x &lt; X &lt; x) = 0.95$ for a standard normal distribution. In the figure below, this is the area between the green dashed lines.
 If your z-score is outside of the critical values, you can reject the null hypothesis.</code></pre>
@@ -857,8 +857,14 @@ Example: Constructing the Empirical CDF
 </div>
 <div class="callout-body-container callout-body">
 <p>Consider the sequence 0.23, 0.67, 0.12, 0.89, 0.45. First, we order the values: 0.12, 0.23, 0.45, 0.67, 0.89.</p>
-<p>The empirical CDF is a step function that jumps by 0.2 at each point: - <span class="math inline">\(F_5(x) = 0.2\)</span> for <span class="math inline">\(0.12 \leq x &lt; 0.23\)</span> - <span class="math inline">\(F_5(x) = 0.4\)</span> for <span class="math inline">\(0.23 \leq x &lt; 0.45\)</span><br>
-- <span class="math inline">\(F_5(x) = 0.6\)</span> for <span class="math inline">\(0.45 \leq x &lt; 0.67\)</span> - And so on…</p>
+<p>The empirical CDF is a step function that jumps by 0.2 at each point:</p>
+<ul>
+<li><span class="math inline">\(F_5(x) = 0.2\)</span> for <span class="math inline">\(0.12 \leq x &lt; 0.23\)</span></li>
+<li><span class="math inline">\(F_5(x) = 0.4\)</span> for <span class="math inline">\(0.23 \leq x &lt; 0.45\)</span><br>
+</li>
+<li><span class="math inline">\(F_5(x) = 0.6\)</span> for <span class="math inline">\(0.45 \leq x &lt; 0.67\)</span></li>
+<li>And so on…</li>
+</ul>
 <p>For a uniform distribution on [0,1], the theoretical CDF is <span class="math inline">\(F(x) = x\)</span>.</p>
 </div>
 </div>
@@ -883,6 +889,15 @@ Theorem: Kolmogorov’s Result
 </div>
 <div class="callout-body-container callout-body">
 <p>Under <span class="math inline">\(H_0\)</span>, as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to the Kolmogorov distribution with CDF: <span class="math display">\[K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}\]</span></p>
+</div>
+</div>
+<div id="69c1d25f" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="rng_files/figure-html/cell-4-output-1.png" width="523" height="376" class="figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>For hypothesis testing, we reject the null hypothesis <span class="math inline">\(H_0\)</span> (that the sample follows the specified distribution) if <span class="math inline">\(D_n &gt; D_{\alpha}\)</span> where <span class="math inline">\(D_{\alpha}\)</span> is the critical value at significance level <span class="math inline">\(\alpha\)</span>. For large <span class="math inline">\(n\)</span>, the critical value can be approximated as:</p>
