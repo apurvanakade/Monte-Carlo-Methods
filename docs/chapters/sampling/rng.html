@@ -738,7 +738,7 @@ Choosing the Number of Bins
 <p>The chi-square test is sensitive to the number of bins <span class="math inline">\(k\)</span>. If <span class="math inline">\(k\)</span> is too small, then the test may not be sensitive enough to detect deviations from the expected distribution. If <span class="math inline">\(k\)</span> is too large, then the test may be too sensitive and may detect deviations that are not significant.</p>
 </div>
 </div>
-<div id="e8477570" class="cell" data-execution_count="1">
+<div id="e8477570" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -773,7 +773,7 @@ Two-Sided Test
 <p>In Python, you can use the <code>scipy.stats.norm.ppf</code> function to compute the critical values for the z-test.</p>
 </div>
 </div>
-<div id="84386419" class="cell" data-execution_count="2">
+<div id="84386419" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-stdout">
 <pre><code>To find the critical value, we find $x$ such that $P(-x &lt; X &lt; x) = 0.95$ for a standard normal distribution. In the figure below, this is the area between the green dashed lines.
 If your z-score is outside of the critical values, you can reject the null hypothesis.</code></pre>
@@ -891,7 +891,7 @@ Theorem: Kolmogorov’s Result
 <p>Under <span class="math inline">\(H_0\)</span>, as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to the Kolmogorov distribution with CDF: <span class="math display">\[K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}\]</span></p>
 </div>
 </div>
-<div id="69c1d25f" class="cell" data-execution_count="3">
+<div id="69c1d25f" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
