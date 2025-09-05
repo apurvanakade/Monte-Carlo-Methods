@@ -1,0 +1,26 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // const issueLink = document.getElementById("report-issue-link");
+    const issueLink = document.querySelector('a[href="https://github.com/apurvanakade/Monte-Carlo-Methods"]');
+    if (issueLink) {
+        const repoUrl = "https://github.com/apurvanakade/Monte-Carlo-Methods";
+        const issueTitle = `Issue on page: ${document.title}`;
+        let issueBody = "";
+        document.addEventListener('selectionchange', function() {
+          const selectedText = window.getSelection().toString();
+          if (selectedText) {
+            issueBody = `Selected text:\n${selectedText}`;
+          } else {
+            issueBody = "";
+          }
+          const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+          issueLink.href = fullIssueUrl;
+        });
+        const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+        issueLink.href = fullIssueUrl;
+        issueLink.target = "_blank"; // Open in a new tab
+    }
+});
+
+
+</script>

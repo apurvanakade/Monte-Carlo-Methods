@@ -9,6 +9,11 @@ book:
     style: docked
   navbar:
     search: true
+    right:
+      - icon: github
+        href: https://github.com/apurvanakade/Monte-Carlo-Methods
+        aria-label: GitHub
+        id: report-issue-link # Not working
   open-graph: true
   chapters:
     - index.qmd
@@ -55,19 +60,15 @@ bibliography:
 
 format:
   html:
-    # theme:
-    #   - cosmo
-    #   - brand
     theme:
       light: [cosmo, brand]
       dark: [superhero, brand]
     css: 
       - style.css
-  pdf:
+    include-before-body: header-scripts.html
     documentclass: scrreprt
 
 
 execute:
   echo: false
-  # freeze: auto  # re-render only when source changes
   cache: true
