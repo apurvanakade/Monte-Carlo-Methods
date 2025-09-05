@@ -74,7 +74,7 @@
     "href": "chapters/estimation/index.html#the-monte-carlo-estimation-strategy",
     "title": "Monte Carlo Estimation",
     "section": "The Monte Carlo Estimation Strategy",
-    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nIn fact, we do not even need \\(\\mathbb{E}[X] = \\theta\\). It suffices that \\(\\lim_{n \\to \\infty} \\hat{\\theta} = \\theta\\) with high probability. For details, see Estimation Theory.",
+    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nIn fact, we do not even need \\(\\mathbb{E}[X] = \\theta\\). It suffices that \\(\\lim_{n \\to \\infty} \\hat{\\theta} = \\theta\\) with high probability. For details, see ?sec-estimation-theory.",
     "crumbs": [
       "Monte Carlo Estimation"
     ]
@@ -253,6 +253,17 @@
     ]
   },
   {
+    "objectID": "chapters/sampling/inverse_transform.html#exponential-distribution",
+    "href": "chapters/sampling/inverse_transform.html#exponential-distribution",
+    "title": "7  Inverse Transform Sampling",
+    "section": "",
+    "text": "Sampling Algorithm\n\n\n\nTo generate an exponential random variable with rate \\(\\lambda\\): 1. Generate \\(u \\sim U(0,1)\\) 2. Return \\(x = -\\frac{1}{\\lambda} \\log(1 - u)\\)\nNote that since \\(1-u\\) is also uniformly distributed on \\((0,1)\\) when \\(u \\sim U(0,1)\\), we can simplify this to \\(x = -\\frac{1}{\\lambda} \\log(u)\\).",
+    "crumbs": [
+      "Sampling Techniques",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
+    ]
+  },
+  {
     "objectID": "chapters/sampling/inverse_transform.html#weibull-distribution",
     "href": "chapters/sampling/inverse_transform.html#weibull-distribution",
     "title": "7  Inverse Transform Sampling",
@@ -297,33 +308,22 @@
     ]
   },
   {
-    "objectID": "chapters/sampling/inverse_transform.html#beta-distribution",
-    "href": "chapters/sampling/inverse_transform.html#beta-distribution",
-    "title": "7  Inverse Transform Sampling",
-    "section": "7.6 Beta Distribution",
-    "text": "7.6 Beta Distribution\nThe Beta distribution is a continuous distribution defined on the interval \\([0, 1]\\). Let \\(X\\) be a random variable with Beta distribution with parameters \\(\\alpha &gt; 0\\) and \\(\\beta &gt; 0\\). The probability density function of \\(X\\) is given by\n\\[\\begin{align*}\nf(x) = cx^{\\alpha-1} (1-x)^{\\beta-1}, \\quad 0 \\leq x \\leq 1,\n\\end{align*}\\]\nwhere \\(c= \\frac{(\\alpha + \\beta - 1)!}{(\\alpha-1)!(\\beta-1)!}\\) is the normalizing constant. (Note that when \\(\\alpha\\) and \\(\\beta\\) are not integers, we use \\(\\Gamma\\) function to as a generalization of the factorial function.)\nThis is a simple function supported over the interval \\([0, 1]\\). The Beta distribution is used as a prior distribution in Bayesian statistics. When \\(\\alpha\\) and \\(\\beta\\) are non-zero, the cdf of the Beta distribution does not have a closed-form expression. However, we can use the inverse transform sampling method to sample from the Beta distribution. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.\n\nDefinition 7.1 (Order Statistics): Let \\(X_1, X_2, \\ldots, X_n\\) be independent and identically distributed random variables. The \\(k\\)-th order statistic, denoted \\(X_{(k)}\\), is the \\(k\\)-th smallest value among \\(X_1, X_2, \\ldots, X_n\\).\n\n\nTheorem 7.4 (Beta-Order Statistics): Let \\(U_1, U_2, \\ldots, U_n\\) be independent random variables with uniform distribution \\(U(0, 1)\\). Then the random variable \\(X = U_{(k)}\\) has Beta distribution with parameters \\(\\alpha = k\\) and \\(\\beta = n - k + 1\\).\n\n\nProof. We’ll work out a partial proof of the theorem. Let \\(X = U_{(k)}\\). The cumulative distribution function of \\(X\\) is given by\n\\[\\begin{align*}\nF(x)\n&= \\mathbb{P}(U_{(k)} \\leq x) \\\\\n&= \\mathbb{P}( \\text{at least } k \\text{ variables among } U_1, U_2, \\ldots, U_n \\text{ are less than } x)  \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} x^i (1-x)^{n-i}.\n\\end{align*}\\]\nWe differentiate both sides to get the probability density function of \\(X\\):\n\\[\\begin{align*}\nf(x) &= \\frac{d}{dx} F(x) \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} \\frac{d}{dx}x^i (1-x)^{n-i} \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} i x^{i-1} (1-x)^{n-i} - \\binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.\n\\end{align*}\\]\nThe rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with \\(i = k\\) remains. \\(\\blacksquare\\)\n\nThis theorem gives us a simple algorithm to sample from the Beta distribution:\n\nGenerate \\(n\\) random numbers \\(u_1, u_2, \\ldots, u_n\\) from the uniform distribution \\(U(0, 1)\\).\nSort the numbers in increasing order \\(u_{(1)} \\leq u_{(2)} \\leq \\ldots \\leq u_{(n)}\\).\nReturn \\(u_{(k)}\\).",
-    "crumbs": [
-      "Sampling Techniques",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
-    ]
-  },
-  {
-    "objectID": "chapters/sampling/inverse_transform.html#mixture-distributions",
-    "href": "chapters/sampling/inverse_transform.html#mixture-distributions",
-    "title": "7  Inverse Transform Sampling",
-    "section": "7.7 Mixture Distributions",
-    "text": "7.7 Mixture Distributions\nA mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let \\(X\\) be a random variable that is a mixture of distributions \\(f_1(x), f_2(x), \\ldots, f_n(x)\\) with weights \\(w_1, w_2, \\ldots, w_n\\). The probability density function of \\(X\\) is given by\n\\[\\begin{align*}\nf(x) = w_1 f_1(x) + w_2 f_2(x) + \\ldots + w_n f_n(x).\n\\end{align*}\\]\nMixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by sampling from the component distributions and then taking a weighted sum of the samples \\(X = Y_1\\) with probability \\(w_1\\), \\(X = Y_2\\) with probability \\(w_2\\), \\(\\ldots, X = Y_n\\) with probability \\(w_n\\).\nTo sample from a mixture distribution, we can use the following algorithm:\n\nSample from the discrete distribution \\([w_1, w_2, \\ldots, w_n]\\) to select a component distribution.\nSample from the selected component distribution.\nReturn the sample.\n\nNote that this is not the same as constructing a linear combination of the component distributions. For example, if \\(X_1 \\sim N(\\mu_1, \\sigma_1^2)\\) and \\(X_2 \\sim N(\\mu_2, \\sigma_2^2)\\) are independent, then \\(w_1 X_1 + w_2 X_2\\) is is a normal distribution with mean \\(w_1 \\mu_1 + w_2 \\mu_2\\) and variance \\(w_1^2 \\sigma_1^2 + w_2^2 \\sigma_2^2\\). This is not the same as a mixture of two normal distributions.",
-    "crumbs": [
-      "Sampling Techniques",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
-    ]
-  },
-  {
     "objectID": "chapters/sampling/other_distributions.html",
     "href": "chapters/sampling/other_distributions.html",
     "title": "8  Other Distributions",
     "section": "",
     "text": "8.1 Beta Distribution\nThe Beta distribution is a continuous distribution defined on the interval \\([0, 1]\\). Let \\(X\\) be a random variable with Beta distribution with parameters \\(\\alpha &gt; 0\\) and \\(\\beta &gt; 0\\). The probability density function of \\(X\\) is given by\n\\[\\begin{align*}\nf(x) = cx^{\\alpha-1} (1-x)^{\\beta-1}, \\quad 0 \\leq x \\leq 1,\n\\end{align*}\\]\nwhere \\(c= \\frac{(\\alpha + \\beta - 1)!}{(\\alpha-1)!(\\beta-1)!}\\) is the normalizing constant. (Note that when \\(\\alpha\\) and \\(\\beta\\) are not integers, we use the \\(\\Gamma\\) function as a generalization of the factorial function.)\nThis is a simple function supported over the interval \\([0, 1]\\). The Beta distribution is used as a prior distribution in Bayesian statistics. When \\(\\alpha\\) and \\(\\beta\\) are non-integers, the CDF of the Beta distribution does not have a closed-form expression, making inverse transform sampling impractical. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.\nThis theorem gives us a simple algorithm to sample from the Beta distribution:",
+    "crumbs": [
+      "Sampling Techniques",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Other Distributions</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/sampling/other_distributions.html#beta-distribution",
+    "href": "chapters/sampling/other_distributions.html#beta-distribution",
+    "title": "8  Other Distributions",
+    "section": "",
+    "text": "Definition 8.1 (Order Statistics): Let \\(X_1, X_2, \\ldots, X_n\\) be independent and identically distributed random variables. The \\(k\\)-th order statistic, denoted \\(X_{(k)}\\), is the \\(k\\)-th smallest value among \\(X_1, X_2, \\ldots, X_n\\).\n\n\nTheorem 8.1 (Beta-Order Statistics): Let \\(U_1, U_2, \\ldots, U_n\\) be independent random variables with uniform distribution \\(U(0, 1)\\). Then the random variable \\(X = U_{(k)}\\) has Beta distribution with parameters \\(\\alpha = k\\) and \\(\\beta = n - k + 1\\).\n\n\nProof. We’ll work out a partial proof of the theorem. Let \\(X = U_{(k)}\\). The cumulative distribution function of \\(X\\) is given by\n\\[\\begin{align*}\nF(x)\n&= \\mathbb{P}(U_{(k)} \\leq x) \\\\\n&= \\mathbb{P}(\\text{at least } k \\text{ variables among } U_1, U_2, \\ldots, U_n \\text{ are less than } x)  \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} x^i (1-x)^{n-i}.\n\\end{align*}\\]\nWe differentiate both sides to get the probability density function of \\(X\\):\n\\[\\begin{align*}\nf(x) &= \\frac{d}{dx} F(x) \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} \\frac{d}{dx}x^i (1-x)^{n-i} \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} i x^{i-1} (1-x)^{n-i} - \\binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.\n\\end{align*}\\]\nThe rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with \\(i = k\\) remains. \\(\\blacksquare\\)\n\n\n\n\n\n\n\n\nAlgorithm\n\n\n\n\nGenerate \\(n\\) random numbers \\(u_1, u_2, \\ldots, u_n\\) from the uniform distribution \\(U(0, 1)\\).\nSort the numbers in increasing order \\(u_{(1)} \\leq u_{(2)} \\leq \\ldots \\leq u_{(n)}\\).\nReturn \\(u_{(k)}\\).",
     "crumbs": [
       "Sampling Techniques",
       "<span class='chapter-number'>8</span>  <span class='chapter-title'>Other Distributions</span>"
@@ -862,39 +862,6 @@
     "crumbs": [
       "Appendices",
       "<span class='chapter-number'>C</span>  <span class='chapter-title'>Hidden Markov Chains</span>"
-    ]
-  },
-  {
-    "objectID": "chapters/sampling/inverse_transform.html#continuous-case-inverse-transform-sampling",
-    "href": "chapters/sampling/inverse_transform.html#continuous-case-inverse-transform-sampling",
-    "title": "7  Inverse Transform Sampling",
-    "section": "",
-    "text": "Theorem 7.1 (Inverse Transform Sampling): Let \\(F(x)\\) be the cumulative distribution function of \\(X\\). If \\(F(x)\\) is strictly increasing and continuous, then the random variable \\(Y = F^{-1}(U)\\) has the same distribution as \\(X\\).\n\n\nProof. Let \\(F(x)\\) be the cumulative distribution function of \\(X\\). The cumulative distribution function of \\(U\\) is given by\n\\[\\begin{align*}\n\\mathbb{P}(U \\leq u) &= u.\n\\end{align*}\\]\nSince \\(F(x)\\) is strictly increasing and continuous, it has an inverse \\(F^{-1}(u)\\).\nThe cumulative distribution function of \\(Y = F^{-1}(U)\\) is given by\n\\[\\begin{align*}\n\\mathbb{P}(Y \\leq y) &= \\mathbb{P}(F^{-1}(U) \\leq y) \\\\\n&= \\mathbb{P}(U \\leq F(y)) \\\\\n&= F(y).\n\\end{align*}\\]\nThus, \\(Y\\) has the same distribution as \\(X\\). \\(\\blacksquare\\)\n\n\n\n\n\n\n\nAlgorithm\n\n\n\nThe inverse transform sampling method can be used to sample from any probability distribution \\(X\\) for which we can compute the cumulative distribution function \\(F(x)\\) and its inverse \\(F^{-1}(u)\\). The algorithm to sample from a probability distribution using the inverse transform sampling method is as follows:\n\nGenerate a random number \\(u\\) from the uniform distribution \\(U(0, 1)\\).\nCompute \\(x = F^{-1}(u)\\).\nReturn \\(x\\).\n\n\n\n\n\n\n\n\n\nGeneralized Inverse\n\n\n\nEven when \\(F(x)\\) is not strictly increasing, we can still use the inverse transform sampling method by using the generalized inverse of \\(F(x)\\). The generalized inverse of \\(F(x)\\) is defined as\n\\[\\begin{align*}\nF^{-1}(u) = \\inf\\{x : F(x) \\geq u\\}.\n\\end{align*}\\]\nYou can think of \\(\\inf\\) as \\(\\min\\) for simplicity. This is what we are doing in the discrete case!",
-    "crumbs": [
-      "Sampling Techniques",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
-    ]
-  },
-  {
-    "objectID": "chapters/sampling/inverse_transform.html#exponential-distribution",
-    "href": "chapters/sampling/inverse_transform.html#exponential-distribution",
-    "title": "7  Inverse Transform Sampling",
-    "section": "",
-    "text": "Sampling Algorithm\n\n\n\nTo generate an exponential random variable with rate \\(\\lambda\\): 1. Generate \\(u \\sim U(0,1)\\) 2. Return \\(x = -\\frac{1}{\\lambda} \\log(1 - u)\\)\nNote that since \\(1-u\\) is also uniformly distributed on \\((0,1)\\) when \\(u \\sim U(0,1)\\), we can simplify this to \\(x = -\\frac{1}{\\lambda} \\log(u)\\).",
-    "crumbs": [
-      "Sampling Techniques",
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
-    ]
-  },
-  {
-    "objectID": "chapters/sampling/other_distributions.html#beta-distribution",
-    "href": "chapters/sampling/other_distributions.html#beta-distribution",
-    "title": "8  Other Distributions",
-    "section": "",
-    "text": "Definition 8.1 (Order Statistics): Let \\(X_1, X_2, \\ldots, X_n\\) be independent and identically distributed random variables. The \\(k\\)-th order statistic, denoted \\(X_{(k)}\\), is the \\(k\\)-th smallest value among \\(X_1, X_2, \\ldots, X_n\\).\n\n\nTheorem 8.1 (Beta-Order Statistics): Let \\(U_1, U_2, \\ldots, U_n\\) be independent random variables with uniform distribution \\(U(0, 1)\\). Then the random variable \\(X = U_{(k)}\\) has Beta distribution with parameters \\(\\alpha = k\\) and \\(\\beta = n - k + 1\\).\n\n\nProof. We’ll work out a partial proof of the theorem. Let \\(X = U_{(k)}\\). The cumulative distribution function of \\(X\\) is given by\n\\[\\begin{align*}\nF(x)\n&= \\mathbb{P}(U_{(k)} \\leq x) \\\\\n&= \\mathbb{P}(\\text{at least } k \\text{ variables among } U_1, U_2, \\ldots, U_n \\text{ are less than } x)  \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} x^i (1-x)^{n-i}.\n\\end{align*}\\]\nWe differentiate both sides to get the probability density function of \\(X\\):\n\\[\\begin{align*}\nf(x) &= \\frac{d}{dx} F(x) \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} \\frac{d}{dx}x^i (1-x)^{n-i} \\\\\n&= \\sum_{i=k}^{n} \\binom{n}{i} i x^{i-1} (1-x)^{n-i} - \\binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.\n\\end{align*}\\]\nThe rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with \\(i = k\\) remains. \\(\\blacksquare\\)\n\n\n\n\n\n\n\n\nAlgorithm\n\n\n\n\nGenerate \\(n\\) random numbers \\(u_1, u_2, \\ldots, u_n\\) from the uniform distribution \\(U(0, 1)\\).\nSort the numbers in increasing order \\(u_{(1)} \\leq u_{(2)} \\leq \\ldots \\leq u_{(n)}\\).\nReturn \\(u_{(k)}\\).",
-    "crumbs": [
-      "Sampling Techniques",
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Other Distributions</span>"
     ]
   }
 ]

@@ -283,10 +283,22 @@ window.Quarto = {
     <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
     </a>
   </div>
-        <div class="quarto-navbar-tools tools-end">
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
-          <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
@@ -533,6 +545,32 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // const issueLink = document.getElementById("report-issue-link");
+    const issueLink = document.querySelector('a[href="https://github.com/apurvanakade/Monte-Carlo-Methods"]');
+    if (issueLink) {
+        const repoUrl = "https://github.com/apurvanakade/Monte-Carlo-Methods";
+        const issueTitle = `Issue on page: ${document.title}`;
+        let issueBody = "";
+        document.addEventListener('selectionchange', function() {
+          const selectedText = window.getSelection().toString();
+          if (selectedText) {
+            issueBody = `Selected text:\n${selectedText}`;
+          } else {
+            issueBody = "";
+          }
+          const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+          issueLink.href = fullIssueUrl;
+        });
+        const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+        issueLink.href = fullIssueUrl;
+        issueLink.target = "_blank"; // Open in a new tab
+    }
+});
+
+
+</script>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">

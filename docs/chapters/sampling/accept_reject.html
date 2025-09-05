@@ -560,17 +560,31 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<script defer="">
+<script>
 document.addEventListener("DOMContentLoaded", function() {
-    const issueLink = document.getElementById("report-issue-link");
+    // const issueLink = document.getElementById("report-issue-link");
+    const issueLink = document.querySelector('a[href="https://github.com/apurvanakade/Monte-Carlo-Methods"]');
     if (issueLink) {
-        const repoUrl = "https://github.com/<your-username>/<your-repo>";
+        const repoUrl = "https://github.com/apurvanakade/Monte-Carlo-Methods";
         const issueTitle = `Issue on page: ${document.title}`;
-        const issueBody = `Found on page: ${window.location.href}`;
+        let issueBody = "";
+        document.addEventListener('selectionchange', function() {
+          const selectedText = window.getSelection().toString();
+          if (selectedText) {
+            issueBody = `Selected text:\n${selectedText}`;
+          } else {
+            issueBody = "";
+          }
+          const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
+          issueLink.href = fullIssueUrl;
+        });
         const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
         issueLink.href = fullIssueUrl;
+        issueLink.target = "_blank"; // Open in a new tab
     }
 });
+
+
 </script>
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/accept_reject.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></a></li></ol></nav>
@@ -658,7 +672,7 @@ p(x) = \begin{cases}
 \tag{9.2}\]</span></span></p>
 <p>We can use the accept-reject method to sample from this distribution. The density function is supported over <span class="math inline">\([0, 1]\)</span> and is bounded by <span class="math inline">\(M = 2\)</span>.</p>
 </div>
-<div id="19fe2041" class="cell" data-execution_count="1">
+<div id="19fe2041" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -667,7 +681,7 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="0899caea" class="cell" data-execution_count="2">
+<div id="0899caea" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -676,7 +690,7 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="33cc8d1e" class="cell" data-execution_count="3">
+<div id="33cc8d1e" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -707,7 +721,7 @@ p(x) = \begin{cases}
 \mathrm{Beta}(2, 2) = 6x(1-x), \quad x \in [0, 1].
 \end{align}\]</span></p>
 </div>
-<div id="93f26b6a" class="cell" data-execution_count="4">
+<div id="93f26b6a" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -756,7 +770,7 @@ f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 <div id="exm-majorizing-function" class="theorem example">
 <p><span class="theorem-title"><strong>Example 9.3</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>9.2</span></a>). We saw that the Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution. We can use the accept-reject method to sample from the triangular distribution using the Beta distribution as the proposal distribution. This improves the efficiency of the method from <span class="math inline">\(1/2\)</span> to <span class="math inline">\(3/4\)</span>.</p>
 </div>
-<div id="14723a91" class="cell" data-execution_count="5">
+<div id="14723a91" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -765,7 +779,7 @@ f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 </div>
 </div>
 </div>
-<div id="1d9d3c00" class="cell" data-execution_count="6">
+<div id="1d9d3c00" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
