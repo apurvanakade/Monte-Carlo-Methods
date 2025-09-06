@@ -74,7 +74,7 @@
     "href": "chapters/estimation/index.html#the-monte-carlo-estimation-strategy",
     "title": "Monte Carlo Estimation",
     "section": "The Monte Carlo Estimation Strategy",
-    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nIn fact, we do not even need \\(\\mathbb{E}[X] = \\theta\\). It suffices that \\(\\lim_{n \\to \\infty} \\hat{\\theta} = \\theta\\) with high probability. For details, see ?sec-estimation-theory.",
+    "text": "The Monte Carlo Estimation Strategy\nThe key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.\n\n\n\n\n\n\nCore Monte Carlo Principle\n\n\n\nTo estimate any quantity θ, we:\n\nConstruct a random variable \\(X\\) such that \\(\\mathbb{E}[X] = \\theta\\)\nGenerate independent samples \\(x_1, x_2, \\ldots, x_n\\) from the distribution of \\(X\\)\n\nEstimate θ using the sample average: \\[\\hat{\\theta} = \\frac{1}{n}\\sum_{i=1}^{n} x_i\\]\n\n\n\nIn fact, we do not even need \\(\\mathbb{E}[X] = \\theta\\). It suffices that \\(\\lim_{n \\to \\infty} \\hat{\\theta} = \\theta\\) with high probability. For details, see Statistical Estimation and the Sample Mean.",
     "crumbs": [
       "Monte Carlo Estimation"
     ]
@@ -711,8 +711,8 @@
     ]
   },
   {
-    "objectID": "appendices/probability.html#statistical-estimation-and-the-sample-mean",
-    "href": "appendices/probability.html#statistical-estimation-and-the-sample-mean",
+    "objectID": "appendices/probability.html#sec-estimation-theory",
+    "href": "appendices/probability.html#sec-estimation-theory",
     "title": "Appendix A — Review of Probability Theory",
     "section": "A.2 Statistical Estimation and the Sample Mean",
     "text": "A.2 Statistical Estimation and the Sample Mean\nConsider i.i.d. observations \\(X_1, \\ldots, X_N\\) with common distribution \\(F\\). We seek to estimate \\(\\theta = \\mathbb{E}[g(X)]\\) for some measurable function \\(g: \\mathbb{R} \\to \\mathbb{R}\\) using the sample mean estimator: \\[\\hat{\\theta}_N = \\frac{1}{N} \\sum_{i=1}^{N} g(X_i) \\tag{A.1}\\]\n\n\n\n\n\n\nTheorem (Properties of the Sample Mean Estimator)\n\n\n\nThe sample mean estimator \\(\\hat{\\theta}_N\\) satisfies:\n\nUnbiasedness: \\(\\mathbb{E}[\\hat{\\theta}_N] = \\theta\\)\nVariance: \\(\\text{Var}(\\hat{\\theta}_N) = \\frac{\\sigma^2}{N}\\) where \\(\\sigma^2 = \\text{Var}(g(X))\\)\nStandard Error: \\(\\text{SE}(\\hat{\\theta}_N) = \\sigma/\\sqrt{N}\\)\nMean Squared Error: \\(\\text{MSE}(\\hat{\\theta}_N) = \\sigma^2/N\\)\n\n\n\nFor any estimator \\(\\hat{\\theta}\\) of parameter \\(\\theta\\), we define:\n\nBias: \\(\\text{Bias}(\\hat{\\theta}) = \\mathbb{E}[\\hat{\\theta}] - \\theta\\)\nMean Squared Error: \\(\\text{MSE}(\\hat{\\theta}) = \\mathbb{E}[(\\hat{\\theta} - \\theta)^2] = \\text{Var}(\\hat{\\theta}) + \\text{Bias}^2(\\hat{\\theta})\\)\n\nAn estimator sequence \\(\\{\\hat{\\theta}_N\\}\\) is consistent if \\(\\hat{\\theta}_N \\xrightarrow{P} \\theta\\) as \\(N \\to \\infty\\), and strongly consistent if \\(\\hat{\\theta}_N \\xrightarrow{a.s.} \\theta\\) as \\(N \\to \\infty\\).",

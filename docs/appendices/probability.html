@@ -545,7 +545,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#probability-spaces-and-random-variables" id="toc-probability-spaces-and-random-variables" class="nav-link active" data-scroll-target="#probability-spaces-and-random-variables"><span class="header-section-number">A.1</span> Probability Spaces and Random Variables</a></li>
-  <li><a href="#statistical-estimation-and-the-sample-mean" id="toc-statistical-estimation-and-the-sample-mean" class="nav-link" data-scroll-target="#statistical-estimation-and-the-sample-mean"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</a></li>
+  <li><a href="#sec-estimation-theory" id="toc-sec-estimation-theory" class="nav-link" data-scroll-target="#sec-estimation-theory"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</a></li>
   <li><a href="#fundamental-limit-theorems" id="toc-fundamental-limit-theorems" class="nav-link" data-scroll-target="#fundamental-limit-theorems"><span class="header-section-number">A.3</span> Fundamental Limit Theorems</a>
   <ul class="collapse">
   <li><a href="#monte-carlo-implications" id="toc-monte-carlo-implications" class="nav-link" data-scroll-target="#monte-carlo-implications"><span class="header-section-number">A.3.1</span> Monte Carlo Implications</a></li>
@@ -629,8 +629,8 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 </div>
 </section>
-<section id="statistical-estimation-and-the-sample-mean" class="level2" data-number="A.2">
-<h2 data-number="A.2" class="anchored" data-anchor-id="statistical-estimation-and-the-sample-mean"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</h2>
+<section id="sec-estimation-theory" class="level2" data-number="A.2">
+<h2 data-number="A.2" class="anchored" data-anchor-id="sec-estimation-theory"><span class="header-section-number">A.2</span> Statistical Estimation and the Sample Mean</h2>
 <p>Consider i.i.d. observations <span class="math inline">\(X_1, \ldots, X_N\)</span> with common distribution <span class="math inline">\(F\)</span>. We seek to estimate <span class="math inline">\(\theta = \mathbb{E}[g(X)]\)</span> for some measurable function <span class="math inline">\(g: \mathbb{R} \to \mathbb{R}\)</span> using the <strong>sample mean estimator</strong>: <span id="eq-sample-mean"><span class="math display">\[\hat{\theta}_N = \frac{1}{N} \sum_{i=1}^{N} g(X_i) \tag{A.1}\]</span></span></p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
