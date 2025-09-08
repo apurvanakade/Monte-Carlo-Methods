@@ -691,7 +691,11 @@ Sampling Algorithm
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>To generate an exponential random variable with rate <span class="math inline">\(\lambda\)</span>: 1. Generate <span class="math inline">\(u \sim U(0,1)\)</span> 2. Return <span class="math inline">\(x = -\frac{1}{\lambda} \log(1 - u)\)</span></p>
+<p>To generate an exponential random variable with rate <span class="math inline">\(\lambda\)</span>:</p>
+<ol type="1">
+<li>Generate <span class="math inline">\(u \sim U(0,1)\)</span></li>
+<li>Return <span class="math inline">\(x = -\frac{1}{\lambda} \log(1 - u)\)</span></li>
+</ol>
 <p>Note that since <span class="math inline">\(1-u\)</span> is also uniformly distributed on <span class="math inline">\((0,1)\)</span> when <span class="math inline">\(u \sim U(0,1)\)</span>, we can simplify this to <span class="math inline">\(x = -\frac{1}{\lambda} \log(u)\)</span>.</p>
 </div>
 </div>

@@ -257,7 +257,7 @@
     "href": "chapters/sampling/inverse_transform.html#exponential-distribution",
     "title": "7  Inverse Transform Sampling",
     "section": "",
-    "text": "Sampling Algorithm\n\n\n\nTo generate an exponential random variable with rate \\(\\lambda\\): 1. Generate \\(u \\sim U(0,1)\\) 2. Return \\(x = -\\frac{1}{\\lambda} \\log(1 - u)\\)\nNote that since \\(1-u\\) is also uniformly distributed on \\((0,1)\\) when \\(u \\sim U(0,1)\\), we can simplify this to \\(x = -\\frac{1}{\\lambda} \\log(u)\\).",
+    "text": "Sampling Algorithm\n\n\n\nTo generate an exponential random variable with rate \\(\\lambda\\):\n\nGenerate \\(u \\sim U(0,1)\\)\nReturn \\(x = -\\frac{1}{\\lambda} \\log(1 - u)\\)\n\nNote that since \\(1-u\\) is also uniformly distributed on \\((0,1)\\) when \\(u \\sim U(0,1)\\), we can simplify this to \\(x = -\\frac{1}{\\lambda} \\log(u)\\).",
     "crumbs": [
       "Sampling Techniques",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Inverse Transform Sampling</span>"
