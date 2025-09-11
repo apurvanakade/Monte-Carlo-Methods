@@ -547,13 +547,31 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#accept-reject-method-v1" id="toc-accept-reject-method-v1" class="nav-link active" data-scroll-target="#accept-reject-method-v1"><span class="header-section-number">9.1</span> Accept-Reject Method v1</a>
+  <li><a href="#mathematical-foundations" id="toc-mathematical-foundations" class="nav-link active" data-scroll-target="#mathematical-foundations"><span class="header-section-number">9.1</span> Mathematical Foundations</a></li>
+  <li><a href="#theoretical-foundation" id="toc-theoretical-foundation" class="nav-link" data-scroll-target="#theoretical-foundation"><span class="header-section-number">9.2</span> Theoretical Foundation</a></li>
+  <li><a href="#accept-reject-method-basic-algorithm" id="toc-accept-reject-method-basic-algorithm" class="nav-link" data-scroll-target="#accept-reject-method-basic-algorithm"><span class="header-section-number">9.3</span> Accept-Reject Method: Basic Algorithm</a>
   <ul class="collapse">
-  <li><a href="#efficiency" id="toc-efficiency" class="nav-link" data-scroll-target="#efficiency"><span class="header-section-number">9.1.1</span> Efficiency</a></li>
+  <li><a href="#worked-example" id="toc-worked-example" class="nav-link" data-scroll-target="#worked-example"><span class="header-section-number">9.3.1</span> Worked Example</a></li>
+  <li><a href="#efficiency" id="toc-efficiency" class="nav-link" data-scroll-target="#efficiency"><span class="header-section-number">9.3.2</span> Efficiency</a></li>
   </ul></li>
-  <li><a href="#accept-reject-method-v2" id="toc-accept-reject-method-v2" class="nav-link" data-scroll-target="#accept-reject-method-v2"><span class="header-section-number">9.2</span> Accept-Reject Method v2</a></li>
-  <li><a href="#normalizing-constant" id="toc-normalizing-constant" class="nav-link" data-scroll-target="#normalizing-constant"><span class="header-section-number">9.3</span> Normalizing Constant</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">9.4</span> Final remarks</a></li>
+  <li><a href="#accept-reject-method-v2" id="toc-accept-reject-method-v2" class="nav-link" data-scroll-target="#accept-reject-method-v2"><span class="header-section-number">9.4</span> Accept-Reject Method v2</a>
+  <ul class="collapse">
+  <li><a href="#improved-algorithm" id="toc-improved-algorithm" class="nav-link" data-scroll-target="#improved-algorithm"><span class="header-section-number">9.4.1</span> Improved Algorithm</a></li>
+  <li><a href="#worked-example-1" id="toc-worked-example-1" class="nav-link" data-scroll-target="#worked-example-1"><span class="header-section-number">9.4.2</span> Worked Example</a></li>
+  </ul></li>
+  <li><a href="#complete-algorithm-with-proposal-distribution" id="toc-complete-algorithm-with-proposal-distribution" class="nav-link" data-scroll-target="#complete-algorithm-with-proposal-distribution"><span class="header-section-number">9.5</span> Complete Algorithm with Proposal Distribution</a>
+  <ul class="collapse">
+  <li><a href="#equivalent-formulations" id="toc-equivalent-formulations" class="nav-link" data-scroll-target="#equivalent-formulations"><span class="header-section-number">9.5.1</span> Equivalent Formulations</a></li>
+  <li><a href="#complete-worked-example" id="toc-complete-worked-example" class="nav-link" data-scroll-target="#complete-worked-example"><span class="header-section-number">9.5.2</span> Complete Worked Example</a></li>
+  </ul></li>
+  <li><a href="#normalizing-constant" id="toc-normalizing-constant" class="nav-link" data-scroll-target="#normalizing-constant"><span class="header-section-number">9.6</span> Normalizing Constant</a>
+  <ul class="collapse">
+  <li><a href="#efficiency-with-unknown-normalizing-constants" id="toc-efficiency-with-unknown-normalizing-constants" class="nav-link" data-scroll-target="#efficiency-with-unknown-normalizing-constants"><span class="header-section-number">9.6.1</span> Efficiency with Unknown Normalizing Constants</a></li>
+  </ul></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">9.7</span> Final Remarks</a>
+  <ul class="collapse">
+  <li><a href="#advanced-methods" id="toc-advanced-methods" class="nav-link" data-scroll-target="#advanced-methods"><span class="header-section-number">9.7.1</span> Advanced Methods</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -618,59 +636,164 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
-<p>The <strong>accept-reject Method</strong>, also called <strong>rejection sampling</strong>, is a simple and general technique for generating random variables. It is based on the idea of sampling from a simple distribution and then rejecting the samples that are not in the desired distribution. This method is particularly useful when the desired distribution is difficult to sample from directly, but it is easy to evaluate the density function of the distribution.</p>
-<p>For the accept-reject method, we need to recall the following definitions: Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be discrete random variables.</p>
+<p>The <strong>accept-reject method</strong>, also called <strong>rejection sampling</strong>, is a simple and general technique for generating random variables. It is based on the idea of sampling from a simple distribution and then rejecting the samples that are not in the desired distribution. This method is particularly useful when the desired distribution is difficult to sample from directly, but it is easy to evaluate the density function of the distribution.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why Use Accept-Reject?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The accept-reject method is especially valuable when:</p>
+<ul>
+<li>Direct sampling from the target distribution is complex or impossible.</li>
+<li>The probability density function (PDF) can be easily evaluated.</li>
+<li>We can find a suitable bounding function for the target distribution.</li>
+</ul>
+</div>
+</div>
+<section id="mathematical-foundations" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="mathematical-foundations"><span class="header-section-number">9.1</span> Mathematical Foundations</h2>
+<p>For the accept-reject method, we need to recall the following definitions:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Definitions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be discrete random variables.</p>
 <p>The <strong>joint distribution</strong> of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is given by the probability mass function</p>
-<p><span class="math display">\[\begin{align*}
-f_{X,Y}(x,y) = \mathbb{P}(X=x, Y=y).
-\end{align*}\]</span></p>
+<p><span id="eq-joint-pmf"><span class="math display">\[f_{X,Y}(x,y) = \mathbb{P}(X=x, Y=y) \tag{9.1}\]</span></span></p>
 <p>The <strong>marginal distribution</strong> of <span class="math inline">\(X\)</span> is given by the probability mass function</p>
-<p><span class="math display">\[\begin{align*}
-f_X(x) = \mathbb{P}(X=x) = \sum_{y} f_{X,Y}(x,y).
-\end{align*}\]</span></p>
+<p><span id="eq-marginal-pmf"><span class="math display">\[f_X(x) = \mathbb{P}(X=x) = \sum_{y} f_{X,Y}(x,y) \tag{9.2}\]</span></span></p>
 <p>The <strong>conditional probability</strong> of <span class="math inline">\(X\)</span> given <span class="math inline">\(Y\)</span> is defined as</p>
-<p><span class="math display">\[\begin{align*}
-f_{X|Y}(x|y) = \mathbb{P}(X=x|Y=y) = \frac{f_{X,Y}(x,y)}{f_Y(y)}.
-\end{align*}\]</span></p>
-<p>When <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are continuous random variables, the definitions are similar, but we replace the probability mass functions with probability density functions.</p>
-<p>The <strong>accept-reject method</strong> is based on the following theorem:</p>
+<p><span id="eq-conditional-pmf"><span class="math display">\[f_{X|Y}(x|y) = \mathbb{P}(X=x|Y=y) = \frac{f_{X,Y}(x,y)}{f_Y(y)} \tag{9.3}\]</span></span></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Continuous Case
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are continuous random variables, the definitions are similar, but we replace the probability mass functions with probability density functions and sums with integrals.</p>
+</div>
+</div>
+</section>
+<section id="theoretical-foundation" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="theoretical-foundation"><span class="header-section-number">9.2</span> Theoretical Foundation</h2>
+<p>The <strong>accept-reject method</strong> is based on the following fundamental theorem:</p>
 <div id="thm-marginal-of-uniform" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 9.1</strong></span> <strong>Theorem (Marginal of Uniform):</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
-<p><span id="eq-uniform-joint-distribution"><span class="math display">\[
-f_{X,Y}(x,y) = \begin{cases}
+<p><span class="theorem-title"><strong>Theorem 9.1 (Marginal of Uniform Distribution)</strong></span> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
+<p><span id="eq-uniform-joint-distribution"><span class="math display">\[f_{X,Y}(x,y) = \begin{cases}
 1, &amp; \text{if } 0 \leq y \leq p(x), \\
 0, &amp; \text{otherwise}.
-\end{cases}
-\tag{9.1}\]</span></span></p>
+\end{cases} \tag{9.4}\]</span></span></p>
 <p>Then the marginal distribution of <span class="math inline">\(X\)</span> is given by <span class="math inline">\(p(x)\)</span>.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>The marginal distribution of <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} dy = p(x).
-\end{align*}\]</span></p>
+<p><span class="math display">\[f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) \, dy = \int_{0}^{p(x)} 1 \, dy = p(x)\]</span></p>
 <p><span class="math inline">\(\blacksquare\)</span></p>
 </div>
-<p>Thus in order to sample from a distribution <span class="math inline">\(p(x)\)</span>, we want to come up with a way to sample from the joint distribution given by (<a href="#eq-uniform-joint-distribution" class="quarto-xref">Equation&nbsp;<span>9.1</span></a>). The accept-reject method is a way to do this.</p>
-<section id="accept-reject-method-v1" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="accept-reject-method-v1"><span class="header-section-number">9.1</span> Accept-Reject Method v1</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Geometric Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This theorem tells us that if we sample uniformly from the region under the curve <span class="math inline">\(y = p(x)\)</span>, the <span class="math inline">\(x\)</span>-coordinates of these samples will follow the distribution <span class="math inline">\(p(x)\)</span>. This is the key insight behind the accept-reject method.</p>
+</div>
+</div>
+<p>Thus, in order to sample from a distribution <span class="math inline">\(p(x)\)</span>, we want to devise a method to sample from the joint distribution given by <a href="#eq-uniform-joint-distribution" class="quarto-xref">Equation&nbsp;<span>9.4</span></a>. The accept-reject method provides exactly such a technique.</p>
+</section>
+<section id="accept-reject-method-basic-algorithm" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="accept-reject-method-basic-algorithm"><span class="header-section-number">9.3</span> Accept-Reject Method: Basic Algorithm</h2>
 <p>Suppose <span class="math inline">\(p(x)\)</span> is a probability distribution from which we want to sample. Suppose further that <span class="math inline">\(p(x)\)</span> is supported over the interval <span class="math inline">\([a, b]\)</span> and is bounded by <span class="math inline">\(M\)</span>, i.e., <span class="math inline">\(p(x) \leq M\)</span> for all <span class="math inline">\(x \in [a, b]\)</span>.</p>
-<p>The simplest version of the accept-reject method is as follows:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Basic Accept-Reject Method
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The simplest version of the accept-reject method proceeds as follows:</p>
 <ol type="1">
-<li>Sample <span class="math inline">\(x\)</span> uniformly from <span class="math inline">\([a, b]\)</span>.</li>
-<li>Sample <span class="math inline">\(y\)</span> uniformly from <span class="math inline">\([0, M]\)</span>.</li>
-<li>If <span class="math inline">\(y \leq p(x)\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
+<li><strong>Generate proposal</strong>: Sample <span class="math inline">\(x\)</span> uniformly from <span class="math inline">\([a, b]\)</span>.</li>
+<li><strong>Generate test value</strong>: Sample <span class="math inline">\(y\)</span> uniformly from <span class="math inline">\([0, M]\)</span>.<br>
+</li>
+<li><strong>Accept or reject</strong>: If <span class="math inline">\(y \leq p(x)\)</span>, <strong>accept</strong> and return <span class="math inline">\(x\)</span>; otherwise, <strong>reject</strong> and go back to step 1.</li>
 </ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Efficiency Considerations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The acceptance probability for this basic method is <span class="math inline">\(\frac{\int_a^b p(x) dx}{M(b-a)} = \frac{1}{M(b-a)}\)</span> (since <span class="math inline">\(p(x)\)</span> is a probability density). For efficiency, we want <span class="math inline">\(M(b-a)\)</span> to be as small as possible, which means finding a tight upper bound <span class="math inline">\(M\)</span>.</p>
+</div>
+</div>
+<section id="worked-example" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="worked-example"><span class="header-section-number">9.3.1</span> Worked Example</h3>
 <div id="exm-triangular-distribution" class="theorem example">
-<p><span class="theorem-title"><strong>Example 9.1</strong></span> Consider the triangular distribution</p>
-<p><span id="eq-triangular-distribution"><span class="math display">\[
-p(x) = \begin{cases}
+<p><span class="theorem-title"><strong>Example 9.1 (Example: Triangular Distribution)</strong></span> Consider the triangular distribution</p>
+<p><span id="eq-triangular-distribution"><span class="math display">\[p(x) = \begin{cases}
 4x, &amp; \text{if } 0 \leq x \leq 0.5, \\
 4(1-x), &amp; \text{if } 0.5 \leq x \leq 1 \\
 0, &amp; \text{otherwise}.
-\end{cases}
-\tag{9.2}\]</span></span></p>
-<p>We can use the accept-reject method to sample from this distribution. The density function is supported over <span class="math inline">\([0, 1]\)</span> and is bounded by <span class="math inline">\(M = 2\)</span>.</p>
+\end{cases} \tag{9.5}\]</span></span></p>
+<p><strong>Analysis:</strong></p>
+<ul>
+<li><strong>Support</strong>: <span class="math inline">\([a,b] = [0, 1]\)</span>.<br>
+</li>
+<li><strong>Maximum value</strong>: <span class="math inline">\(M = \max_{x \in [0,1]} p(x) = p(0.5) = 2\)</span>.</li>
+<li><strong>Acceptance probability</strong>: <span class="math inline">\(\frac{1}{M(b-a)} = \frac{1}{2 \cdot 1} = 0.5\)</span>.</li>
+</ul>
+<p><strong>Algorithm application:</strong></p>
+<ol type="1">
+<li>Sample <span class="math inline">\(x \sim \text{Uniform}(0, 1)\)</span>.</li>
+<li>Sample <span class="math inline">\(y \sim \text{Uniform}(0, 2)\)</span>.<br>
+</li>
+<li>If <span class="math inline">\(y \leq p(x)\)</span>, accept <span class="math inline">\(x\)</span>; otherwise reject and repeat.</li>
+</ol>
+<p>On average, we expect to reject half of our proposals.</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Implementation Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In practice, you would implement this algorithm in a loop until you obtain the desired number of samples. The triangular distribution is actually simple enough that direct methods exist, but it serves as a good example for understanding the accept-reject principle.</p>
+</div>
 </div>
 <div id="19fe2041" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
@@ -699,28 +822,115 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
-<section id="efficiency" class="level3" data-number="9.1.1">
-<h3 data-number="9.1.1" class="anchored" data-anchor-id="efficiency"><span class="header-section-number">9.1.1</span> Efficiency</h3>
+</section>
+<section id="efficiency" class="level3" data-number="9.3.2">
+<h3 data-number="9.3.2" class="anchored" data-anchor-id="efficiency"><span class="header-section-number">9.3.2</span> Efficiency</h3>
 <p>Note that unlike the methods we have seen so far, the accept-reject method is probabilistic. The method generates uniformly distributed samples in the rectangle of area <span class="math inline">\(M(b-a)\)</span>, where <span class="math inline">\(M\)</span> is the bound on <span class="math inline">\(p(x)\)</span> and <span class="math inline">\([a, b]\)</span> is the support of <span class="math inline">\(p(x)\)</span>. But because <span class="math inline">\(p(x)\)</span> is a probability distribution, the area under the curve is 1. Thus the efficiency of the accept-reject method is given by</p>
-<p><span class="math display">\[\begin{align*}
-\text{Efficiency} = \frac{1}{M(b-a)}.
-\end{align*}\]</span></p>
-<p>If <span class="math inline">\(M\)</span> is large i.e.&nbsp;the probability distribution has a large peak, then the efficiency of the accept-reject method is low.</p>
+<p><span id="eq-efficiency"><span class="math display">\[\text{Efficiency} = \frac{1}{M(b-a)} \tag{9.6}\]</span></span></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Efficiency Trade-offs
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(M\)</span> is large (i.e., the probability distribution has a large peak), then the efficiency of the accept-reject method is low. This means:</p>
+<ul>
+<li><strong>High peaks</strong>: Lead to many rejected samples and slower convergence.</li>
+<li><strong>Tight bounds</strong>: Finding the smallest possible <span class="math inline">\(M\)</span> is crucial for good performance.</li>
+<li><strong>Wide support</strong>: Large intervals <span class="math inline">\([a,b]\)</span> also reduce efficiency.</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Geometric Interpretation of Efficiency
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The efficiency represents the fraction of the bounding rectangle that lies under the target density curve. In our triangular distribution example:</p>
+<ul>
+<li>Rectangle area: <span class="math inline">\(M(b-a) = 2 \times 1 = 2\)</span></li>
+<li>Area under curve: <span class="math inline">\(\int_0^1 p(x) dx = 1\)</span></li>
+<li>Efficiency: <span class="math inline">\(\frac{1}{2} = 50\%\)</span></li>
+</ul>
+<p>This means we accept exactly half of our proposals on average.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="accept-reject-method-v2" class="level2" data-number="9.2">
-<h2 data-number="9.2" class="anchored" data-anchor-id="accept-reject-method-v2"><span class="header-section-number">9.2</span> Accept-Reject Method v2</h2>
-<p>A better version of the accept-reject method is obtained by replacing the enveloping rectangle with a enveloping curve. The closer the enveloping curve is to the distribution, the higher the efficiency of the method.</p>
+<section id="accept-reject-method-v2" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="accept-reject-method-v2"><span class="header-section-number">9.4</span> Accept-Reject Method v2</h2>
+<p>A better version of the accept-reject method is obtained by replacing the enveloping rectangle with an enveloping curve. The closer the enveloping curve is to the distribution, the higher the efficiency of the method.</p>
 <div id="def-majorizing-function" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition 9.1</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. A function <span class="math inline">\(g(x)\)</span> is said to majorize <span class="math inline">\(p(x)\)</span> if <span class="math inline">\(g(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>.</p>
+<p><span class="theorem-title"><strong>Definition 9.1 (Definition: Majorizing Function)</strong></span> Let <span class="math inline">\(p(x)\)</span> be a probability distribution. A function <span class="math inline">\(g(x)\)</span> is said to <strong>majorize</strong> <span class="math inline">\(p(x)\)</span> if <span class="math inline">\(g(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>.</p>
 <p>In the accept-reject jargon, we call <span class="math inline">\(p(x)\)</span> the <strong>target distribution</strong> and <span class="math inline">\(g(x)\)</span> the <strong>proposal distribution</strong>. Note that a probability distribution can never majorize another probability distribution as the area under the curve is 1. But we can scale the proposal distribution by a constant <span class="math inline">\(M\)</span> such that <span class="math inline">\(Mg(x)\)</span> majorizes <span class="math inline">\(p(x)\)</span>.</p>
 </div>
-<div id="exm-majorizing-function" class="theorem example">
-<p><span class="theorem-title"><strong>Example 9.2</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>9.2</span></a>). We saw that we can use the enveloping rectangle with <span class="math inline">\(M = 2\)</span> to sample from this distribution. The Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution with constant <span class="math inline">\(M = 4/3\)</span>.</p>
-<p><span class="math display">\[\begin{align}
-\mathrm{Beta}(2, 2) = 6x(1-x), \quad x \in [0, 1].
-\end{align}\]</span></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
+<div class="callout-title-container flex-fill">
+Key Requirements for Proposal Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For <span class="math inline">\(g(x)\)</span> to be a valid proposal distribution, it must satisfy:</p>
+<ul>
+<li><strong>Majorization</strong>: <span class="math inline">\(Mg(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>.</li>
+<li><strong>Easy sampling</strong>: We must be able to easily generate samples from <span class="math inline">\(g(x)\)</span>.</li>
+<li><strong>Easy evaluation</strong>: Both <span class="math inline">\(g(x)\)</span> and <span class="math inline">\(p(x)\)</span> must be easy to evaluate.</li>
+<li><strong>Efficiency</strong>: <span class="math inline">\(Mg(x)\)</span> should be as close to <span class="math inline">\(p(x)\)</span> as possible to minimize rejections.</li>
+</ul>
+</div>
+</div>
+<section id="improved-algorithm" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="improved-algorithm"><span class="header-section-number">9.4.1</span> Improved Algorithm</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Accept-Reject with Proposal Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a target distribution <span class="math inline">\(p(x)\)</span> and a proposal distribution <span class="math inline">\(g(x)\)</span> with scaling constant <span class="math inline">\(M\)</span> such that <span class="math inline">\(Mg(x) \geq p(x)\)</span>:</p>
+<ol type="1">
+<li><strong>Generate proposal</strong>: Sample <span class="math inline">\(x\)</span> from the proposal distribution <span class="math inline">\(g(x)\)</span>.</li>
+<li><strong>Generate test value</strong>: Sample <span class="math inline">\(u\)</span> uniformly from <span class="math inline">\([0, 1]\)</span>.</li>
+<li><strong>Accept or reject</strong>: If <span class="math inline">\(u \leq \frac{p(x)}{Mg(x)}\)</span>, <strong>accept</strong> and return <span class="math inline">\(x\)</span>; otherwise, <strong>reject</strong> and go back to step 1.</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Why This Works
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The acceptance probability <span class="math inline">\(\frac{p(x)}{Mg(x)}\)</span> ensures that we accept samples with probability proportional to how well the target density <span class="math inline">\(p(x)\)</span> matches the scaled proposal density <span class="math inline">\(Mg(x)\)</span> at point <span class="math inline">\(x\)</span>.</p>
+</div>
+</div>
+</section>
+<section id="worked-example-1" class="level3" data-number="9.4.2">
+<h3 data-number="9.4.2" class="anchored" data-anchor-id="worked-example-1"><span class="header-section-number">9.4.2</span> Worked Example</h3>
+<div id="exm-majorizing-function" class="theorem example">
+<p><span class="theorem-title"><strong>Example 9.2 (Example: Beta Proposal for Triangular Distribution)</strong></span> Consider the triangular distribution given by <a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>9.5</span></a>. We saw that we can use the enveloping rectangle with <span class="math inline">\(M = 2\)</span> to sample from this distribution. The Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> provides a better majorizing function with constant <span class="math inline">\(M = 4/3\)</span>.</p>
+<p>The <span class="math inline">\(\text{Beta}(2, 2)\)</span> distribution has density: <span id="eq-beta-22"><span class="math display">\[g(x) = 6x(1-x), \quad x \in [0, 1] \tag{9.7}\]</span></span></p>
 <div id="93f26b6a" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
@@ -730,45 +940,152 @@ p(x) = \begin{cases}
 </div>
 </div>
 </div>
+<p><strong>Efficiency comparison:</strong></p>
+<ul>
+<li><strong>Rectangle method</strong>: Efficiency = <span class="math inline">\(\frac{1}{2 \cdot 1} = 50\%\)</span></li>
+<li><strong>Beta proposal</strong>: Efficiency = <span class="math inline">\(\frac{1}{M} = \frac{1}{4/3} = 75\%\)</span></li>
+</ul>
+<p>The Beta proposal method is significantly more efficient!</p>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Finding the Optimal Scaling Constant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The scaling constant <span class="math inline">\(M\)</span> should be chosen as the smallest value such that <span class="math inline">\(Mg(x) \geq p(x)\)</span> for all <span class="math inline">\(x\)</span>. This typically requires: <span class="math display">\[M = \max_x \frac{p(x)}{g(x)}\]</span> Finding this maximum may require calculus or numerical optimization.</p>
+</div>
+</div>
 <p>In order to run the accept-reject method, we need to sample uniformly from the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis. This can be done using the following theorem:</p>
 <div id="thm-majorizing-function" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 9.2</strong></span> <strong>Majorizing Function:</strong> Let <span class="math inline">\(g(x)\)</span> be a probability distribution and let <span class="math inline">\(M\)</span> be a constant. Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables such that <span class="math inline">\(X \sim g(x)\)</span> and <span class="math inline">\((Y | X = x)\sim U(0, Mg(x))\)</span>. Then the joint distribution of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is uniform over the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis.</p>
+<p><span class="theorem-title"><strong>Theorem 9.2 (Uniform Sampling Under Majorizing Function)</strong></span> Let <span class="math inline">\(g(x)\)</span> be a probability distribution and let <span class="math inline">\(M\)</span> be a constant. Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables such that <span class="math inline">\(X \sim g(x)\)</span> and <span class="math inline">\((Y | X = x) \sim U(0, Mg(x))\)</span>. Then the joint distribution of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is uniform over the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>The conditional probability of <span class="math inline">\(Y\)</span> given <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f_{Y|X}(y|x) = \begin{cases}
+<p><span class="math display">\[f_{Y|X}(y|x) = \begin{cases}
 \frac{1}{Mg(x)}, &amp; \text{if } 0 \leq y \leq Mg(x), \\
 0, &amp; \text{otherwise}.
-\end{cases}
-\end{align*}\]</span></p>
+\end{cases}\]</span></p>
 <p>Hence, the joint distribution of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
+<p><span class="math display">\[f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 \frac{1}{M}, &amp; \text{if } 0 \leq y \leq Mg(x), \\
 0, &amp; \text{otherwise}.
-\end{cases}
-\end{align*}\]</span></p>
+\end{cases}\]</span></p>
 <p>Hence, the joint distribution is uniform over the region between the graph of <span class="math inline">\(Mg(x)\)</span> and the <span class="math inline">\(x\)</span>-axis.</p>
 <p>Note that we are seeing the constant <span class="math inline">\(1/M\)</span> instead of 1 as the area under the curve <span class="math inline">\(y = Mg(x)\)</span> is <span class="math inline">\(M\)</span> and not 1.</p>
+<p><span class="math inline">\(\blacksquare\)</span></p>
 </div>
-<p>This gives us a way to sample from the majorizing function <span class="math inline">\(g(x)\)</span>. We can then use the accept-reject method to sample from the target distribution <span class="math inline">\(p(x)\)</span>. The algorithm is as follows:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Geometric Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This theorem establishes that we can generate uniform points under any scaled probability density <span class="math inline">\(Mg(x)\)</span> by first sampling from the base distribution <span class="math inline">\(g(x)\)</span>, then sampling uniformly in the vertical direction up to the curve height.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="complete-algorithm-with-proposal-distribution" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="complete-algorithm-with-proposal-distribution"><span class="header-section-number">9.5</span> Complete Algorithm with Proposal Distribution</h2>
+<p>This gives us a way to sample from the majorizing function <span class="math inline">\(g(x)\)</span>. We can then use the accept-reject method to sample from the target distribution <span class="math inline">\(p(x)\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Accept-Reject with Majorizing Function (Version 1)
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Sample <span class="math inline">\(x\)</span> from <span class="math inline">\(g(x)\)</span>.</li>
 <li>Sample <span class="math inline">\(y\)</span> uniformly from <span class="math inline">\([0, Mg(x)]\)</span>.</li>
 <li>If <span class="math inline">\(y \leq p(x)\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
 </ol>
-<p>Steps 2 and 3, are often rewritten as:</p>
-<ol start="2" type="1">
+</div>
+</div>
+<section id="equivalent-formulations" class="level3" data-number="9.5.1">
+<h3 data-number="9.5.1" class="anchored" data-anchor-id="equivalent-formulations"><span class="header-section-number">9.5.1</span> Equivalent Formulations</h3>
+<p>Steps 2 and 3 are often rewritten as:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Accept-Reject with Majorizing Function (Version 2)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Sample <span class="math inline">\(x\)</span> from <span class="math inline">\(g(x)\)</span>.</li>
 <li>Sample <span class="math inline">\(u\)</span> uniformly from <span class="math inline">\([0, 1]\)</span>.</li>
-<li>If <span class="math inline">\(u \leq p(x)/(Mg(x))\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
+<li>If <span class="math inline">\(u \leq \frac{p(x)}{Mg(x)}\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
 </ol>
-<p>Furthermore, taking a ratio of two small numbers can lead to numerical instability. We can avoid this by taking the logarithm of the ratio. The third step of the algorithm becomes:</p>
-<ol start="3" type="1">
-<li>If <span class="math inline">\(\log(u) \leq \log(p(x)) - \log(Mg(x))\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Numerical Stability Considerations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Taking a ratio of two small numbers can lead to numerical instability. We can avoid this by taking the logarithm of the ratio. The third step of the algorithm becomes:</p>
+<p><strong>Step 3 (log version):</strong> If <span class="math inline">\(\log(u) \leq \log(p(x)) - \log(Mg(x))\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</p>
+<p>This is particularly important when dealing with distributions that have very small density values.</p>
+</div>
+</div>
+</section>
+<section id="complete-worked-example" class="level3" data-number="9.5.2">
+<h3 data-number="9.5.2" class="anchored" data-anchor-id="complete-worked-example"><span class="header-section-number">9.5.2</span> Complete Worked Example</h3>
+<div id="exm-beta-proposal-complete" class="theorem example">
+<p><span class="theorem-title"><strong>Example 9.3 (Example: Complete Beta Proposal Implementation)</strong></span> Consider the triangular distribution given by <a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>9.5</span></a>. We saw that the Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution with <span class="math inline">\(M = 4/3\)</span>.</p>
+<p><strong>Step-by-step implementation:</strong></p>
+<ol type="1">
+<li><p><strong>Sample from proposal</strong>: Generate <span class="math inline">\(x \sim \text{Beta}(2, 2)\)</span> with density <span class="math inline">\(g(x) = 6x(1-x)\)</span>.</p></li>
+<li><p><strong>Generate uniform test</strong>: Sample <span class="math inline">\(u \sim U(0, 1)\)</span>.</p></li>
+<li><p><strong>Acceptance test</strong>: Compute the ratio <span class="math display">\[\frac{p(x)}{Mg(x)} = \frac{p(x)}{\frac{4}{3} \cdot 6x(1-x)} = \frac{3p(x)}{8x(1-x)}\]</span></p>
+<p>If <span class="math inline">\(u \leq \frac{3p(x)}{8x(1-x)}\)</span>, accept <span class="math inline">\(x\)</span>; otherwise reject and repeat.</p></li>
 </ol>
-<div id="exm-majorizing-function" class="theorem example">
-<p><span class="theorem-title"><strong>Example 9.3</strong></span> Consider the triangular distribution given by (<a href="#eq-triangular-distribution" class="quarto-xref">Equation&nbsp;<span>9.2</span></a>). We saw that the Beta distribution <span class="math inline">\(\text{Beta}(2, 2)\)</span> majorizes the triangular distribution. We can use the accept-reject method to sample from the triangular distribution using the Beta distribution as the proposal distribution. This improves the efficiency of the method from <span class="math inline">\(1/2\)</span> to <span class="math inline">\(3/4\)</span>.</p>
+<p><strong>Efficiency improvement:</strong></p>
+<ul>
+<li><strong>Rectangle method</strong>: Efficiency = <span class="math inline">\(50\%\)</span></li>
+<li><strong>Beta proposal method</strong>: Efficiency = <span class="math inline">\(75\%\)</span></li>
+</ul>
+<p>This represents a 50% reduction in the expected number of iterations!</p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Choosing Good Proposal Distributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The best proposal distributions:</p>
+<ul>
+<li>Have a similar shape to the target distribution.</li>
+<li>Are easy to sample from (e.g., normal, beta, gamma distributions).</li>
+<li>Allow for easy evaluation of the density ratio <span class="math inline">\(\frac{p(x)}{g(x)}\)</span>.</li>
+<li>Minimize the scaling constant <span class="math inline">\(M\)</span>.</li>
+</ul>
+</div>
 </div>
 <div id="14723a91" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
@@ -789,42 +1106,138 @@ f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 </div>
 </div>
 </section>
-<section id="normalizing-constant" class="level2" data-number="9.3">
-<h2 data-number="9.3" class="anchored" data-anchor-id="normalizing-constant"><span class="header-section-number">9.3</span> Normalizing Constant</h2>
+</section>
+<section id="normalizing-constant" class="level2" data-number="9.6">
+<h2 data-number="9.6" class="anchored" data-anchor-id="normalizing-constant"><span class="header-section-number">9.6</span> Normalizing Constant</h2>
 <p>We often find ourselves in a situation where we know the probability density function <span class="math inline">\(f\)</span> up to a normalizing constant. For example, the gamma distribution has the density function</p>
-<p><span class="math display">\[\begin{align}
-p(x) = c x^{\alpha - 1} e^{-x/\beta},
-\end{align}\]</span></p>
+<p><span id="eq-gamma-unnormalized"><span class="math display">\[p(x) = c x^{\alpha - 1} e^{-x/\beta} \tag{9.8}\]</span></span></p>
 <p>where <span class="math inline">\(c\)</span> is a normalizing constant. We can compute <span class="math inline">\(c\)</span> by integrating <span class="math inline">\(p(x)\)</span> and setting the integral to 1. But as it turns out we do not need to know <span class="math inline">\(c\)</span> to sample from the distribution. We can use the accept-reject method to sample from the distribution without knowing the normalizing constant. For this we need the following theorem:</p>
 <div id="thm-normalizing-constant" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 9.3</strong></span> <strong>Normalizing Constant:</strong> Let <span class="math inline">\(p(x)\)</span> be any function with a finite integral <span class="math inline">\(c\)</span>. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
-<p><span class="math display">\[\begin{align}
-f_{X,Y}(x,y) = \begin{cases}
+<p><span class="theorem-title"><strong>Theorem 9.3 (Sampling with Unknown Normalizing Constant)</strong></span> Let <span class="math inline">\(p(x)\)</span> be any function with a finite integral <span class="math inline">\(c\)</span>. Let <span class="math inline">\(X, Y\)</span> be two random variables having the joint distribution</p>
+<p><span id="eq-joint-unnormalized"><span class="math display">\[f_{X,Y}(x,y) = \begin{cases}
 \frac{1}{c}, &amp; \text{if } 0 \leq y \leq p(x), \\
 0, &amp; \text{otherwise}.
-\end{cases}
-\end{align}\]</span></p>
+\end{cases} \tag{9.9}\]</span></span></p>
 <p>Then the marginal distribution of <span class="math inline">\(X\)</span> is given by <span class="math inline">\(p(x)/c\)</span>.</p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span>The marginal distribution of <span class="math inline">\(X\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} dy = \frac{p(x)}{c}.
-\end{align*}\]</span></p>
+<p><span class="math display">\[f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} dy = \frac{p(x)}{c}\]</span></p>
 <p><span class="math inline">\(\blacksquare\)</span></p>
 </div>
-<p>Thus sampling from a uniform distribution over the graph of <span class="math inline">\(p(x)\)</span> and then finding the marginal distribution of <span class="math inline">\(X\)</span> gives us a sample from the distribution <span class="math inline">\(p(x)/c\)</span>. This is a powerful result as it allows us to sample from a distribution without knowing the normalizing constant.</p>
-<p>If we majorize <span class="math inline">\(cp(x)\)</span> with a proposal distribution <span class="math inline">\(Mg(x)\)</span>, we can use the accept-reject method to sample from the distribution <span class="math inline">\(p(x)/c\)</span> without knowing the normalizing constant. The efficiency in this case will be given by</p>
-<p><span class="math display">\[\begin{align*}
-\text{Efficiency} = \frac{\text{area under the graph of } p(x)}{\text{area under the graph of } Mg(x)} = \frac{c}{M}.
-\end{align*}\]</span></p>
-<p>Note that there is no loss in efficiency due to the unknown normalizing constant as if we can majorize <span class="math inline">\(p(x)\)</span> with <span class="math inline">\(Mg(x)\)</span>, we can majorize the normalized proposal density <span class="math inline">\(p(x)/c\)</span> by <span class="math inline">\(Mg(x)/c\)</span>, giving us the same efficiency.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sampling from a uniform distribution over the graph of <span class="math inline">\(p(x)\)</span> and then finding the marginal distribution of <span class="math inline">\(X\)</span> gives us a sample from the distribution <span class="math inline">\(p(x)/c\)</span>. This is a powerful result as it allows us to sample from a distribution without knowing the normalizing constant.</p>
+</div>
+</div>
+<section id="efficiency-with-unknown-normalizing-constants" class="level3" data-number="9.6.1">
+<h3 data-number="9.6.1" class="anchored" data-anchor-id="efficiency-with-unknown-normalizing-constants"><span class="header-section-number">9.6.1</span> Efficiency with Unknown Normalizing Constants</h3>
+<p>If we majorize <span class="math inline">\(p(x)\)</span> with a proposal distribution <span class="math inline">\(Mg(x)\)</span>, we can use the accept-reject method to sample from the distribution <span class="math inline">\(p(x)/c\)</span> without knowing the normalizing constant. The efficiency in this case will be given by</p>
+<p><span id="eq-efficiency-unnormalized"><span class="math display">\[\text{Efficiency} = \frac{\text{area under the graph of } p(x)}{\text{area under the graph of } Mg(x)} = \frac{c}{M} \tag{9.10}\]</span></span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+No Loss of Efficiency
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that there is no loss in efficiency due to the unknown normalizing constant. If we can majorize <span class="math inline">\(p(x)\)</span> with <span class="math inline">\(Mg(x)\)</span>, we can majorize the normalized density <span class="math inline">\(p(x)/c\)</span> by <span class="math inline">\(Mg(x)/c\)</span>, giving us the same efficiency ratio.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Accept-Reject with Unknown Normalizing Constant
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given an unnormalized target function <span class="math inline">\(p(x)\)</span> and a proposal distribution <span class="math inline">\(g(x)\)</span> with scaling constant <span class="math inline">\(M\)</span> such that <span class="math inline">\(Mg(x) \geq p(x)\)</span>:</p>
+<ol type="1">
+<li>Sample <span class="math inline">\(x\)</span> from <span class="math inline">\(g(x)\)</span>.</li>
+<li>Sample <span class="math inline">\(u\)</span> uniformly from <span class="math inline">\([0, 1]\)</span>.</li>
+<li>If <span class="math inline">\(u \leq \frac{p(x)}{Mg(x)}\)</span>, return <span class="math inline">\(x\)</span>; otherwise, go back to step 1.</li>
+</ol>
+<p>Note that we never need to compute the normalizing constant <span class="math inline">\(c\)</span> explicitly!</p>
+</div>
+</div>
 </section>
-<section id="final-remarks" class="level2" data-number="9.4">
-<h2 data-number="9.4" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">9.4</span> Final remarks</h2>
-<p>If the proposal distribution is not close to the target distribution, then the efficiency of the method is low. In higher dimensions, it is difficult to come up with a good proposal distribution.</p>
-<p>In higher dimensions, we need more sophisticated methods to sample from the target distribution such as Markov Chain Monte Carlo (MCMC) methods. We’ll see some of these methods such as Metropolis-Hastings and Gibbs sampling in the future.</p>
-<p>Adaptive rejection sampling is another method that tries to find a good proposal distribution by using the samples generated so far. The idea is to use the samples to build a piecewise linear majorizing function. This function is then used as the proposal distribution for the accept-reject method. Because the cdf of a piecewise linear function is a quadratic function, it can be inverted easily. The method works for log-concave densities but has been extended to more general densities. This would be a good topic for a project.</p>
+</section>
+<section id="final-remarks" class="level2" data-number="9.7">
+<h2 data-number="9.7" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">9.7</span> Final Remarks</h2>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Limitations of Accept-Reject Methods
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If the proposal distribution is not close to the target distribution, then the efficiency of the method is low. In higher dimensions, it becomes increasingly difficult to come up with a good proposal distribution due to the <strong>curse of dimensionality</strong>.</p>
+<p>Key challenges include:</p>
+<ul>
+<li><strong>Volume growth</strong>: In <span class="math inline">\(d\)</span> dimensions, volumes grow as <span class="math inline">\(r^d\)</span>, making tight bounds harder to achieve.</li>
+<li><strong>Shape matching</strong>: Finding proposal distributions that match complex multivariate shapes becomes prohibitive.</li>
+<li><strong>Computational cost</strong>: Evaluating density ratios becomes expensive in high dimensions.</li>
+</ul>
+</div>
+</div>
+<section id="advanced-methods" class="level3" data-number="9.7.1">
+<h3 data-number="9.7.1" class="anchored" data-anchor-id="advanced-methods"><span class="header-section-number">9.7.1</span> Advanced Methods</h3>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Beyond Basic Accept-Reject
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Markov Chain Monte Carlo (MCMC):</strong> In higher dimensions, we need more sophisticated methods to sample from target distributions such as:</p>
+<ul>
+<li><strong>Metropolis-Hastings algorithm</strong>: Uses proposal distributions but doesn’t require majorization.</li>
+<li><strong>Gibbs sampling</strong>: Samples from conditional distributions sequentially.</li>
+<li><strong>Hamiltonian Monte Carlo</strong>: Uses gradient information for efficient proposals.</li>
+</ul>
+<p>We’ll explore these methods in future sections.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Adaptive Rejection Sampling
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Adaptive rejection sampling</strong> is another method that tries to find a good proposal distribution by using the samples generated so far. Key features:</p>
+<ul>
+<li><strong>Adaptive construction</strong>: Uses previous samples to build a piecewise linear majorizing function.</li>
+<li><strong>Easy inversion</strong>: The CDF of a piecewise linear function is quadratic and can be inverted easily.</li>
+<li><strong>Log-concave densities</strong>: The method works particularly well for log-concave densities.</li>
+<li><strong>Extensions</strong>: Has been extended to more general densities beyond log-concave cases.</li>
+</ul>
+<p>This adaptive approach would make an excellent topic for a research project, as it combines the simplicity of accept-reject with the adaptability needed for complex distributions.</p>
+</div>
+</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="../images/adaptive.png" class="img-fluid figure-img"></p>
@@ -833,6 +1246,7 @@ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) dy = \int_{0}^{p(x)} \frac{1}{c} d
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

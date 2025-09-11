@@ -547,22 +547,23 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#stochastic-processes" id="toc-stochastic-processes" class="nav-link active" data-scroll-target="#stochastic-processes"><span class="header-section-number">13.1</span> Stochastic Processes</a>
+  <li><a href="#from-ordinary-to-stochastic-differential-equations" id="toc-from-ordinary-to-stochastic-differential-equations" class="nav-link active" data-scroll-target="#from-ordinary-to-stochastic-differential-equations"><span class="header-section-number">13.1</span> From Ordinary to Stochastic Differential Equations</a></li>
+  <li><a href="#stochastic-processes" id="toc-stochastic-processes" class="nav-link" data-scroll-target="#stochastic-processes"><span class="header-section-number">13.2</span> Stochastic Processes</a>
   <ul class="collapse">
-  <li><a href="#wiener-process" id="toc-wiener-process" class="nav-link" data-scroll-target="#wiener-process"><span class="header-section-number">13.1.1</span> Wiener Process</a></li>
+  <li><a href="#wiener-process" id="toc-wiener-process" class="nav-link" data-scroll-target="#wiener-process"><span class="header-section-number">13.2.1</span> Wiener Process</a></li>
   </ul></li>
-  <li><a href="#stochastic-differential-equations" id="toc-stochastic-differential-equations" class="nav-link" data-scroll-target="#stochastic-differential-equations"><span class="header-section-number">13.2</span> Stochastic Differential Equations</a>
+  <li><a href="#stochastic-differential-equations" id="toc-stochastic-differential-equations" class="nav-link" data-scroll-target="#stochastic-differential-equations"><span class="header-section-number">13.3</span> Stochastic Differential Equations</a>
   <ul class="collapse">
-  <li><a href="#ito-vs-stratonovich-interpretation" id="toc-ito-vs-stratonovich-interpretation" class="nav-link" data-scroll-target="#ito-vs-stratonovich-interpretation"><span class="header-section-number">13.2.1</span> Ito vs Stratonovich Interpretation</a></li>
+  <li><a href="#itô-vs-stratonovich-interpretation" id="toc-itô-vs-stratonovich-interpretation" class="nav-link" data-scroll-target="#itô-vs-stratonovich-interpretation"><span class="header-section-number">13.3.1</span> Itô vs Stratonovich Interpretation</a></li>
   </ul></li>
-  <li><a href="#geometric-brownian-motion" id="toc-geometric-brownian-motion" class="nav-link" data-scroll-target="#geometric-brownian-motion"><span class="header-section-number">13.3</span> Geometric Brownian Motion</a></li>
-  <li><a href="#euler-maruyama-method" id="toc-euler-maruyama-method" class="nav-link" data-scroll-target="#euler-maruyama-method"><span class="header-section-number">13.4</span> Euler-Maruyama Method</a></li>
-  <li><a href="#convergence-of-the-euler-maruyama-method" id="toc-convergence-of-the-euler-maruyama-method" class="nav-link" data-scroll-target="#convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.5</span> Convergence of the Euler-Maruyama Method</a>
+  <li><a href="#geometric-brownian-motion" id="toc-geometric-brownian-motion" class="nav-link" data-scroll-target="#geometric-brownian-motion"><span class="header-section-number">13.4</span> Geometric Brownian Motion</a></li>
+  <li><a href="#euler-maruyama-method" id="toc-euler-maruyama-method" class="nav-link" data-scroll-target="#euler-maruyama-method"><span class="header-section-number">13.5</span> Euler-Maruyama Method</a></li>
+  <li><a href="#convergence-of-the-euler-maruyama-method" id="toc-convergence-of-the-euler-maruyama-method" class="nav-link" data-scroll-target="#convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.6</span> Convergence of the Euler-Maruyama Method</a>
   <ul class="collapse">
-  <li><a href="#weak-convergence" id="toc-weak-convergence" class="nav-link" data-scroll-target="#weak-convergence"><span class="header-section-number">13.5.1</span> Weak Convergence</a></li>
-  <li><a href="#strong-convergence" id="toc-strong-convergence" class="nav-link" data-scroll-target="#strong-convergence"><span class="header-section-number">13.5.2</span> Strong Convergence</a></li>
+  <li><a href="#weak-convergence" id="toc-weak-convergence" class="nav-link" data-scroll-target="#weak-convergence"><span class="header-section-number">13.6.1</span> Weak Convergence</a></li>
+  <li><a href="#strong-convergence" id="toc-strong-convergence" class="nav-link" data-scroll-target="#strong-convergence"><span class="header-section-number">13.6.2</span> Strong Convergence</a></li>
   </ul></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">13.6</span> Final remarks</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">13.7</span> Final Remarks</a></li>
   </ul>
 </nav>
     </div>
@@ -627,49 +628,79 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
-<p>In this module, we will look at the Euler-Maruyama method for solving stochastic differential equations. Our focus will be on understanding numberical stability and convergence of the method.</p>
+<p>In this module, we will look at the Euler-Maruyama method for solving stochastic differential equations. Our focus will be on understanding numerical stability and convergence of the method.</p>
+<section id="from-ordinary-to-stochastic-differential-equations" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="from-ordinary-to-stochastic-differential-equations"><span class="header-section-number">13.1</span> From Ordinary to Stochastic Differential Equations</h2>
 <p>Recall that the most basic differential equation, which is at the foundation of theory of ordinary differential equations, is the first order ordinary differential equation (ODE) of the form</p>
-<p><span id="eq-ode"><span class="math display">\[
-\frac{dy}{dt} = \lambda y
-\tag{13.1}\]</span></span></p>
-<p>where <span class="math inline">\(\lambda\)</span> is a constant. The solution to this ODE is given by <span id="eq-ode_solution"><span class="math display">\[
-y(t) = y(0) e^{\lambda t}.
-\tag{13.2}\]</span></span></p>
-<p>We want to modify the ODE (<a href="#eq-ode" class="quarto-xref">Equation&nbsp;<span>13.1</span></a>) to include noise <span class="math display">\[
-\frac{dy}{dt} = \lambda y + \text{ noise}.
-\]</span></p>
+<p><span id="eq-ode"><span class="math display">\[\frac{dy}{dt} = \lambda y \tag{13.1}\]</span></span></p>
+<p>where <span class="math inline">\(\lambda\)</span> is a constant. The solution to this ODE is given by</p>
+<p><span id="eq-ode_solution"><span class="math display">\[y(t) = y(0) e^{\lambda t} \tag{13.2}\]</span></span></p>
+<p>We want to modify the ODE <a href="#eq-ode" class="quarto-xref">Equation&nbsp;<span>13.1</span></a> to include noise:</p>
+<p><span class="math display">\[\frac{dy}{dt} = \lambda y + \text{noise}\]</span></p>
 <p>To make sense of this, we’ll make two changes:</p>
 <ol type="1">
 <li>We’ll replace the function <span class="math inline">\(y(t)\)</span> with a stochastic process <span class="math inline">\(X(t)\)</span>.</li>
 <li>We’ll model the noise as a Wiener process <span class="math inline">\(W(t)\)</span>.</li>
 </ol>
-<section id="stochastic-processes" class="level2" data-number="13.1">
-<h2 data-number="13.1" class="anchored" data-anchor-id="stochastic-processes"><span class="header-section-number">13.1</span> Stochastic Processes</h2>
-<p>A stochastic process is a time dependent random variable. More precisely, it is a function of the form</p>
-<p><span class="math display">\[
-X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
-\]</span></p>
-<p>where <span class="math inline">\(\Omega\)</span> is the sample space. For example, if <span class="math inline">\(\Omega\)</span> is the set of gas molecules in a room, then <span class="math inline">\(X(t, i)\)</span> could be the position of the <span class="math inline">\(i\)</span>-th molecule at time <span class="math inline">\(t\)</span>. For at fixed <span class="math inline">\(t\)</span>, <span class="math inline">\(X(t, \cdot)\)</span> is a random variable. For a fixed <span class="math inline">\(\omega\)</span>, <span class="math inline">\(X(\cdot, \omega)\)</span> is a function of time. This function, <span class="math inline">\(X(\cdot, \omega)\)</span> is called a <strong>sample path</strong> of the stochastic process.</p>
-<section id="wiener-process" class="level3" data-number="13.1.1">
-<h3 data-number="13.1.1" class="anchored" data-anchor-id="wiener-process"><span class="header-section-number">13.1.1</span> Wiener Process</h3>
-<p>A <strong>Wiener process</strong>, <span class="math inline">\(W(t)\)</span>, also known as Brownian motion, is a stochastic process with the following properties:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Applications of Stochastic Differential Equations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Stochastic differential equations arise naturally in many applications including financial modeling (stock prices with random market fluctuations), physics (particle motion with thermal noise), biology (population dynamics with environmental randomness), and engineering (control systems with measurement noise).</p>
+</div>
+</div>
+</section>
+<section id="stochastic-processes" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="stochastic-processes"><span class="header-section-number">13.2</span> Stochastic Processes</h2>
+<p>A <strong>stochastic process</strong> is a time-dependent random variable. More precisely, it is a function of the form</p>
+<p><span id="eq-stochastic-process"><span class="math display">\[X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R} \tag{13.3}\]</span></span></p>
+<p>where <span class="math inline">\(\Omega\)</span> is the sample space. For example, if <span class="math inline">\(\Omega\)</span> is the set of gas molecules in a room, then <span class="math inline">\(X(t, i)\)</span> could be the position of the <span class="math inline">\(i\)</span>-th molecule at time <span class="math inline">\(t\)</span>. For a fixed <span class="math inline">\(t\)</span>, <span class="math inline">\(X(t, \cdot)\)</span> is a random variable. For a fixed <span class="math inline">\(\omega\)</span>, <span class="math inline">\(X(\cdot, \omega)\)</span> is a function of time. This function, <span class="math inline">\(X(\cdot, \omega)\)</span>, is called a <strong>sample path</strong> of the stochastic process.</p>
+<section id="wiener-process" class="level3" data-number="13.2.1">
+<h3 data-number="13.2.1" class="anchored" data-anchor-id="wiener-process"><span class="header-section-number">13.2.1</span> Wiener Process</h3>
+<p>A <strong>Wiener process</strong>, <span class="math inline">\(W(t)\)</span>, also known as <strong>Brownian motion</strong>, is a stochastic process with the following properties:</p>
 <ol type="1">
 <li><span class="math inline">\(W(0) = 0\)</span>.</li>
-<li>For <span class="math inline">\(0 \leq s &lt; t\)</span>, the increment <span class="math inline">\(W(t) - W(s)\)</span> is normally distributed with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(t-s\)</span>.</li>
+<li>For <span class="math inline">\(0 \leq s &lt; t\)</span>, the increment <span class="math inline">\(W(t) - W(s)\)</span> is normally distributed with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(t-s\)</span>: <span class="math display">\[W(t) - W(s) \sim \mathcal{N}(0, t-s)\]</span></li>
 <li>The increments are independent.</li>
 <li>The process is continuous but nowhere differentiable.</li>
 </ol>
-<p>We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time <span class="math inline">\(t\)</span>, the mean of <span class="math inline">\(W(t)\)</span> is <span class="math inline">\(0\)</span>. However the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.</p>
-<div id="271009cf" class="cell" data-execution_count="2">
+<p>We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time <span class="math inline">\(t\)</span>, the mean of <span class="math inline">\(W(t)\)</span> is <span class="math inline">\(0\)</span>. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.</p>
+<p>From the definition, we can derive several important properties:</p>
+<ul>
+<li><strong>Mean</strong>: <span class="math inline">\(\mathbb{E}[W(t)] = 0\)</span> for all <span class="math inline">\(t \geq 0\)</span>.</li>
+<li><strong>Variance</strong>: <span class="math inline">\(\text{Var}(W(t)) = t\)</span> for all <span class="math inline">\(t \geq 0\)</span>.</li>
+<li><strong>Covariance</strong>: <span class="math inline">\(\text{Cov}(W(s), W(t)) = \min(s,t)\)</span> for <span class="math inline">\(s, t \geq 0\)</span>.</li>
+<li><strong>Distribution</strong>: <span class="math inline">\(W(t) \sim \mathcal{N}(0, t)\)</span> for any <span class="math inline">\(t &gt; 0\)</span>.</li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Mathematical Subtlety
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The nowhere differentiable property of Wiener processes means that expressions like <span class="math inline">\(\frac{dW}{dt}\)</span> don’t exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.</p>
+</div>
+</div>
+<div id="c56470a7" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="600" height="449" class="figure-img"></p>
+<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="587" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="47eda541" class="cell" data-execution_count="3">
+<div id="198bc222" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -680,125 +711,166 @@ X(t, \omega): \mathbb{R} \times \Omega \to \mathbb{R}
 </div>
 </section>
 </section>
-<section id="stochastic-differential-equations" class="level2" data-number="13.2">
-<h2 data-number="13.2" class="anchored" data-anchor-id="stochastic-differential-equations"><span class="header-section-number">13.2</span> Stochastic Differential Equations</h2>
+<section id="stochastic-differential-equations" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="stochastic-differential-equations"><span class="header-section-number">13.3</span> Stochastic Differential Equations</h2>
 <p>A <strong>stochastic differential equation</strong> (SDE) is an equation of the form</p>
-<p><span class="math display">\[
-dX(t) = a(X(t), t) dt + b(X(t), t) dW(t)
-\]</span></p>
-<p>where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are functions of <span class="math inline">\(X(t)\)</span> and <span class="math inline">\(t\)</span>. The term <span class="math inline">\(a(X(t), t) dt\)</span> is the deterministic part of the equation and <span class="math inline">\(b(X(t), t) dW(t)\)</span> is the stochastic part. The solution to an SDE is a stochastic process <span class="math inline">\(X(t)\)</span>. <span class="math inline">\(W(t)\)</span> is the Wiener process.</p>
+<p><span id="eq-sde-general"><span class="math display">\[dX(t) = a(X(t), t) dt + b(X(t), t) dW(t) \tag{13.4}\]</span></span></p>
+<p>where <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are functions of <span class="math inline">\(X(t)\)</span> and <span class="math inline">\(t\)</span>. The term <span class="math inline">\(a(X(t), t) dt\)</span> is the deterministic part of the equation and <span class="math inline">\(b(X(t), t) dW(t)\)</span> is the stochastic part. The solution to an SDE is a stochastic process <span class="math inline">\(X(t)\)</span>, and <span class="math inline">\(W(t)\)</span> is the Wiener process.</p>
 <p>We write the equation in this form because the Wiener process is not differentiable. We interpret the equation as saying</p>
-<p><span class="math display">\[
-X(t) - X(0) = \int_0^t a(X(s), s) ds + \int_0^t b(X(s), s) dW(s).
-\]</span></p>
-<section id="ito-vs-stratonovich-interpretation" class="level3" data-number="13.2.1">
-<h3 data-number="13.2.1" class="anchored" data-anchor-id="ito-vs-stratonovich-interpretation"><span class="header-section-number">13.2.1</span> Ito vs Stratonovich Interpretation</h3>
+<p><span id="eq-sde-integral"><span class="math display">\[X(t) - X(0) = \int_0^t a(X(s), s) ds + \int_0^t b(X(s), s) dW(s) \tag{13.5}\]</span></span></p>
+<section id="itô-vs-stratonovich-interpretation" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="itô-vs-stratonovich-interpretation"><span class="header-section-number">13.3.1</span> Itô vs Stratonovich Interpretation</h3>
 <p>We can try to define the above integrals in the usual sense using Riemann sums. The first integral can be written as the limit</p>
-<p><span class="math display">\[
-\int_0^t a(X(s), s) ds = \lim_{n \to \infty} \sum_{i=0}^{n-1} a(X(t_i), t_i) \Delta t_i
-\]</span></p>
+<p><span class="math display">\[\int_0^t a(X(s), s) ds = \lim_{n \to \infty} \sum_{i=0}^{n-1} a(X(t_i), t_i) \Delta t_i\]</span></p>
 <p>where <span class="math inline">\(t_i\)</span> is some point in the interval <span class="math inline">\([t_{i}, t_{i+1}]\)</span> and <span class="math inline">\(\Delta t = t/n\)</span>. Even though function <span class="math inline">\(a(X(s), s)\)</span> is a stochastic process, it is mathematically still just a function. The integral can be defined in the usual sense.</p>
 <p>However, the second integral is more problematic. We can try to define it as</p>
-<p><span class="math display">\[
-\int_0^t b(X(s), s) dW(s) = \lim_{n \to \infty} \sum_{i=0}^{n-1} b(X(t_i), t_i) (W(t_{i+1}) - W(t_i))
-\]</span></p>
-<p>where <span class="math inline">\(t_i\)</span> is some point in the interval <span class="math inline">\([t_{i}, t_{i+1}]\)</span>, <span class="math inline">\(\Delta t = t/n\)</span>, and <span class="math inline">\(W(t_{i+1}) - W(t_i)\)</span> is normally distributed with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\Delta t\)</span>. The problem is that this integral does not converge in the usual sense. Where the sum converges depends on which point in the interval <span class="math inline">\([t_{i}, t_{i+1}]\)</span> we choose to evaluate the integrand. This happens because the Wiener process is not differentiable. There are two commonly used interpretations of the integral:</p>
+<p><span class="math display">\[\int_0^t b(X(s), s) dW(s) = \lim_{n \to \infty} \sum_{i=0}^{n-1} b(X(t_i), t_i) (W(t_{i+1}) - W(t_i))\]</span></p>
+<p>where <span class="math inline">\(t_i\)</span> is some point in the interval <span class="math inline">\([t_{i}, t_{i+1}]\)</span>, <span class="math inline">\(\Delta t = t/n\)</span>, and <span class="math inline">\(W(t_{i+1}) - W(t_i)\)</span> is normally distributed with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\Delta t\)</span>. The problem is that this integral does not converge in the usual sense. Where the sum converges depends on which point in the interval <span class="math inline">\([t_{i}, t_{i+1}]\)</span> we choose to evaluate the integrand. This happens because the Wiener process is not differentiable.</p>
+<p>There are two commonly used interpretations of the integral:</p>
 <ol type="1">
-<li><strong>Ito Interpretation</strong>: In this interpretation, we use the left end point of the interval to evaluate the integrand. This is the most common interpretation.</li>
+<li><strong>Itô Interpretation</strong>: In this interpretation, we use the left end point of the interval to evaluate the integrand. This is the most common interpretation.</li>
 <li><strong>Stratonovich Interpretation</strong>: In this interpretation, we use the midpoint of the interval to evaluate the integrand.</li>
 </ol>
-<p>It is possible to convert between the two interpretations using the Ito formula. We will assume the Ito interpretation in this module.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>It is possible to convert between the two interpretations using the Itô formula. We will assume the Itô interpretation in this module.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="geometric-brownian-motion" class="level2" data-number="13.3">
-<h2 data-number="13.3" class="anchored" data-anchor-id="geometric-brownian-motion"><span class="header-section-number">13.3</span> Geometric Brownian Motion</h2>
+<section id="geometric-brownian-motion" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="geometric-brownian-motion"><span class="header-section-number">13.4</span> Geometric Brownian Motion</h2>
 <p>A simple example of a stochastic differential equation is the <strong>geometric Brownian motion</strong>. This is a model for the evolution of stock prices. The equation is</p>
-<p><span class="math display">\[
-dX(t) = \mu X(t) dt + \sigma X(t) dW(t)
-\]</span></p>
-<p>where <span class="math inline">\(\mu\)</span> is the drift and <span class="math inline">\(\sigma\)</span> is the volatility. This is one of the few SDEs for which we can find an exact solution. The solution to the Ito version of the equation is</p>
-<p><span id="eq-geometric-brownian-motion-solution"><span class="math display">\[
-X(t) = X(0) e^{(\mu - \sigma^2/2)t + \sigma W(t)}.
-\tag{13.3}\]</span></span></p>
-<p>This is a log-normal distribution whose mean is given by <span class="math inline">\(X(0) e^{\mu t}\)</span> and variance is given by <span class="math inline">\(X(0)^2 e^{2\mu t} (e^{\sigma^2 t} - 1)\)</span>. Note that when <span class="math inline">\(\sigma = 0\)</span>, this reduces to a standard ODE. Unlike (<a href="#eq-ode_solution" class="quarto-xref">Equation&nbsp;<span>13.2</span></a>), the solution to the SDE has a quadratic term <span class="math inline">\(\sigma^2/2\)</span> in the exponent. This term appears due to <a href="https://en.wikipedia.org/wiki/It%C3%B4%27s_lemma">Ito’s lemma</a>, which is the stochastic analog of the chain rule.</p>
-<div id="236bf931" class="cell" data-execution_count="4">
+<p><span id="eq-geometric-brownian-motion"><span class="math display">\[dX(t) = \mu X(t) dt + \sigma X(t) dW(t) \tag{13.6}\]</span></span></p>
+<p>where <span class="math inline">\(\mu\)</span> is the drift and <span class="math inline">\(\sigma\)</span> is the volatility. This is one of the few SDEs for which we can find an exact solution. The solution to the Itô version of the equation is</p>
+<p><span id="eq-geometric-brownian-motion-solution"><span class="math display">\[X(t) = X(0) e^{(\mu - \sigma^2/2)t + \sigma W(t)} \tag{13.7}\]</span></span></p>
+<p>This is a log-normal distribution whose mean is given by <span class="math inline">\(X(0) e^{\mu t}\)</span> and variance is given by <span class="math inline">\(X(0)^2 e^{2\mu t} (e^{\sigma^2 t} - 1)\)</span>. Note that when <span class="math inline">\(\sigma = 0\)</span>, this reduces to a standard ODE. Unlike <a href="#eq-ode_solution" class="quarto-xref">Equation&nbsp;<span>13.2</span></a>, the solution to the SDE has a quadratic term <span class="math inline">\(\sigma^2/2\)</span> in the exponent. This term appears due to <a href="https://en.wikipedia.org/wiki/It%C3%B4%27s_lemma">Itô’s lemma</a>, which is the stochastic analog of the chain rule.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Itô Correction Term
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The appearance of the <span class="math inline">\(-\sigma^2/2\)</span> term in <a href="#eq-geometric-brownian-motion-solution" class="quarto-xref">Equation&nbsp;<span>13.7</span></a> is a direct consequence of Itô’s lemma. This correction term distinguishes stochastic calculus from ordinary calculus and reflects the quadratic variation of the Wiener process.</p>
+</div>
+</div>
+<div id="5906f65f" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="SDE_files/figure-html/cell-5-output-1.png" width="601" height="449" class="figure-img"></p>
+<p><img src="SDE_files/figure-html/cell-5-output-1.png" width="593" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="euler-maruyama-method" class="level2" data-number="13.4">
-<h2 data-number="13.4" class="anchored" data-anchor-id="euler-maruyama-method"><span class="header-section-number">13.4</span> Euler-Maruyama Method</h2>
+<section id="euler-maruyama-method" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="euler-maruyama-method"><span class="header-section-number">13.5</span> Euler-Maruyama Method</h2>
 <p>Most SDEs do not have analytical solutions. We need to solve them numerically. Similar to ODEs, some simple regularity conditions on the coefficients <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> imply that the SDE has a unique solution. Most common SDEs satisfy these conditions. However, unlike ODEs, the solution to an SDE is a stochastic process. We can’t just evaluate the solution at a few points to get an approximate solution. We need to generate several sample paths of the stochastic process to get an approximate solution.</p>
 <p>The simplest method for solving SDEs is the <strong>Euler-Maruyama method</strong>. This is a stochastic analog of the Euler method for ODEs. The Euler-Maruyama method is a recursive method. Given the value of the stochastic process <span class="math inline">\(X_n\)</span> at time <span class="math inline">\(t_n\)</span>, we can find the value of the process at time <span class="math inline">\(t_{n+1} = t_n + \Delta t\)</span> using the formula</p>
-<p><span class="math display">\[
-X_{n+1} = X_n + a(X_n, t_n) \Delta t + b(X_n, t_n) \Delta W_n
-\]</span></p>
-<p>where <span class="math inline">\(\Delta t = t_{n+1} - t_n\)</span> and <span class="math inline">\(\Delta W_n = W(t_{n+1}) - W(t_n) \sim \mathcal{N}(0, \Delta t)\)</span>. This results in a simple algorithm for solving SDEs:</p>
+<p><span id="eq-euler-maruyama"><span class="math display">\[X_{n+1} = X_n + a(X_n, t_n) \Delta t + b(X_n, t_n) \Delta W_n \tag{13.8}\]</span></span></p>
+<p>where <span class="math inline">\(\Delta t = t_{n+1} - t_n\)</span> and <span class="math inline">\(\Delta W_n = W(t_{n+1}) - W(t_n) \sim \mathcal{N}(0, \Delta t)\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Euler-Maruyama Method
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This results in a simple algorithm for solving SDEs:</p>
 <ol type="1">
 <li>Initialize <span class="math inline">\(X_0\)</span>.</li>
-<li>For <span class="math inline">\(n = 0, 1, 2, \ldots, N-1\)</span>, do
-<ol type="1">
+<li>For <span class="math inline">\(n = 0, 1, 2, \ldots, N-1\)</span>, do:
+<ol type="a">
 <li>Generate a random number <span class="math inline">\(\Delta W_n \sim \mathcal{N}(0, \Delta t)\)</span>.</li>
 <li>Compute <span class="math inline">\(X_{n+1} = X_n + a(X_n, t_n) \Delta t + b(X_n, t_n) \Delta W_n\)</span>.</li>
 </ol></li>
 <li>Return <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span>.</li>
 </ol>
+</div>
+</div>
 </section>
-<section id="convergence-of-the-euler-maruyama-method" class="level2" data-number="13.5">
-<h2 data-number="13.5" class="anchored" data-anchor-id="convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.5</span> Convergence of the Euler-Maruyama Method</h2>
+<section id="convergence-of-the-euler-maruyama-method" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.6</span> Convergence of the Euler-Maruyama Method</h2>
 <p>The EM method provides a numerical approximation to the solution of the SDE. We want to understand how good this approximation is.</p>
 <p>Fix a time interval <span class="math inline">\([0, T]\)</span>. Divide the interval <span class="math inline">\([0, T]\)</span> into <span class="math inline">\(N\)</span> subintervals of length <span class="math inline">\(\Delta t = T/N\)</span>. Let <span class="math inline">\(t_i = i \Delta t\)</span> so that <span class="math inline">\(t_0 = 0\)</span> and <span class="math inline">\(t_N = T\)</span>. Let <span class="math inline">\(X(t)\)</span> be the analytical solution to the SDE at time <span class="math inline">\(t\)</span> with initial condition <span class="math inline">\(X(0)\)</span>. We first think of the EM method as generating a sequence of random variables <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span> defined recursively by</p>
 <p><span class="math display">\[\begin{align*}
 X_0 &amp;= X(0), \\
-X_{i+1} &amp;= X_i + a(X_i, t_i) \Delta t + b(X_i, t_i) \Delta W_i.
+X_{i+1} &amp;= X_i + a(X_i, t_i) \Delta t + b(X_i, t_i) \Delta W_i
 \end{align*}\]</span></p>
 <p>where <span class="math inline">\(\Delta W_i \sim \mathcal{N}(0, \Delta t)\)</span>.</p>
 <p>Then we are interested in the question of how good the sequence <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span> is as an approximation to the solution <span class="math inline">\(X(t_0), X(t_1), \ldots, X(t_N)\)</span>. If the EM method is a good approximation method, we should get</p>
-<p><span class="math display">\[
-X_i \to X(t_i) \text{ as } \Delta t \to 0.
-\]</span></p>
+<p><span class="math display">\[X_i \to X(t_i) \text{ as } \Delta t \to 0\]</span></p>
 <p>However, as <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X(t_i)\)</span> are random variables, we need to be more precise about what we mean by convergence. There are two notions of convergence that we are interested in: weak convergence and strong convergence.</p>
-<section id="weak-convergence" class="level3" data-number="13.5.1">
-<h3 data-number="13.5.1" class="anchored" data-anchor-id="weak-convergence"><span class="header-section-number">13.5.1</span> Weak Convergence</h3>
-<p>With the setup as above, we say that the EM method converges weakly to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
-<p><span class="math display">\[
-\mathbb{E}[X_i] \to \mathbb{E}[X(t_i)] \text{ as } \Delta t \to 0.
-\]</span></p>
-<p>Since we are interested in using the EM method to approximate the solution to the SDE, we need more than just convergence in expectation. We need to know how fast the method converges. We say that the EM method converges weakly to the solution over the interval <span class="math inline">\([0, T]\)</span> with order <span class="math inline">\(p\)</span> if</p>
-<p><span class="math display">\[
-|\mathbb{E}[X_i] - \mathbb{E}[X(t_i)]| \leq C \Delta t^p
-\]</span></p>
-<p>For some constant <span class="math inline">\(C\)</span> that does not depend on <span class="math inline">\(\Delta t\)</span>. Note that <span class="math inline">\(C\)</span> is allowed to depend on <span class="math inline">\(T\)</span> and <span class="math inline">\(X(0)\)</span>. We often write this as</p>
-<p><span class="math display">\[
-|\mathbb{E}[X_i] - \mathbb{E}[X(t_i)]| = O(\Delta t^p)
-\]</span> to emphasize the rate of convergence.</p>
+<section id="weak-convergence" class="level3" data-number="13.6.1">
+<h3 data-number="13.6.1" class="anchored" data-anchor-id="weak-convergence"><span class="header-section-number">13.6.1</span> Weak Convergence</h3>
+<p>With the setup as above, we say that the EM method <strong>converges weakly</strong> to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
+<p><span class="math display">\[\mathbb{E}[X_i] \to \mathbb{E}[X(t_i)] \text{ as } \Delta t \to 0\]</span></p>
+<p>Since we are interested in using the EM method to approximate the solution to the SDE, we need more than just convergence in expectation. We need to know how fast the method converges. We say that the EM method converges weakly to the solution over the interval <span class="math inline">\([0, T]\)</span> with <strong>order</strong> <span class="math inline">\(p\)</span> if</p>
+<p><span id="eq-weak-convergence-order"><span class="math display">\[|\mathbb{E}[X_i] - \mathbb{E}[X(t_i)]| \leq C \Delta t^p \tag{13.9}\]</span></span></p>
+<p>for some constant <span class="math inline">\(C\)</span> that does not depend on <span class="math inline">\(\Delta t\)</span>. Note that <span class="math inline">\(C\)</span> is allowed to depend on <span class="math inline">\(T\)</span> and <span class="math inline">\(X(0)\)</span>. We often write this as</p>
+<p><span class="math display">\[|\mathbb{E}[X_i] - \mathbb{E}[X(t_i)]| = O(\Delta t^p)\]</span></p>
+<p>to emphasize the rate of convergence.</p>
 </section>
-<section id="strong-convergence" class="level3" data-number="13.5.2">
-<h3 data-number="13.5.2" class="anchored" data-anchor-id="strong-convergence"><span class="header-section-number">13.5.2</span> Strong Convergence</h3>
-<p>Strong convergence is the convergence of the sample paths. We say that the EM method converges strongly to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
-<p><span class="math display">\[
-X_i \xrightarrow{a.s.} X(t_i) \text{ as } \Delta t \to 0.
-\]</span></p>
-<p>Recall that convergence almost surely means that the probability of the event that the sequence <span class="math inline">\(X_i\)</span> does not converge to <span class="math inline">\(X(t_i)\)</span> is <span class="math inline">\(0\)</span>. By <a href="https://en.wikipedia.org/wiki/Markov%27s_inequality">Markov’s inequality</a> it is enough to say that the expected value of the distance between <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X(t_i)\)</span> goes to <span class="math inline">\(0\)</span>.</p>
-<p><span class="math display">\[
-\mathbb{E}[|X_i - X(t_i)|] \to 0 \text{ as } \Delta t \to 0.
-\]</span></p>
-<p>We say that the EM method converges strongly to the solution over the interval <span class="math inline">\([0, T]\)</span> with order <span class="math inline">\(p\)</span> if</p>
-<p><span class="math display">\[
-\mathbb{E}[|X_i - X(t_i)|] = O(\Delta t^p)
-\]</span></p>
+<section id="strong-convergence" class="level3" data-number="13.6.2">
+<h3 data-number="13.6.2" class="anchored" data-anchor-id="strong-convergence"><span class="header-section-number">13.6.2</span> Strong Convergence</h3>
+<p>Strong convergence is the convergence of the sample paths. We say that the EM method <strong>converges strongly</strong> to the solution over the interval <span class="math inline">\([0, T]\)</span> if</p>
+<p><span class="math display">\[X_i \xrightarrow{a.s.} X(t_i) \text{ as } \Delta t \to 0\]</span></p>
+<p>Recall that convergence almost surely means that the probability of the event that the sequence <span class="math inline">\(X_i\)</span> does not converge to <span class="math inline">\(X(t_i)\)</span> is <span class="math inline">\(0\)</span>. By <a href="https://en.wikipedia.org/wiki/Markov%27s_inequality">Markov’s inequality</a> it is enough to say that the expected value of the distance between <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X(t_i)\)</span> goes to <span class="math inline">\(0\)</span>:</p>
+<p><span class="math display">\[\mathbb{E}[|X_i - X(t_i)|] \to 0 \text{ as } \Delta t \to 0\]</span></p>
+<p>We say that the EM method converges strongly to the solution over the interval <span class="math inline">\([0, T]\)</span> with <strong>order</strong> <span class="math inline">\(p\)</span> if</p>
+<p><span id="eq-strong-convergence-order"><span class="math display">\[\mathbb{E}[|X_i - X(t_i)|] = O(\Delta t^p) \tag{13.10}\]</span></span></p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Empirical vs Theoretical Convergence Analysis
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>In the homework assignment, you will derive the rates of convergence for the EM method for the geometric Brownian motion <em>empirically</em>. However, it is necessary to derive these rates theoretically as for arbitrary SDEs, it is not possible to write an exact analytical solution. The rates of convergence tell us how close the analytical solution is to the numerical solution.</p>
-<p>Also, you’ll only estimate <span class="math inline">\(p\)</span> at the end of the interval i.e.&nbsp;<span class="math inline">\(t = T\)</span>. This is technically not correct. We should find a <span class="math inline">\(p\)</span> that works for each time step <span class="math inline">\(t_i\)</span>. However, this is computationally expensive and the assumption is that error grows with time so that the error at the end of the interval is the largest.</p>
+<p>Also, you’ll only estimate <span class="math inline">\(p\)</span> at the end of the interval i.e., <span class="math inline">\(t = T\)</span>. This is technically not correct. We should find a <span class="math inline">\(p\)</span> that works for each time step <span class="math inline">\(t_i\)</span>. However, this is computationally expensive and the assumption is that error grows with time so that the error at the end of the interval is the largest.</p>
+</div>
+</div>
 </section>
 </section>
-<section id="final-remarks" class="level2" data-number="13.6">
-<h2 data-number="13.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">13.6</span> Final remarks</h2>
-<p>The EM method has a slower rate of strong convergence compared to weak convergence. This is because even though the EM method is a natural extension of the Euler method for ODEs, there are second order terms in the Ito formula (chain rule for stochastic processes) that contribute to the error. This is fixed in the <a href="https://en.wikipedia.org/wiki/Milstein_method">Milstein method</a>, which is a second order method for solving SDEs. However the Milstein method is more computationally expensive compared to the EM method and has the same weak rate of convergence as the EM method.</p>
+<section id="final-remarks" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">13.7</span> Final Remarks</h2>
+<p>The EM method has a slower rate of strong convergence compared to weak convergence. This is because even though the EM method is a natural extension of the Euler method for ODEs, there are second order terms in the Itô formula (chain rule for stochastic processes) that contribute to the error. This is fixed in the <a href="https://en.wikipedia.org/wiki/Milstein_method">Milstein method</a>, which is a second order method for solving SDEs. However, the Milstein method is more computationally expensive compared to the EM method and has the same weak rate of convergence as the EM method.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Trade-offs in SDE Numerical Methods
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Euler-Maruyama</strong>: Simple to implement, but slower strong convergence.</li>
+<li><strong>Milstein</strong>: Better strong convergence, but requires computing derivatives of the diffusion coefficient <span class="math inline">\(b(x,t)\)</span>.</li>
+<li><strong>Higher-order methods</strong>: Exist but are significantly more complex and computationally expensive.</li>
+</ul>
+</div>
+</div>
 
 
 </section>

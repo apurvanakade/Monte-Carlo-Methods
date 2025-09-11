@@ -93,8 +93,8 @@ F^{-1}(u) = -\frac{1}{\lambda} \log(1 - u).
 
 To generate an exponential random variable with rate $\lambda$:
 
-1. Generate $u \sim U(0,1)$
-2. Return $x = -\frac{1}{\lambda} \log(1 - u)$
+1. Generate $u \sim U(0,1)$.
+2. Return $x = -\frac{1}{\lambda} \log(1 - u)$.
 
 Note that since $1-u$ is also uniformly distributed on $(0,1)$ when $u \sim U(0,1)$, we can simplify this to $x = -\frac{1}{\lambda} \log(u)$.
 :::
@@ -126,8 +126,9 @@ u &= 1 - e^{-(x/\lambda)^k} \\
 ## Sampling Algorithm
 
 To generate a Weibull random variable:
-1. Generate $u \sim U(0,1)$
-2. Return $x = \lambda[-\log(1 - u)]^{1/k}$
+
+1. Generate $u \sim U(0,1)$.
+2. Return $x = \lambda[-\log(1 - u)]^{1/k}$.
 :::
 
 ## Triangular Distribution
@@ -330,7 +331,7 @@ The Poisson-Exponential connection gives us a simple algorithm to sample from th
 
 ### Knuth's Algorithm
 
-In the above algorithm, we rely on @thm-poisson-exponential. In order to generate $X_i \sim \mathrm{Exp}(\lambda)$, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. 
+In the above algorithm, we rely on @thm-poisson-exponential. In order to generate $X_i \sim \mathrm{Exp}(\lambda)$, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.
 
 Consider the following set of inequalities:
 

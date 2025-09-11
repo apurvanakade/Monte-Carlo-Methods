@@ -694,8 +694,8 @@ Sampling Algorithm
 <div class="callout-body-container callout-body">
 <p>To generate an exponential random variable with rate <span class="math inline">\(\lambda\)</span>:</p>
 <ol type="1">
-<li>Generate <span class="math inline">\(u \sim U(0,1)\)</span></li>
-<li>Return <span class="math inline">\(x = -\frac{1}{\lambda} \log(1 - u)\)</span></li>
+<li>Generate <span class="math inline">\(u \sim U(0,1)\)</span>.</li>
+<li>Return <span class="math inline">\(x = -\frac{1}{\lambda} \log(1 - u)\)</span>.</li>
 </ol>
 <p>Note that since <span class="math inline">\(1-u\)</span> is also uniformly distributed on <span class="math inline">\((0,1)\)</span> when <span class="math inline">\(u \sim U(0,1)\)</span>, we can simplify this to <span class="math inline">\(x = -\frac{1}{\lambda} \log(u)\)</span>.</p>
 </div>
@@ -727,7 +727,11 @@ Sampling Algorithm
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>To generate a Weibull random variable: 1. Generate <span class="math inline">\(u \sim U(0,1)\)</span> 2. Return <span class="math inline">\(x = \lambda[-\log(1 - u)]^{1/k}\)</span></p>
+<p>To generate a Weibull random variable:</p>
+<ol type="1">
+<li>Generate <span class="math inline">\(u \sim U(0,1)\)</span>.</li>
+<li>Return <span class="math inline">\(x = \lambda[-\log(1 - u)]^{1/k}\)</span>.</li>
+</ol>
 </div>
 </div>
 </section>
@@ -933,7 +937,7 @@ Algorithm
 </section>
 <section id="knuths-algorithm" class="level3" data-number="7.5.3">
 <h3 data-number="7.5.3" class="anchored" data-anchor-id="knuths-algorithm"><span class="header-section-number">7.5.3</span> Knuth’s Algorithm</h3>
-<p>In the above algorithm, we rely on <a href="#thm-poisson-exponential" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>. In order to generate <span class="math inline">\(X_i \sim \mathrm{Exp}(\lambda)\)</span>, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors.</p>
+<p>In the above algorithm, we rely on <a href="#thm-poisson-exponential" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>. In order to generate <span class="math inline">\(X_i \sim \mathrm{Exp}(\lambda)\)</span>, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.</p>
 <p>Consider the following set of inequalities:</p>
 <p><span class="math display">\[
 \begin{align*}
