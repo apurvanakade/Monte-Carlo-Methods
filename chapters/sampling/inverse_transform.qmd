@@ -228,6 +228,11 @@ This gives us the following algorithm to sample from the normal distribution:
 
 ::: 
 
+::: {.callout-tip}
+
+Note that if $X$ is a standard normal random variable, then $Z = \sigma X + \mu$ is a normal random variable with mean $\mu$ and variance $\sigma^2$. Thus, to sample from a normal distribution with mean $\mu$ and variance $\sigma^2$, we can use the above algorithm to sample from the standard normal distribution and then transform the result using $Z = \sigma X + \mu$.
+:::
+
 ## Poisson Distribution
 
 The Poisson distribution with parameter $\lambda > 0$ is a discrete distribution that models the number of events occurring in a fixed interval of time or space, where $\lambda$ is the average rate of events. In unit time $T$, the expected number of events is $\lambda T$. The probability mass function of the Poisson distribution is given by
@@ -319,6 +324,35 @@ The Poisson-Exponential connection gives us a simple algorithm to sample from th
     1. Generate a random number $x \sim \mathrm{Exp}(\lambda)$.
     2. Set $S = S + x$.
     3. If $S > 1$, return $N$.
+    4. Else, set $N = N + 1$.
+
+:::
+
+### Knuth's Algorithm
+
+In the above algorithm, we rely on @thm-poisson-exponential. In order to generate $X_i \sim \mathrm{Exp}(\lambda)$, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. 
+
+Consider the following set of inequalities:
+
+$$
+\begin{align*}
+    X_1 + X_2 + \dots + X_n &< 1 \\
+    \Leftrightarrow -\dfrac{1}{\lambda} \ln(U_1) + \dfrac{1}{\lambda} \ln(U_2) + \dots + \dfrac{1}{\lambda} \ln(U_n) &< -1 \\
+    \Leftrightarrow \ln(U_1 U_2 \dots U_n) &> \lambda \\
+    \Leftrightarrow U_1 U_2 \dots U_n &> e^\lambda 
+\end{align*}
+$$
+
+This is the motivation behind Knuth's algorithm:
+
+::: {.callout-note}
+## Algorithm
+
+1. Set $S = 1$ and $N = 0$.
+2. While True:
+    1. Generate a random number $u \sim F(0, 1)$.
+    2. Set $S = S * u$.
+    3. If $S > e^{\lambda}$, return $N$.
     4. Else, set $N = N + 1$.
 
 :::

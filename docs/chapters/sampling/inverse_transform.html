@@ -553,6 +553,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#relation-between-poisson-and-binomial-distribution" id="toc-relation-between-poisson-and-binomial-distribution" class="nav-link" data-scroll-target="#relation-between-poisson-and-binomial-distribution"><span class="header-section-number">7.5.1</span> Relation between Poisson and Binomial Distribution</a></li>
   <li><a href="#relation-between-poisson-and-exponential-distribution" id="toc-relation-between-poisson-and-exponential-distribution" class="nav-link" data-scroll-target="#relation-between-poisson-and-exponential-distribution"><span class="header-section-number">7.5.2</span> Relation between Poisson and Exponential Distribution</a></li>
+  <li><a href="#knuths-algorithm" id="toc-knuths-algorithm" class="nav-link" data-scroll-target="#knuths-algorithm"><span class="header-section-number">7.5.3</span> Knuth’s Algorithm</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -816,6 +817,19 @@ Algorithm
 </ol>
 </div>
 </div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that if <span class="math inline">\(X\)</span> is a standard normal random variable, then <span class="math inline">\(Z = \sigma X + \mu\)</span> is a normal random variable with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2\)</span>. Thus, to sample from a normal distribution with mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2\)</span>, we can use the above algorithm to sample from the standard normal distribution and then transform the result using <span class="math inline">\(Z = \sigma X + \mu\)</span>.</p>
+</div>
+</div>
 </section>
 <section id="poisson-distribution" class="level2" data-number="7.5">
 <h2 data-number="7.5" class="anchored" data-anchor-id="poisson-distribution"><span class="header-section-number">7.5</span> Poisson Distribution</h2>
@@ -911,6 +925,42 @@ Algorithm
 <li>Generate a random number <span class="math inline">\(x \sim \mathrm{Exp}(\lambda)\)</span>.</li>
 <li>Set <span class="math inline">\(S = S + x\)</span>.</li>
 <li>If <span class="math inline">\(S &gt; 1\)</span>, return <span class="math inline">\(N\)</span>.</li>
+<li>Else, set <span class="math inline">\(N = N + 1\)</span>.</li>
+</ol></li>
+</ol>
+</div>
+</div>
+</section>
+<section id="knuths-algorithm" class="level3" data-number="7.5.3">
+<h3 data-number="7.5.3" class="anchored" data-anchor-id="knuths-algorithm"><span class="header-section-number">7.5.3</span> Knuth’s Algorithm</h3>
+<p>In the above algorithm, we rely on <a href="#thm-poisson-exponential" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>. In order to generate <span class="math inline">\(X_i \sim \mathrm{Exp}(\lambda)\)</span>, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors.</p>
+<p>Consider the following set of inequalities:</p>
+<p><span class="math display">\[
+\begin{align*}
+    X_1 + X_2 + \dots + X_n &amp;&lt; 1 \\
+    \Leftrightarrow -\dfrac{1}{\lambda} \ln(U_1) + \dfrac{1}{\lambda} \ln(U_2) + \dots + \dfrac{1}{\lambda} \ln(U_n) &amp;&lt; -1 \\
+    \Leftrightarrow \ln(U_1 U_2 \dots U_n) &amp;&gt; \lambda \\
+    \Leftrightarrow U_1 U_2 \dots U_n &amp;&gt; e^\lambda
+\end{align*}
+\]</span></p>
+<p>This is the motivation behind Knuth’s algorithm:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Set <span class="math inline">\(S = 1\)</span> and <span class="math inline">\(N = 0\)</span>.</li>
+<li>While True:
+<ol type="1">
+<li>Generate a random number <span class="math inline">\(u \sim F(0, 1)\)</span>.</li>
+<li>Set <span class="math inline">\(S = S * u\)</span>.</li>
+<li>If <span class="math inline">\(S &gt; e^{\lambda}\)</span>, return <span class="math inline">\(N\)</span>.</li>
 <li>Else, set <span class="math inline">\(N = N + 1\)</span>.</li>
 </ol></li>
 </ol>
