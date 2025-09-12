@@ -246,7 +246,7 @@ This results in a simple algorithm for solving SDEs:
 
 The EM method provides a numerical approximation to the solution of the SDE. We want to understand how good this approximation is. 
 
-Fix a time interval $[0, T]$. Divide the interval $[0, T]$ into $N$ subintervals of length $\Delta t = T/N$. Let $t_i = i \Delta t$ so that $t_0 = 0$ and $t_N = T$. Let $X(t)$ be the analytical solution to the SDE at time $t$ with initial condition $X(0)$. We first think of the EM method as generating a sequence of random variables $X_0, X_1, \ldots, X_N$ defined recursively by
+Fix a time interval $[0, T]$. Divide the interval $[0, T]$ into $N$ subintervals of length $\Delta t = T/N.$ Let $t_i = i \Delta t$ so that $t_0 = 0$ and $t_N = T$. Let $X(t)$ be the analytical solution to the SDE at time $t$ with initial condition $X(0)$. We first think of the EM method as generating a sequence of random variables $X_0, X_1, \ldots, X_N$ defined recursively by
 
 \begin{align*}
 X_0 &= X(0), \\

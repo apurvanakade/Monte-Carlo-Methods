@@ -691,7 +691,7 @@ Mathematical Subtlety
 <p>The nowhere differentiable property of Wiener processes means that expressions like <span class="math inline">\(\frac{dW}{dt}\)</span> don’t exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.</p>
 </div>
 </div>
-<div id="c56470a7" class="cell" data-execution_count="2">
+<div id="c56470a7" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -700,7 +700,7 @@ Mathematical Subtlety
 </div>
 </div>
 </div>
-<div id="198bc222" class="cell" data-execution_count="3">
+<div id="198bc222" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -766,7 +766,7 @@ The Itô Correction Term
 <p>The appearance of the <span class="math inline">\(-\sigma^2/2\)</span> term in <a href="#eq-geometric-brownian-motion-solution" class="quarto-xref">Equation&nbsp;<span>13.7</span></a> is a direct consequence of Itô’s lemma. This correction term distinguishes stochastic calculus from ordinary calculus and reflects the quadratic variation of the Wiener process.</p>
 </div>
 </div>
-<div id="5906f65f" class="cell" data-execution_count="4">
+<div id="5906f65f" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -808,7 +808,7 @@ Algorithm: Euler-Maruyama Method
 <section id="convergence-of-the-euler-maruyama-method" class="level2" data-number="13.6">
 <h2 data-number="13.6" class="anchored" data-anchor-id="convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.6</span> Convergence of the Euler-Maruyama Method</h2>
 <p>The EM method provides a numerical approximation to the solution of the SDE. We want to understand how good this approximation is.</p>
-<p>Fix a time interval <span class="math inline">\([0, T]\)</span>. Divide the interval <span class="math inline">\([0, T]\)</span> into <span class="math inline">\(N\)</span> subintervals of length <span class="math inline">\(\Delta t = T/N\)</span>. Let <span class="math inline">\(t_i = i \Delta t\)</span> so that <span class="math inline">\(t_0 = 0\)</span> and <span class="math inline">\(t_N = T\)</span>. Let <span class="math inline">\(X(t)\)</span> be the analytical solution to the SDE at time <span class="math inline">\(t\)</span> with initial condition <span class="math inline">\(X(0)\)</span>. We first think of the EM method as generating a sequence of random variables <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span> defined recursively by</p>
+<p>Fix a time interval <span class="math inline">\([0, T]\)</span>. Divide the interval <span class="math inline">\([0, T]\)</span> into <span class="math inline">\(N\)</span> subintervals of length <span class="math inline">\(\Delta t = T/N.\)</span> Let <span class="math inline">\(t_i = i \Delta t\)</span> so that <span class="math inline">\(t_0 = 0\)</span> and <span class="math inline">\(t_N = T\)</span>. Let <span class="math inline">\(X(t)\)</span> be the analytical solution to the SDE at time <span class="math inline">\(t\)</span> with initial condition <span class="math inline">\(X(0)\)</span>. We first think of the EM method as generating a sequence of random variables <span class="math inline">\(X_0, X_1, \ldots, X_N\)</span> defined recursively by</p>
 <p><span class="math display">\[\begin{align*}
 X_0 &amp;= X(0), \\
 X_{i+1} &amp;= X_i + a(X_i, t_i) \Delta t + b(X_i, t_i) \Delta W_i
