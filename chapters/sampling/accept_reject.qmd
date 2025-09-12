@@ -23,9 +23,6 @@ The accept-reject method is especially valuable when:
 
 For the accept-reject method, we need to recall the following definitions:
 
-::: {.callout-important}
-## Key Definitions
-
 Let $X$ and $Y$ be discrete random variables. 
 
 The **joint distribution** of $X$ and $Y$ is given by the probability mass function 
@@ -39,7 +36,6 @@ $$f_X(x) = \mathbb{P}(X=x) = \sum_{y} f_{X,Y}(x,y)$$ {#eq-marginal-pmf}
 The **conditional probability** of $X$ given $Y$ is defined as
 
 $$f_{X|Y}(x|y) = \mathbb{P}(X=x|Y=y) = \frac{f_{X,Y}(x,y)}{f_Y(y)}$$ {#eq-conditional-pmf}
-:::
 
 ::: {.callout-tip}
 ## Continuous Case

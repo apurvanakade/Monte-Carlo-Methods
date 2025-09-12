@@ -567,6 +567,7 @@ window.Quarto = {
   <li><a href="#running-average" id="toc-running-average" class="nav-link" data-scroll-target="#running-average"><span class="header-section-number">B.9.2</span> Running Average</a></li>
   <li><a href="#autocorrelation-function" id="toc-autocorrelation-function" class="nav-link" data-scroll-target="#autocorrelation-function"><span class="header-section-number">B.9.3</span> Autocorrelation Function</a></li>
   </ul></li>
+  <li><a href="#concluding-remarks" id="toc-concluding-remarks" class="nav-link" data-scroll-target="#concluding-remarks"><span class="header-section-number">B.10</span> Concluding Remarks</a></li>
   </ul>
 </nav>
     </div>
@@ -631,48 +632,46 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
+<p>This appendix provides the theoretical foundation for MCMC methods covered in the main course. We will learn about Markov chains and focus on discrete chains for simplicity, but all results extend to the continuous case used in practice.</p>
 <section id="definitions" class="level2" data-number="B.1">
 <h2 data-number="B.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">B.1</span> Definitions</h2>
-<p>In this module, we will learn about Markov Chains. A Markov Chain is a discrete-time stochastic process that satisfies the Markov property. The Markov property states that the future state of the process depends only on the current state and not on the sequence of events that preceded it. In other words, the future is conditionally independent of the past given the present.</p>
+<p>A Markov chain is a discrete-time stochastic process that satisfies the Markov property. The Markov property states that the future state of the process depends only on the current state and not on the sequence of events that preceded it. In other words, the future is conditionally independent of the past given the present.</p>
 <div id="def-Markov-Chain" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition B.1</strong></span> <strong>Markov Chain</strong>: A Markov chain is a sequence of random variables <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> satisfying the following properties:</p>
 <ol type="1">
-<li><strong>State Space</strong>: The random variables <span class="math inline">\(X_i\)</span> take values in a finite set <span class="math inline">\(\Omega\)</span> called the state space.</li>
-<li><strong>Markov Property</strong>: For all <span class="math inline">\(n \geq 0\)</span> and all states <span class="math inline">\(i_0, i_1, \ldots, i_{n+1} \in \Omega\)</span>,</li>
-</ol>
-<p><span class="math display">\[\begin{align*}
-P(X_{n+1} = i_{n+1} \mid X_0 = i_0, X_1 = i_1, \ldots, X_n = i_n) = P(X_{n+1} = i_{n+1} \mid X_n = i_n).
-\end{align*}\]</span></p>
-<ol start="3" type="1">
-<li><strong>Time Homogeneity</strong>: The transition probabilities <span class="math inline">\(P(X_{n+1} = j \mid X_n = i)\)</span> do not depend on <span class="math inline">\(n\)</span>.</li>
+<li><p><strong>State Space</strong>: The random variables <span class="math inline">\(X_i\)</span> take values in a finite set <span class="math inline">\(\Omega\)</span> called the state space.</p></li>
+<li><p><strong>Markov Property</strong>: For all <span class="math inline">\(n \geq 0\)</span> and all states <span class="math inline">\(i_0, i_1, \ldots, i_{n+1} \in \Omega\)</span>, <span class="math display">\[P(X_{n+1} = i_{n+1} \mid X_0 = i_0, X_1 = i_1, \ldots, X_n = i_n) = P(X_{n+1} = i_{n+1} \mid X_n = i_n).\]</span></p></li>
+<li><p><strong>Time Homogeneity</strong>: The transition probabilities <span class="math inline">\(P(X_{n+1} = j \mid X_n = i)\)</span> do not depend on <span class="math inline">\(n\)</span>.</p></li>
 </ol>
 </div>
 <p>The transition matrix of a Markov chain is a square matrix whose <span class="math inline">\((i, j)\)</span>-th entry is the probability of transitioning from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span> in one time step.</p>
 <div id="def-Transition-Matrix" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition B.2</strong></span> <strong>Transition Matrix</strong>: Let <span class="math inline">\(X_1, X_2, X_3, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span>. The transition matrix <span class="math inline">\(P\)</span> of the Markov chain is an <span class="math inline">\(N \times N\)</span> matrix whose <span class="math inline">\((i, j)\)</span>-th entry is given by</p>
-<p><span class="math display">\[\begin{align*}
-P(i, j) = P(X_{n+1} = j \mid X_n = i).
-\end{align*}\]</span></p>
+<p><span class="theorem-title"><strong>Definition B.2</strong></span> <strong>Transition Matrix</strong>: Let <span class="math inline">\(X_1, X_2, X_3, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span>. The transition matrix <span class="math inline">\(P\)</span> of the Markov chain is an <span class="math inline">\(N \times N\)</span> matrix whose <span class="math inline">\((i, j)\)</span>-th entry is given by <span class="math display">\[P(i, j) = P(X_{n+1} = j \mid X_n = i).\]</span></p>
 </div>
 <p>Throughout this notebook, we’ll let <span class="math inline">\(X_0, X_1, X_2, \ldots\)</span> be a Markov chain with state space <span class="math inline">\(\Omega = \{1, 2, \ldots, N\}\)</span> and transition matrix <span class="math inline">\(P\)</span>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+State Diagrams
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>We can represent a Markov chain by a directed graph called a <strong>state diagram</strong>. Each state is represented by a node, and the transition probabilities are represented by directed edges between the nodes. The transition matrix can be derived from the state diagram by assigning the transition probabilities to the corresponding entries of the matrix.</p>
-<p>The probability distribution of the Markov chain at time <span class="math inline">\(n\)</span> is a <em>row vector</em> <span class="math inline">\(\pi_n\)</span> whose <span class="math inline">\(i^{th}\)</span> entry is <span class="math inline">\(\mathbb{P}(X_n = i)\)</span> for each <span class="math inline">\(i \in \Omega\)</span>.</p>
+</div>
+</div>
+<p>The probability distribution of the Markov chain at time <span class="math inline">\(n\)</span> is a <em>row vector</em> <span class="math inline">\(\pi_n\)</span> whose <span class="math inline">\(i\)</span>-th entry is <span class="math inline">\(\mathbb{P}(X_n = i)\)</span> for each <span class="math inline">\(i \in \Omega\)</span>.</p>
 <div id="thm-probability-distribution" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.1</strong></span> Let <span class="math inline">\(\pi_n\)</span> be the probability distribution of the chain at time <span class="math inline">\(n\)</span>. Then,</p>
-<p><span class="math display">\[\begin{align*}
-\pi_{n+1} = \pi_n P.
-\end{align*}\]</span></p>
-<p>And hence,</p>
-<p><span class="math display">\[\begin{align*}
-\pi_n = \pi_0 P^n.
-\end{align*}\]</span></p>
+<p><span class="theorem-title"><strong>Theorem B.1</strong></span> Let <span class="math inline">\(\pi_n\)</span> be the probability distribution of the chain at time <span class="math inline">\(n\)</span>. Then, <span class="math display">\[\pi_{n+1} = \pi_n P.\]</span> And hence, <span class="math display">\[\pi_n = \pi_0 P^n.\]</span></p>
 </div>
 <div class="proof">
 <p><span class="proof-title"><em>Proof</em>. </span><span class="math display">\[\begin{align*}
 \pi_{n+1}(j) &amp;= \mathbb{P}(X_{n+1} = j) \\
-&amp;= \sum_{i \in S} \mathbb{P}(X_{n+1} = j \mid X_n = i) \mathbb{P}(X_n = i) \\
-&amp;= \sum_{i \in S} \pi_n(i) P(i, j) \\
-&amp;= \pi_n P(j).
+&amp;= \sum_{i \in \Omega} \mathbb{P}(X_{n+1} = j \mid X_n = i) \mathbb{P}(X_n = i) \\
+&amp;= \sum_{i \in \Omega} \pi_n(i) P(i, j) \\
+&amp;= (\pi_n P)(j).
 \end{align*}\]</span></p>
 </div>
 </section>
@@ -681,99 +680,75 @@ P(i, j) = P(X_{n+1} = j \mid X_n = i).
 <div id="def-Stationary-Distribution" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition B.3</strong></span> A probability distribution <span class="math inline">\(\pi\)</span> is called a <strong>stationary distribution</strong> of a Markov chain with transition matrix <span class="math inline">\(P\)</span> if <span class="math inline">\(\pi = \pi P\)</span>.</p>
 </div>
-<p><span class="math inline">\(P\)</span> is guaranteed to have an eigenvalue of 1 because it’s row sum is 1 i.e.&nbsp;</p>
-<p><span class="math display">\[
-  P \vec{1} = \vec{1},
-\]</span></p>
-<p>where <span class="math inline">\(\vec{1}\)</span> is the vector of all ones. Since, there is a right eigenvector corresponding to the eigenvalue 1, there will be a left eigenvector as well. The left eigenvector is a stationary distribution of the Markov chain.</p>
-<p>It is not hard to see that every eigenvalue of <span class="math inline">\(P\)</span> is less than or equal to 1 in magnitude. Suppose <span class="math inline">\(\vec{v}\)</span> is a left eigenvector of <span class="math inline">\(P\)</span> corresponding to an eigenvalue <span class="math inline">\(\lambda\)</span>. Let <span class="math inline">\(v_I\)</span> be the largest component of <span class="math inline">\(\vec{v}\)</span> in magnitude. Then, we have</p>
-<p><span class="math display">\[\begin{align*}
+<p>The transition matrix <span class="math inline">\(P\)</span> is guaranteed to have an eigenvalue of 1 because its row sum is 1, i.e., <span class="math display">\[P \vec{1} = \vec{1},\]</span> where <span class="math inline">\(\vec{1}\)</span> is the vector of all ones. Since there is a right eigenvector corresponding to the eigenvalue 1, there will be a left eigenvector as well. The left eigenvector is a stationary distribution of the Markov chain.</p>
+<p>It is not hard to see that every eigenvalue of <span class="math inline">\(P\)</span> is less than or equal to 1 in magnitude. Suppose <span class="math inline">\(\vec{v}\)</span> is a left eigenvector of <span class="math inline">\(P\)</span> corresponding to an eigenvalue <span class="math inline">\(\lambda\)</span>. Let <span class="math inline">\(v_I\)</span> be the largest component of <span class="math inline">\(\vec{v}\)</span> in magnitude. Then, we have <span class="math display">\[\begin{align*}
 \lambda \vec{v} &amp;= \vec{v} P \\
 \implies
 \lambda v_I &amp;= \sum_{j} v_j P(j, I) \\
 &amp;\leq \sum_{j} |v_j| P(j, I) \\
 &amp;\leq \sum_{j} |v_I| P(j, I) \\
-&amp;= |v_I|
+&amp;= |v_I|.
 \end{align*}\]</span></p>
-<p>Thus, <span class="math inline">\(|\lambda| \leq 1\)</span>. In particular, this means that the Frobenius norm of <span class="math inline">\(P\)</span> is less than or equal to 1 and for all vectors <span class="math inline">\(\vec{v}\)</span>, we have</p>
-<p><span class="math display">\[
-\| \vec{v} \|_2 \leq \| \vec{v} P \|_2.
-\]</span></p>
-<p>We are particularly interested in the case when there is exactly one eigenvector with eigenvalue of magnitude 1 which would then be the stationary distribution of the Markov chain.</p>
+<p>Thus, <span class="math inline">\(|\lambda| \leq 1\)</span>. In particular, this means that the spectral radius of <span class="math inline">\(P\)</span> is less than or equal to 1, and for all vectors <span class="math inline">\(\vec{v}\)</span>, we have <span class="math display">\[\| \vec{v} \|_2 \geq \| \vec{v} P \|_2.\]</span></p>
+<p>We are particularly interested in the case when there is exactly one eigenvector with eigenvalue of magnitude 1, which would then correspond to the stationary distribution of the Markov chain.</p>
 </section>
 <section id="fundamental-theorem" class="level2" data-number="B.3">
 <h2 data-number="B.3" class="anchored" data-anchor-id="fundamental-theorem"><span class="header-section-number">B.3</span> Fundamental Theorem</h2>
 <div id="def-irreducibility" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition B.4</strong></span> We say that a Markov Chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span> i.e.&nbsp;it is possible to go from any state to any other state in a finite number of steps.</p>
+<p><span class="theorem-title"><strong>Definition B.4</strong></span> We say that a Markov chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span>, i.e., it is possible to go from any state to any other state in a finite number of steps.</p>
 </div>
 <div id="def-aperiodicity" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition B.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic.</p>
 </div>
-<p>Note that sometimes we add a preliminary requirement that the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is non-empty. This condition is called <strong>positive recurrence</strong>. We’ll assume this as a part of the definition of aperiodicity.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note on Positive Recurrence
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sometimes we add a preliminary requirement that the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is non-empty. This condition is called <strong>positive recurrence</strong>. We’ll assume this as part of the definition of aperiodicity.</p>
+</div>
+</div>
 <div id="def-ergodicity" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition B.6</strong></span> A Markov chain is called <strong>ergodic</strong> if it is irreducible and aperiodic.</p>
 </div>
 <div id="thm-fundamental-theorem" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span> i.e.&nbsp;</p>
-<p><span class="math display">\[\begin{align*}
-\lim_{n \to \infty} \pi_0 P^n = \Pi,
-\end{align*}\]</span></p>
-<p>for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem B.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>, i.e., <span class="math display">\[\lim_{n \to \infty} \pi_0 P^n = \Pi\]</span> for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
 </div>
 </section>
 <section id="random-walk-on-graphs" class="level2" data-number="B.4">
 <h2 data-number="B.4" class="anchored" data-anchor-id="random-walk-on-graphs"><span class="header-section-number">B.4</span> Random Walk on Graphs</h2>
 <p>Our main example of a Markov chain is the random walk on a graph. Let <span class="math inline">\(G = (V, E)\)</span> be a graph with vertex set <span class="math inline">\(V\)</span> and edge set <span class="math inline">\(E\)</span>. Suppose you want to move from one vertex to another by following the edges of the graph. At each vertex, you choose an edge uniformly at random and move to the adjacent vertex. This process is called a random walk on the graph.</p>
-<p>The random walk on <span class="math inline">\(G\)</span> is a Markov chain with state space <span class="math inline">\(\Omega = V\)</span> and transition probabilities given by</p>
-<p><span class="math display">\[\begin{align*}
-P(i, j) =
+<p>The random walk on <span class="math inline">\(G\)</span> is a Markov chain with state space <span class="math inline">\(\Omega = V\)</span> and transition probabilities given by <span class="math display">\[P(i, j) =
 \begin{cases}
-\frac{1}{\text{deg}(i)} &amp; \text{if } (i, j) \in E, \\
+\frac{1}{\deg(i)} &amp; \text{if } (i, j) \in E, \\
 0 &amp; \text{otherwise},
-\end{cases}
-\end{align*}\]</span></p>
-<p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> i.e.&nbsp;the number of edges incident to <span class="math inline">\(i\)</span>.</p>
-<div id="exm-random-walk" class="theorem example">
-<p><span class="theorem-title"><strong>Example B.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by</p>
-<p><span class="math display">\[\begin{align*}
-  P =
-  \begin{pmatrix}
-    0 &amp; 1 &amp; 0 &amp; 0 \\
-    1/3 &amp; 0 &amp; 1/3 &amp; 1/3 \\
-    0 &amp; 1/2 &amp; 0 &amp; 1/2 \\
-    0 &amp; 1/2 &amp; 1/2 &amp; 0
-  \end{pmatrix}.
-\end{align*}\]</span></p>
-<p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n^{th}\)</span> distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>, as shown below.</p>
+\end{cases}\]</span> where <span class="math inline">\(\deg(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>, i.e., the number of edges incident to <span class="math inline">\(i\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div id="dae0a3a1" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-3-output-1.png" width="787" height="403" class="figure-img"></p>
-</figure>
+<div class="callout-title-container flex-fill">
+Algorithm: Random Walk on a Graph
 </div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Transition matrix of the Markov chain:
-[[0.         1.         0.         0.        ]
- [0.33333333 0.         0.33333333 0.33333333]
- [0.         0.5        0.         0.5       ]
- [0.         0.5        0.5        0.        ]]
-
- 
-Example of evolution of a Markov chain:
-State at time 0 : [1, 0, 0, 0]
-State at time 1 : [0. 1. 0. 0.]
-State at time 2 : [0.333 0.    0.333 0.333]
-State at time 3 : [0.    0.667 0.167 0.167]
-State at time 4 : [0.222 0.167 0.306 0.306]
-State at time 5 : [0.056 0.528 0.208 0.208]
-State at time 6 : [0.176 0.264 0.28  0.28 ]
-State at time 7 : [0.088 0.456 0.228 0.228]
-State at time 8 : [0.152 0.316 0.266 0.266]
-State at time 9 : [0.105 0.418 0.238 0.238]
-State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
+<div class="callout-body-container callout-body">
+<p>Given a graph <span class="math inline">\(G = (V, E)\)</span> and starting vertex <span class="math inline">\(v_0 \in V\)</span>:</p>
+<ol type="1">
+<li>Set current vertex <span class="math inline">\(v = v_0\)</span> and time <span class="math inline">\(t = 0\)</span></li>
+<li>While <span class="math inline">\(t &lt; T\)</span> (for some stopping time <span class="math inline">\(T\)</span>):
+<ul>
+<li>Let <span class="math inline">\(N(v) = \{u \in V : (v, u) \in E\}\)</span> be the neighbors of <span class="math inline">\(v\)</span></li>
+<li>Choose next vertex <span class="math inline">\(u\)</span> uniformly at random from <span class="math inline">\(N(v)\)</span></li>
+<li>Set <span class="math inline">\(v = u\)</span> and <span class="math inline">\(t = t + 1\)</span></li>
+<li>Record the current vertex <span class="math inline">\(v\)</span></li>
+</ul></li>
+</ol>
 </div>
 </div>
 <p>In HW, you’ll prove the following theorem about ergodicity of random walks on graphs.</p>
@@ -783,39 +758,77 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 <li>Irreducible if and only if the graph is connected.</li>
 <li>Aperiodic if and only if the graph is not bipartite.</li>
 </ol>
-<p>If these conditions hold, then the stationary distribution of the random walk is given by</p>
-<p><span class="math display">\[\begin{align*}
-\Pi(i) = \frac{\text{deg}(i)}{2|E|},
-\end{align*}\]</span></p>
-<p>where <span class="math inline">\(\text{deg}(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> and <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+<p>If these conditions hold, then the stationary distribution of the random walk is given by <span class="math display">\[\Pi(i) = \frac{\deg(i)}{2|E|},\]</span> where <span class="math inline">\(\deg(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> and <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+</div>
+<div id="exm-random-walk" class="theorem example">
+<p><span class="theorem-title"><strong>Example B.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by <span class="math display">\[P =
+\begin{pmatrix}
+0 &amp; 1 &amp; 0 &amp; 0 \\
+1/3 &amp; 0 &amp; 1/3 &amp; 1/3 \\
+0 &amp; 1/2 &amp; 0 &amp; 1/2 \\
+0 &amp; 1/2 &amp; 1/2 &amp; 0
+\end{pmatrix}.\]</span></p>
+<p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n\)</span>-th distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>.</p>
+</div>
+<div id="f0a9b4fe" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-3-output-1.png" width="403" height="307" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transition matrix of the Markov chain:
+[[0.   1.   0.   0.  ]
+ [0.33 0.   0.33 0.33]
+ [0.   0.5  0.   0.5 ]
+ [0.   0.5  0.5  0.  ]]
+
+Evolution of the Markov chain starting from state A:
+
+        A      B      C      D
+0   1.000  0.000  0.000  0.000
+1   0.000  1.000  0.000  0.000
+2   0.333  0.000  0.333  0.333
+3   0.000  0.667  0.167  0.167
+4   0.222  0.167  0.306  0.306
+5   0.056  0.528  0.208  0.208
+6   0.176  0.264  0.280  0.280
+7   0.088  0.456  0.228  0.228
+8   0.152  0.316  0.266  0.266
+9   0.105  0.418  0.238  0.238
+10  0.139  0.344  0.259  0.259</code></pre>
+</div>
 </div>
 </section>
 <section id="mixing-time" class="level2" data-number="B.5">
 <h2 data-number="B.5" class="anchored" data-anchor-id="mixing-time"><span class="header-section-number">B.5</span> Mixing Time</h2>
 <p>Assume that the Markov chain is ergodic, and hence has a stationary distribution <span class="math inline">\(\Pi\)</span>. We know that any initial distribution <span class="math inline">\(\pi_0\)</span> converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>. The mixing time measures the rate of this convergence.</p>
 <div id="def-total-variation-distance" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition B.7</strong></span> The <strong>total variation distance</strong> between two probability distributions <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> on a finite state space <span class="math inline">\(\Omega\)</span> is defined as</p>
-<p><span class="math display">\[\begin{align*}
-\| \mu - \nu \|_{\text{TV}}
-&amp;= \frac{1}{2} \sum_{i \in \Omega} |\mu(i) - \nu(i)| \\
-&amp;= \frac{1}{2} \| \mu - \nu \|_{L^1}.
-\end{align*}\]</span></p>
+<p><span class="theorem-title"><strong>Definition B.7</strong></span> The <strong>total variation distance</strong> between two probability distributions <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\nu\)</span> on a finite state space <span class="math inline">\(\Omega\)</span> is defined as <span class="math display">\[\| \mu - \nu \|_{\text{TV}}
+= \frac{1}{2} \sum_{i \in \Omega} |\mu(i) - \nu(i)|
+= \frac{1}{2} \| \mu - \nu \|_{L^1}.\]</span></p>
 </div>
-<p>One can show that</p>
-<p><span class="math display">\[\begin{align*}
-\| \mu - \nu \|_{\text{TV}} = \mathrm{sup} \{ |\mu(A) - \nu(A)| : A \subseteq \Omega \},
-\end{align*}\]</span></p>
-<p>i.e.&nbsp;<span class="math inline">\(\|\mu - \nu \|_{\text{TV}}\)</span> is the maximum difference in the probability of any event under the two distributions.</p>
-<p>We use the total variation distance to measure the distance between the distribution of the Markov chain at time <span class="math inline">\(n\)</span> and the stationary distribution. The <strong>mixing time</strong> of the Markov chain is defined as the smallest <span class="math inline">\(N\)</span> such that for the stationary distribution <span class="math inline">\(\Pi\)</span> and any initial distributions <span class="math inline">\(\pi_0\)</span>, we have</p>
-<p><span class="math display">\[\begin{align*}
-\| \pi_0 P^n - \Pi \|_{\text{TV}} \leq \frac{1}{4},
-\end{align*}\]</span></p>
-<p>for all <span class="math inline">\(n \geq N\)</span>. The constant <span class="math inline">\(\frac{1}{4}\)</span> is arbitrary and can be replaced by any other constant in <span class="math inline">\((0, 1)\)</span>. This will only change the value of the mixing time by a constant factor and not the order of magnitude.</p>
-<p>When using Markov chains for sampling, we want the mixing time to be as small as possible. This ensures that the distribution of the chain is close to the stationary distribution after a small number of steps. We think of the time before the chain mixes as a transient phase - the chain has not yet reached equilibrium. This is a burn-in period where we discard the samples. The bigger the mixing time, the more the number of wasted samples in the burn-in phase.</p>
-<p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>B.1</span></a> again. If we start at the vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is 4.</p>
-<p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times.</p>
+<p>One can show that <span class="math display">\[\| \mu - \nu \|_{\text{TV}} = \sup \{ |\mu(A) - \nu(A)| : A \subseteq \Omega \},\]</span> i.e., <span class="math inline">\(\|\mu - \nu \|_{\text{TV}}\)</span> is the maximum difference in the probability of any event under the two distributions.</p>
+<p>We use the total variation distance to measure the distance between the distribution of the Markov chain at time <span class="math inline">\(n\)</span> and the stationary distribution. The <strong>mixing time</strong> of the Markov chain is defined as the smallest <span class="math inline">\(N\)</span> such that for the stationary distribution <span class="math inline">\(\Pi\)</span> and any initial distribution <span class="math inline">\(\pi_0\)</span>, we have <span class="math display">\[\| \pi_0 P^n - \Pi \|_{\text{TV}} \leq \frac{1}{4}\]</span> for all <span class="math inline">\(n \geq N\)</span>. The constant <span class="math inline">\(\frac{1}{4}\)</span> is arbitrary and can be replaced by any other constant in <span class="math inline">\((0, 1)\)</span>. This will only change the value of the mixing time by a constant factor and not the order of magnitude.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical Significance of Mixing Time
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When using Markov chains for sampling, we want the mixing time to be as small as possible. This ensures that the distribution of the chain is close to the stationary distribution after a small number of steps. We think of the time before the chain mixes as a transient phase—the chain has not yet reached equilibrium. This is a burn-in period where we discard the samples. The bigger the mixing time, the more the number of wasted samples in the burn-in phase.</p>
+</div>
+</div>
+<p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>B.1</span></a> again. If we start at vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is at most 4 for this initial distribution.</p>
+<p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times over all initial distributions.</p>
 <p>In practice, we either provide a theoretical bound on the mixing time or “visually” inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.</p>
-<div id="6973174c" class="cell" data-execution_count="3">
+<div id="94b06084" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -826,39 +839,61 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 </div>
 <section id="connection-to-spectral-theory" class="level3" data-number="B.5.1">
 <h3 data-number="B.5.1" class="anchored" data-anchor-id="connection-to-spectral-theory"><span class="header-section-number">B.5.1</span> Connection to Spectral Theory</h3>
-<p>Continuing the example from above, the matrix <span class="math inline">\(I_4 - P\)</span> is called the <strong>normalized Laplacian matrix</strong> of the graph <span class="math inline">\(G\)</span>.</p>
-<p><span class="math display">\[\begin{align*}
-\mathcal{L} = I_4 - P =
-  \begin{pmatrix}
-    1 &amp; -1 &amp; 0 &amp; 0 \\
-    -1/3 &amp; 1 &amp; -1/3 &amp; -1/3 \\
-    0 &amp; -1/2 &amp; 1 &amp; -1/2 \\
-    0 &amp; -1/2 &amp; -1/2 &amp; 0
-  \end{pmatrix}
-\end{align*}\]</span></p>
+<p>Continuing the example from above, the matrix <span class="math inline">\(I_4 - P\)</span> is called the <strong>normalized Laplacian matrix</strong> of the graph <span class="math inline">\(G\)</span>. <span class="math display">\[\mathcal{L} = I_4 - P =
+\begin{pmatrix}
+1 &amp; -1 &amp; 0 &amp; 0 \\
+-1/3 &amp; 1 &amp; -1/3 &amp; -1/3 \\
+0 &amp; -1/2 &amp; 1 &amp; -1/2 \\
+0 &amp; -1/2 &amp; -1/2 &amp; 1
+\end{pmatrix}\]</span></p>
 <p>One can show that 0 is an eigenvalue of <span class="math inline">\(\mathcal{L}\)</span> and all eigenvalues are non-negative. The second smallest eigenvalue of <span class="math inline">\(\mathcal{L}\)</span> is called the <strong>spectral gap</strong> of the graph (which could be 0).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Spectral Gap and Mixing Time
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Spectral graph theory, in particular Cheeger inequalities, prove that there is an inverse relationship between the spectral gap of the graph and the mixing time of the random walk on the graph. The smaller the spectral gap, the larger the mixing time. You’ll explore this connection in the homework.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="sampling-from-a-markov-chain" class="level2" data-number="B.6">
 <h2 data-number="B.6" class="anchored" data-anchor-id="sampling-from-a-markov-chain"><span class="header-section-number">B.6</span> Sampling from a Markov Chain</h2>
-<p>The algorithm to generate sample paths of length <span class="math inline">\(n\)</span> of a Markov Chain is simple. Suppose <span class="math inline">\(P\)</span> is the transition matrix of the Markov Chain with mixing time <span class="math inline">\(t\)</span>. The algorithm is as follows:</p>
-<ol type="1">
-<li>Start at some initial state <span class="math inline">\(X_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>
-<ul>
-<li>Generate <span class="math inline">\(X_{i+1} \sim P(X_i , \cdot )\)</span>.</li>
-</ul></li>
-<li>Discard the first <span class="math inline">\(T\)</span> samples and return <span class="math inline">\(X_{T+1}, X_{T+2}, \ldots, X_N\)</span>.</li>
-</ol>
-<p>We can interpret this algorithm as generating <span class="math inline">\(N-T\)</span> samples from the stationary distribution of the Markov Chain. The number of samples discarded is called the <strong>burn-in period</strong>.</p>
-<p>One big issue with this algorithm is that the samples are highly correlated. If independence is important, selecting every 40th sample may be beneficial. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
-<div id="exm-random-walk-on-graph" class="theorem example">
-<p><span class="theorem-title"><strong>Example B.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\([0, 14]\)</span> by generating a random walk over a cycle of length 15.</p>
-<p>The autocorrelation plot below shows the correlation between samples at different lags i.e.&nbsp;<span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
-<p>We can either discard the first 40 samples or select every 40-th sample to reduce the correlation. If independence is important, then we should select every 40-th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+<p>The algorithm to generate sample paths of length <span class="math inline">\(n\)</span> of a Markov chain is simple. Suppose <span class="math inline">\(P\)</span> is the transition matrix of the Markov chain with mixing time <span class="math inline">\(t\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div id="cc89da3e" class="cell" data-fold="true" data-execution_count="4">
+<div class="callout-title-container flex-fill">
+Algorithm: Markov Chain Sampling
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given a transition matrix <span class="math inline">\(P\)</span> and desired number of samples <span class="math inline">\(N\)</span>:</p>
+<ol type="1">
+<li>Start at some initial state <span class="math inline">\(X_0\)</span></li>
+<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
+<ul>
+<li>Generate <span class="math inline">\(X_{i+1} \sim P(X_i, \cdot)\)</span></li>
+</ul></li>
+<li>Discard the first <span class="math inline">\(T\)</span> samples and return <span class="math inline">\(X_{T+1}, X_{T+2}, \ldots, X_N\)</span></li>
+</ol>
+<p>We can interpret this algorithm as generating <span class="math inline">\(N-T\)</span> samples from the stationary distribution of the Markov chain. The number of samples discarded is called the <strong>burn-in period</strong>.</p>
+</div>
+</div>
+<p>One big issue with this algorithm is that the samples are highly correlated. If independence is important, selecting every <span class="math inline">\(k\)</span>-th sample may be beneficial. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+<div id="exm-random-walk-on-graph" class="theorem example">
+<p><span class="theorem-title"><strong>Example B.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\(\{0, 1, \ldots, 14\}\)</span> by generating a random walk over a cycle of length 15.</p>
+<p>The autocorrelation plot below shows the correlation between samples at different lags, i.e., <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
+<p>We can either discard the first 40 samples or select every 40th sample to reduce the correlation. If independence is important, then we should select every 40th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+</div>
+<div id="6be17282" class="cell" data-fold="true" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -877,107 +912,100 @@ State at time 10 : [0.139 0.344 0.259 0.259]</code></pre>
 </section>
 <section id="reversible-markov-chains" class="level2" data-number="B.7">
 <h2 data-number="B.7" class="anchored" data-anchor-id="reversible-markov-chains"><span class="header-section-number">B.7</span> Reversible Markov Chains</h2>
-<p>A Markov Chain is <strong>reversible</strong> with respect to a distribution <span class="math inline">\(\pi\)</span> if the following holds:</p>
-<p><span id="eq-reversible"><span class="math display">\[
-\pi_i P(i, j) = \pi_j P(j, i) \quad \text{for all } i, j.
-\tag{B.1}\]</span></span></p>
+<p>A Markov chain is <strong>reversible</strong> with respect to a distribution <span class="math inline">\(\pi\)</span> if the following holds: <span id="eq-reversible"><span class="math display">\[\pi_i P(i, j) = \pi_j P(j, i) \quad \text{for all } i, j. \tag{B.1}\]</span></span></p>
 <p>This is saying that the probability of transitioning from <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span> is the same as the probability of transitioning from <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. <a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>B.1</span></a> is known as the <strong>detailed balance equation</strong>.</p>
 <div id="thm-detailed-balance" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.4</strong></span> <strong>(Detailed Balance Equation).</strong> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then <span class="math inline">\(\pi\)</span> is a stationary distribution of the Markov Chain.</p>
+<p><span class="theorem-title"><strong>Theorem B.4</strong></span> <strong>(Detailed Balance Equation).</strong> If a Markov chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then <span class="math inline">\(\pi\)</span> is a stationary distribution of the Markov chain.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>Suppose the Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Then,</p>
-<p><span class="math display">\[
-\begin{aligned}
+<p><span class="proof-title"><em>Proof</em>. </span>Suppose the Markov chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Then, <span class="math display">\[\begin{aligned}
 (\pi P)_i &amp;= \sum_j \pi_j P(j, i) \\
 &amp;= \sum_j \pi_i P(i, j) \\
 &amp;= \pi_i \sum_j P(i, j) \\
 &amp;= \pi_i.
-\end{aligned}
-\]</span></p>
-<p>Thus, <span class="math inline">\(\pi\)</span> is the stationary distribution of the Markov Chain.</p>
+\end{aligned}\]</span> Thus, <span class="math inline">\(\pi\)</span> is the stationary distribution of the Markov chain.</p>
 </div>
-<p><a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>B.1</span></a> is a sufficient but not necessary condition for <span class="math inline">\(\pi\)</span> to be the stationary distribution of the Markov Chain. You can have a Markov Chain with a stationary distribution that is not reversible.</p>
-<p>Note that we did not use any properties of the Markov Chain in the proof of the theorem, except that the row sum of the transition matrix is <span class="math inline">\(1\)</span>. A better way to phrase this theorem would be to say that “if the row sum of the transition matrix is <span class="math inline">\(1\)</span> and the detailed balance equation holds, then <span class="math inline">\(\pi\)</span> is an eigenvector of the transition matrix with eigenvalue <span class="math inline">\(1\)</span>.”</p>
+<p><a href="#eq-reversible" class="quarto-xref">Equation&nbsp;<span>B.1</span></a> is a sufficient but not necessary condition for <span class="math inline">\(\pi\)</span> to be the stationary distribution of the Markov chain. You can have a Markov chain with a stationary distribution that is not reversible.</p>
+<p>Note that we did not use any properties of the Markov chain in the proof of the theorem, except that the row sum of the transition matrix is <span class="math inline">\(1\)</span>. A better way to phrase this theorem would be to say that “if the row sum of the transition matrix is <span class="math inline">\(1\)</span> and the detailed balance equation holds, then <span class="math inline">\(\pi\)</span> is an eigenvector of the transition matrix with eigenvalue <span class="math inline">\(1\)</span>.”</p>
 <div id="exm-random-walks-on-graphs" class="theorem example">
-<p><span class="theorem-title"><strong>Example B.3</strong></span> <strong>Random Walks on Graphs.</strong> Consider a graph <span class="math inline">\(G = (V, E)\)</span> with vertices <span class="math inline">\(V\)</span> and edges <span class="math inline">\(E\)</span>. Let <span class="math inline">\(P(i, j) = 1/d(i)\)</span> if <span class="math inline">\((i, j) \in E\)</span> and <span class="math inline">\(0\)</span> otherwise, where <span class="math inline">\(d(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>. Then, the stationary distribution of the Markov Chain is <span class="math inline">\(\pi_i = d(i)/2|E|\)</span>, where <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
-<p>The Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Consider two vertices <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. If <span class="math inline">\((i, j) \in E\)</span>, then</p>
-<p><span class="math display">\[
-\begin{aligned}
-\pi_i P(i, j) &amp;= \frac{d(i)}{2|E|} \cdot \frac{1}{d(i)} \\
+<p><span class="theorem-title"><strong>Example B.3</strong></span> <strong>Random Walks on Graphs.</strong> Consider a graph <span class="math inline">\(G = (V, E)\)</span> with vertices <span class="math inline">\(V\)</span> and edges <span class="math inline">\(E\)</span>. Let <span class="math inline">\(P(i, j) = 1/\deg(i)\)</span> if <span class="math inline">\((i, j) \in E\)</span> and <span class="math inline">\(0\)</span> otherwise, where <span class="math inline">\(\deg(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span>. Then, the stationary distribution of the Markov chain is <span class="math inline">\(\pi_i = \deg(i)/(2|E|)\)</span>, where <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
+<p>The Markov chain is reversible with respect to <span class="math inline">\(\pi\)</span>. Consider two vertices <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. If <span class="math inline">\((i, j) \in E\)</span>, then <span class="math display">\[\begin{aligned}
+\pi_i P(i, j) &amp;= \frac{\deg(i)}{2|E|} \cdot \frac{1}{\deg(i)} \\
 &amp;= \frac{1}{2|E|} \\
-&amp;= \frac{d(j)}{2|E|} \cdot \frac{1}{d(j)} \\
+&amp;= \frac{\deg(j)}{2|E|} \cdot \frac{1}{\deg(j)} \\
 &amp;= \pi_j P(j, i).
-\end{aligned}
-\]</span></p>
-<p>If <span class="math inline">\((i, j) \notin E\)</span>, then <span class="math inline">\(\pi_i P(i, j) = \pi_j P(j, i) = 0\)</span>.</p>
+\end{aligned}\]</span> If <span class="math inline">\((i, j) \notin E\)</span>, then <span class="math inline">\(\pi_i P(i, j) = \pi_j P(j, i) = 0\)</span>.</p>
 </div>
-<p>Many Markov chains encountered in practice are reversible with respect to some distribution. It is much easier to check the detailed balance equation than to compute the stationary distribution directly. Moreover, reversible markov chains can be analyzed using spectral methods and we can find good bounds on their mixing time.</p>
+<p>Many Markov chains encountered in practice are reversible with respect to some distribution. It is much easier to check the detailed balance equation than to compute the stationary distribution directly. Moreover, reversible Markov chains can be analyzed using spectral methods and we can find good bounds on their mixing time.</p>
 <section id="reversibility-and-symmetry" class="level3" data-number="B.7.1">
 <h3 data-number="B.7.1" class="anchored" data-anchor-id="reversibility-and-symmetry"><span class="header-section-number">B.7.1</span> Reversibility and Symmetry</h3>
 <div id="thm-reversibility-symmetry" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.5</strong></span> If a Markov Chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then the matrix</p>
-<p><span class="math display">\[
-Q = \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}})
-\]</span></p>
-<p>is symmetric. In particular, <span class="math inline">\(P\)</span> is similar to the symmetric matrix <span class="math inline">\(Q\)</span> and hence has real eigenvalues.</p>
+<p><span class="theorem-title"><strong>Theorem B.5</strong></span> If a Markov chain is reversible with respect to a distribution <span class="math inline">\(\pi\)</span>, then the matrix <span class="math display">\[Q = \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}})\]</span> is symmetric. In particular, <span class="math inline">\(P\)</span> is similar to the symmetric matrix <span class="math inline">\(Q\)</span> and hence has real eigenvalues.</p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>This is because</p>
-<p><span class="math display">\[
-\begin{aligned}
+<p><span class="proof-title"><em>Proof</em>. </span>This is because <span class="math display">\[\begin{aligned}
 Q(i, j)
 &amp;= \sqrt{\pi_i} P(i, j) \sqrt{\pi_j^{-1}} \\
-&amp;= \sqrt{\pi_i} \dfrac{\pi_j P(j, i)}{\pi_i} \sqrt{\pi_j^{-1}} \\
+&amp;= \sqrt{\pi_i} \frac{\pi_j P(j, i)}{\pi_i} \sqrt{\pi_j^{-1}} \\
 &amp;= \sqrt{\pi_j} P(j, i) \sqrt{\pi_i^{-1}} \\
 &amp;= Q(j, i).
-\end{aligned}
-\]</span></p>
-<p>Similarly, <span class="math inline">\(Q(j, i) = \pi_j P(j, i)\)</span>. As the Markov Chain is reversible with respect to <span class="math inline">\(\pi\)</span>, we get <span class="math inline">\(Q(i, j) = Q(j, i)\)</span>. Thus, <span class="math inline">\(Q\)</span> is symmetric.</p>
+\end{aligned}\]</span> Thus, <span class="math inline">\(Q\)</span> is symmetric.</p>
 </div>
-<p>Now suppose <span class="math inline">\(\textbf{v}\)</span> is a left eigenvector of <span class="math inline">\(Q\)</span> with eigenvalue <span class="math inline">\(\lambda\)</span>. Then,</p>
-<p><span class="math display">\[
-\begin{aligned}
-\textbf{v} Q &amp;= \lambda \textbf{v} \\
-\textbf{v} \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}}) &amp;= \lambda \textbf{v} \\
-\implies \textbf{v} \text{diag}(\sqrt{\pi}) \: P &amp;= \lambda \textbf{v} \: \text{diag}(\sqrt{\pi}).
-\end{aligned}
-\]</span></p>
-<p>Hence, <span class="math inline">\(\text{diag}(\sqrt{\pi}) \textbf{v}\)</span> will be an eigenvector of <span class="math inline">\(P\)</span> with the same eigenvalue. As <span class="math inline">\(Q\)</span> is symmetric, it has real eigenvalues and orthogonal eigenvectors. It is easier to do spectral analysis of <span class="math inline">\(Q\)</span> and use that to deduce properties of <span class="math inline">\(P\)</span>. For example, we can find the eigenvector corresponding to the largest eigenvalue of <span class="math inline">\(Q\)</span> by solving the optimization problem</p>
-<p><span class="math display">\[
-\mathbf{v} = \underset{\mathbf{x} \neq 0}{\text{arg max}} \dfrac{\mathbf{x}^T Q \mathbf{x}}{\mathbf{x}^T \mathbf{x}}.
-\]</span></p>
+<p>Now suppose <span class="math inline">\(\mathbf{v}\)</span> is a left eigenvector of <span class="math inline">\(Q\)</span> with eigenvalue <span class="math inline">\(\lambda\)</span>. Then, <span class="math display">\[\begin{aligned}
+\mathbf{v} Q &amp;= \lambda \mathbf{v} \\
+\mathbf{v} \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}}) &amp;= \lambda \mathbf{v} \\
+\implies \mathbf{v} \text{diag}(\sqrt{\pi}) \: P &amp;= \lambda \mathbf{v} \: \text{diag}(\sqrt{\pi}).
+\end{aligned}\]</span></p>
+<p>Hence, <span class="math inline">\(\mathbf{v} \text{diag}(\sqrt{\pi})\)</span> will be an eigenvector of <span class="math inline">\(P\)</span> with the same eigenvalue. As <span class="math inline">\(Q\)</span> is symmetric, it has real eigenvalues and orthogonal eigenvectors. It is easier to do spectral analysis of <span class="math inline">\(Q\)</span> and use that to deduce properties of <span class="math inline">\(P\)</span>. For example, we can find the eigenvector corresponding to the largest eigenvalue of <span class="math inline">\(Q\)</span> by solving the optimization problem <span class="math display">\[\mathbf{v} = \underset{\mathbf{x} \neq 0}{\text{arg max}} \frac{\mathbf{x}^T Q \mathbf{x}}{\mathbf{x}^T \mathbf{x}}.\]</span></p>
 <p>Multiplying the above vector <span class="math inline">\(\mathbf{v}\)</span> by <span class="math inline">\(\text{diag}(\sqrt{\pi})\)</span> gives us the stationary distribution for <span class="math inline">\(P\)</span>.</p>
 </section>
 </section>
 <section id="transition-kernels" class="level2" data-number="B.8">
 <h2 data-number="B.8" class="anchored" data-anchor-id="transition-kernels"><span class="header-section-number">B.8</span> Transition Kernels</h2>
-<p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability of transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the <strong>density</strong> of the distribution at that point. The transition kernel satisfies the equation:</p>
-<p><span class="math display">\[\begin{align*}
-\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.
-\end{align*}\]</span></p>
-<p>All the properties of Markov Chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov Chains becomes</p>
+<p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability of transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the <strong>density</strong> of the distribution at that point. The transition kernel satisfies the equation: <span class="math display">\[\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.\]</span></p>
+<p>All the properties of Markov chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov chains becomes</p>
 <div id="thm-fundamental-theorem-kernels" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov Chain with transition kernel <span class="math inline">\(K\)</span> is</p>
+<p><span class="theorem-title"><strong>Theorem B.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov chain with transition kernel <span class="math inline">\(K\)</span> is</p>
 <ol type="1">
 <li><strong>Irreducible</strong>: For all <span class="math inline">\(x, y\)</span>, there exists <span class="math inline">\(n\)</span> such that <span class="math inline">\(K^n(x, y) &gt; 0\)</span>.</li>
 <li><strong>Positive recurrent</strong>: The expected return time to a state is finite.</li>
 <li><strong>Aperiodic</strong>: For all <span class="math inline">\(x\)</span>, <span class="math inline">\(\gcd\{n : K^n(x, x) &gt; 0\} = 1\)</span>.</li>
 </ol>
-<p>Then, the Markov Chain has a unique stationary distribution <span class="math inline">\(\Pi\)</span> and for all initial distributions <span class="math inline">\(\pi_0\)</span>,</p>
-<p><span class="math display">\[\begin{align*}
-\int \pi_0(x) K^n(x, y) \, dx \xrightarrow[TV]{} \Pi(y) \quad \text{as } n \to \infty.
-\end{align*}\]</span></p>
+<p>Then, the Markov chain has a unique stationary distribution <span class="math inline">\(\Pi\)</span> and for all initial distributions <span class="math inline">\(\pi_0\)</span>, <span class="math display">\[\int \pi_0(x) K^n(x, y) \, dx \xrightarrow[TV]{} \Pi(y) \quad \text{as } n \to \infty.\]</span></p>
 </div>
 </section>
 <section id="analyzing-convergence-of-markov-chains" class="level2" data-number="B.9">
 <h2 data-number="B.9" class="anchored" data-anchor-id="analyzing-convergence-of-markov-chains"><span class="header-section-number">B.9</span> Analyzing Convergence of Markov Chains</h2>
 <p>In practice we need to decide how many samples to burn and how many samples to generate. We use various heuristics to decide this.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Trace Plot Analysis
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To assess convergence of a Markov chain:</p>
+<ol type="1">
+<li>Generate a long chain of samples <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span></li>
+<li>Plot the sequence of samples against time</li>
+<li>Look for:
+<ul>
+<li>Stabilization around a central value</li>
+<li>Absence of trends or drifts</li>
+<li>Consistent variability across the chain</li>
+</ul></li>
+<li>If the chain appears to have converged, determine burn-in period</li>
+</ol>
+</div>
+</div>
 <section id="trace-plots" class="level3" data-number="B.9.1">
 <h3 data-number="B.9.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">B.9.1</span> Trace Plots</h3>
-<p>A trace plot is simply a scatter plot of the samples generated by the Markov Chain. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the trace plot should look like a cloud of points. If the Markov Chain has not converged, the trace plot will show a trend.</p>
-<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after a 1000 samples but after 5000 samples it is starting to look uniform.</p>
-<div id="3f0bafc9" class="cell" data-fold="true" data-execution_count="5">
+<p>A trace plot is simply a scatter plot of the samples generated by the Markov chain. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the trace plot should look like a cloud of points. If the Markov chain has not converged, the trace plot will show a trend.</p>
+<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after 1000 samples but after 5000 samples it is starting to look uniform.</p>
+<div id="0cd277c3" class="cell" data-fold="true" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -989,10 +1017,22 @@ Q(i, j)
 </section>
 <section id="running-average" class="level3" data-number="B.9.2">
 <h3 data-number="B.9.2" class="anchored" data-anchor-id="running-average"><span class="header-section-number">B.9.2</span> Running Average</h3>
-<p>The running average is the average of the first <span class="math inline">\(n\)</span> samples. It is useful to see if the Markov Chain has converged. If the Markov Chain has converged, the running average should stabilize around the true mean. If the Markov Chain has not converged, the running average will show a trend.</p>
+<p>The running average is the average of the first <span class="math inline">\(n\)</span> samples. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the running average should stabilize around the true mean. If the Markov chain has not converged, the running average will show a trend.</p>
 <p>Below is the running average plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the running average is stabilizing around the true mean around 3000 samples.</p>
-<p>Running averages can be deceptive and show stability even when the Markov Chain has not converged. It is better to use multiple diagnostics to check for convergence. They are better at telling when the Markov Chain has <strong>not</strong> converged than when it has converged.</p>
-<div id="2aada0e9" class="cell" data-fold="true" data-execution_count="6">
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Limitations of Running Averages
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Running averages can be deceptive and show stability even when the Markov chain has not converged. It is better to use multiple diagnostics to check for convergence. They are better at telling when the Markov chain has <strong>not</strong> converged than when it has converged.</p>
+</div>
+</div>
+<div id="d80e7118" class="cell" data-fold="true" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1004,25 +1044,62 @@ Q(i, j)
 </section>
 <section id="autocorrelation-function" class="level3" data-number="B.9.3">
 <h3 data-number="B.9.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">B.9.3</span> Autocorrelation Function</h3>
-<p>One method for finding the burn-in period is to use the autocorrelation function. The <strong>autocorrelation function</strong> of a sequence of numbers <span class="math inline">\(x = (x_0, x_1, \dots, x_n)\)</span> at lag <span class="math inline">\(k\)</span> is defined as</p>
-<p><span class="math display">\[
-\text{ACF}(k) = \text{Corr}(x[k: \:], x[\: :-k])
-\]</span></p>
-<p>where by <span class="math inline">\(x[k:]\)</span> we mean the subsequence <span class="math inline">\(x_k, x_{k+1}, \dots, x_n\)</span> and by <span class="math inline">\(x[:-k]\)</span> we mean the subsequence <span class="math inline">\(x_0, x_1, \dots, x_{n-k}\)</span>. It is the correlation between the sequence <span class="math inline">\(x\)</span> and the same sequence shifted by <span class="math inline">\(k\)</span>. One way to choose a burn-in period is to pick a threshold <span class="math inline">\(\epsilon\)</span> and find the smallest <span class="math inline">\(T\)</span> such that <span class="math inline">\(\text{ACF}(T) &lt; \epsilon\)</span>. Then to be conservative choose a burn-in period of <span class="math inline">\(2T\)</span> or <span class="math inline">\(3T\)</span>.</p>
+<p>One method for finding the burn-in period is to use the autocorrelation function. The <strong>autocorrelation function</strong> of a sequence of numbers <span class="math inline">\(x = (x_0, x_1, \ldots, x_n)\)</span> at lag <span class="math inline">\(k\)</span> is defined as <span class="math display">\[\text{ACF}(k) = \text{Corr}(x[k:], x[:-k])\]</span> where by <span class="math inline">\(x[k:]\)</span> we mean the subsequence <span class="math inline">\(x_k, x_{k+1}, \ldots, x_n\)</span> and by <span class="math inline">\(x[:-k]\)</span> we mean the subsequence <span class="math inline">\(x_0, x_1, \ldots, x_{n-k}\)</span>. It is the correlation between the sequence <span class="math inline">\(x\)</span> and the same sequence shifted by <span class="math inline">\(k\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Choosing Burn-in Period Using ACF
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To determine the burn-in period using the autocorrelation function:</p>
+<ol type="1">
+<li>Compute the autocorrelation function <span class="math inline">\(\text{ACF}(k)\)</span> for various lags <span class="math inline">\(k\)</span></li>
+<li>Choose a threshold <span class="math inline">\(\epsilon\)</span> (e.g., <span class="math inline">\(\epsilon = 0.1\)</span> or <span class="math inline">\(\epsilon = 0.05\)</span>)</li>
+<li>Find the smallest <span class="math inline">\(T\)</span> such that <span class="math inline">\(\text{ACF}(T) &lt; \epsilon\)</span></li>
+<li>To be conservative, choose a burn-in period of <span class="math inline">\(2T\)</span> or <span class="math inline">\(3T\)</span></li>
+</ol>
+</div>
+</div>
 <p>Below is the autocorrelation plot for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and drops below <span class="math inline">\(0.1\)</span> around <span class="math inline">\(17\)</span>. So a burn-in period of <span class="math inline">\(40\)</span> is a good conservative choice.</p>
 <p>This is just one way to choose the burn-in period. There are many other methods and the choice depends on the application. We will stick to this method for the rest of the course.</p>
-<div id="b99c8665" class="cell" data-fold="true" data-execution_count="7">
+<div id="d1dd44e3" class="cell" data-fold="true" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-8-output-1.png" width="600" height="449" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-8-output-1.png" width="589" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-
-
 </section>
+</section>
+<section id="concluding-remarks" class="level2" data-number="B.10">
+<h2 data-number="B.10" class="anchored" data-anchor-id="concluding-remarks"><span class="header-section-number">B.10</span> Concluding Remarks</h2>
+<p>In this module, we have established the foundational theory of Markov chains that underpins modern Monte Carlo methods. The key insights we have developed include:</p>
+<p><strong>Theoretical Foundations</strong>: We have seen how the Markov property leads to a rich mathematical structure, where the long-term behavior of the chain is determined by the spectral properties of the transition matrix. The fundamental theorem guarantees convergence to a unique stationary distribution under ergodicity conditions, providing the theoretical justification for using Markov chains as sampling algorithms.</p>
+<p><strong>Practical Considerations</strong>: The gap between theory and practice is bridged by understanding mixing times and convergence diagnostics. While theoretical convergence is guaranteed, practical implementation requires careful attention to burn-in periods, autocorrelation, and the trade-offs between computational efficiency and sample quality.</p>
+<p><strong>Spectral Connections</strong>: The connection between reversibility and spectral theory provides powerful tools for analysis. Reversible chains, which satisfy detailed balance, can be analyzed using symmetric matrix theory, leading to better bounds on mixing times and deeper understanding of convergence rates.</p>
+<p><strong>Limitations and Challenges</strong>: Despite their theoretical elegance, Markov chains face practical challenges. High-dimensional problems often suffer from slow mixing, and convergence diagnostics can be misleading. The autocorrelation function and trace plots provide useful heuristics, but they cannot guarantee convergence—they are better at detecting non-convergence than confirming convergence.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Looking Ahead
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The theory developed here forms the backbone for advanced MCMC algorithms such as Metropolis-Hastings, Gibbs sampling, and Hamiltonian Monte Carlo. Each of these methods constructs specific transition kernels designed to have desired stationary distributions while maintaining good mixing properties. Understanding the fundamental principles of Markov chain theory is essential for both implementing these algorithms correctly and diagnosing their performance in practice.</p>
+</div>
+</div>
+<p>The interplay between theory and computation in Markov chain Monte Carlo exemplifies the power of probability theory in solving practical problems. While we must always be mindful of the assumptions underlying our theoretical guarantees, the robustness of these methods across diverse applications demonstrates the value of this mathematical framework.</p>
+
+
 </section>
 
 </main> <!-- /main -->

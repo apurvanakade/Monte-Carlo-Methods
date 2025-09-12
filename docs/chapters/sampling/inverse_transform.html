@@ -937,7 +937,7 @@ Algorithm
 </section>
 <section id="knuths-algorithm" class="level3" data-number="7.5.3">
 <h3 data-number="7.5.3" class="anchored" data-anchor-id="knuths-algorithm"><span class="header-section-number">7.5.3</span> Knuth’s Algorithm</h3>
-<p>In the above algorithm, we rely on <a href="#thm-poisson-exponential" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a>. In order to generate <span class="math inline">\(X_i \sim \mathrm{Exp}(\lambda)\)</span>, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.</p>
+<p>In the above algorithm, we rely on <a href="#thm-poisson-exponential" class="quarto-xref">Theorem&nbsp;<span>7.3</span></a> to generate <span class="math inline">\(X_i \sim \mathrm{Exp}(\lambda)\)</span>, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.</p>
 <p>Consider the following set of inequalities:</p>
 <p><span class="math display">\[
 \begin{align*}

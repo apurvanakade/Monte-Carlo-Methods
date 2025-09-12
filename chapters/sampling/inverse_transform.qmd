@@ -331,7 +331,7 @@ The Poisson-Exponential connection gives us a simple algorithm to sample from th
 
 ### Knuth's Algorithm
 
-In the above algorithm, we rely on @thm-poisson-exponential. In order to generate $X_i \sim \mathrm{Exp}(\lambda)$, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.
+In the above algorithm, we rely on @thm-poisson-exponential to generate $X_i \sim \mathrm{Exp}(\lambda)$, we use inverse transform sampling. However, this is inefficient as taking logarithms repeatedly can lead to floating point errors. It is possible to avoid this by using the following insight.
 
 Consider the following set of inequalities:
 
