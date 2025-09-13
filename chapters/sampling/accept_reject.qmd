@@ -541,20 +541,16 @@ Key challenges include:
 
 ### Advanced Methods
 
-::: {.callout-tip}
-## Beyond Basic Accept-Reject
 
-**Markov Chain Monte Carlo (MCMC):** In higher dimensions, we need more sophisticated methods to sample from target distributions such as:
+In higher dimensions, we need more sophisticated methods to sample from target distributions such as:
 
 - **Metropolis-Hastings algorithm**: Uses proposal distributions but doesn't require majorization.
 - **Gibbs sampling**: Samples from conditional distributions sequentially.
 - **Hamiltonian Monte Carlo**: Uses gradient information for efficient proposals.
 
 We'll explore these methods in future sections.
-:::
 
-::: {.callout-note}
-## Adaptive Rejection Sampling
+### Adaptive Rejection Sampling
 
 **Adaptive rejection sampling** is another method that tries to find a good proposal distribution by using the samples generated so far. Key features:
 
@@ -564,7 +560,6 @@ We'll explore these methods in future sections.
 - **Extensions**: Has been extended to more general densities beyond log-concave cases.
 
 This adaptive approach would make an excellent topic for a research project, as it combines the simplicity of accept-reject with the adaptability needed for complex distributions.
-:::
 
 ![Gilks, W. R., & Wild, P. (1992). Adaptive Rejection Sampling for Gibbs Sampling. Journal of the Royal Statistical Society. Series C (Applied Statistics), 41(2), 337–348. https://doi.org/10.2307/2347565](../images/adaptive.png)
 

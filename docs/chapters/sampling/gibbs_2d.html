@@ -547,9 +547,13 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#joint-exponential-distribution" id="toc-joint-exponential-distribution" class="nav-link active" data-scroll-target="#joint-exponential-distribution"><span class="header-section-number">10.0.1</span> Joint Exponential Distribution</a></li>
-  <li><a href="#bivariate-normal-distribution" id="toc-bivariate-normal-distribution" class="nav-link" data-scroll-target="#bivariate-normal-distribution"><span class="header-section-number">10.0.2</span> Bivariate Normal Distribution</a></li>
-  <li><a href="#sec-gibbs-markov-chain" id="toc-sec-gibbs-markov-chain" class="nav-link" data-scroll-target="#sec-gibbs-markov-chain"><span class="header-section-number">10.1</span> Markov Chain</a></li>
+  <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link active" data-scroll-target="#gibbs-sampling"><span class="header-section-number">11</span> Gibbs Sampling</a>
+  <ul class="collapse">
+  <li><a href="#joint-exponential-distribution" id="toc-joint-exponential-distribution" class="nav-link" data-scroll-target="#joint-exponential-distribution"><span class="header-section-number">11.1</span> Joint Exponential Distribution</a></li>
+  <li><a href="#bivariate-normal-distribution" id="toc-bivariate-normal-distribution" class="nav-link" data-scroll-target="#bivariate-normal-distribution"><span class="header-section-number">11.2</span> Bivariate Normal Distribution</a></li>
+  <li><a href="#sec-gibbs-markov-chain" id="toc-sec-gibbs-markov-chain" class="nav-link" data-scroll-target="#sec-gibbs-markov-chain"><span class="header-section-number">11.3</span> Markov Chain</a></li>
+  <li><a href="#concluding-remarks" id="toc-concluding-remarks" class="nav-link" data-scroll-target="#concluding-remarks"><span class="header-section-number">11.4</span> Concluding Remarks</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -614,42 +618,83 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
+<section id="gibbs-sampling" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Gibbs Sampling</h1>
 <p>Gibbs Sampling is a MCMC algorithm that is used to sample from a joint distribution using conditional distributions. For now, we’ll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.</p>
-<p>The Gibbs sampling algorithm for sampling from a joint distribution <span class="math inline">\(f_{X, Y}(X, Y)\)</span> is as follows:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Gibbs Sampling Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Gibbs sampling algorithm for sampling from a joint distribution <span class="math inline">\(f_{X, Y}(x, y)\)</span> is as follows:</p>
 <ol type="1">
 <li>Start with some initial values <span class="math inline">\(X_0\)</span> and <span class="math inline">\(Y_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>
-<ol type="1">
-<li>Sample <span class="math inline">\(X_i \sim f_{X|Y}(\: \cdot \: | Y_{i-1})\)</span>.</li>
-<li>Sample <span class="math inline">\(Y_i \sim f_{Y|X}(\: \cdot \:  | X_i)\)</span>.</li>
+<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>:
+<ol type="a">
+<li>Sample <span class="math inline">\(X_i \sim f_{X|Y}(\cdot \mid Y_{i-1})\)</span>.</li>
+<li>Sample <span class="math inline">\(Y_i \sim f_{Y|X}(\cdot \mid X_i)\)</span>.</li>
 </ol></li>
-<li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
+<li>Return the sequence <span class="math inline">\((X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)\)</span>.</li>
 </ol>
-<p>The algorithm generates a sample path of length <span class="math inline">\(N\)</span> of the Markov Chain as described in <a href="#sec-gibbs-markov-chain" class="quarto-xref"><span>Section 10.1</span></a>. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.</p>
-<section id="joint-exponential-distribution" class="level3" data-number="10.0.1">
-<h3 data-number="10.0.1" class="anchored" data-anchor-id="joint-exponential-distribution"><span class="header-section-number">10.0.1</span> Joint Exponential Distribution</h3>
+</div>
+</div>
+<p>The algorithm generates a sample path of length <span class="math inline">\(N\)</span> of the Markov Chain as described in <a href="#sec-gibbs-markov-chain" class="quarto-xref"><span>Section 11.3</span></a>. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.</p>
+<section id="joint-exponential-distribution" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="joint-exponential-distribution"><span class="header-section-number">11.1</span> Joint Exponential Distribution</h2>
 <p>Let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be two random variables with the truncated exponential distribution:</p>
 <p><span class="math display">\[
-f_{X,Y}(x, y) = c e^{-\lambda xy} \text{ for } 0 \le x \le D_1, 0 \le y \le D_2,
+f_{X,Y}(x, y) = c e^{-\lambda xy} \quad \text{for } 0 \leq x \leq D_1, \, 0 \leq y \leq D_2,
 \]</span></p>
-<p>where <span class="math inline">\(c\)</span> is the normalization constant. We want to sample from the joint distribution <span class="math inline">\(f_{X,Y}\)</span>. One can show that the conditionals are,</p>
+<p>where <span class="math inline">\(c\)</span> is the normalization constant. We want to sample from the joint distribution <span class="math inline">\(f_{X,Y}\)</span>.</p>
+<p>One can show that the conditionals are:</p>
 <p><span class="math display">\[
 \begin{aligned}
-f_{X|Y}(x | y_0) &amp;= c_{y_0} e^{-\lambda xy_0} \text{ for } 0 \le x \le D_1 \\
-f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
+f_{X|Y}(x \mid y_0) &amp;= c_{y_0} e^{-\lambda x y_0} \quad \text{for } 0 \leq x \leq D_1 \\
+f_{Y|X}(y \mid x_0) &amp;= c_{x_0} e^{-\lambda y x_0} \quad \text{for } 0 \leq y \leq D_2,
 \end{aligned}
 \]</span></p>
-<p>where <span class="math inline">\(c_{y_0}\)</span> and <span class="math inline">\(c_{x_0}\)</span> are the normalization constants. We can easily sample from the two conditionals <span class="math inline">\(f_{X|Y}\)</span> and <span class="math inline">\(f_{Y|X}\)</span> using the inverse method function (even for truncated distributions). The Gibbs algorithm becomes</p>
+<p>where <span class="math inline">\(c_{y_0}\)</span> and <span class="math inline">\(c_{x_0}\)</span> are the normalization constants.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that each conditional distribution is simply a truncated exponential distribution with rate parameter that depends on the conditioning variable. This makes sampling straightforward using the inverse transform method.</p>
+</div>
+</div>
+<p>We can easily sample from the two conditionals <span class="math inline">\(f_{X|Y}\)</span> and <span class="math inline">\(f_{Y|X}\)</span> using the inverse transform method (even for truncated distributions).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Gibbs Algorithm for Joint Exponential Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Start with some initial values <span class="math inline">\(X_0\)</span> and <span class="math inline">\(Y_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>
-<ol type="1">
-<li>Sample <span class="math inline">\(X_i \sim (\text{Exp}(\lambda Y_{i-1})\)</span> restricted to <span class="math inline">\([0, D_1])\)</span> using the inverse transform method.</li>
-<li>Sample <span class="math inline">\(Y_i \sim (\text{Exp}(\lambda X_i)\)</span> restricted to <span class="math inline">\([0, D_2]\)</span>) using the inverse transform method.</li>
+<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>:
+<ol type="a">
+<li>Sample <span class="math inline">\(X_i \sim \text{Exp}(\lambda Y_{i-1})\)</span> restricted to <span class="math inline">\([0, D_1]\)</span> using the inverse transform method.</li>
+<li>Sample <span class="math inline">\(Y_i \sim \text{Exp}(\lambda X_i)\)</span> restricted to <span class="math inline">\([0, D_2]\)</span> using the inverse transform method.</li>
 </ol></li>
-<li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
+<li>Return the sequence <span class="math inline">\((X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)\)</span>.</li>
 </ol>
-<div id="1e1bad3f" class="cell" data-execution_count="4">
+</div>
+</div>
+<div id="1e1bad3f" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -658,7 +703,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="1d0ab029" class="cell" data-fig-width="7" data-execution_count="6">
+<div id="1d0ab029" class="cell" data-fig-width="7" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -668,26 +713,52 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </section>
-<section id="bivariate-normal-distribution" class="level3" data-number="10.0.2">
-<h3 data-number="10.0.2" class="anchored" data-anchor-id="bivariate-normal-distribution"><span class="header-section-number">10.0.2</span> Bivariate Normal Distribution</h3>
-<p>Suppose <span class="math inline">\((X, Y)\)</span> has a bivariate normal distribution with mean <span class="math inline">\((0, 0)\)</span> and covariance matrix <span class="math inline">\(\Sigma = \begin{pmatrix} 1 &amp; \rho \\ \rho &amp; 1 \end{pmatrix}\)</span>. We want to sample from the joint distribution <span class="math inline">\(f_{X, Y}\)</span>. One can show that</p>
+<section id="bivariate-normal-distribution" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="bivariate-normal-distribution"><span class="header-section-number">11.2</span> Bivariate Normal Distribution</h2>
+<p>Suppose <span class="math inline">\((X, Y)\)</span> has a bivariate normal distribution with mean <span class="math inline">\((0, 0)\)</span> and covariance matrix <span class="math inline">\(\Sigma = \begin{pmatrix} 1 &amp; \rho \\ \rho &amp; 1 \end{pmatrix}\)</span>. We want to sample from the joint distribution <span class="math inline">\(f_{X, Y}\)</span>.</p>
+<p>One can show that the conditional distributions are:</p>
 <p><span class="math display">\[
 \begin{aligned}
-(X|Y = y_0) &amp;\sim \mathcal{N}(\rho y_0, 1 - \rho^2) \\
-(Y|X = x_0) &amp;\sim \mathcal{N}(\rho x_0, 1 - \rho^2).
+(X \mid Y = y_0) &amp;\sim \mathcal{N}(\rho y_0, 1 - \rho^2) \\
+(Y \mid X = x_0) &amp;\sim \mathcal{N}(\rho x_0, 1 - \rho^2).
 \end{aligned}
 \]</span></p>
-<p>We can sample from the two conditionals <span class="math inline">\(f_{X|Y}\)</span> and <span class="math inline">\(f_{Y|X}\)</span> using the Box-Muller method. The Gibbs algorithm becomes</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Property
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that both conditional distributions have the same variance <span class="math inline">\(1 - \rho^2\)</span>, which decreases as the correlation <span class="math inline">\(|\rho|\)</span> increases. When <span class="math inline">\(\rho = 0\)</span> (independence), the conditional variance equals the marginal variance.</p>
+</div>
+</div>
+<p>We can sample from the two conditionals <span class="math inline">\(f_{X|Y}\)</span> and <span class="math inline">\(f_{Y|X}\)</span> using standard normal sampling methods such as the Box-Muller transform.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Gibbs Algorithm for Bivariate Normal Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
 <li>Start with some initial values <span class="math inline">\(X_0\)</span> and <span class="math inline">\(Y_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>
-<ol type="1">
+<li>For <span class="math inline">\(i = 1, 2, \ldots, N\)</span>:
+<ol type="a">
 <li>Sample <span class="math inline">\(X_i \sim \mathcal{N}(\rho Y_{i-1}, 1 - \rho^2)\)</span>.</li>
 <li>Sample <span class="math inline">\(Y_i \sim \mathcal{N}(\rho X_i, 1 - \rho^2)\)</span>.</li>
 </ol></li>
-<li>Return the <span class="math inline">\((X_0, Y_0)\)</span>, <span class="math inline">\((X_1, Y_1)\)</span>, <span class="math inline">\(\ldots\)</span>, <span class="math inline">\((X_N, Y_N)\)</span>.</li>
+<li>Return the sequence <span class="math inline">\((X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)\)</span>.</li>
 </ol>
-<div id="febd8f33" class="cell" data-fig-width="7" data-execution_count="7">
+</div>
+</div>
+<div id="febd8f33" class="cell" data-fig-width="7" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -696,7 +767,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="8d73936d" class="cell" data-fig-width="7" data-execution_count="9">
+<div id="8d73936d" class="cell" data-fig-width="7" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -705,7 +776,7 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </div>
-<div id="5ef26692" class="cell" data-fig-width="7" data-execution_count="10">
+<div id="5ef26692" class="cell" data-fig-width="7" data-execution_count="11">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -715,23 +786,110 @@ f_{Y|X}(y | x_0) &amp;= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
 </div>
 </div>
 </section>
-<section id="sec-gibbs-markov-chain" class="level2" data-number="10.1">
-<h2 data-number="10.1" class="anchored" data-anchor-id="sec-gibbs-markov-chain"><span class="header-section-number">10.1</span> Markov Chain</h2>
-<p>The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables <span class="math inline">\(\Omega = \Omega_X \times \Omega_Y\)</span>. In the above examples, the state space is <span class="math inline">\([0, D_1] \times [0, D_2]\)</span> for the exponential distribution and <span class="math inline">\(\mathbb{R}^2\)</span> for the bivariate normal distribution. The transition matrix of the Markov Chain in discrete case is given by</p>
+<section id="sec-gibbs-markov-chain" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="sec-gibbs-markov-chain"><span class="header-section-number">11.3</span> Markov Chain</h2>
+<p>The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables <span class="math inline">\(\Omega = \Omega_X \times \Omega_Y\)</span>. In the above examples, the state space is <span class="math inline">\([0, D_1] \times [0, D_2]\)</span> for the exponential distribution and <span class="math inline">\(\mathbb{R}^2\)</span> for the bivariate normal distribution.</p>
+<p>The transition matrix of the Markov Chain in the discrete case is given by:</p>
 <p><span class="math display">\[
-P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' | Y_i = y) \mathbb{P}(Y_{i+1} = y' | X_i = x').
+P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' \mid Y_i = y) \mathbb{P}(Y_{i+1} = y' \mid X_{i+1} = x').
 \]</span></p>
-<p>In the continuous case, the transition <em>kernel</em> is given by</p>
+<p>In the continuous case, the transition <em>kernel</em> is given by:</p>
 <p><span class="math display">\[
 K \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right)
-= f_{X|Y}(x | y) f_{Y|X}(y | x').
+= f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x').
 \]</span></p>
-<div id="thm-Gibbs-Markov-Chain" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 10.1</strong></span> The Gibbs sampling algorithm generates a Markov Chain with the transition matrix <span class="math inline">\(P\)</span> as described above. The joint distribution <span class="math inline">\(f_{X, Y}\)</span> is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to <span class="math inline">\(f_{X, Y}\)</span>.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<p>We’ll provide a proof of the above theorem in the next section.</p>
+<div class="callout-title-container flex-fill">
+Important Detail
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that in the transition kernel, we condition <span class="math inline">\(Y_{i+1}\)</span> on the <em>newly sampled</em> value <span class="math inline">\(X_{i+1} = x'\)</span>, not on the previous value <span class="math inline">\(X_i = x\)</span>. This reflects the sequential nature of the Gibbs sampler.</p>
+</div>
+</div>
+<div id="thm-Gibbs-Markov-Chain" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 11.1 (Theorem: Gibbs Chain Stationarity)</strong></span> The Gibbs sampling algorithm generates a Markov Chain with the transition kernel <span class="math inline">\(K\)</span> as described above. The joint distribution <span class="math inline">\(f_{X, Y}\)</span> is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to <span class="math inline">\(f_{X, Y}\)</span>.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>To show that <span class="math inline">\(f_{X,Y}\)</span> is a stationary distribution, we need to verify that if <span class="math inline">\((X_i, Y_i) \sim f_{X,Y}\)</span>, then <span class="math inline">\((X_{i+1}, Y_{i+1}) \sim f_{X,Y}\)</span> as well.</p>
+<p>Let <span class="math inline">\((X_i, Y_i)\)</span> be distributed according to <span class="math inline">\(f_{X,Y}\)</span>. We want to show that <span class="math inline">\((X_{i+1}, Y_{i+1})\)</span> obtained through one step of the Gibbs sampler also follows <span class="math inline">\(f_{X,Y}\)</span>.</p>
+<p>The Gibbs sampler performs the following operations: 1. Sample <span class="math inline">\(X_{i+1} \sim f_{X|Y}(\cdot \mid Y_i)\)</span> 2. Sample <span class="math inline">\(Y_{i+1} \sim f_{Y|X}(\cdot \mid X_{i+1})\)</span></p>
+<p>We need to compute the joint density of <span class="math inline">\((X_{i+1}, Y_{i+1})\)</span>. Using the law of total probability and the conditional sampling steps:</p>
+<p><span class="math display">\[
+f_{X_{i+1}, Y_{i+1}}(x', y') = \int_{\Omega_Y} f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) f_{Y_i}(y) \, dy
+\]</span></p>
+<p>Given <span class="math inline">\(Y_i = y\)</span>, the Gibbs steps give us: - <span class="math inline">\(X_{i+1} \mid Y_i = y \sim f_{X|Y}(\cdot \mid y)\)</span> - <span class="math inline">\(Y_{i+1} \mid X_{i+1} = x', Y_i = y \sim f_{Y|X}(\cdot \mid x')\)</span></p>
+<p>Note that <span class="math inline">\(Y_{i+1}\)</span> depends only on <span class="math inline">\(X_{i+1}\)</span>, not directly on <span class="math inline">\(Y_i\)</span>. Therefore:</p>
+<p><span class="math display">\[
+f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) = f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x')
+\]</span></p>
+<p>Substituting back:</p>
+<p><span class="math display">\[
+\begin{aligned}
+f_{X_{i+1}, Y_{i+1}}(x', y') &amp;= \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x') f_{Y}(y) \, dy \\
+&amp;= f_{Y|X}(y' \mid x') \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y}(y) \, dy
+\end{aligned}
+\]</span></p>
+<p>Using the definition of marginal density: <span class="math display">\[
+f_X(x') = \int_{\Omega_Y} f_{X,Y}(x', y) \, dy = \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_Y(y) \, dy
+\]</span></p>
+<p>Therefore: <span class="math display">\[
+f_{X_{i+1}, Y_{i+1}}(x', y') = f_{Y|X}(y' \mid x') f_X(x') = f_{X,Y}(x', y')
+\]</span></p>
+<p>where the last equality follows from the fundamental relationship <span class="math inline">\(f_{X,Y}(x,y) = f_{Y|X}(y \mid x) f_X(x)\)</span>.</p>
+<p>Thus, <span class="math inline">\((X_{i+1}, Y_{i+1}) \sim f_{X,Y}\)</span>, proving that <span class="math inline">\(f_{X,Y}\)</span> is a stationary distribution of the Gibbs Markov Chain. <span class="math inline">\(\blacksquare\)</span></p>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Key Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The proof relies on the fundamental relationships between joint, marginal, and conditional densities. The stationarity follows naturally from the fact that we’re sampling from the correct conditional distributions at each step.</p>
+</div>
+</div>
+</section>
+<section id="concluding-remarks" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="concluding-remarks"><span class="header-section-number">11.4</span> Concluding Remarks</h2>
+<p>We have introduced the Gibbs sampling algorithm as a powerful MCMC method for sampling from joint distributions when the conditional distributions are known and easy to sample from. The key insights from our analysis are:</p>
+<ol type="1">
+<li><p><strong>Algorithmic Simplicity</strong>: Gibbs sampling reduces the complex problem of sampling from a joint distribution to the simpler task of iteratively sampling from conditional distributions.</p></li>
+<li><p><strong>Theoretical Foundation</strong>: We proved that the joint distribution <span class="math inline">\(f_{X,Y}\)</span> is a stationary distribution of the Markov Chain generated by the Gibbs sampler, ensuring that our samples will asymptotically follow the target distribution.</p></li>
+<li><p><strong>Practical Examples</strong>: Through the joint exponential and bivariate normal distributions, we demonstrated how the algorithm adapts to different types of conditional distributions—from truncated exponentials to Gaussians.</p></li>
+</ol>
+<p>The examples we studied involved continuous random variables with relatively simple conditional forms. However, the true power of Gibbs sampling becomes apparent when dealing with high-dimensional discrete systems where direct sampling from the joint distribution is computationally intractable.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Looking Ahead: The Ising Model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In our next topic, we will apply Gibbs sampling to the <strong>Ising model</strong>—a fundamental model in statistical physics that describes magnetic systems. The Ising model presents several new challenges:</p>
+<ul>
+<li><strong>Discrete state space</strong>: Each site takes values in <span class="math inline">\(\{-1, +1\}\)</span> rather than continuous values</li>
+<li><strong>High dimensionality</strong>: We’ll work with lattices containing hundreds or thousands of sites</li>
+<li><strong>Complex dependencies</strong>: Each site’s conditional distribution depends on all its neighbors</li>
+<li><strong>Phase transitions</strong>: The model exhibits different behavior at different temperatures</li>
+</ul>
+<p>The Ising model will demonstrate how Gibbs sampling can tackle problems where the joint distribution is known up to a normalization constant, but direct sampling is impossible due to the combinatorial explosion of possible configurations.</p>
+</div>
+</div>
+<p>The techniques we’ve developed here—understanding the Markov chain structure, working with conditional distributions, and ensuring proper convergence—will be essential tools as we move to this more complex and practically important application.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

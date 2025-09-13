@@ -28,44 +28,61 @@ N = 10000
 ```
 
 
+# Gibbs Sampling
+
 Gibbs Sampling is a MCMC algorithm that is used to sample from a joint distribution using conditional distributions. For now, we'll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.
 
-The Gibbs sampling algorithm for sampling from a joint distribution $f_{X, Y}(X, Y)$ is as follows:
+::: {.callout-note}
+## Gibbs Sampling Algorithm
+
+The Gibbs sampling algorithm for sampling from a joint distribution $f_{X, Y}(x, y)$ is as follows:
 
 1. Start with some initial values $X_0$ and $Y_0$.
-2. For $i = 1, 2, \ldots, N$
-   1. Sample $X_i \sim f_{X|Y}(\: \cdot \: | Y_{i-1})$.
-   2. Sample $Y_i \sim f_{Y|X}(\: \cdot \:  | X_i)$.
-3. Return the $(X_0, Y_0)$, $(X_1, Y_1)$, $\ldots$, $(X_N, Y_N)$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim f_{X|Y}(\cdot \mid Y_{i-1})$.
+   b. Sample $Y_i \sim f_{Y|X}(\cdot \mid X_i)$.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
 
 The algorithm generates a sample path of length $N$ of the Markov Chain as described in @sec-gibbs-markov-chain. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.
 
-### Joint Exponential Distribution
+## Joint Exponential Distribution
 
 Let $X$ and $Y$ be two random variables with the truncated exponential distribution:
 
 $$
-f_{X,Y}(x, y) = c e^{-\lambda xy} \text{ for } 0 \le x \le D_1, 0 \le y \le D_2,
+f_{X,Y}(x, y) = c e^{-\lambda xy} \quad \text{for } 0 \leq x \leq D_1, \, 0 \leq y \leq D_2,
 $$
 
-where $c$ is the normalization constant. We want to sample from the joint distribution $f_{X,Y}$. 
-One can show that the conditionals are,
+where $c$ is the normalization constant. We want to sample from the joint distribution $f_{X,Y}$.
+
+One can show that the conditionals are:
 
 $$
 \begin{aligned}
-f_{X|Y}(x | y_0) &= c_{y_0} e^{-\lambda xy_0} \text{ for } 0 \le x \le D_1 \\
-f_{Y|X}(y | x_0) &= c_{x_0} e^{-\lambda yx_0} \text{ for } 0 \le y \le D_2,
+f_{X|Y}(x \mid y_0) &= c_{y_0} e^{-\lambda x y_0} \quad \text{for } 0 \leq x \leq D_1 \\
+f_{Y|X}(y \mid x_0) &= c_{x_0} e^{-\lambda y x_0} \quad \text{for } 0 \leq y \leq D_2,
 \end{aligned}
 $$
 
 where $c_{y_0}$ and $c_{x_0}$ are the normalization constants.
-We can easily sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the inverse method function (even for truncated distributions). The Gibbs algorithm becomes
+
+::: {.callout-tip}
+## Key Insight
+Notice that each conditional distribution is simply a truncated exponential distribution with rate parameter that depends on the conditioning variable. This makes sampling straightforward using the inverse transform method.
+:::
+
+We can easily sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the inverse transform method (even for truncated distributions).
+
+::: {.callout-note}
+## Gibbs Algorithm for Joint Exponential Distribution
 
 1. Start with some initial values $X_0$ and $Y_0$.
-2. For $i = 1, 2, \ldots, N$
-   1. Sample $X_i \sim (\text{Exp}(\lambda Y_{i-1})$ restricted to $[0, D_1])$ using the inverse transform method.
-   2. Sample $Y_i \sim (\text{Exp}(\lambda X_i)$ restricted to $[0, D_2]$) using the inverse transform method.
-3. Return the $(X_0, Y_0)$, $(X_1, Y_1)$, $\ldots$, $(X_N, Y_N)$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim \text{Exp}(\lambda Y_{i-1})$ restricted to $[0, D_1]$ using the inverse transform method.
+   b. Sample $Y_i \sim \text{Exp}(\lambda X_i)$ restricted to $[0, D_2]$ using the inverse transform method.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
 
 ```{python}
 class truncated_exponential:
@@ -226,25 +243,35 @@ plt.ylabel('Y')
 plt.show()
 ```
 
-### Bivariate Normal Distribution
+## Bivariate Normal Distribution
 
 Suppose $(X, Y)$ has a bivariate normal distribution with mean $(0, 0)$ and covariance matrix $\Sigma = \begin{pmatrix} 1 & \rho \\ \rho & 1 \end{pmatrix}$. We want to sample from the joint distribution $f_{X, Y}$.
-One can show that 
+
+One can show that the conditional distributions are:
 
 $$
 \begin{aligned}
-(X|Y = y_0) &\sim \mathcal{N}(\rho y_0, 1 - \rho^2) \\
-(Y|X = x_0) &\sim \mathcal{N}(\rho x_0, 1 - \rho^2).
+(X \mid Y = y_0) &\sim \mathcal{N}(\rho y_0, 1 - \rho^2) \\
+(Y \mid X = x_0) &\sim \mathcal{N}(\rho x_0, 1 - \rho^2).
 \end{aligned}
 $$
 
-We can sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the Box-Muller method. The Gibbs algorithm becomes
+::: {.callout-important}
+## Key Property
+Notice that both conditional distributions have the same variance $1 - \rho^2$, which decreases as the correlation $|\rho|$ increases. When $\rho = 0$ (independence), the conditional variance equals the marginal variance.
+:::
+
+We can sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using standard normal sampling methods such as the Box-Muller transform.
+
+::: {.callout-note}
+## Gibbs Algorithm for Bivariate Normal Distribution
 
 1. Start with some initial values $X_0$ and $Y_0$.
-2. For $i = 1, 2, \ldots, N$
-   1. Sample $X_i \sim \mathcal{N}(\rho Y_{i-1}, 1 - \rho^2)$.
-   2. Sample $Y_i \sim \mathcal{N}(\rho X_i, 1 - \rho^2)$.
-3. Return the $(X_0, Y_0)$, $(X_1, Y_1)$, $\ldots$, $(X_N, Y_N)$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim \mathcal{N}(\rho Y_{i-1}, 1 - \rho^2)$.
+   b. Sample $Y_i \sim \mathcal{N}(\rho X_i, 1 - \rho^2)$.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
 
 ```{python}
 #| fig-width: 7
@@ -340,21 +367,110 @@ plt.show()
 
 ## Markov Chain {#sec-gibbs-markov-chain}
 
-The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables $\Omega = \Omega_X \times \Omega_Y$. In the above examples, the state space is $[0, D_1] \times [0, D_2]$ for the exponential distribution and $\mathbb{R}^2$ for the bivariate normal distribution. The transition matrix of the Markov Chain in discrete case is given by
+The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables $\Omega = \Omega_X \times \Omega_Y$. In the above examples, the state space is $[0, D_1] \times [0, D_2]$ for the exponential distribution and $\mathbb{R}^2$ for the bivariate normal distribution.
+
+The transition matrix of the Markov Chain in the discrete case is given by:
 
 $$
-P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' | Y_i = y) \mathbb{P}(Y_{i+1} = y' | X_i = x').
+P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' \mid Y_i = y) \mathbb{P}(Y_{i+1} = y' \mid X_{i+1} = x').
 $$
 
-In the continuous case, the transition *kernel* is given by
+In the continuous case, the transition *kernel* is given by:
 
 $$
 K \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right)
-= f_{X|Y}(x | y) f_{Y|X}(y | x').
+= f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x').
 $$
 
-::: {#thm-Gibbs-Markov-Chain}
-The Gibbs sampling algorithm generates a Markov Chain with the transition matrix $P$ as described above. The joint distribution $f_{X, Y}$ is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to $f_{X, Y}$.
+::: {.callout-warning}
+## Important Detail
+Note that in the transition kernel, we condition $Y_{i+1}$ on the *newly sampled* value $X_{i+1} = x'$, not on the previous value $X_i = x$. This reflects the sequential nature of the Gibbs sampler.
 :::
 
-We'll provide a proof of the above theorem in the next section.
+::: {#thm-Gibbs-Markov-Chain}
+## Theorem: Gibbs Chain Stationarity
+
+The Gibbs sampling algorithm generates a Markov Chain with the transition kernel $K$ as described above. The joint distribution $f_{X, Y}$ is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to $f_{X, Y}$.
+:::
+
+::: {.proof}
+To show that $f_{X,Y}$ is a stationary distribution, we need to verify that if $(X_i, Y_i) \sim f_{X,Y}$, then $(X_{i+1}, Y_{i+1}) \sim f_{X,Y}$ as well.
+
+Let $(X_i, Y_i)$ be distributed according to $f_{X,Y}$. We want to show that $(X_{i+1}, Y_{i+1})$ obtained through one step of the Gibbs sampler also follows $f_{X,Y}$.
+
+The Gibbs sampler performs the following operations:
+1. Sample $X_{i+1} \sim f_{X|Y}(\cdot \mid Y_i)$
+2. Sample $Y_{i+1} \sim f_{Y|X}(\cdot \mid X_{i+1})$
+
+We need to compute the joint density of $(X_{i+1}, Y_{i+1})$. Using the law of total probability and the conditional sampling steps:
+
+$$
+f_{X_{i+1}, Y_{i+1}}(x', y') = \int_{\Omega_Y} f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) f_{Y_i}(y) \, dy
+$$
+
+Given $Y_i = y$, the Gibbs steps give us:
+- $X_{i+1} \mid Y_i = y \sim f_{X|Y}(\cdot \mid y)$
+- $Y_{i+1} \mid X_{i+1} = x', Y_i = y \sim f_{Y|X}(\cdot \mid x')$
+
+Note that $Y_{i+1}$ depends only on $X_{i+1}$, not directly on $Y_i$. Therefore:
+
+$$
+f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) = f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x')
+$$
+
+Substituting back:
+
+$$
+\begin{aligned}
+f_{X_{i+1}, Y_{i+1}}(x', y') &= \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x') f_{Y}(y) \, dy \\
+&= f_{Y|X}(y' \mid x') \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y}(y) \, dy
+\end{aligned}
+$$
+
+Using the definition of marginal density:
+$$
+f_X(x') = \int_{\Omega_Y} f_{X,Y}(x', y) \, dy = \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_Y(y) \, dy
+$$
+
+Therefore:
+$$
+f_{X_{i+1}, Y_{i+1}}(x', y') = f_{Y|X}(y' \mid x') f_X(x') = f_{X,Y}(x', y')
+$$
+
+where the last equality follows from the fundamental relationship $f_{X,Y}(x,y) = f_{Y|X}(y \mid x) f_X(x)$.
+
+Thus, $(X_{i+1}, Y_{i+1}) \sim f_{X,Y}$, proving that $f_{X,Y}$ is a stationary distribution of the Gibbs Markov Chain.
+$\blacksquare$
+:::
+
+::: {.callout-tip}
+## Key Insight
+The proof relies on the fundamental relationships between joint, marginal, and conditional densities. The stationarity follows naturally from the fact that we're sampling from the correct conditional distributions at each step.
+:::
+
+
+## Concluding Remarks
+
+We have introduced the Gibbs sampling algorithm as a powerful MCMC method for sampling from joint distributions when the conditional distributions are known and easy to sample from. The key insights from our analysis are:
+
+1. **Algorithmic Simplicity**: Gibbs sampling reduces the complex problem of sampling from a joint distribution to the simpler task of iteratively sampling from conditional distributions.
+
+2. **Theoretical Foundation**: We proved that the joint distribution $f_{X,Y}$ is a stationary distribution of the Markov Chain generated by the Gibbs sampler, ensuring that our samples will asymptotically follow the target distribution.
+
+3. **Practical Examples**: Through the joint exponential and bivariate normal distributions, we demonstrated how the algorithm adapts to different types of conditional distributions—from truncated exponentials to Gaussians.
+
+The examples we studied involved continuous random variables with relatively simple conditional forms. However, the true power of Gibbs sampling becomes apparent when dealing with high-dimensional discrete systems where direct sampling from the joint distribution is computationally intractable.
+
+::: {.callout-note}
+## Looking Ahead: The Ising Model
+In our next topic, we will apply Gibbs sampling to the **Ising model**—a fundamental model in statistical physics that describes magnetic systems. The Ising model presents several new challenges:
+
+- **Discrete state space**: Each site takes values in $\{-1, +1\}$ rather than continuous values
+- **High dimensionality**: We'll work with lattices containing hundreds or thousands of sites
+- **Complex dependencies**: Each site's conditional distribution depends on all its neighbors
+- **Phase transitions**: The model exhibits different behavior at different temperatures
+
+The Ising model will demonstrate how Gibbs sampling can tackle problems where the joint distribution is known up to a normalization constant, but direct sampling is impossible due to the combinatorial explosion of possible configurations.
+:::
+
+The techniques we've developed here—understanding the Markov chain structure, working with conditional distributions, and ensuring proper convergence—will be essential tools as we move to this more complex and practically important application.

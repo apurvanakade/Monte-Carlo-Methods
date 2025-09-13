@@ -571,6 +571,7 @@ window.Quarto = {
   <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">9.7</span> Final Remarks</a>
   <ul class="collapse">
   <li><a href="#advanced-methods" id="toc-advanced-methods" class="nav-link" data-scroll-target="#advanced-methods"><span class="header-section-number">9.7.1</span> Advanced Methods</a></li>
+  <li><a href="#adaptive-rejection-sampling" id="toc-adaptive-rejection-sampling" class="nav-link" data-scroll-target="#adaptive-rejection-sampling"><span class="header-section-number">9.7.2</span> Adaptive Rejection Sampling</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1187,35 +1188,16 @@ Limitations of Accept-Reject Methods
 </div>
 <section id="advanced-methods" class="level3" data-number="9.7.1">
 <h3 data-number="9.7.1" class="anchored" data-anchor-id="advanced-methods"><span class="header-section-number">9.7.1</span> Advanced Methods</h3>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Beyond Basic Accept-Reject
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>Markov Chain Monte Carlo (MCMC):</strong> In higher dimensions, we need more sophisticated methods to sample from target distributions such as:</p>
+<p>In higher dimensions, we need more sophisticated methods to sample from target distributions such as:</p>
 <ul>
 <li><strong>Metropolis-Hastings algorithm</strong>: Uses proposal distributions but doesn’t require majorization.</li>
 <li><strong>Gibbs sampling</strong>: Samples from conditional distributions sequentially.</li>
 <li><strong>Hamiltonian Monte Carlo</strong>: Uses gradient information for efficient proposals.</li>
 </ul>
 <p>We’ll explore these methods in future sections.</p>
-</div>
-</div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Adaptive Rejection Sampling
-</div>
-</div>
-<div class="callout-body-container callout-body">
+</section>
+<section id="adaptive-rejection-sampling" class="level3" data-number="9.7.2">
+<h3 data-number="9.7.2" class="anchored" data-anchor-id="adaptive-rejection-sampling"><span class="header-section-number">9.7.2</span> Adaptive Rejection Sampling</h3>
 <p><strong>Adaptive rejection sampling</strong> is another method that tries to find a good proposal distribution by using the samples generated so far. Key features:</p>
 <ul>
 <li><strong>Adaptive construction</strong>: Uses previous samples to build a piecewise linear majorizing function.</li>
@@ -1224,8 +1206,6 @@ Adaptive Rejection Sampling
 <li><strong>Extensions</strong>: Has been extended to more general densities beyond log-concave cases.</li>
 </ul>
 <p>This adaptive approach would make an excellent topic for a research project, as it combines the simplicity of accept-reject with the adaptability needed for complex distributions.</p>
-</div>
-</div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="../images/adaptive.png" class="img-fluid figure-img"></p>
