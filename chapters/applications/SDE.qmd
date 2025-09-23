@@ -11,8 +11,6 @@ execute:
 ```{python}
 import numpy as np
 import matplotlib.pyplot as plt
-
-
 ```
 
 In this module, we will look at the Euler-Maruyama method for solving stochastic differential equations. Our focus will be on understanding numerical stability and convergence of the method.
@@ -60,6 +58,21 @@ A **Wiener process**, $W(t)$, also known as **Brownian motion**, is a stochastic
 3. The increments are independent.
 4. The process is continuous but nowhere differentiable.
 
+This results in a simple algorithm for generating sample paths of Brownian motion:
+
+::: {.callout-note}
+## Algorithm: Brownian Motion Path Generation
+
+1. Initialize $W_0 = 0$.
+2. Choose time step $\Delta t = \frac{T}{N}$ where $T$ is the final time and $N$ is the number of steps.
+3. For $n = 0, 1, 2, \ldots, N-1$, do:
+   a. Generate a random number $Z_n \sim \mathcal{N}(0, 1)$.
+   b. Compute $W_{n+1} = W_n + \sqrt{\Delta t} \cdot Z_n$.
+4. Return $W_0, W_1, \ldots, W_N$ at times $t_0 = 0, t_1 = \Delta t, \ldots, t_N = T$.
+:::
+
+This algorithm exploits the fact that Brownian motion has independent increments with $W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)$, making it a special case of the Euler-Maruyama method with $a(x,t) = 0$ and $b(x,t) = 1$.
+
 We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time $t$, the mean of $W(t)$ is $0$. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.
 
 From the definition, we can derive several important properties:
@@ -99,10 +112,6 @@ plt.title('Sample paths of Wiener process')
 plt.show()
 ```
 
-
-    
-
-
 ```{python}
 M = 10000
 W1 = wiener_process(T, N, M)
@@ -128,7 +137,7 @@ plt.show()
 ```
 
 
-    
+
 
 
 ## Stochastic Differential Equations 
@@ -218,7 +227,7 @@ plt.show()
 ```
 
 
-    
+
 
 ## Euler-Maruyama Method
 

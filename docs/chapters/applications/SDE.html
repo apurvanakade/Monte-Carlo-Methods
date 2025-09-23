@@ -670,6 +670,30 @@ Applications of Stochastic Differential Equations
 <li>The increments are independent.</li>
 <li>The process is continuous but nowhere differentiable.</li>
 </ol>
+<p>This results in a simple algorithm for generating sample paths of Brownian motion:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Algorithm: Brownian Motion Path Generation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Initialize <span class="math inline">\(W_0 = 0\)</span>.</li>
+<li>Choose time step <span class="math inline">\(\Delta t = \frac{T}{N}\)</span> where <span class="math inline">\(T\)</span> is the final time and <span class="math inline">\(N\)</span> is the number of steps.</li>
+<li>For <span class="math inline">\(n = 0, 1, 2, \ldots, N-1\)</span>, do:
+<ol type="a">
+<li>Generate a random number <span class="math inline">\(Z_n \sim \mathcal{N}(0, 1)\)</span>.</li>
+<li>Compute <span class="math inline">\(W_{n+1} = W_n + \sqrt{\Delta t} \cdot Z_n\)</span>.</li>
+</ol></li>
+<li>Return <span class="math inline">\(W_0, W_1, \ldots, W_N\)</span> at times <span class="math inline">\(t_0 = 0, t_1 = \Delta t, \ldots, t_N = T\)</span>.</li>
+</ol>
+</div>
+</div>
+<p>This algorithm exploits the fact that Brownian motion has independent increments with <span class="math inline">\(W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)\)</span>, making it a special case of the Euler-Maruyama method with <span class="math inline">\(a(x,t) = 0\)</span> and <span class="math inline">\(b(x,t) = 1\)</span>.</p>
 <p>We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time <span class="math inline">\(t\)</span>, the mean of <span class="math inline">\(W(t)\)</span> is <span class="math inline">\(0\)</span>. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.</p>
 <p>From the definition, we can derive several important properties:</p>
 <ul>
@@ -691,16 +715,16 @@ Mathematical Subtlety
 <p>The nowhere differentiable property of Wiener processes means that expressions like <span class="math inline">\(\frac{dW}{dt}\)</span> don’t exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.</p>
 </div>
 </div>
-<div id="c56470a7" class="cell" data-execution_count="3">
+<div id="61e38d8f" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="587" height="449" class="figure-img"></p>
+<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="600" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="198bc222" class="cell" data-execution_count="4">
+<div id="c0a8d0d7" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -766,7 +790,7 @@ The Itô Correction Term
 <p>The appearance of the <span class="math inline">\(-\sigma^2/2\)</span> term in <a href="#eq-geometric-brownian-motion-solution" class="quarto-xref">Equation&nbsp;<span>13.7</span></a> is a direct consequence of Itô’s lemma. This correction term distinguishes stochastic calculus from ordinary calculus and reflects the quadratic variation of the Wiener process.</p>
 </div>
 </div>
-<div id="5906f65f" class="cell" data-execution_count="5">
+<div id="c31858db" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
