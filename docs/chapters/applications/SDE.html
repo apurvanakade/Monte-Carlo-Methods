@@ -557,7 +557,7 @@ window.Quarto = {
   <li><a href="#itô-vs-stratonovich-interpretation" id="toc-itô-vs-stratonovich-interpretation" class="nav-link" data-scroll-target="#itô-vs-stratonovich-interpretation"><span class="header-section-number">13.3.1</span> Itô vs Stratonovich Interpretation</a></li>
   </ul></li>
   <li><a href="#geometric-brownian-motion" id="toc-geometric-brownian-motion" class="nav-link" data-scroll-target="#geometric-brownian-motion"><span class="header-section-number">13.4</span> Geometric Brownian Motion</a></li>
-  <li><a href="#euler-maruyama-method" id="toc-euler-maruyama-method" class="nav-link" data-scroll-target="#euler-maruyama-method"><span class="header-section-number">13.5</span> Euler-Maruyama Method</a></li>
+  <li><a href="#sec-euler-maruyama" id="toc-sec-euler-maruyama" class="nav-link" data-scroll-target="#sec-euler-maruyama"><span class="header-section-number">13.5</span> Euler-Maruyama Method</a></li>
   <li><a href="#convergence-of-the-euler-maruyama-method" id="toc-convergence-of-the-euler-maruyama-method" class="nav-link" data-scroll-target="#convergence-of-the-euler-maruyama-method"><span class="header-section-number">13.6</span> Convergence of the Euler-Maruyama Method</a>
   <ul class="collapse">
   <li><a href="#weak-convergence" id="toc-weak-convergence" class="nav-link" data-scroll-target="#weak-convergence"><span class="header-section-number">13.6.1</span> Weak Convergence</a></li>
@@ -693,7 +693,25 @@ Algorithm: Brownian Motion Path Generation
 </ol>
 </div>
 </div>
-<p>This algorithm exploits the fact that Brownian motion has independent increments with <span class="math inline">\(W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)\)</span>, making it a special case of the Euler-Maruyama method with <span class="math inline">\(a(x,t) = 0\)</span> and <span class="math inline">\(b(x,t) = 1\)</span>.</p>
+<p>This algorithm exploits the fact that Brownian motion has independent increments with <span class="math inline">\(W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)\)</span>, making it a special case of the Euler-Maruyama method from <a href="#sec-euler-maruyama" class="quarto-xref"><span>Section 13.5</span></a> with <span class="math inline">\(a(x,t) = 0\)</span> and <span class="math inline">\(b(x,t) = 1\)</span>.</p>
+<div id="61e38d8f" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="600" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="c0a8d0d7" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="SDE_files/figure-html/cell-4-output-1.png" width="589" height="431" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 <p>We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time <span class="math inline">\(t\)</span>, the mean of <span class="math inline">\(W(t)\)</span> is <span class="math inline">\(0\)</span>. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.</p>
 <p>From the definition, we can derive several important properties:</p>
 <ul>
@@ -713,24 +731,6 @@ Mathematical Subtlety
 </div>
 <div class="callout-body-container callout-body">
 <p>The nowhere differentiable property of Wiener processes means that expressions like <span class="math inline">\(\frac{dW}{dt}\)</span> don’t exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.</p>
-</div>
-</div>
-<div id="61e38d8f" class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="SDE_files/figure-html/cell-3-output-1.png" width="600" height="449" class="figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="c0a8d0d7" class="cell" data-execution_count="4">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="SDE_files/figure-html/cell-4-output-1.png" width="589" height="431" class="figure-img"></p>
-</figure>
-</div>
 </div>
 </div>
 </section>
@@ -800,8 +800,8 @@ The Itô Correction Term
 </div>
 </div>
 </section>
-<section id="euler-maruyama-method" class="level2" data-number="13.5">
-<h2 data-number="13.5" class="anchored" data-anchor-id="euler-maruyama-method"><span class="header-section-number">13.5</span> Euler-Maruyama Method</h2>
+<section id="sec-euler-maruyama" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="sec-euler-maruyama"><span class="header-section-number">13.5</span> Euler-Maruyama Method</h2>
 <p>Most SDEs do not have analytical solutions. We need to solve them numerically. Similar to ODEs, some simple regularity conditions on the coefficients <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> imply that the SDE has a unique solution. Most common SDEs satisfy these conditions. However, unlike ODEs, the solution to an SDE is a stochastic process. We can’t just evaluate the solution at a few points to get an approximate solution. We need to generate several sample paths of the stochastic process to get an approximate solution.</p>
 <p>The simplest method for solving SDEs is the <strong>Euler-Maruyama method</strong>. This is a stochastic analog of the Euler method for ODEs. The Euler-Maruyama method is a recursive method. Given the value of the stochastic process <span class="math inline">\(X_n\)</span> at time <span class="math inline">\(t_n\)</span>, we can find the value of the process at time <span class="math inline">\(t_{n+1} = t_n + \Delta t\)</span> using the formula</p>
 <p><span id="eq-euler-maruyama"><span class="math display">\[X_{n+1} = X_n + a(X_n, t_n) \Delta t + b(X_n, t_n) \Delta W_n \tag{13.8}\]</span></span></p>

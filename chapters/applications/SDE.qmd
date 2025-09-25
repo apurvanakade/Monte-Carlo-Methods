@@ -71,22 +71,7 @@ This results in a simple algorithm for generating sample paths of Brownian motio
 4. Return $W_0, W_1, \ldots, W_N$ at times $t_0 = 0, t_1 = \Delta t, \ldots, t_N = T$.
 :::
 
-This algorithm exploits the fact that Brownian motion has independent increments with $W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)$, making it a special case of the Euler-Maruyama method with $a(x,t) = 0$ and $b(x,t) = 1$.
-
-We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time $t$, the mean of $W(t)$ is $0$. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.
-
-From the definition, we can derive several important properties:
-
-- **Mean**: $\mathbb{E}[W(t)] = 0$ for all $t \geq 0$.
-- **Variance**: $\text{Var}(W(t)) = t$ for all $t \geq 0$.
-- **Covariance**: $\text{Cov}(W(s), W(t)) = \min(s,t)$ for $s, t \geq 0$.
-- **Distribution**: $W(t) \sim \mathcal{N}(0, t)$ for any $t > 0$.
-
-::: {.callout-warning}
-## Mathematical Subtlety
-The nowhere differentiable property of Wiener processes means that expressions like $\frac{dW}{dt}$ don't exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.
-:::
-
+This algorithm exploits the fact that Brownian motion has independent increments with $W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)$, making it a special case of the Euler-Maruyama method from @sec-euler-maruyama with $a(x,t) = 0$ and $b(x,t) = 1$.
 
 
 ```{python}
@@ -135,6 +120,20 @@ plt.ylabel('Density')
 
 plt.show()
 ```
+
+We can derive the properties of the Wiener process by taking the continuous limit of a random walk. Note that for all time $t$, the mean of $W(t)$ is $0$. However, the variance grows with time. Imagine a box of gas particles all starting at the origin without any initial velocity or external forces. As there is no external force or initial velocity, the center of mass of the gas particles will remain at the origin. However, the gas particles will spread out over time. The Wiener process models this spreading out of gas particles.
+
+From the definition, we can derive several important properties:
+
+- **Mean**: $\mathbb{E}[W(t)] = 0$ for all $t \geq 0$.
+- **Variance**: $\text{Var}(W(t)) = t$ for all $t \geq 0$.
+- **Covariance**: $\text{Cov}(W(s), W(t)) = \min(s,t)$ for $s, t \geq 0$.
+- **Distribution**: $W(t) \sim \mathcal{N}(0, t)$ for any $t > 0$.
+
+::: {.callout-warning}
+## Mathematical Subtlety
+The nowhere differentiable property of Wiener processes means that expressions like $\frac{dW}{dt}$ don't exist in the classical sense. This is why we need special mathematical machinery (Itô calculus) to handle stochastic differential equations properly.
+:::
 
 
 
@@ -229,7 +228,7 @@ plt.show()
 
 
 
-## Euler-Maruyama Method
+## Euler-Maruyama Method {#sec-euler-maruyama}
 
 Most SDEs do not have analytical solutions. We need to solve them numerically. Similar to ODEs, some simple regularity conditions on the coefficients $a$ and $b$ imply that the SDE has a unique solution. Most common SDEs satisfy these conditions. However, unlike ODEs, the solution to an SDE is a stochastic process. We can't just evaluate the solution at a few points to get an approximate solution. We need to generate several sample paths of the stochastic process to get an approximate solution.
 
