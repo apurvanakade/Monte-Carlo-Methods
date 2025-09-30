@@ -69,6 +69,78 @@ $$\pi_n = \pi_0 P^n.$$
 \end{align*}
 :::
 
+::: {#exm-random-walk}
+
+Consider a graph $G$ with 4 vertices as shown below. The transition matrix of the random walk on $G$ is given by
+$$P = 
+\begin{pmatrix}
+0 & 1 & 0 & 0 \\ 
+1/3 & 0 & 1/3 & 1/3 \\
+0 & 1/2 & 0 & 1/2 \\
+0 & 1/2 & 1/2 & 0
+\end{pmatrix}.$$
+
+Suppose we start at vertex $A$. This means that the initial distribution is $\pi_0 = [1, 0, 0, 0]$. The $n$-th distribution $\pi_n$ can be obtained by multiplying $\pi_0$ with the transition matrix $P^n$.
+
+:::
+
+```{python}
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add edges with transition probabilities
+edges = [
+    ('A', 'B', 1),
+    ('B', 'C', 1/3),
+    ('B', 'A', 1/3),
+    ('B', 'D', 1/3),
+    ('C', 'B', 1/2),
+    ('C', 'D', 1/2),
+    ('D', 'B', 1/2),
+    ('D', 'C', 1/2)
+]
+
+G.add_weighted_edges_from(edges)
+
+plt.figure(figsize=(4,3))
+pos = nx.spectral_layout(G)
+nx.draw(G, pos, with_labels=True, node_size=1000, node_color='lightblue', edgecolors='black',
+  labels={n: f"$\\bf{{{n}}}$" for n in G.nodes})
+
+# Draw edge labels (weights)
+edge_labels = {(u, v): f"{d['weight']:.2f}" for u, v, d in G.edges(data=True)}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
+
+plt.show()
+
+
+# Generate the transition matrix
+T = nx.to_numpy_array(G)
+
+print("Transition matrix of the Markov chain:")
+print(np.round(T, 2))
+
+## Example: Evolution of a Markov Chain
+
+import pandas as pd
+
+print("\nEvolution of the Markov chain starting from state A:\n")
+
+# Initial state distribution (start at A)
+state = np.array([1, 0, 0, 0])
+evolution = [state.copy()]
+
+# Compute the distribution at each time step for 10 steps
+for t in range(1, 11):
+  state = state @ T
+  evolution.append(state.copy())
+
+# Create a DataFrame to display the evolution of probabilities for each state
+df = pd.DataFrame(np.round(evolution, 3), columns=['A', 'B', 'C', 'D'])
+# df.index.name = "Time"
+print(df)
+```
+
 ## Stationary Distribution
 
 ::: {#def-Stationary-Distribution}
@@ -169,77 +241,7 @@ where $\deg(i)$ is the degree of vertex $i$ and $|E|$ is the number of edges in 
 
 :::
 
-::: {#exm-random-walk}
 
-Consider a graph $G$ with 4 vertices as shown below. The transition matrix of the random walk on $G$ is given by
-$$P = 
-\begin{pmatrix}
-0 & 1 & 0 & 0 \\ 
-1/3 & 0 & 1/3 & 1/3 \\
-0 & 1/2 & 0 & 1/2 \\
-0 & 1/2 & 1/2 & 0
-\end{pmatrix}.$$
-
-Suppose we start at vertex $A$. This means that the initial distribution is $\pi_0 = [1, 0, 0, 0]$. The $n$-th distribution $\pi_n$ can be obtained by multiplying $\pi_0$ with the transition matrix $P^n$.
-
-:::
-
-```{python}
-# Create a directed graph
-G = nx.DiGraph()
-
-# Add edges with transition probabilities
-edges = [
-    ('A', 'B', 1),
-    ('B', 'C', 1/3),
-    ('B', 'A', 1/3),
-    ('B', 'D', 1/3),
-    ('C', 'B', 1/2),
-    ('C', 'D', 1/2),
-    ('D', 'B', 1/2),
-    ('D', 'C', 1/2)
-]
-
-G.add_weighted_edges_from(edges)
-
-plt.figure(figsize=(4,3))
-pos = nx.spectral_layout(G)
-nx.draw(G, pos, with_labels=True, node_size=1000, node_color='lightblue', edgecolors='black',
-  labels={n: f"$\\bf{{{n}}}$" for n in G.nodes})
-
-# Draw edge labels (weights)
-edge_labels = {(u, v): f"{d['weight']:.2f}" for u, v, d in G.edges(data=True)}
-nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
-
-plt.show()
-
-
-# Generate the transition matrix
-T = nx.to_numpy_array(G)
-
-print("Transition matrix of the Markov chain:")
-print(np.round(T, 2))
-
-## Example: Evolution of a Markov Chain
-
-import pandas as pd
-
-print("\nEvolution of the Markov chain starting from state A:\n")
-
-# Initial state distribution (start at A)
-state = np.array([1, 0, 0, 0])
-evolution = [state.copy()]
-
-# Compute the distribution at each time step for 10 steps
-for t in range(1, 11):
-  state = state @ T
-  evolution.append(state.copy())
-
-# Create a DataFrame to display the evolution of probabilities for each state
-df = pd.DataFrame(np.round(evolution, 3), columns=['A', 'B', 'C', 'D'])
-# df.index.name = "Time"
-print(df)
-```
 
 ## Mixing Time
 

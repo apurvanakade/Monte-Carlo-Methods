@@ -674,6 +674,47 @@ State Diagrams
 &amp;= (\pi_n P)(j).
 \end{align*}\]</span></p>
 </div>
+<div id="exm-random-walk" class="theorem example">
+<p><span class="theorem-title"><strong>Example B.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by <span class="math display">\[P =
+\begin{pmatrix}
+0 &amp; 1 &amp; 0 &amp; 0 \\
+1/3 &amp; 0 &amp; 1/3 &amp; 1/3 \\
+0 &amp; 1/2 &amp; 0 &amp; 1/2 \\
+0 &amp; 1/2 &amp; 1/2 &amp; 0
+\end{pmatrix}.\]</span></p>
+<p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n\)</span>-th distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>.</p>
+</div>
+<div id="f0a9b4fe" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="markov_chains_files/figure-html/cell-3-output-1.png" width="403" height="307" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transition matrix of the Markov chain:
+[[0.   1.   0.   0.  ]
+ [0.33 0.   0.33 0.33]
+ [0.   0.5  0.   0.5 ]
+ [0.   0.5  0.5  0.  ]]
+
+Evolution of the Markov chain starting from state A:
+
+        A      B      C      D
+0   1.000  0.000  0.000  0.000
+1   0.000  1.000  0.000  0.000
+2   0.333  0.000  0.333  0.333
+3   0.000  0.667  0.167  0.167
+4   0.222  0.167  0.306  0.306
+5   0.056  0.528  0.208  0.208
+6   0.176  0.264  0.280  0.280
+7   0.088  0.456  0.228  0.228
+8   0.152  0.316  0.266  0.266
+9   0.105  0.418  0.238  0.238
+10  0.139  0.344  0.259  0.259</code></pre>
+</div>
+</div>
 </section>
 <section id="stationary-distribution" class="level2" data-number="B.2">
 <h2 data-number="B.2" class="anchored" data-anchor-id="stationary-distribution"><span class="header-section-number">B.2</span> Stationary Distribution</h2>
@@ -759,47 +800,6 @@ Algorithm: Random Walk on a Graph
 <li>Aperiodic if and only if the graph is not bipartite.</li>
 </ol>
 <p>If these conditions hold, then the stationary distribution of the random walk is given by <span class="math display">\[\Pi(i) = \frac{\deg(i)}{2|E|},\]</span> where <span class="math inline">\(\deg(i)\)</span> is the degree of vertex <span class="math inline">\(i\)</span> and <span class="math inline">\(|E|\)</span> is the number of edges in the graph.</p>
-</div>
-<div id="exm-random-walk" class="theorem example">
-<p><span class="theorem-title"><strong>Example B.1</strong></span> Consider a graph <span class="math inline">\(G\)</span> with 4 vertices as shown below. The transition matrix of the random walk on <span class="math inline">\(G\)</span> is given by <span class="math display">\[P =
-\begin{pmatrix}
-0 &amp; 1 &amp; 0 &amp; 0 \\
-1/3 &amp; 0 &amp; 1/3 &amp; 1/3 \\
-0 &amp; 1/2 &amp; 0 &amp; 1/2 \\
-0 &amp; 1/2 &amp; 1/2 &amp; 0
-\end{pmatrix}.\]</span></p>
-<p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n\)</span>-th distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>.</p>
-</div>
-<div id="f0a9b4fe" class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-3-output-1.png" width="403" height="307" class="figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Transition matrix of the Markov chain:
-[[0.   1.   0.   0.  ]
- [0.33 0.   0.33 0.33]
- [0.   0.5  0.   0.5 ]
- [0.   0.5  0.5  0.  ]]
-
-Evolution of the Markov chain starting from state A:
-
-        A      B      C      D
-0   1.000  0.000  0.000  0.000
-1   0.000  1.000  0.000  0.000
-2   0.333  0.000  0.333  0.333
-3   0.000  0.667  0.167  0.167
-4   0.222  0.167  0.306  0.306
-5   0.056  0.528  0.208  0.208
-6   0.176  0.264  0.280  0.280
-7   0.088  0.456  0.228  0.228
-8   0.152  0.316  0.266  0.266
-9   0.105  0.418  0.238  0.238
-10  0.139  0.344  0.259  0.259</code></pre>
-</div>
 </div>
 </section>
 <section id="mixing-time" class="level2" data-number="B.5">
