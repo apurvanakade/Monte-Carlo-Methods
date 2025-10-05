@@ -400,7 +400,7 @@
     "href": "chapters/sampling/gibbs_2d.html",
     "title": "10  Gibbs Sampling",
     "section": "",
-    "text": "11 Gibbs Sampling\nGibbs Sampling is a MCMC algorithm that is used to sample from a joint distribution using conditional distributions. For now, we’ll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.\nThe algorithm generates a sample path of length \\(N\\) of the Markov Chain as described in Section 11.3. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.",
+    "text": "11 Gibbs Sampling\nGibbs Sampling is a Markov Chain Monte Carlo algorithm that is used to sample from a joint distribution using conditional distributions. For now, we’ll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.\nThe algorithm generates a sample path of length \\(N\\) of the Markov Chain as described in Section 11.3. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.",
     "crumbs": [
       "Sampling Techniques",
       "<span class='chapter-number'>10</span>  <span class='chapter-title'>Gibbs Sampling</span>"

@@ -30,7 +30,7 @@ N = 10000
 
 # Gibbs Sampling
 
-Gibbs Sampling is a MCMC algorithm that is used to sample from a joint distribution using conditional distributions. For now, we'll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.
+Gibbs Sampling is a Markov Chain Monte Carlo algorithm that is used to sample from a joint distribution using conditional distributions. For now, we'll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.
 
 ::: {.callout-note}
 ## Gibbs Sampling Algorithm
@@ -213,6 +213,17 @@ def gibbs_sampler_exp(lambda_, D1, D2, x0=1.0, y0=1.0):
     return X, Y
 
 X, Y = gibbs_sampler_exp(lambda_, D1, D2)
+```
+
+```{python}
+#| fig-width: 7
+
+plt.figure(figsize=(7, 7))
+plt.scatter(X, Y, alpha=0.5, color='r', s=5)
+plt.title('Gibbs Sampler for Bivariate Normal')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.show()
 ```
 
 ```{python}

@@ -44,9 +44,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-d49a37c80e95ea2516c73b6f7289119c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -631,7 +631,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><strong>Magnetization</strong>: If the system is in a state where most of the particles have the same spin, the system is said to be magnetized.</li>
 </ol>
 <p>Next we create a mathematical model to describe the system.</p>
-<div id="110fc3dd" class="cell" data-execution_count="2">
+<div id="ff9388f6" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -703,7 +703,7 @@ h_{i, j}
 \end{aligned}
 \]</span></p>
 <p>The conditional distribution in <a href="#eq-conditional" class="quarto-xref">Equation&nbsp;<span>14.1</span></a> is a logistic function. When <span class="math inline">\(h_{i, j}\)</span> is positive, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is greater than <span class="math inline">\(0.5\)</span>, and when <span class="math inline">\(h_{i, j}\)</span> is negative, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is less than <span class="math inline">\(0.5\)</span>. This makes sense because if the effective field is positive, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(1\)</span> and if the effective field is negative, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(-1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(-1\)</span>.</p>
-<div id="c717a478" class="cell" data-execution_count="3">
+<div id="d06be51f" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -748,7 +748,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 <p>Below are the results of simulating the Ising model on a <span class="math inline">\(20 \times 20\)</span> grid for <span class="math inline">\(J = 1\)</span>. The predicted critical temperature is <span class="math inline">\(T_c = 2.269\)</span>.</p>
 <p>We can see that at <span class="math inline">\(T=1.5\)</span>, the system is magnetized and the magnetization is more or less constant and close to 1 or -1 over various runs. At <span class="math inline">\(T=2.5\)</span>, the system is not magnetized and the average magnetization is close to 0. It fluctuates wildly over various runs.</p>
 <p>If we gradually increase the temperature from <span class="math inline">\(T=1\)</span> to <span class="math inline">\(T=3\)</span>, we can see that the magnetization decreases smoothly until <span class="math inline">\(T=2\)</span> after which it drops suddenly. This is the phase transition. Below the graph are the snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.</p>
-<div id="7bf14f94" class="cell" data-execution_count="5">
+<div id="f06a2c94" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -764,7 +764,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="09641cc4" class="cell" data-execution_count="7">
+<div id="dc66829a" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -773,7 +773,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="92f8d31d" class="cell" data-execution_count="9">
+<div id="daee6d10" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
