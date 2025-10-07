@@ -1018,21 +1018,7 @@ Algorithm: Trace Plot Analysis
 <section id="running-average" class="level3" data-number="B.9.2">
 <h3 data-number="B.9.2" class="anchored" data-anchor-id="running-average"><span class="header-section-number">B.9.2</span> Running Average</h3>
 <p>The <strong>running average</strong> (also called cumulative mean) is the average of the first <span class="math inline">\(n\)</span> samples: <span class="math display">\[\bar{x}_n = \frac{1}{n}\sum_{i=1}^n x_i\]</span></p>
-<p>Running averages are a simple diagnostic tool for assessing MCMC convergence. The basic principle is that if a Markov chain has converged to its stationary distribution, the running average should eventually stabilize around the true mean of the target distribution.</p>
-<section id="how-to-interpret-running-averages" class="level4" data-number="B.9.2.1">
-<h4 data-number="B.9.2.1" class="anchored" data-anchor-id="how-to-interpret-running-averages"><span class="header-section-number">B.9.2.1</span> How to Interpret Running Averages</h4>
-<p><strong>Signs of convergence:</strong></p>
-<ul>
-<li>The running average stabilizes (stops trending) after some initial period</li>
-<li>Fluctuations around the stable value decrease as <span class="math inline">\(n\)</span> increases</li>
-<li>The stabilization point is consistent across different portions of the chain</li>
-</ul>
-<p><strong>Signs of non-convergence:</strong></p>
-<ul>
-<li>Persistent trends or drift in the running average</li>
-<li>Large jumps or sudden changes in the running average</li>
-<li>Different behavior when computed from different starting points</li>
-</ul>
+<p>Running averages are a simple diagnostic tool for assessing MCMC convergence. If a chain has converged, the running average should stabilize around the true mean, with consistent behavior across different starting points.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1043,26 +1029,32 @@ Important Limitations of Running Averages
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Running averages have several critical limitations:</p>
+<p>Running averages have critical limitations:</p>
 <ol type="1">
-<li><strong>False stability</strong>: They can appear stable even when the chain hasn’t converged, especially if the chain gets “stuck” in one region</li>
-<li><strong>Slow to detect problems</strong>: Due to their cumulative nature, they respond slowly to changes in the chain’s behavior</li>
-<li><strong>Masking effect</strong>: Early samples heavily influence the running average, potentially masking later convergence issues</li>
-<li><strong>No information about mixing</strong>: They don’t reveal whether the chain is exploring the full distribution</li>
+<li><strong>False stability</strong>: Can appear stable even when the chain hasn’t converged.</li>
+<li><strong>Slow detection</strong>: Respond slowly to changes due to their cumulative nature.<br>
+</li>
+<li><strong>Masking effect</strong>: Early samples heavily influence the average, hiding later issues.</li>
+<li><strong>Limited scope</strong>: Don’t reveal whether the chain explores the full distribution.</li>
 </ol>
-<p><strong>Key insight</strong>: Running averages are better at detecting when a chain has <strong>not</strong> converged than confirming when it <strong>has</strong> converged. Always use them alongside other diagnostics.</p>
+<p><strong>Key insight</strong>: Running averages are better at detecting non-convergence than confirming convergence. Always use alongside other diagnostics.</p>
 </div>
 </div>
-</section>
-<section id="proper-usage-strategy" class="level4" data-number="B.9.2.2">
-<h4 data-number="B.9.2.2" class="anchored" data-anchor-id="proper-usage-strategy"><span class="header-section-number">B.9.2.2</span> Proper Usage Strategy</h4>
-<p>To use running averages effectively:</p>
-<ol type="1">
-<li><strong>Compare multiple starting points</strong>: Calculate running averages from different points in your chain</li>
-<li><strong>Look for consistent stabilization</strong>: The stabilization should occur at similar points regardless of where you start</li>
-<li><strong>Check for trend changes</strong>: Sudden changes in trend may indicate the chain is moving between different regions</li>
-<li><strong>Use as supporting evidence</strong>: Combine with autocorrelation analysis and visual inspection</li>
-</ol>
+<section id="effective-usage-strategy" class="level4" data-number="B.9.2.1">
+<h4 data-number="B.9.2.1" class="anchored" data-anchor-id="effective-usage-strategy"><span class="header-section-number">B.9.2.1</span> Effective Usage Strategy</h4>
+<p><strong>Signs of convergence:</strong></p>
+<ul>
+<li>Running averages from different starting points converge to similar values.</li>
+<li>Stabilization occurs consistently regardless of where you start.</li>
+<li>Absence of persistent trends or sudden jumps.</li>
+</ul>
+<p><strong>Signs of problems:</strong></p>
+<ul>
+<li>Persistent drift or trending behavior.</li>
+<li>Different stabilization points from different starting points.</li>
+<li>Large jumps indicating the chain is moving between regions.</li>
+</ul>
+<p>Use running averages as <strong>supporting evidence</strong> for your autocorrelation-based burn-in determination, not as the primary diagnostic.</p>
 <div id="exm">
 <p>Below is the running average analysis for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>.</p>
 <div id="95b904bf" class="cell" data-fold="true" data-execution_count="7">
@@ -1080,15 +1072,18 @@ Difference: 0.084</code></pre>
 </div>
 </div>
 </div>
-<p><strong>Interpretation guidelines:</strong> - If running averages from different starting points converge to similar values, this suggests convergence - The “Local Average Differences” plot helps identify when the chain behavior stabilizes - A trend test correlation close to zero in the latter portion indicates the absence of systematic drift - Use this analysis to support (not replace) your autocorrelation-based burn-in determination</p>
-<p>Remember: running averages are most valuable when they show <strong>problems</strong> (trends, instability) rather than when they appear stable. Always combine this diagnostic with autocorrelation analysis for robust convergence assessment.</p>
 </section>
 </section>
 <section id="autocorrelation-function" class="level3" data-number="B.9.3">
 <h3 data-number="B.9.3" class="anchored" data-anchor-id="autocorrelation-function"><span class="header-section-number">B.9.3</span> Autocorrelation Function</h3>
 <p>One method for finding the burn-in period is to use the autocorrelation function. The <strong>autocorrelation function</strong> of a sequence of numbers <span class="math inline">\(x = (x_0, x_1, \ldots, x_n)\)</span> at lag <span class="math inline">\(k\)</span> is defined as <span class="math display">\[\text{ACF}(k) = \text{Corr}(x[k:], x[:-k])\]</span> where by <span class="math inline">\(x[k:]\)</span> we mean the subsequence <span class="math inline">\(x_k, x_{k+1}, \ldots, x_n\)</span> and by <span class="math inline">\(x[:-k]\)</span> we mean the subsequence <span class="math inline">\(x_0, x_1, \ldots, x_{n-k}\)</span>. It is the correlation between the sequence <span class="math inline">\(x\)</span> and the same sequence shifted by <span class="math inline">\(k\)</span>.</p>
 <p>The key insight for using autocorrelation to determine burn-in is that once a Markov chain converges to its stationary distribution, the autocorrelation pattern becomes stable and translation-invariant. This means the autocorrelation function should look the same regardless of which part of the converged chain you analyze.</p>
-<p>A common mistake is to burn-in samples simply where autocorrelation is high. This is incorrect because: - High autocorrelation indicates slow mixing, not lack of convergence - A chain can be perfectly converged but still have high autocorrelation - This approach may discard valid samples from the target distribution</p>
+<p>A common mistake is to burn-in samples simply where autocorrelation is high. This is incorrect because:</p>
+<ul>
+<li>High autocorrelation indicates slow mixing, not lack of convergence.</li>
+<li>A chain can be perfectly converged but still have high autocorrelation.</li>
+<li>This approach may discard valid samples from the target distribution.</li>
+</ul>
 <p>The correct approach focuses on <strong>autocorrelation stability</strong>, not autocorrelation magnitude.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1102,11 +1097,11 @@ Algorithm: Choosing Burn-in Period Using ACF Stability
 <div class="callout-body-container callout-body">
 <p>To determine the burn-in period using autocorrelation stability:</p>
 <ol type="1">
-<li><p><strong>Select candidate burn-in points</strong>: Choose several potential burn-in locations (e.g., 10%, 20%, 25%, 33% of chain length)</p></li>
-<li><p><strong>Calculate ACF for each candidate</strong>: For each candidate burn-in point <span class="math inline">\(s\)</span>, compute the autocorrelation function <span class="math inline">\(\text{ACF}_s(k)\)</span> using only the chain from iteration <span class="math inline">\(s\)</span> onward</p></li>
-<li><p><strong>Compare ACF patterns</strong>: For consecutive candidates <span class="math inline">\(s_1 &lt; s_2\)</span>, calculate the similarity: <span class="math display">\[\text{Similarity} = \frac{1}{K}\sum_{k=1}^{K} |\text{ACF}_{s_1}(k) - \text{ACF}_{s_2}(k)|\]</span> where <span class="math inline">\(K\)</span> is the maximum lag considered</p></li>
-<li><p><strong>Find convergence point</strong>: The burn-in period ends at the first <span class="math inline">\(s\)</span> where the similarity falls below a threshold <span class="math inline">\(\epsilon\)</span> (e.g., <span class="math inline">\(\epsilon = 0.05\)</span>)</p></li>
-<li><p><strong>Apply safety margin</strong>: Double the detected burn-in period to be conservative</p></li>
+<li><p><strong>Select candidate burn-in points</strong>: Choose several potential burn-in locations (e.g., 10%, 20%, 25%, 33% of chain length).</p></li>
+<li><p><strong>Calculate ACF for each candidate</strong>: For each candidate burn-in point <span class="math inline">\(s\)</span>, compute the autocorrelation function <span class="math inline">\(\text{ACF}_s(k)\)</span> using only the chain from iteration <span class="math inline">\(s\)</span> onward.</p></li>
+<li><p><strong>Compare ACF patterns</strong>: For consecutive candidates <span class="math inline">\(s_1 &lt; s_2\)</span>, calculate the similarity: <span class="math display">\[\text{Similarity} = \frac{1}{K}\sum_{k=1}^{K} |\text{ACF}_{s_1}(k) - \text{ACF}_{s_2}(k)|\]</span> where <span class="math inline">\(K\)</span> is the maximum lag considered.</p></li>
+<li><p><strong>Find convergence point</strong>: The burn-in period ends at the first <span class="math inline">\(s\)</span> where the similarity falls below a threshold <span class="math inline">\(\epsilon\)</span> (e.g., <span class="math inline">\(\epsilon = 0.05\)</span>).</p></li>
+<li><p><strong>Apply safety margin</strong>: Double the detected burn-in period to be conservative.</p></li>
 </ol>
 </div>
 </div>
