@@ -642,6 +642,9 @@ To determine the burn-in period using autocorrelation stability:
 
 - **Stable autocorrelation pattern**: Indicates convergence, regardless of whether the values are high or low.
 :::
+From this analysis, we can see whether the autocorrelation patterns are similar across different starting points. If they are, the chain has likely converged by the earliest point where this stability is observed. This approach is more principled than simply thresholding autocorrelation values, as it's based on the fundamental property that converged Markov chains have time-invariant statistical properties.
+
+::: {#exm-autocorrelation}
 
 Below is the autocorrelation analysis for @exm-random-walk-on-graph. Rather than simply looking for where autocorrelation drops below a threshold, we examine whether the autocorrelation pattern has stabilized across different portions of the chain.
 
@@ -681,13 +684,12 @@ for i, burn_in in enumerate(candidate_burn_ins):
         autocorr_functions[burn_in] = autocorrs
         plt.plot(autocorrs, color=colors[i], 
                 label=f'Start at {burn_in} ({burn_in/len(walk)*100:.0f}%)')
-
-plt.axhline(0.1, color='black', linestyle='--', alpha=0.5, label='0.1 threshold')
 plt.xlabel('Lag')
 plt.ylabel('Autocorrelation')
 plt.title('ACF Stability Analysis')
 plt.legend()
 plt.grid(True, alpha=0.3)
+plt.show()
 
 # Check similarity between consecutive autocorrelation functions
 print("Similarity analysis:")
@@ -701,8 +703,7 @@ for i in range(len(burn_in_list)-1):
 
 print(f"\nBased on visual inspection and similarity analysis, no burn-in is required.")
 ```
-
-From this analysis, we can see whether the autocorrelation patterns are similar across different starting points. If they are, the chain has likely converged by the earliest point where this stability is observed. This approach is more principled than simply thresholding autocorrelation values, as it's based on the fundamental property that converged Markov chains have time-invariant statistical properties.
+:::
 
 ## Concluding Remarks
 
