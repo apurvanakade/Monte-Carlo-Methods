@@ -599,54 +599,110 @@ plt.tight_layout()
 plt.show()
 ```
 
+
 ### Autocorrelation Function
 
 One method for finding the burn-in period is to use the autocorrelation function. The **autocorrelation function** of a sequence of numbers $x = (x_0, x_1, \ldots, x_n)$ at lag $k$ is defined as
 $$\text{ACF}(k) = \text{Corr}(x[k:], x[:-k])$$
-where by $x[k:]$ we mean the subsequence $x_k, x_{k+1}, \ldots, x_n$ and by $x[:-k]$ we mean the subsequence $x_0, x_1, \ldots, x_{n-k}$. It is the correlation between the sequence $x$ and the same sequence shifted by $k$. 
+where by $x[k:]$ we mean the subsequence $x_k, x_{k+1}, \ldots, x_n$ and by $x[:-k]$ we mean the subsequence $x_0, x_1, \ldots, x_{n-k}$. It is the correlation between the sequence $x$ and the same sequence shifted by $k$.
+
+The key insight for using autocorrelation to determine burn-in is that once a Markov chain converges to its stationary distribution, the autocorrelation pattern becomes stable and translation-invariant. This means the autocorrelation function should look the same regardless of which part of the converged chain you analyze.
+
+A common mistake is to burn-in samples simply where autocorrelation is high. This is incorrect because:
+- High autocorrelation indicates slow mixing, not lack of convergence
+- A chain can be perfectly converged but still have high autocorrelation
+- This approach may discard valid samples from the target distribution
+
+The correct approach focuses on **autocorrelation stability**, not autocorrelation magnitude.
 
 ::: {.callout-note}
-## Algorithm: Choosing Burn-in Period Using ACF
+## Algorithm: Choosing Burn-in Period Using ACF Stability
 
-To determine the burn-in period using the autocorrelation function:
+To determine the burn-in period using autocorrelation stability:
 
-1. Compute the autocorrelation function $\text{ACF}(k)$ for various lags $k$
-2. Choose a threshold $\epsilon$ (e.g., $\epsilon = 0.1$ or $\epsilon = 0.05$)
-3. Find the smallest $T$ such that $\text{ACF}(T) < \epsilon$
-4. To be conservative, choose a burn-in period of $2T$ or $3T$
+1. **Select candidate burn-in points**: Choose several potential burn-in locations (e.g., 10%, 20%, 25%, 33% of chain length)
+
+2. **Calculate ACF for each candidate**: For each candidate burn-in point $s$, compute the autocorrelation function $\text{ACF}_s(k)$ using only the chain from iteration $s$ onward
+
+3. **Compare ACF patterns**: For consecutive candidates $s_1 < s_2$, calculate the similarity:
+   $$\text{Similarity} = \frac{1}{K}\sum_{k=1}^{K} |\text{ACF}_{s_1}(k) - \text{ACF}_{s_2}(k)|$$
+   where $K$ is the maximum lag considered
+
+4. **Find convergence point**: The burn-in period ends at the first $s$ where the similarity falls below a threshold $\epsilon$ (e.g., $\epsilon = 0.05$)
+
+5. **Apply safety margin**: Double the detected burn-in period to be conservative
 :::
 
-Below is the autocorrelation plot for @exm-random-walk-on-graph. We can see that the correlation decreases as $k$ increases and drops below $0.1$ around $17$. So a burn-in period of $40$ is a good conservative choice.
+::: {.callout-tip}
+## Interpreting Autocorrelation Results
 
-This is just one way to choose the burn-in period. There are many other methods and the choice depends on the application. We will stick to this method for the rest of the course.
+- **High but stable autocorrelation**: Chain has converged but mixes slowly. Solution: run longer chains or improve the sampler, not longer burn-in.
+
+- **Low but changing autocorrelation**: Chain may not have converged yet. The autocorrelation pattern is still evolving.
+
+- **Stable autocorrelation pattern**: Indicates convergence, regardless of whether the values are high or low.
+:::
+
+Below is the autocorrelation analysis for @exm-random-walk-on-graph. Rather than simply looking for where autocorrelation drops below a threshold, we examine whether the autocorrelation pattern has stabilized across different portions of the chain.
 
 ```{python}
 #| fold: true
-#autocorrelation analysis of walk
-def autocorr(x, t):
-    return np.corrcoef(x[:-t], x[t:])[0, 1]
+import numpy as np
+import matplotlib.pyplot as plt
 
-autocorrs = [autocorr(walk, t) for t in range(1, 100)]
+# Autocorrelation analysis of walk
+def autocorr(x, max_lag=50):
+    """Calculate autocorrelation function up to max_lag"""
+    n = len(x)
+    x_centered = x - np.mean(x)
+    autocorrs = []
+    
+    for lag in range(max_lag):
+        if n - lag > lag:
+            corr = np.corrcoef(x_centered[:-lag] if lag > 0 else x_centered, 
+                              x_centered[lag:])[0, 1]
+            autocorrs.append(corr)
+        else:
+            break
+    return np.array(autocorrs)
 
-# find value where autocorrelation drops and stays below 0.1
-epsilon = 0.1
+# Calculate autocorrelation from different starting points
+candidate_burn_ins = [0, len(walk)//10, len(walk)//5, len(walk)//4]
+colors = ['blue', 'red', 'green', 'orange']
 
+plt.figure(figsize=(12, 5))
 
-plt.plot(autocorrs)
-# horizontal line at epsilon = 0.1
-plt.axhline(0.1, color='r', linestyle='--', label='ε = 0.1')
+# Autocorrelation functions from different starting points
+autocorr_functions = {}
+for i, burn_in in enumerate(candidate_burn_ins):
+    if len(walk) - burn_in > 100:  # Ensure enough data
+        post_burn_walk = walk[burn_in:]
+        autocorrs = autocorr(post_burn_walk, 50)
+        autocorr_functions[burn_in] = autocorrs
+        plt.plot(autocorrs, color=colors[i], 
+                label=f'Start at {burn_in} ({burn_in/len(walk)*100:.0f}%)')
 
-min_t = 17
-# vertical line at min_t
-plt.axvline(min_t, color='g', linestyle='--', label='t = {}'.format(min_t))
-
-plt.legend()
+plt.axhline(0.1, color='black', linestyle='--', alpha=0.5, label='0.1 threshold')
 plt.xlabel('Lag')
 plt.ylabel('Autocorrelation')
-plt.title('Autocorrelation of Walk')
+plt.title('ACF Stability Analysis')
+plt.legend()
+plt.grid(True, alpha=0.3)
 
-plt.show()
+# Check similarity between consecutive autocorrelation functions
+print("Similarity analysis:")
+burn_in_list = sorted(autocorr_functions.keys())
+for i in range(len(burn_in_list)-1):
+    current = autocorr_functions[burn_in_list[i]]
+    next_one = autocorr_functions[burn_in_list[i+1]]
+    min_len = min(len(current), len(next_one))
+    similarity = np.mean(np.abs(current[:min_len] - next_one[:min_len]))
+    print(f"Burn-in {burn_in_list[i]} vs {burn_in_list[i+1]}: similarity = {similarity:.3f}")
+
+print(f"\nBased on visual inspection and similarity analysis, no burn-in is required.")
 ```
+
+From this analysis, we can see whether the autocorrelation patterns are similar across different starting points. If they are, the chain has likely converged by the earliest point where this stability is observed. This approach is more principled than simply thresholding autocorrelation values, as it's based on the fundamental property that converged Markov chains have time-invariant statistical properties.
 
 ## Concluding Remarks
 
