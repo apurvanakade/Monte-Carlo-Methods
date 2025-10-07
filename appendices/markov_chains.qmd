@@ -566,38 +566,93 @@ plt.show()
 
 ### Running Average
 
-The running average is the average of the first $n$ samples. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the running average should stabilize around the true mean. If the Markov chain has not converged, the running average will show a trend.
+The **running average** (also called cumulative mean) is the average of the first $n$ samples:
+$$\bar{x}_n = \frac{1}{n}\sum_{i=1}^n x_i$$
 
-Below is the running average plot for @exm-random-walk-on-graph. We can see that the running average is stabilizing around the true mean around 3000 samples.
+Running averages are a simple diagnostic tool for assessing MCMC convergence. The basic principle is that if a Markov chain has converged to its stationary distribution, the running average should eventually stabilize around the true mean of the target distribution.
+
+#### How to Interpret Running Averages
+
+**Signs of convergence:**
+
+- The running average stabilizes (stops trending) after some initial period
+- Fluctuations around the stable value decrease as $n$ increases
+- The stabilization point is consistent across different portions of the chain
+
+**Signs of non-convergence:**
+
+- Persistent trends or drift in the running average
+- Large jumps or sudden changes in the running average
+- Different behavior when computed from different starting points
 
 ::: {.callout-warning}
-## Limitations of Running Averages
-Running averages can be deceptive and show stability even when the Markov chain has not converged. It is better to use multiple diagnostics to check for convergence. They are better at telling when the Markov chain has **not** converged than when it has converged.
+## Important Limitations of Running Averages
+
+Running averages have several critical limitations:
+
+1. **False stability**: They can appear stable even when the chain hasn't converged, especially if the chain gets "stuck" in one region
+2. **Slow to detect problems**: Due to their cumulative nature, they respond slowly to changes in the chain's behavior
+3. **Masking effect**: Early samples heavily influence the running average, potentially masking later convergence issues
+4. **No information about mixing**: They don't reveal whether the chain is exploring the full distribution
+
+**Key insight**: Running averages are better at detecting when a chain has **not** converged than confirming when it **has** converged. Always use them alongside other diagnostics.
 :::
+
+#### Proper Usage Strategy
+
+To use running averages effectively:
+
+1. **Compare multiple starting points**: Calculate running averages from different points in your chain
+2. **Look for consistent stabilization**: The stabilization should occur at similar points regardless of where you start
+3. **Check for trend changes**: Sudden changes in trend may indicate the chain is moving between different regions
+4. **Use as supporting evidence**: Combine with autocorrelation analysis and visual inspection
+
+::: {#exm}
+
+Below is the running average analysis for @exm-random-walk-on-graph. 
 
 ```{python}
 #| fold: true
-temp = 1000
-running_avg1 = np.cumsum(walk[:temp]) / np.arange(1, temp + 1)
-running_avg2 = np.cumsum(walk) / np.arange(1, len(walk) + 1)
+import numpy as np
+import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+# Calculate running averages from different starting points
+start_points = [0, len(walk)//10, len(walk)//5]
+colors = ['blue', 'red', 'green']
+labels = ['Full chain', '90% of chain', '80% of chain']
 
-axs[0].plot(running_avg1, label='First {} samples'.format(temp))
-axs[0].set_xlabel('Number of samples')
-axs[0].set_ylabel('Running average')
-axs[0].set_title('Running average of first {} samples'.format(temp))
-axs[0].legend()
+plt.figure(figsize=(10, 6))
+plt.title('Running Averages from Different Starting Points')
 
-axs[1].plot(running_avg2, label='First {} samples'.format(len(walk)))
-axs[1].set_xlabel('Number of samples')
-axs[1].set_ylabel('Running average')
-axs[1].set_title('Running average of first {} samples'.format(len(walk)))
-axs[1].legend()
+for i, start in enumerate(start_points):
+    x_subset = walk[start:]
+    running_avg = np.cumsum(x_subset) / np.arange(1, len(x_subset) + 1)
+    iterations = np.arange(start, start + len(running_avg))
+    plt.plot(iterations, running_avg, color=colors[i], label=labels[i])
 
-plt.tight_layout()
+plt.xlabel('Iteration')
+plt.ylabel('Running Average')
+plt.legend()
+plt.grid(True, alpha=0.3)
 plt.show()
+
+# Quantitative analysis - compare full chain vs 80% chain averages
+final_running_avg = np.cumsum(walk)[-1] / len(walk)
+last_80_percent_avg = np.mean(walk[len(walk)//5:])  # Average of last 80% of chain
+print(f"Final running average (full chain): {final_running_avg:.3f}")
+print(f"Average of last 80% of chain: {last_80_percent_avg:.3f}")
+print(f"Difference: {abs(final_running_avg - last_80_percent_avg):.3f}")
 ```
+
+:::
+
+**Interpretation guidelines:**
+- If running averages from different starting points converge to similar values, this suggests convergence
+- The "Local Average Differences" plot helps identify when the chain behavior stabilizes
+- A trend test correlation close to zero in the latter portion indicates the absence of systematic drift
+- Use this analysis to support (not replace) your autocorrelation-based burn-in determination
+
+Remember: running averages are most valuable when they show **problems** (trends, instability) rather than when they appear stable. Always combine this diagnostic with autocorrelation analysis for robust convergence assessment.
 
 
 ### Autocorrelation Function
