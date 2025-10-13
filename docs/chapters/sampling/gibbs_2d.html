@@ -877,33 +877,32 @@ $\blacksquare$
 :::
 -->
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>For simplicity, we assume <span class="math inline">\(f\)</span> represents a discrete distribution, but the proof follows the same structure in the continuous case.</p>
-<p>Let <span class="math inline">\(P_{\text{odd}}\)</span> and <span class="math inline">\(P_{\text{even}}\)</span> denote the transition matrices for the two steps of the Gibbs sampler: - <span class="math inline">\(P_{\text{odd}}\)</span>: update <span class="math inline">\(X\)</span> given current <span class="math inline">\(Y\)</span> (keep <span class="math inline">\(Y\)</span> unchanged) - <span class="math inline">\(P_{\text{even}}\)</span>: update <span class="math inline">\(Y\)</span> given current <span class="math inline">\(X\)</span> (keep <span class="math inline">\(X\)</span> unchanged)</p>
-<p>One complete Gibbs iteration is <span class="math inline">\(P = P_{\text{even}} P_{\text{odd}}\)</span>.</p>
-<p><strong>Step 1:</strong> Show <span class="math inline">\(f_{X,Y}\)</span> is invariant under <span class="math inline">\(P_{\text{odd}}\)</span></p>
-<p>The transition matrix <span class="math inline">\(P_{\text{odd}}\)</span> has entries: <span class="math display">\[P_{\text{odd}}[(x',y'), (x,y)] = \begin{cases}
+<p><span class="proof-title"><em>Proof</em>. </span>For simplicity, we assume <span class="math inline">\(f\)</span> represents a discrete distribution, though the proof extends naturally to the continuous case.</p>
+<p>We establish stationarity by verifying detailed balance for each component of the Gibbs sampler separately.</p>
+<p><strong>Part I: Detailed Balance for the Odd Step (Update <span class="math inline">\(X\)</span>)</strong></p>
+<p>The odd step updates only the <span class="math inline">\(X\)</span> component, keeping <span class="math inline">\(Y\)</span> fixed. The transition probabilities are: <span class="math display">\[P_{\text{odd}}[(x',y') , (x,y)] = \begin{cases}
 f_{X|Y}(x \mid y') &amp; \text{if } y' = y \\
 0 &amp; \text{if } y' \neq y
 \end{cases}\]</span></p>
-<p>This means we can only transition to <span class="math inline">\((x,y)\)</span> from states <span class="math inline">\((x',y)\)</span> with the same <span class="math inline">\(y\)</span>-coordinate.</p>
-<p>Starting from distribution <span class="math inline">\(f_{X,Y}\)</span>, the distribution after applying <span class="math inline">\(P_{\text{odd}}\)</span> is: <span class="math display">\[[f_{X,Y} P_{\text{odd}}](x,y) = \sum_{(x',y')} f_{X,Y}(x',y') \cdot P_{\text{odd}}[(x',y'), (x,y)]\]</span></p>
-<p><span class="math display">\[= \sum_{x'} f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y)\]</span></p>
-<p><span class="math display">\[= f_{X|Y}(x \mid y) \sum_{x'} f_{X,Y}(x',y)\]</span></p>
-<p><span class="math display">\[= f_{X|Y}(x \mid y) \cdot f_Y(y) = f_{X,Y}(x,y)\]</span></p>
-<p>Therefore, <span class="math inline">\(f_{X,Y} P_{\text{odd}} = f_{X,Y}\)</span>.</p>
-<p><strong>Step 2:</strong> Show <span class="math inline">\(f_{X,Y}\)</span> is invariant under <span class="math inline">\(P_{\text{even}}\)</span></p>
-<p>The transition matrix <span class="math inline">\(P_{\text{even}}\)</span> has entries: <span class="math display">\[P_{\text{even}}[(x',y'), (x,y)] = \begin{cases}
+<p>For states with <span class="math inline">\(y' = y\)</span>, we verify: <span class="math display">\[f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y) = f_{X,Y}(x,y) \cdot f_{X|Y}(x' \mid y)\]</span></p>
+<p>Using <span class="math inline">\(f_{X,Y}(a,b) = f_{X|Y}(a \mid b) f_Y(b)\)</span>: <span class="math display">\[\begin{align}
+\text{LHS} &amp;= f_{X|Y}(x' \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x \mid y) \\
+\text{RHS} &amp;= f_{X|Y}(x \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x' \mid y)
+\end{align}\]</span></p>
+<p>Clearly, LHS = RHS. For states with <span class="math inline">\(y' \neq y\)</span>, both sides equal zero since the transition probability is zero.</p>
+<p><strong>Part II: Detailed Balance for the Even Step (Update <span class="math inline">\(Y\)</span>)</strong></p>
+<p>The even step updates only the <span class="math inline">\(Y\)</span> component, keeping <span class="math inline">\(X\)</span> fixed. The transition probabilities are: <span class="math display">\[P_{\text{even}}[(x',y') , (x,y)] = \begin{cases}
 f_{Y|X}(y \mid x') &amp; \text{if } x' = x \\
 0 &amp; \text{if } x' \neq x
 \end{cases}\]</span></p>
-<p>Starting from distribution <span class="math inline">\(f_{X,Y}\)</span>: <span class="math display">\[[f_{X,Y} P_{\text{even}}](x,y) = \sum_{(x',y')} f_{X,Y}(x',y') \cdot P_{\text{even}}[(x',y'), (x,y)]\]</span></p>
-<p><span class="math display">\[= \sum_{y'} f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x)\]</span></p>
-<p><span class="math display">\[= f_{Y|X}(y \mid x) \sum_{y'} f_{X,Y}(x,y')\]</span></p>
-<p><span class="math display">\[= f_{Y|X}(y \mid x) \cdot f_X(x) = f_{X,Y}(x,y)\]</span></p>
-<p>Therefore, <span class="math inline">\(f_{X,Y} P_{\text{even}} = f_{X,Y}\)</span>.</p>
-<p><strong>Step 3:</strong> Conclude stationarity for complete Gibbs step</p>
-<p>Since both individual steps preserve <span class="math inline">\(f_{X,Y}\)</span>: <span class="math display">\[f_{X,Y} P = f_{X,Y} P_{\text{even}} P_{\text{odd}} = (f_{X,Y} P_{\text{even}}) P_{\text{odd}} = f_{X,Y} P_{\text{odd}} = f_{X,Y}\]</span></p>
-<p>Therefore, <span class="math inline">\(f_{X,Y}\)</span> is the stationary distribution of the Gibbs sampler. <span class="math inline">\(\blacksquare\)</span></p>
+<p>For states with <span class="math inline">\(x' = x\)</span>, we verify: <span class="math display">\[f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x) = f_{X,Y}(x,y) \cdot f_{Y|X}(y' \mid x)\]</span></p>
+<p>Using <span class="math inline">\(f_{X,Y}(a,b) = f_{Y|X}(b \mid a) f_X(a)\)</span>: <span class="math display">\[\begin{align}
+\text{LHS} &amp;= f_{Y|X}(y' \mid x) \cdot f_X(x) \cdot f_{Y|X}(y \mid x) \\
+\text{RHS} &amp;= f_{Y|X}(y \mid x) \cdot f_X(x) \cdot f_{Y|X}(y' \mid x)
+\end{align}\]</span></p>
+<p>Again, LHS = RHS. For states with <span class="math inline">\(x' \neq x\)</span>, both sides equal zero.</p>
+<p><strong>Conclusion</strong></p>
+<p>Since both <span class="math inline">\(P_{\text{odd}}\)</span> and <span class="math inline">\(P_{\text{even}}\)</span> satisfy detailed balance with <span class="math inline">\(f_{X,Y}\)</span>, and the complete Gibbs transition is <span class="math inline">\(P = P_{\text{even}} P_{\text{odd}}\)</span>, the distribution <span class="math inline">\(f_{X,Y}\)</span> is stationary under the full Gibbs sampler.</p>
 </div>
 </section>
 <section id="concluding-remarks" class="level2" data-number="11.4">

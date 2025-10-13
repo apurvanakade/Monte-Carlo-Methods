@@ -457,64 +457,54 @@ Thus, $(X_{i+1}, Y_{i+1}) \sim f_{X,Y}$, proving that $f_{X,Y}$ is a stationary 
 $\blacksquare$
 :::
 -->
+
 ::: {.proof}
-For simplicity, we assume $f$ represents a discrete distribution, but the proof follows the same structure in the continuous case.
+For simplicity, we assume $f$ represents a discrete distribution, though the proof extends naturally to the continuous case.
 
-Let $P_{\text{odd}}$ and $P_{\text{even}}$ denote the transition matrices for the two steps of the Gibbs sampler:
-- $P_{\text{odd}}$: update $X$ given current $Y$ (keep $Y$ unchanged)
-- $P_{\text{even}}$: update $Y$ given current $X$ (keep $X$ unchanged)
+We establish stationarity by verifying detailed balance for each component of the Gibbs sampler separately.
 
-One complete Gibbs iteration is $P = P_{\text{even}} P_{\text{odd}}$.
+**Part I: Detailed Balance for the Odd Step (Update $X$)**
 
-**Step 1:** Show $f_{X,Y}$ is invariant under $P_{\text{odd}}$
-
-The transition matrix $P_{\text{odd}}$ has entries:
-$$P_{\text{odd}}[(x',y'), (x,y)] = \begin{cases} 
+The odd step updates only the $X$ component, keeping $Y$ fixed. The transition probabilities are:
+$$P_{\text{odd}}[(x',y') , (x,y)] = \begin{cases} 
 f_{X|Y}(x \mid y') & \text{if } y' = y \\
 0 & \text{if } y' \neq y
 \end{cases}$$
 
-This means we can only transition to $(x,y)$ from states $(x',y)$ with the same $y$-coordinate.
+For states with $y' = y$, we verify:
+$$f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y) = f_{X,Y}(x,y) \cdot f_{X|Y}(x' \mid y)$$
 
-Starting from distribution $f_{X,Y}$, the distribution after applying $P_{\text{odd}}$ is:
-$$[f_{X,Y} P_{\text{odd}}](x,y) = \sum_{(x',y')} f_{X,Y}(x',y') \cdot P_{\text{odd}}[(x',y'), (x,y)]$$
+Using $f_{X,Y}(a,b) = f_{X|Y}(a \mid b) f_Y(b)$:
+\begin{align}
+\text{LHS} &= f_{X|Y}(x' \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x \mid y) \\
+\text{RHS} &= f_{X|Y}(x \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x' \mid y)
+\end{align}
 
-$$= \sum_{x'} f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y)$$
+Clearly, LHS = RHS. For states with $y' \neq y$, both sides equal zero since the transition probability is zero.
 
-$$= f_{X|Y}(x \mid y) \sum_{x'} f_{X,Y}(x',y)$$
+**Part II: Detailed Balance for the Even Step (Update $Y$)**
 
-$$= f_{X|Y}(x \mid y) \cdot f_Y(y) = f_{X,Y}(x,y)$$
-
-Therefore, $f_{X,Y} P_{\text{odd}} = f_{X,Y}$.
-
-**Step 2:** Show $f_{X,Y}$ is invariant under $P_{\text{even}}$
-
-The transition matrix $P_{\text{even}}$ has entries:
-$$P_{\text{even}}[(x',y'), (x,y)] = \begin{cases} 
+The even step updates only the $Y$ component, keeping $X$ fixed. The transition probabilities are:
+$$P_{\text{even}}[(x',y') , (x,y)] = \begin{cases} 
 f_{Y|X}(y \mid x') & \text{if } x' = x \\
 0 & \text{if } x' \neq x
 \end{cases}$$
 
-Starting from distribution $f_{X,Y}$:
-$$[f_{X,Y} P_{\text{even}}](x,y) = \sum_{(x',y')} f_{X,Y}(x',y') \cdot P_{\text{even}}[(x',y'), (x,y)]$$
+For states with $x' = x$, we verify:
+$$f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x) = f_{X,Y}(x,y) \cdot f_{Y|X}(y' \mid x)$$
 
-$$= \sum_{y'} f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x)$$
+Using $f_{X,Y}(a,b) = f_{Y|X}(b \mid a) f_X(a)$:
+\begin{align}
+\text{LHS} &= f_{Y|X}(y' \mid x) \cdot f_X(x) \cdot f_{Y|X}(y \mid x) \\
+\text{RHS} &= f_{Y|X}(y \mid x) \cdot f_X(x) \cdot f_{Y|X}(y' \mid x)
+\end{align}
 
-$$= f_{Y|X}(y \mid x) \sum_{y'} f_{X,Y}(x,y')$$
+Again, LHS = RHS. For states with $x' \neq x$, both sides equal zero.
 
-$$= f_{Y|X}(y \mid x) \cdot f_X(x) = f_{X,Y}(x,y)$$
+**Conclusion**
 
-Therefore, $f_{X,Y} P_{\text{even}} = f_{X,Y}$.
-
-**Step 3:** Conclude stationarity for complete Gibbs step
-
-Since both individual steps preserve $f_{X,Y}$:
-$$f_{X,Y} P = f_{X,Y} P_{\text{even}} P_{\text{odd}} = (f_{X,Y} P_{\text{even}}) P_{\text{odd}} = f_{X,Y} P_{\text{odd}} = f_{X,Y}$$
-
-Therefore, $f_{X,Y}$ is the stationary distribution of the Gibbs sampler.
-$\blacksquare$
+Since both $P_{\text{odd}}$ and $P_{\text{even}}$ satisfy detailed balance with $f_{X,Y}$, and the complete Gibbs transition is $P = P_{\text{even}} P_{\text{odd}}$, the distribution $f_{X,Y}$ is stationary under the full Gibbs sampler.
 :::
-
 
 
 ## Concluding Remarks
