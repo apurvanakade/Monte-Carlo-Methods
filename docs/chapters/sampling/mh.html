@@ -44,9 +44,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-d49a37c80e95ea2516c73b6f7289119c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -558,9 +558,9 @@ window.Quarto = {
   <li><a href="#acceptance-criterion" id="toc-acceptance-criterion" class="nav-link" data-scroll-target="#acceptance-criterion"><span class="header-section-number">11.2.3</span> Acceptance Criterion</a></li>
   </ul></li>
   <li><a href="#symmetric-proposal-distribution" id="toc-symmetric-proposal-distribution" class="nav-link" data-scroll-target="#symmetric-proposal-distribution"><span class="header-section-number">11.3</span> Symmetric Proposal Distribution</a></li>
-  <li><a href="#metropolis-markov-chain" id="toc-metropolis-markov-chain" class="nav-link" data-scroll-target="#metropolis-markov-chain"><span class="header-section-number">11.4</span> Metropolis Markov Chain</a>
+  <li><a href="#metropolis-algorithm-for-symmetric-proposals" id="toc-metropolis-algorithm-for-symmetric-proposals" class="nav-link" data-scroll-target="#metropolis-algorithm-for-symmetric-proposals"><span class="header-section-number">11.4</span> Metropolis Algorithm for Symmetric Proposals</a>
   <ul class="collapse">
-  <li><a href="#detailed-balance-equations" id="toc-detailed-balance-equations" class="nav-link" data-scroll-target="#detailed-balance-equations"><span class="header-section-number">11.4.1</span> Detailed Balance Equations</a></li>
+  <li><a href="#detailed-balance-and-reversibility" id="toc-detailed-balance-and-reversibility" class="nav-link" data-scroll-target="#detailed-balance-and-reversibility"><span class="header-section-number">11.4.1</span> Detailed Balance and Reversibility</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -665,7 +665,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ol>
 <div id="exm-L-shape" class="theorem example">
 <p><span class="theorem-title"><strong>Example 11.1</strong></span> Consider the L-shaped region in <span class="math inline">\(\mathbb{R}^2\)</span> as shown below. This is a non-convex region and rejection sampling would only provide an efficiency of <span class="math inline">\(0.1 + 0.1 - 0.01 = 0.18\)</span>. We’ll use the Metropolis–Hastings algorithm to sample from this region with higher efficiency.</p>
-<div id="090b050a" class="cell" data-execution_count="2">
+<div id="bc3f11c5" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -676,7 +676,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 <p>The images below show scatter plots for the samples generated using the Metropolis–Hastings algorithm with four different choices of the Gaussian proposal distribution with standard deviations <span class="math inline">\(1\)</span>, <span class="math inline">\(0.5\)</span>, <span class="math inline">\(0.2\)</span>, and <span class="math inline">\(0.01\)</span>. The plots to the right are the running averages of the <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> coordinates. The scatter plot and the running averages provide a visual representation of the convergence of the samples to the target distribution.</p>
 </div>
-<div id="37bdcb59" class="cell" data-execution_count="4">
+<div id="5280e069" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -685,7 +685,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 </div>
 </div>
-<div id="a7db56e4" class="cell" data-execution_count="5">
+<div id="5d73be12" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -694,7 +694,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 </div>
 </div>
-<div id="08fa4031" class="cell" data-execution_count="6">
+<div id="7881c254" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -703,7 +703,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 </div>
 </div>
-<div id="a887681a" class="cell" data-execution_count="7">
+<div id="72d227ad" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -779,8 +779,18 @@ q(y | x) = \mathcal{N}(y ; x, \sigma^2 I).
 <li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
 </ol>
 <p>We can expand the algorithm further as follows:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Metropolis–Hastings Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ol type="1">
-<li><strong>Initialization</strong>: Start at a point <span class="math inline">\(x_0\)</span>.</li>
+<li>Start at a point <span class="math inline">\(x_0\)</span>.</li>
 <li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
 <ol type="1">
 <li>Generate a proposal <span class="math inline">\(y \sim q(y | x_i)\)</span>.</li>
@@ -804,6 +814,8 @@ q(y | x) = \mathcal{N}(y ; x, \sigma^2 I).
 </ol></li>
 <li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
 </ol>
+</div>
+</div>
 </section>
 </section>
 <section id="symmetric-proposal-distribution" class="level2" data-number="11.3">
@@ -848,70 +860,136 @@ q(y | x) = \mathcal{N}(y ; x, \sigma^2 I).
 <p>This means that we always accept a proposal <span class="math inline">\(y\)</span> if it is in the region <span class="math inline">\(\Omega\)</span> and reject it otherwise. This is equivalent to the random walk Metropolis–Hastings algorithm in <a href="#sec-random-walks" class="quarto-xref"><span>Section 11.1</span></a>.</p>
 <p>Several other algorithms, such as rejection sampling, random walks on graphs, and Gibbs sampling, can be viewed as special cases of the Metropolis–Hastings algorithm.</p>
 </div>
+<!--
+## Metropolis Markov Chain
+
+If the target distribution $p(x)$ is defined over the sample space $\Omega$, then the Metropolis--Hastings algorithm generates a Markov chain with state space $\Omega$. 
+
+For simplicity, 
+
+1. we will analyze the Metropolis algorithm with a symmetric proposal distribution $q(y | x) = q(x | y)$, and
+2. we will assume that the target distribution $p(x)$ is defined over a finite sample space $\Omega$.
+
+The transition matrix for the Markov chain is given by
+
+$$
+\begin{aligned}
+\mathbb{P}(X = b | X = a) = \begin{cases}
+q(b | a) & \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
+\frac{p(b)}{p(a)} \cdot q(b | a) & \text{if } p(b) < p(a) \text{ and } a \neq b, \\
+q(a | a) + \sum \limits_{b \in \Omega, p(b) < p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) & \text{if } a = b.
+\end{cases}
+\end{aligned}
+$$
+
+One can check that this defines a valid transition matrix by showing that the sum of the transition probabilities for each state is $1$.
+
+$$
+\begin{aligned}
+&\sum \limits_{b \in \Omega} \mathbb{P}(X = b | X = a) \\
+&= \sum \limits_{p(b) \ge p(a), a \neq b} q(b | a) 
++ \sum \limits_{p(b) < p(a)} \frac{p(b)}{p(a)} \cdot q(b | a) 
++ q(a|a)
++ \sum \limits_{p(b) < p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) \\
+&= \sum \limits_{b \in \Omega} q(b | a) \\
+&= 1.
+\end{aligned}
+$$ 
+
+### Detailed Balance Equations
+
+::: {#thm-detailed-balance}
+The Metropolis algorithm is reversible with respect to the target distribution $p(x)$. This means that the Markov chain defined by the Metropolis algorithm satisfies the detailed balance equations:
+
+$$
+p(a) \cdot \mathbb{P}(X = b | X = a) = p(b) \cdot \mathbb{P}(X = a | X = b).
+$$
+:::
+
+::: {.proof}
+We only need check the detailed balance equations for the case when $a \neq b$. The case when $a = b$ is trivial. We make two cases:
+
+1. **Case 1**: $p(a) \neq p(b)$.
+
+Without loss of generality, assume that $p(a) < p(b)$. Then we have
+
+$$
+\begin{aligned}
+p(a) \cdot \mathbb{P}(X = b | X = a)
+&= p(a) \cdot q(b | a) \\
+&= p(a) \cdot q(a | b) \\
+&= p(b) \cdot q(a | b) \dfrac{p(a)}{p(b)} \\
+&= p(b) \cdot \mathbb{P}(X = a | X = b).
+\end{aligned}
+$$
+
+2. **Case 2**: $p(a) = p(b)$.
+In this case, we have
+$$
+\begin{aligned}
+p(a) \cdot \mathbb{P}(X = b | X = a)
+&= p(a) \cdot q(b | a) \\
+&= p(b) \cdot q(a | b) \\
+&= p(b) \cdot \mathbb{P}(X = a | X = b).
+\end{aligned}
+$$
+Thus, in both cases, we have shown that the detailed balance equations hold. This completes the proof.
+
+:::
+-->
 </section>
-<section id="metropolis-markov-chain" class="level2" data-number="11.4">
-<h2 data-number="11.4" class="anchored" data-anchor-id="metropolis-markov-chain"><span class="header-section-number">11.4</span> Metropolis Markov Chain</h2>
-<p>If the target distribution <span class="math inline">\(p(x)\)</span> is defined over the sample space <span class="math inline">\(\Omega\)</span>, then the Metropolis–Hastings algorithm generates a Markov chain with state space <span class="math inline">\(\Omega\)</span>.</p>
-<p>For simplicity,</p>
-<ol type="1">
-<li>we will analyze the Metropolis algorithm with a symmetric proposal distribution <span class="math inline">\(q(y | x) = q(x | y)\)</span>, and</li>
-<li>we will assume that the target distribution <span class="math inline">\(p(x)\)</span> is defined over a finite sample space <span class="math inline">\(\Omega\)</span>.</li>
-</ol>
+<section id="metropolis-algorithm-for-symmetric-proposals" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="metropolis-algorithm-for-symmetric-proposals"><span class="header-section-number">11.4</span> Metropolis Algorithm for Symmetric Proposals</h2>
+<p>When the proposal distribution is symmetric, i.e., <span class="math inline">\(q(y | x) = q(x | y)\)</span>, the Metropolis-Hastings algorithm simplifies to the Metropolis algorithm. We analyze this case for a target distribution <span class="math inline">\(p(x)\)</span> defined over a finite sample space <span class="math inline">\(\Omega\)</span>.</p>
 <p>The transition matrix for the Markov chain is given by</p>
 <p><span class="math display">\[
 \begin{aligned}
 \mathbb{P}(X = b | X = a) = \begin{cases}
-q(b | a) &amp; \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
-\frac{p(b)}{p(a)} \cdot q(b | a) &amp; \text{if } p(b) &lt; p(a) \text{ and } a \neq b, \\
-q(a | a) + \sum \limits_{b \in \Omega, p(b) &lt; p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) &amp; \text{if } a = b.
+q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) &amp; \text{if } a \neq b, \\
+1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right) &amp; \text{if } a = b.
 \end{cases}
 \end{aligned}
 \]</span></p>
-<p>One can check that this defines a valid transition matrix by showing that the sum of the transition probabilities for each state is <span class="math inline">\(1\)</span>.</p>
+<p>This can be equivalently written as:</p>
 <p><span class="math display">\[
 \begin{aligned}
-&amp;\sum \limits_{b \in \Omega} \mathbb{P}(X = b | X = a) \\
-&amp;= \sum \limits_{p(b) \ge p(a), a \neq b} q(b | a)
-+ \sum \limits_{p(b) &lt; p(a)} \frac{p(b)}{p(a)} \cdot q(b | a)
-+ q(a|a)
-+ \sum \limits_{p(b) &lt; p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) \\
-&amp;= \sum \limits_{b \in \Omega} q(b | a) \\
+\mathbb{P}(X = b | X = a) = \begin{cases}
+q(b | a) &amp; \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
+q(b | a) \cdot \frac{p(b)}{p(a)} &amp; \text{if } p(b) &lt; p(a) \text{ and } a \neq b, \\
+q(a | a) + \sum_{c: p(c) &lt; p(a)} q(c | a) \left(1 - \frac{p(c)}{p(a)}\right) &amp; \text{if } a = b.
+\end{cases}
+\end{aligned}
+\]</span></p>
+<p>To verify this defines a valid transition matrix, we check that transition probabilities sum to 1:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\sum_{b \in \Omega} \mathbb{P}(X = b | X = a)
+&amp;= \sum_{b \neq a} q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) + \left[1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right)\right] \\
 &amp;= 1.
 \end{aligned}
 \]</span></p>
-<section id="detailed-balance-equations" class="level3" data-number="11.4.1">
-<h3 data-number="11.4.1" class="anchored" data-anchor-id="detailed-balance-equations"><span class="header-section-number">11.4.1</span> Detailed Balance Equations</h3>
-<div id="thm-detailed-balance" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 11.1</strong></span> The Metropolis algorithm is reversible with respect to the target distribution <span class="math inline">\(p(x)\)</span>. This means that the Markov chain defined by the Metropolis algorithm satisfies the detailed balance equations:</p>
+<section id="detailed-balance-and-reversibility" class="level3" data-number="11.4.1">
+<h3 data-number="11.4.1" class="anchored" data-anchor-id="detailed-balance-and-reversibility"><span class="header-section-number">11.4.1</span> Detailed Balance and Reversibility</h3>
+<div id="thm-detailed-balance-symmetric" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 11.1</strong></span> The Metropolis algorithm with symmetric proposals satisfies the detailed balance equations with respect to the target distribution <span class="math inline">\(p(x)\)</span>:</p>
 <p><span class="math display">\[
 p(a) \cdot \mathbb{P}(X = b | X = a) = p(b) \cdot \mathbb{P}(X = a | X = b).
 \]</span></p>
 </div>
 <div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>We only need check the detailed balance equations for the case when <span class="math inline">\(a \neq b\)</span>. The case when <span class="math inline">\(a = b\)</span> is trivial. We make two cases:</p>
-<ol type="1">
-<li><strong>Case 1</strong>: <span class="math inline">\(p(a) \neq p(b)\)</span>.</li>
-</ol>
-<p>Without loss of generality, assume that <span class="math inline">\(p(a) &lt; p(b)\)</span>. Then we have</p>
+<p><span class="proof-title"><em>Proof</em>. </span>For <span class="math inline">\(a = b\)</span>, the equation trivially holds. For <span class="math inline">\(a \neq b\)</span>, we verify:</p>
+<p>Since <span class="math inline">\(q(b | a) = q(a | b)\)</span> by symmetry, we have:</p>
 <p><span class="math display">\[
 \begin{aligned}
 p(a) \cdot \mathbb{P}(X = b | X = a)
-&amp;= p(a) \cdot q(b | a) \\
-&amp;= p(a) \cdot q(a | b) \\
-&amp;= p(b) \cdot q(a | b) \dfrac{p(a)}{p(b)} \\
+&amp;= p(a) \cdot q(b | a) \cdot \min\left(1, \frac{p(b)}{p(a)}\right) \\
+&amp;= q(b | a) \cdot \min(p(a), p(b)) \\
+&amp;= q(a | b) \cdot \min(p(b), p(a)) \\
+&amp;= p(b) \cdot q(a | b) \cdot \min\left(1, \frac{p(a)}{p(b)}\right) \\
 &amp;= p(b) \cdot \mathbb{P}(X = a | X = b).
 \end{aligned}
 \]</span></p>
-<ol start="2" type="1">
-<li><strong>Case 2</strong>: <span class="math inline">\(p(a) = p(b)\)</span>. In this case, we have <span class="math display">\[
-\begin{aligned}
-p(a) \cdot \mathbb{P}(X = b | X = a)
-&amp;= p(a) \cdot q(b | a) \\
-&amp;= p(b) \cdot q(a | b) \\
-&amp;= p(b) \cdot \mathbb{P}(X = a | X = b).
-\end{aligned}
-\]</span> Thus, in both cases, we have shown that the detailed balance equations hold. This completes the proof.</li>
-</ol>
+<p>This establishes that the Metropolis algorithm is reversible with respect to <span class="math inline">\(p(x)\)</span>.</p>
 </div>
 
 

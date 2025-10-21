@@ -305,7 +305,11 @@ The complete Metropolis--Hastings algorithm is as follows:
 
 We can expand the algorithm further as follows:
 
-1. **Initialization**: Start at a point $x_0$.
+:::{.callout-note}
+
+## Metropolis--Hastings Algorithm
+
+1. Start at a point $x_0$.
 2. For $i = 0, 1, \ldots, N-1$:
     1. Generate a proposal $y \sim q(y | x_i)$.
     2. Compute 
@@ -319,6 +323,8 @@ We can expand the algorithm further as follows:
         3. Else,
            1. Set $x_{i+1} = x_i$.
 3. Return the sequence of points $x_0, x_1, \ldots, x_{N-1}$.
+
+:::
 
 ## Symmetric Proposal Distribution
 
@@ -361,6 +367,7 @@ Several other algorithms, such as rejection sampling, random walks on graphs, an
 
 :::
 
+<!--
 ## Metropolis Markov Chain
 
 If the target distribution $p(x)$ is defined over the sample space $\Omega$, then the Metropolis--Hastings algorithm generates a Markov chain with state space $\Omega$. 
@@ -435,4 +442,71 @@ p(a) \cdot \mathbb{P}(X = b | X = a)
 $$
 Thus, in both cases, we have shown that the detailed balance equations hold. This completes the proof.
 
+:::
+-->
+
+## Metropolis Algorithm for Symmetric Proposals
+
+When the proposal distribution is symmetric, i.e., $q(y | x) = q(x | y)$, the Metropolis-Hastings algorithm simplifies to the Metropolis algorithm. We analyze this case for a target distribution $p(x)$ defined over a finite sample space $\Omega$.
+
+The transition matrix for the Markov chain is given by
+
+$$
+\begin{aligned}
+\mathbb{P}(X = b | X = a) = \begin{cases}
+q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) & \text{if } a \neq b, \\
+1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right) & \text{if } a = b.
+\end{cases}
+\end{aligned}
+$$
+
+This can be equivalently written as:
+
+$$
+\begin{aligned}
+\mathbb{P}(X = b | X = a) = \begin{cases}
+q(b | a) & \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
+q(b | a) \cdot \frac{p(b)}{p(a)} & \text{if } p(b) < p(a) \text{ and } a \neq b, \\
+q(a | a) + \sum_{c: p(c) < p(a)} q(c | a) \left(1 - \frac{p(c)}{p(a)}\right) & \text{if } a = b.
+\end{cases}
+\end{aligned}
+$$
+
+To verify this defines a valid transition matrix, we check that transition probabilities sum to 1:
+
+$$
+\begin{aligned}
+\sum_{b \in \Omega} \mathbb{P}(X = b | X = a) 
+&= \sum_{b \neq a} q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) + \left[1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right)\right] \\
+&= 1.
+\end{aligned}
+$$
+
+### Detailed Balance and Reversibility
+
+::: {#thm-detailed-balance-symmetric}
+The Metropolis algorithm with symmetric proposals satisfies the detailed balance equations with respect to the target distribution $p(x)$:
+
+$$
+p(a) \cdot \mathbb{P}(X = b | X = a) = p(b) \cdot \mathbb{P}(X = a | X = b).
+$$
+:::
+
+::: {.proof}
+For $a = b$, the equation trivially holds. For $a \neq b$, we verify:
+
+Since $q(b | a) = q(a | b)$ by symmetry, we have:
+
+$$
+\begin{aligned}
+p(a) \cdot \mathbb{P}(X = b | X = a) 
+&= p(a) \cdot q(b | a) \cdot \min\left(1, \frac{p(b)}{p(a)}\right) \\
+&= q(b | a) \cdot \min(p(a), p(b)) \\
+&= q(a | b) \cdot \min(p(b), p(a)) \\
+&= p(b) \cdot q(a | b) \cdot \min\left(1, \frac{p(a)}{p(b)}\right) \\
+&= p(b) \cdot \mathbb{P}(X = a | X = b).
+\end{aligned}
+$$
+
+This establishes that the Metropolis algorithm is reversible with respect to $p(x)$.
 :::
