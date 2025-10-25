@@ -554,14 +554,29 @@ window.Quarto = {
   <li><a href="#low-temperature" id="toc-low-temperature" class="nav-link" data-scroll-target="#low-temperature"><span class="header-section-number">14.2.3</span> Low Temperature</a></li>
   <li><a href="#magnetization" id="toc-magnetization" class="nav-link" data-scroll-target="#magnetization"><span class="header-section-number">14.2.4</span> Magnetization</a></li>
   </ul></li>
-  <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link" data-scroll-target="#gibbs-sampling"><span class="header-section-number">14.3</span> Gibbs Sampling</a>
+  <li><a href="#phase-transitions" id="toc-phase-transitions" class="nav-link" data-scroll-target="#phase-transitions"><span class="header-section-number">14.3</span> Phase Transitions</a></li>
+  <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link" data-scroll-target="#gibbs-sampling"><span class="header-section-number">14.4</span> Gibbs Sampling</a>
   <ul class="collapse">
-  <li><a href="#conditional-distribution" id="toc-conditional-distribution" class="nav-link" data-scroll-target="#conditional-distribution"><span class="header-section-number">14.3.1</span> Conditional Distribution</a></li>
-  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm"><span class="header-section-number">14.3.2</span> The Algorithm</a></li>
+  <li><a href="#conditional-distribution" id="toc-conditional-distribution" class="nav-link" data-scroll-target="#conditional-distribution"><span class="header-section-number">14.4.1</span> Conditional Distribution</a></li>
   </ul></li>
-  <li><a href="#phase-transitions" id="toc-phase-transitions" class="nav-link" data-scroll-target="#phase-transitions"><span class="header-section-number">14.4</span> Phase Transitions</a></li>
-  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">14.5</span> Simulation</a></li>
-  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">14.6</span> Final Remarks</a></li>
+  <li><a href="#metropolis-hastings-algorithm" id="toc-metropolis-hastings-algorithm" class="nav-link" data-scroll-target="#metropolis-hastings-algorithm"><span class="header-section-number">14.5</span> Metropolis-Hastings Algorithm</a>
+  <ul class="collapse">
+  <li><a href="#the-algorithm" id="toc-the-algorithm" class="nav-link" data-scroll-target="#the-algorithm"><span class="header-section-number">14.5.1</span> The Algorithm</a></li>
+  <li><a href="#energy-change-calculation" id="toc-energy-change-calculation" class="nav-link" data-scroll-target="#energy-change-calculation"><span class="header-section-number">14.5.2</span> Energy Change Calculation</a></li>
+  <li><a href="#acceptance-probability" id="toc-acceptance-probability" class="nav-link" data-scroll-target="#acceptance-probability"><span class="header-section-number">14.5.3</span> Acceptance Probability</a></li>
+  <li><a href="#the-algorithm-1" id="toc-the-algorithm-1" class="nav-link" data-scroll-target="#the-algorithm-1"><span class="header-section-number">14.5.4</span> The Algorithm</a></li>
+  <li><a href="#comparison-with-gibbs-sampling" id="toc-comparison-with-gibbs-sampling" class="nav-link" data-scroll-target="#comparison-with-gibbs-sampling"><span class="header-section-number">14.5.5</span> Comparison with Gibbs Sampling</a></li>
+  </ul></li>
+  <li><a href="#wolff-algorithm-for-critical-temperature-sampling" id="toc-wolff-algorithm-for-critical-temperature-sampling" class="nav-link" data-scroll-target="#wolff-algorithm-for-critical-temperature-sampling"><span class="header-section-number">14.6</span> Wolff Algorithm for Critical Temperature Sampling</a>
+  <ul class="collapse">
+  <li><a href="#the-physical-motivation" id="toc-the-physical-motivation" class="nav-link" data-scroll-target="#the-physical-motivation"><span class="header-section-number">14.6.1</span> The Physical Motivation</a></li>
+  <li><a href="#the-algorithm-2" id="toc-the-algorithm-2" class="nav-link" data-scroll-target="#the-algorithm-2"><span class="header-section-number">14.6.2</span> The Algorithm</a></li>
+  <li><a href="#the-addition-probability" id="toc-the-addition-probability" class="nav-link" data-scroll-target="#the-addition-probability"><span class="header-section-number">14.6.3</span> The Addition Probability</a></li>
+  <li><a href="#physical-interpretation-of-clusters" id="toc-physical-interpretation-of-clusters" class="nav-link" data-scroll-target="#physical-interpretation-of-clusters"><span class="header-section-number">14.6.4</span> Physical Interpretation of Clusters</a></li>
+  <li><a href="#comparison-with-other-methods" id="toc-comparison-with-other-methods" class="nav-link" data-scroll-target="#comparison-with-other-methods"><span class="header-section-number">14.6.5</span> Comparison with Other Methods</a></li>
+  </ul></li>
+  <li><a href="#simulation-results" id="toc-simulation-results" class="nav-link" data-scroll-target="#simulation-results"><span class="header-section-number">14.7</span> Simulation Results</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">14.8</span> Final Remarks</a></li>
   </ul>
 </nav>
     </div>
@@ -631,7 +646,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><strong>Magnetization</strong>: If the system is in a state where most of the particles have the same spin, the system is said to be magnetized.</li>
 </ol>
 <p>Next we create a mathematical model to describe the system.</p>
-<div id="110fc3dd" class="cell" data-execution_count="2">
+<div id="110fc3dd" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -682,28 +697,74 @@ M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
 <p>If the system is magnetized, then <span class="math inline">\(M(\sigma)\)</span> will be close to <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution <span class="math inline">\(f(\sigma)\)</span> and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.</p>
 </section>
 </section>
-<section id="gibbs-sampling" class="level2" data-number="14.3">
-<h2 data-number="14.3" class="anchored" data-anchor-id="gibbs-sampling"><span class="header-section-number">14.3</span> Gibbs Sampling</h2>
+<section id="phase-transitions" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="phase-transitions"><span class="header-section-number">14.3</span> Phase Transitions</h2>
+<p>It was discovered that the Ising model for a 2D grid exhibits a phenomenon called <strong>phase transition</strong>. If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the <strong>critical temperature</strong>.</p>
+<p>It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice <span class="math inline">\(\to \infty\)</span>. This limiting critical temperature for a square lattice is given by</p>
+<p><span class="math display">\[
+T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
+\]</span></p>
+<p>Of course, in our simulation, we’ll be using finite sized lattices so we should expect some deviation from this result.</p>
+</section>
+<section id="gibbs-sampling" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="gibbs-sampling"><span class="header-section-number">14.4</span> Gibbs Sampling</h2>
 <p>There are two natural ways of sampling from the distribution <span class="math inline">\(f(\sigma)\)</span>: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we’ll use Gibbs sampling.</p>
-<section id="conditional-distribution" class="level3" data-number="14.3.1">
-<h3 data-number="14.3.1" class="anchored" data-anchor-id="conditional-distribution"><span class="header-section-number">14.3.1</span> Conditional Distribution</h3>
-<p>Consider a single spin <span class="math inline">\(X_{i, j}\)</span>. Let <span class="math inline">\(\hat{X}_{i, j}\)</span> denote the set of spins at all sites except <span class="math inline">\((i, j)\)</span>. We want to find the conditional distribution of <span class="math inline">\(X_{i, j}\)</span> given <span class="math inline">\(\hat{X}_{i, j}\)</span>. We’ll assume the following result without proof:</p>
+<section id="conditional-distribution" class="level3" data-number="14.4.1">
+<h3 data-number="14.4.1" class="anchored" data-anchor-id="conditional-distribution"><span class="header-section-number">14.4.1</span> Conditional Distribution</h3>
+<p>Consider a single spin <span class="math inline">\(X_{i, j}\)</span>. Let <span class="math inline">\(\hat{X}_{i, j}\)</span> denote the set of spins at all sites except <span class="math inline">\((i, j)\)</span>. We want to find the conditional distribution of <span class="math inline">\(X_{i, j}\)</span> given <span class="math inline">\(\hat{X}_{i, j}\)</span>.</p>
+<section id="derivation-from-boltzmann-distribution" class="level4" data-number="14.4.1.1">
+<h4 data-number="14.4.1.1" class="anchored" data-anchor-id="derivation-from-boltzmann-distribution"><span class="header-section-number">14.4.1.1</span> Derivation from Boltzmann Distribution</h4>
+<p>The conditional probability can be derived directly from the Boltzmann distribution. The key insight is that when we condition on all other spins, only the energy terms involving <span class="math inline">\(X_{i,j}\)</span> matter for the probability ratio.</p>
+<p>The full Hamiltonian can be written as: <span class="math display">\[H(\sigma) = H_{\text{rest}} + H_{\text{local}}\]</span></p>
+<p>where <span class="math inline">\(H_{\text{rest}}\)</span> contains all terms not involving <span class="math inline">\(X_{i,j}\)</span>, and <span class="math display">\[H_{\text{local}} = -J \cdot X_{i,j} \sum_{(i',j') \in \text{neighbors}(i,j)} X_{i',j'} = -X_{i,j} \cdot h_{i,j}\]</span></p>
+<p>Here, <span class="math inline">\(h_{i,j} = J(X_{i-1,j} + X_{i+1,j} + X_{i,j-1} + X_{i,j+1})\)</span> is the <strong>effective field</strong> at site <span class="math inline">\((i,j)\)</span>.</p>
+<p>Using the Boltzmann distribution: <span class="math display">\[P(X_{i,j} = s | \hat{X}_{i,j}) = \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma_{+1})/T} + e^{-H(\sigma_{-1})/T}}\]</span></p>
+<p>where <span class="math inline">\(\sigma_{+1}\)</span> and <span class="math inline">\(\sigma_{-1}\)</span> are configurations with <span class="math inline">\(X_{i,j} = +1\)</span> and <span class="math inline">\(X_{i,j} = -1\)</span> respectively.</p>
+<p>Since <span class="math inline">\(H_{\text{rest}}\)</span> cancels out in the ratio: <span class="math display">\[P(X_{i,j} = +1 | \hat{X}_{i,j}) = \frac{e^{h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{-2h_{i,j}/T}}\]</span></p>
+<p>Similarly: <span class="math display">\[P(X_{i,j} = -1 | \hat{X}_{i,j}) = \frac{e^{-h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{2h_{i,j}/T}}\]</span></p>
+<p>This gives us our final result:</p>
 <p><span id="eq-conditional"><span class="math display">\[
 \begin{aligned}
 P(X_{i, j} = 1 | \hat{X}_{i, j}) &amp;= \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}, \\
 P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 \end{aligned}
 \tag{14.1}\]</span></span></p>
-<p>where <span class="math inline">\(T\)</span> is the temperature of the system and <span class="math inline">\(h_{i, j}\)</span> is the effective field at site <span class="math inline">\((i, j)\)</span>, given by</p>
-<p><span class="math display">\[
-\begin{aligned}
-h_{i, j}
-&amp;= J \sum_{(i', j') \in \text{neighbors}(i, j)} X_{i', j'} \\
-&amp;= J \left( X_{i-1, j} + X_{i+1, j} + X_{i, j-1} + X_{i, j+1} \right)
-\end{aligned}
-\]</span></p>
-<p>The conditional distribution in <a href="#eq-conditional" class="quarto-xref">Equation&nbsp;<span>14.1</span></a> is a logistic function. When <span class="math inline">\(h_{i, j}\)</span> is positive, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is greater than <span class="math inline">\(0.5\)</span>, and when <span class="math inline">\(h_{i, j}\)</span> is negative, the probability of <span class="math inline">\(X_{i, j}\)</span> being <span class="math inline">\(1\)</span> is less than <span class="math inline">\(0.5\)</span>. This makes sense because if the effective field is positive, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(1\)</span> and if the effective field is negative, most of the neighbors of <span class="math inline">\((i, j)\)</span> have spin <span class="math inline">\(-1\)</span>, so it is likely that <span class="math inline">\((i, j)\)</span> will also have spin <span class="math inline">\(-1\)</span>.</p>
-<div id="c717a478" class="cell" data-execution_count="3">
+<p>Thus the conditional distribution in <a href="#eq-conditional" class="quarto-xref">Equation&nbsp;<span>14.1</span></a> is a logistic function.</p>
+</section>
+<section id="physical-interpretation-of-the-effective-field" class="level4" data-number="14.4.1.2">
+<h4 data-number="14.4.1.2" class="anchored" data-anchor-id="physical-interpretation-of-the-effective-field"><span class="header-section-number">14.4.1.2</span> Physical Interpretation of the Effective Field</h4>
+<p>The effective field <span class="math inline">\(h_{i,j}\)</span> represents the “magnetic influence” of the neighboring spins: - When <span class="math inline">\(h_{i,j} &gt; 0\)</span>: Most neighbors are spin-up (<span class="math inline">\(+1\)</span>), favoring <span class="math inline">\(X_{i,j} = +1\)</span> - When <span class="math inline">\(h_{i,j} &lt; 0\)</span>: Most neighbors are spin-down (<span class="math inline">\(-1\)</span>), favoring <span class="math inline">\(X_{i,j} = -1\)</span><br>
+- When <span class="math inline">\(h_{i,j} = 0\)</span>: Equal influence from up and down neighbors, so <span class="math inline">\(P(X_{i,j} = +1) = 0.5\)</span></p>
+<p>The temperature <span class="math inline">\(T\)</span> controls how strongly the system responds to this local field: - Low <span class="math inline">\(T\)</span>: Sharp response, spins almost always align with neighbors - High <span class="math inline">\(T\)</span>: Weak response, spins behave more randomly regardless of neighbors</p>
+</section>
+</section>
+</section>
+<section id="metropolis-hastings-algorithm" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="metropolis-hastings-algorithm"><span class="header-section-number">14.5</span> Metropolis-Hastings Algorithm</h2>
+<p>While Gibbs sampling updates spins by sampling from exact conditional distributions, the <strong>Metropolis-Hastings algorithm</strong> uses a different approach: it proposes random changes and accepts or rejects them based on how they affect the system’s energy.</p>
+<section id="the-algorithm" class="level3" data-number="14.5.1">
+<h3 data-number="14.5.1" class="anchored" data-anchor-id="the-algorithm"><span class="header-section-number">14.5.1</span> The Algorithm</h3>
+<p>The Metropolis-Hastings algorithm for the Ising model works as follows:</p>
+<ol type="1">
+<li><strong>Proposal step</strong>: Randomly select a spin <span class="math inline">\(X_{i,j}\)</span> and propose flipping it: <span class="math inline">\(X_{i,j} \to -X_{i,j}\)</span></li>
+<li><strong>Energy calculation</strong>: Compute the energy change <span class="math inline">\(\Delta E\)</span> caused by this flip</li>
+<li><strong>Acceptance decision</strong>: Accept the flip with probability <span class="math inline">\(\min(1, e^{-\Delta E/T})\)</span></li>
+<li><strong>Update</strong>: If accepted, flip the spin; if rejected, keep the current state</li>
+</ol>
+</section>
+<section id="energy-change-calculation" class="level3" data-number="14.5.2">
+<h3 data-number="14.5.2" class="anchored" data-anchor-id="energy-change-calculation"><span class="header-section-number">14.5.2</span> Energy Change Calculation</h3>
+<p>When we flip spin <span class="math inline">\(X_{i,j}\)</span> from <span class="math inline">\(s\)</span> to <span class="math inline">\(-s\)</span>, only the energy terms involving this spin change. The energy change is:</p>
+<p><span class="math display">\[\Delta E = E_{\text{new}} - E_{\text{old}} = -J(-s)\sum_{\text{neighbors}} X_{i',j'} - (-J \cdot s \sum_{\text{neighbors}} X_{i',j'})\]</span></p>
+<p><span class="math display">\[\Delta E = 2J \cdot s \sum_{\text{neighbors}} X_{i',j'} = 2s \cdot h_{i,j}\]</span></p>
+<p>where <span class="math inline">\(h_{i,j} = J(X_{i-1,j} + X_{i+1,j} + X_{i,j-1} + X_{i,j+1})\)</span> is the same effective field from Gibbs sampling.</p>
+</section>
+<section id="acceptance-probability" class="level3" data-number="14.5.3">
+<h3 data-number="14.5.3" class="anchored" data-anchor-id="acceptance-probability"><span class="header-section-number">14.5.3</span> Acceptance Probability</h3>
+<p>The Metropolis acceptance probability is: <span class="math display">\[P_{\text{accept}} = \min\left(1, e^{-\Delta E/T}\right) = \min\left(1, e^{-2s \cdot h_{i,j}/T}\right)\]</span></p>
+<p>This has a simple interpretation: - <strong>Energy-lowering moves</strong> (<span class="math inline">\(\Delta E &lt; 0\)</span>): Always accepted (probability = 1) - <strong>Energy-raising moves</strong> (<span class="math inline">\(\Delta E &gt; 0\)</span>): Accepted with probability <span class="math inline">\(e^{-\Delta E/T}\)</span></p>
+<p>Higher temperatures make the algorithm more likely to accept energy-raising moves, allowing exploration of higher-energy configurations.</p>
+<div id="c717a478" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -713,8 +774,8 @@ h_{i, j}
 </div>
 </div>
 </section>
-<section id="the-algorithm" class="level3" data-number="14.3.2">
-<h3 data-number="14.3.2" class="anchored" data-anchor-id="the-algorithm"><span class="header-section-number">14.3.2</span> The Algorithm</h3>
+<section id="the-algorithm-1" class="level3" data-number="14.5.4">
+<h3 data-number="14.5.4" class="anchored" data-anchor-id="the-algorithm-1"><span class="header-section-number">14.5.4</span> The Algorithm</h3>
 <ol type="1">
 <li>Initialize the grid of spins <span class="math inline">\(X_i\)</span> for <span class="math inline">\(i = 1\)</span> to <span class="math inline">\(N\)</span> randomly.</li>
 <li>For <span class="math inline">\(i = 1\)</span> to <span class="math inline">\(N\)</span>
@@ -729,26 +790,188 @@ h_{i, j}
 <li>Compute the magnetization of the system.</li>
 <li>Repeat steps 2 and 3.</li>
 </ol>
-<p><strong>Equilibrium/Mixing Time:</strong></p>
-<p>Even when the grid size is modest, the dimensions of the state space is quite large, <span class="math inline">\(2^{N^2}\)</span>. This means that the Markov chain will take a long time to mix. Practically, this means that the initial configuration might be far from the stationary distribution i.e.&nbsp;the system has not reached thermal equilibrium. In this case it is important to discard the initial samples to not skew the magnetization estimate.</p>
-<p>One simple way to this is to run the Gibbs sampler until the running average of the magnetization stabilizes. At that point, we can start using the samples to estimate the magnetization.</p>
+</section>
+<section id="comparison-with-gibbs-sampling" class="level3" data-number="14.5.5">
+<h3 data-number="14.5.5" class="anchored" data-anchor-id="comparison-with-gibbs-sampling"><span class="header-section-number">14.5.5</span> Comparison with Gibbs Sampling</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 38%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th style="text-align: center;">Gibbs Sampling</th>
+<th style="text-align: center;">Metropolis-Hastings</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Update mechanism</td>
+<td style="text-align: center;">Sample from exact conditional distribution</td>
+<td style="text-align: center;">Propose and accept/reject</td>
+</tr>
+<tr class="even">
+<td>Computational cost</td>
+<td style="text-align: center;">Requires exponential (logistic) calculation</td>
+<td style="text-align: center;">Simple energy difference</td>
+</tr>
+<tr class="odd">
+<td>Acceptance rate</td>
+<td style="text-align: center;">Always 100% (every update accepted)</td>
+<td style="text-align: center;">Variable (depends on T and local environment)</td>
+</tr>
+<tr class="even">
+<td>Implementation</td>
+<td style="text-align: center;">More complex (logistic function)</td>
+<td style="text-align: center;">Simpler (just energy differences)</td>
+</tr>
+<tr class="odd">
+<td>Generalizability</td>
+<td style="text-align: center;">Requires known conditional distributions</td>
+<td style="text-align: center;">Works for any energy function</td>
+</tr>
+<tr class="even">
+<td>Efficiency near T_c</td>
+<td style="text-align: center;">Generally faster convergence</td>
+<td style="text-align: center;">Can have low acceptance rates</td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
-<section id="phase-transitions" class="level2" data-number="14.4">
-<h2 data-number="14.4" class="anchored" data-anchor-id="phase-transitions"><span class="header-section-number">14.4</span> Phase Transitions</h2>
-<p>It was discovered that the Ising model for a 2D grid exhibits a phenomenon called <strong>phase transition</strong>. If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the <strong>critical temperature</strong>.</p>
-<p>It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice <span class="math inline">\(\to \infty\)</span>. This limiting critical temperature for a square lattice is given by</p>
-<p><span class="math display">\[
-T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
-\]</span></p>
-<p>Of course, in our simulation, we’ll be using finite sized lattices so we should expect some deviation from this result.</p>
+<section id="wolff-algorithm-for-critical-temperature-sampling" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="wolff-algorithm-for-critical-temperature-sampling"><span class="header-section-number">14.6</span> Wolff Algorithm for Critical Temperature Sampling</h2>
+<p>Near the critical temperature, both Gibbs sampling and single-spin Metropolis-Hastings suffer from <strong>critical slowing down</strong>. The correlation length ξ diverges as ξ ~ |T - T_c|^{-ν}, causing spins to become highly correlated over large distances. Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.</p>
+<p>The <strong>Wolff algorithm</strong>, developed by Ulli Wolff in 1989, solves this problem by identifying and flipping entire <strong>clusters</strong> of aligned spins simultaneously, dramatically reducing critical slowing down at low temperatures and near the critical point.</p>
+<section id="the-physical-motivation" class="level3" data-number="14.6.1">
+<h3 data-number="14.6.1" class="anchored" data-anchor-id="the-physical-motivation"><span class="header-section-number">14.6.1</span> The Physical Motivation</h3>
+<p>At low temperatures and near T_c, the system develops large domains of aligned spins that fluctuate together as coherent units. Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time. The Wolff algorithm instead:</p>
+<ol type="1">
+<li>Identifies clusters of spins that “want” to flip together</li>
+<li>Respects the correlation structure by flipping entire domains</li>
+<li>Maintains detailed balance while working with the physics rather than against it</li>
+</ol>
+<p>This approach is analogous to the difference between trying to turn a school of fish by grabbing individual fish versus guiding the entire school as a unit.</p>
 </section>
-<section id="simulation" class="level2" data-number="14.5">
-<h2 data-number="14.5" class="anchored" data-anchor-id="simulation"><span class="header-section-number">14.5</span> Simulation</h2>
+<section id="the-algorithm-2" class="level3" data-number="14.6.2">
+<h3 data-number="14.6.2" class="anchored" data-anchor-id="the-algorithm-2"><span class="header-section-number">14.6.2</span> The Algorithm</h3>
+<ol type="1">
+<li><p><strong>Seed selection</strong>: Randomly choose a starting spin s₀ at site (i₀, j₀)</p></li>
+<li><p><strong>Cluster growth</strong>: Use a breadth-first search to grow a cluster:</p>
+<ul>
+<li>Initialize a queue with the seed spin</li>
+<li>Mark the seed as visited</li>
+<li>While the queue is not empty:
+<ul>
+<li>Remove a spin from the queue</li>
+<li>Examine each of its four neighbors</li>
+<li>If a neighbor has the same orientation as the original seed spin AND has not been visited:
+<ul>
+<li>Add it to the cluster with probability P_add = 1 - e^{-2βJ}</li>
+<li>If added, mark as visited and add to the queue</li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><p><strong>Cluster flip</strong>: Flip all spins in the identified cluster simultaneously</p></li>
+<li><p><strong>Acceptance</strong>: The move is always accepted (acceptance probability = 1)</p></li>
+</ol>
+</section>
+<section id="the-addition-probability" class="level3" data-number="14.6.3">
+<h3 data-number="14.6.3" class="anchored" data-anchor-id="the-addition-probability"><span class="header-section-number">14.6.3</span> The Addition Probability</h3>
+<p>The key insight is the addition probability P_add = 1 - e^{-2βJ}. This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence:</p>
+<p><strong>High temperature</strong> (T &gt;&gt; T_c):</p>
+<ul>
+<li>P_add ≈ 2βJ ≈ 0 (since β = 1/T is small)</li>
+<li>Clusters remain small, typically containing only 1-2 spins</li>
+<li>Behavior similar to single-spin updates</li>
+</ul>
+<p><strong>Low temperature</strong> (T &lt;&lt; T_c):</p>
+<ul>
+<li>P_add ≈ 1 (since 2βJ is large)</li>
+<li>Large aligned regions are almost always included in clusters</li>
+<li>Entire domains flip together efficiently, avoiding high-energy intermediate states</li>
+</ul>
+<p><strong>Critical temperature</strong> (T ≈ T_c):</p>
+<ul>
+<li>P_add takes intermediate values</li>
+<li>Cluster sizes automatically match the natural correlation length ξ</li>
+<li>Optimal balance between exploration and respecting correlations.</li>
+</ul>
+</section>
+<section id="physical-interpretation-of-clusters" class="level3" data-number="14.6.4">
+<h3 data-number="14.6.4" class="anchored" data-anchor-id="physical-interpretation-of-clusters"><span class="header-section-number">14.6.4</span> Physical Interpretation of Clusters</h3>
+<p>The clusters identified by the Wolff algorithm have physical meaning:</p>
+<ul>
+<li><strong>Small clusters</strong> (size ~ 1): High temperature regime, spins behave independently</li>
+<li><strong>Medium clusters</strong> (size ~ 10-100): Intermediate correlations, local domains</li>
+<li><strong>Large clusters</strong> (size ~ L²): Low temperature or near critical point, system-spanning correlations</li>
+<li><strong>Percolating clusters</strong>: Clusters that wrap around periodic boundaries indicate long-range order</li>
+</ul>
+<p>The average cluster size ⟨s⟩ is related to the magnetic susceptibility: ⟨s⟩ ~ χ ~ |T - T_c|^{-γ}, providing a direct probe of critical behavior.</p>
+</section>
+<section id="comparison-with-other-methods" class="level3" data-number="14.6.5">
+<h3 data-number="14.6.5" class="anchored" data-anchor-id="comparison-with-other-methods"><span class="header-section-number">14.6.5</span> Comparison with Other Methods</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Aspect</th>
+<th>Single-Spin</th>
+<th>Wolff Algorithm</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Update size</strong></td>
+<td>Always 1 spin</td>
+<td>Variable (1 to L² spins)</td>
+</tr>
+<tr class="even">
+<td><strong>Acceptance rate</strong></td>
+<td>Variable (very low at low T)</td>
+<td>Always 100%</td>
+</tr>
+<tr class="odd">
+<td><strong>Critical slowing down</strong></td>
+<td>Severe</td>
+<td>Minimal</td>
+</tr>
+<tr class="even">
+<td><strong>Implementation</strong></td>
+<td>Simple</td>
+<td>Moderate complexity</td>
+</tr>
+<tr class="odd">
+<td><strong>Memory usage</strong></td>
+<td>Minimal</td>
+<td>Moderate (cluster storage)</td>
+</tr>
+<tr class="even">
+<td><strong>Efficiency at high T</strong></td>
+<td>Good</td>
+<td>Similar</td>
+</tr>
+<tr class="odd">
+<td><strong>Efficiency near T_c</strong></td>
+<td>Very poor</td>
+<td>Excellent</td>
+</tr>
+<tr class="even">
+<td><strong>Efficiency at low T</strong></td>
+<td>Poor</td>
+<td>Excellent</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="simulation-results" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="simulation-results"><span class="header-section-number">14.7</span> Simulation Results</h2>
 <p>Below are the results of simulating the Ising model on a <span class="math inline">\(20 \times 20\)</span> grid for <span class="math inline">\(J = 1\)</span>. The predicted critical temperature is <span class="math inline">\(T_c = 2.269\)</span>.</p>
 <p>We can see that at <span class="math inline">\(T=1.5\)</span>, the system is magnetized and the magnetization is more or less constant and close to 1 or -1 over various runs. At <span class="math inline">\(T=2.5\)</span>, the system is not magnetized and the average magnetization is close to 0. It fluctuates wildly over various runs.</p>
 <p>If we gradually increase the temperature from <span class="math inline">\(T=1\)</span> to <span class="math inline">\(T=3\)</span>, we can see that the magnetization decreases smoothly until <span class="math inline">\(T=2\)</span> after which it drops suddenly. This is the phase transition. Below the graph are the snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.</p>
-<div id="7bf14f94" class="cell" data-execution_count="5">
+<div id="7bf14f94" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -764,7 +987,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="09641cc4" class="cell" data-execution_count="7">
+<div id="09641cc4" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -773,7 +996,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </div>
-<div id="92f8d31d" class="cell" data-execution_count="9">
+<div id="92f8d31d" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -783,8 +1006,8 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </div>
 </div>
 </section>
-<section id="final-remarks" class="level2" data-number="14.6">
-<h2 data-number="14.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">14.6</span> Final Remarks</h2>
+<section id="final-remarks" class="level2" data-number="14.8">
+<h2 data-number="14.8" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">14.8</span> Final Remarks</h2>
 <p>Not all graphs show a phase transition. The Ising model in 1D has no phase transition at any temperature. It was conjectured that the Ising model in 2D has no phase transition either, but this was proven wrong when an analytical solution was found by Lars Onsager in 1944. The Ising model in 3D also has a phase transition, but the critical temperature is not known exactly. Most critical temperatures are only known for limiting cases when the size of the lattice goes to infinity. For finite cases, Monte Carlo simulations are the only way to estimate the critical temperature.</p>
 
 

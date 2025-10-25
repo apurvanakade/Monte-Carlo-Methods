@@ -126,6 +126,21 @@ $$
 
 If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
 
+
+## Phase Transitions
+
+It was discovered that the Ising model for a 2D grid exhibits a phenomenon called **phase transition**. 
+If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the **critical temperature**.
+
+
+It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice $\to \infty$. This limiting critical temperature for a square lattice is given by
+
+$$
+T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
+$$
+
+Of course, in our simulation, we'll be using finite sized lattices so we should expect some deviation from this result.
+
 ## Gibbs Sampling
 
 There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we'll use Gibbs sampling.
@@ -133,8 +148,32 @@ There are two natural ways of sampling from the distribution $f(\sigma)$: Metrop
 
 ### Conditional Distribution
 
-Consider a single spin $X_{i, j}$. Let $\hat{X}_{i, j}$ denote the set of spins at all sites except $(i, j)$. We want to find the conditional distribution of $X_{i, j}$ given $\hat{X}_{i, j}$. 
-We'll assume the following result without proof:
+Consider a single spin $X_{i, j}$. Let $\hat{X}_{i, j}$ denote the set of spins at all sites except $(i, j)$. We want to find the conditional distribution of $X_{i, j}$ given $\hat{X}_{i, j}$.
+
+#### Derivation from Boltzmann Distribution
+
+The conditional probability can be derived directly from the Boltzmann distribution. The key insight is that when we condition on all other spins, only the energy terms involving $X_{i,j}$ matter for the probability ratio.
+
+The full Hamiltonian can be written as:
+$$H(\sigma) = H_{\text{rest}} + H_{\text{local}}$$
+
+where $H_{\text{rest}}$ contains all terms not involving $X_{i,j}$, and 
+$$H_{\text{local}} = -J \cdot X_{i,j} \sum_{(i',j') \in \text{neighbors}(i,j)} X_{i',j'} = -X_{i,j} \cdot h_{i,j}$$
+
+Here, $h_{i,j} = J(X_{i-1,j} + X_{i+1,j} + X_{i,j-1} + X_{i,j+1})$ is the **effective field** at site $(i,j)$.
+
+Using the Boltzmann distribution:
+$$P(X_{i,j} = s | \hat{X}_{i,j}) = \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma_{+1})/T} + e^{-H(\sigma_{-1})/T}}$$
+
+where $\sigma_{+1}$ and $\sigma_{-1}$ are configurations with $X_{i,j} = +1$ and $X_{i,j} = -1$ respectively.
+
+Since $H_{\text{rest}}$ cancels out in the ratio:
+$$P(X_{i,j} = +1 | \hat{X}_{i,j}) = \frac{e^{h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{-2h_{i,j}/T}}$$
+
+Similarly:
+$$P(X_{i,j} = -1 | \hat{X}_{i,j}) = \frac{e^{-h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{2h_{i,j}/T}}$$
+
+This gives us our final result:
 
 $$
 \begin{aligned}
@@ -143,19 +182,53 @@ P(X_{i, j} = -1 | \hat{X}_{i, j}) &= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 \end{aligned}
 $$ {#eq-conditional}
 
-where $T$ is the temperature of the system and $h_{i, j}$ is the effective field at site $(i, j)$, given by
 
-$$
-\begin{aligned}
-h_{i, j} 
-&= J \sum_{(i', j') \in \text{neighbors}(i, j)} X_{i', j'} \\
-&= J \left( X_{i-1, j} + X_{i+1, j} + X_{i, j-1} + X_{i, j+1} \right)
-\end{aligned}
-$$
+Thus the conditional distribution in @eq-conditional is a logistic function. 
 
-The conditional distribution in @eq-conditional is a logistic function. When $h_{i, j}$ is positive, the probability of $X_{i, j}$ being $1$ is greater than $0.5$, and when $h_{i, j}$ is negative, the probability of $X_{i, j}$ being $1$ is less than $0.5$. This makes sense because if the effective field is positive, most of the neighbors of $(i, j)$ have spin $1$, so it is likely that $(i, j)$ will also have spin $1$ and if the effective field is negative, most of the neighbors of $(i, j)$ have spin $-1$, so it is likely that $(i, j)$ will also have spin $-1$.
+#### Physical Interpretation of the Effective Field
 
+The effective field $h_{i,j}$ represents the "magnetic influence" of the neighboring spins:
+- When $h_{i,j} > 0$: Most neighbors are spin-up ($+1$), favoring $X_{i,j} = +1$
+- When $h_{i,j} < 0$: Most neighbors are spin-down ($-1$), favoring $X_{i,j} = -1$  
+- When $h_{i,j} = 0$: Equal influence from up and down neighbors, so $P(X_{i,j} = +1) = 0.5$
 
+The temperature $T$ controls how strongly the system responds to this local field:
+- Low $T$: Sharp response, spins almost always align with neighbors
+- High $T$: Weak response, spins behave more randomly regardless of neighbors
+
+## Metropolis-Hastings Algorithm
+
+While Gibbs sampling updates spins by sampling from exact conditional distributions, the **Metropolis-Hastings algorithm** uses a different approach: it proposes random changes and accepts or rejects them based on how they affect the system's energy.
+
+### The Algorithm
+
+The Metropolis-Hastings algorithm for the Ising model works as follows:
+
+1. **Proposal step**: Randomly select a spin $X_{i,j}$ and propose flipping it: $X_{i,j} \to -X_{i,j}$
+2. **Energy calculation**: Compute the energy change $\Delta E$ caused by this flip
+3. **Acceptance decision**: Accept the flip with probability $\min(1, e^{-\Delta E/T})$
+4. **Update**: If accepted, flip the spin; if rejected, keep the current state
+
+### Energy Change Calculation
+
+When we flip spin $X_{i,j}$ from $s$ to $-s$, only the energy terms involving this spin change. The energy change is:
+
+$$\Delta E = E_{\text{new}} - E_{\text{old}} = -J(-s)\sum_{\text{neighbors}} X_{i',j'} - (-J \cdot s \sum_{\text{neighbors}} X_{i',j'})$$
+
+$$\Delta E = 2J \cdot s \sum_{\text{neighbors}} X_{i',j'} = 2s \cdot h_{i,j}$$
+
+where $h_{i,j} = J(X_{i-1,j} + X_{i+1,j} + X_{i,j-1} + X_{i,j+1})$ is the same effective field from Gibbs sampling.
+
+### Acceptance Probability
+
+The Metropolis acceptance probability is:
+$$P_{\text{accept}} = \min\left(1, e^{-\Delta E/T}\right) = \min\left(1, e^{-2s \cdot h_{i,j}/T}\right)$$
+
+This has a simple interpretation:
+- **Energy-lowering moves** ($\Delta E < 0$): Always accepted (probability = 1)
+- **Energy-raising moves** ($\Delta E > 0$): Accepted with probability $e^{-\Delta E/T}$
+
+Higher temperatures make the algorithm more likely to accept energy-raising moves, allowing exploration of higher-energy configurations.
 
 ```{python}
 # draw graph of logistic function 
@@ -184,28 +257,101 @@ plt.show()
 3. Compute the magnetization of the system.
 4. Repeat steps 2 and 3.
 
-**Equilibrium/Mixing Time:**
 
-Even when the grid size is modest, the dimensions of the state space is quite large, $2^{N^2}$. This means that the Markov chain will take a long time to mix. Practically, this means that the initial configuration might be far from the stationary distribution i.e. the system has not reached thermal equilibrium. In this case it is important to discard the initial samples to not skew the magnetization estimate.
+### Comparison with Gibbs Sampling
 
-One simple way to this is to run the Gibbs sampler until the running average of the magnetization stabilizes. At that point, we can start using the samples to estimate the magnetization.
+| Aspect | Gibbs Sampling | Metropolis-Hastings |
+|---|:---:|:---:|
+| Update mechanism | Sample from exact conditional distribution | Propose and accept/reject |
+| Computational cost | Requires exponential (logistic) calculation | Simple energy difference |
+| Acceptance rate | Always 100% (every update accepted) | Variable (depends on T and local environment) |
+| Implementation | More complex (logistic function) | Simpler (just energy differences) |
+| Generalizability | Requires known conditional distributions | Works for any energy function |
+| Efficiency near T_c | Generally faster convergence | Can have low acceptance rates |
+
+## Wolff Algorithm for Critical Temperature Sampling
+
+Near the critical temperature, both Gibbs sampling and single-spin Metropolis-Hastings suffer from **critical slowing down**. The correlation length ξ diverges as ξ ~ |T - T_c|^{-ν}, causing spins to become highly correlated over large distances. Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.
+
+The **Wolff algorithm**, developed by Ulli Wolff in 1989, solves this problem by identifying and flipping entire **clusters** of aligned spins simultaneously, dramatically reducing critical slowing down at low temperatures and near the critical point.
+
+### The Physical Motivation
+
+At low temperatures and near T_c, the system develops large domains of aligned spins that fluctuate together as coherent units. Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time. The Wolff algorithm instead:
+
+1. Identifies clusters of spins that "want" to flip together
+2. Respects the correlation structure by flipping entire domains
+3. Maintains detailed balance while working with the physics rather than against it
+
+This approach is analogous to the difference between trying to turn a school of fish by grabbing individual fish versus guiding the entire school as a unit.
+
+### The Algorithm
+
+1. **Seed selection**: Randomly choose a starting spin s₀ at site (i₀, j₀)
+
+2. **Cluster growth**: Use a breadth-first search to grow a cluster:
+   - Initialize a queue with the seed spin
+   - Mark the seed as visited
+   - While the queue is not empty:
+     - Remove a spin from the queue
+     - Examine each of its four neighbors
+     - If a neighbor has the same orientation as the original seed spin AND has not been visited:
+       - Add it to the cluster with probability P_add = 1 - e^{-2βJ}
+       - If added, mark as visited and add to the queue
+
+3. **Cluster flip**: Flip all spins in the identified cluster simultaneously
+
+4. **Acceptance**: The move is always accepted (acceptance probability = 1)
+
+### The Addition Probability
+
+The key insight is the addition probability P_add = 1 - e^{-2βJ}. This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence:
+
+**High temperature** (T >> T_c): 
+
+- P_add ≈ 2βJ ≈ 0 (since β = 1/T is small)
+- Clusters remain small, typically containing only 1-2 spins
+- Behavior similar to single-spin updates
+
+**Low temperature** (T << T_c):
+
+- P_add ≈ 1 (since 2βJ is large)
+- Large aligned regions are almost always included in clusters
+- Entire domains flip together efficiently, avoiding high-energy intermediate states
+
+**Critical temperature** (T ≈ T_c):
+
+- P_add takes intermediate values
+- Cluster sizes automatically match the natural correlation length ξ
+- Optimal balance between exploration and respecting correlations.
+
+### Physical Interpretation of Clusters
+
+The clusters identified by the Wolff algorithm have physical meaning:
+
+- **Small clusters** (size ~ 1): High temperature regime, spins behave independently
+- **Medium clusters** (size ~ 10-100): Intermediate correlations, local domains
+- **Large clusters** (size ~ L²): Low temperature or near critical point, system-spanning correlations
+- **Percolating clusters**: Clusters that wrap around periodic boundaries indicate long-range order
+
+The average cluster size ⟨s⟩ is related to the magnetic susceptibility: ⟨s⟩ ~ χ ~ |T - T_c|^{-γ}, providing a direct probe of critical behavior.
+
+### Comparison with Other Methods
+
+| Aspect | Single-Spin | Wolff Algorithm |
+|--------|-------------|-----------------|
+| **Update size** | Always 1 spin | Variable (1 to L² spins) |
+| **Acceptance rate** | Variable (very low at low T) | Always 100% |
+| **Critical slowing down** | Severe | Minimal |
+| **Implementation** | Simple | Moderate complexity |
+| **Memory usage** | Minimal | Moderate (cluster storage) |
+| **Efficiency at high T** | Good | Similar |
+| **Efficiency near T_c** | Very poor | Excellent |
+| **Efficiency at low T** | Poor | Excellent |
 
 
-## Phase Transitions
 
-It was discovered that the Ising model for a 2D grid exhibits a phenomenon called **phase transition**. 
-If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the **critical temperature**.
-
-
-It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice $\to \infty$. This limiting critical temperature for a square lattice is given by
-
-$$
-T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
-$$
-
-Of course, in our simulation, we'll be using finite sized lattices so we should expect some deviation from this result.
-
-## Simulation
+## Simulation Results
 
 Below are the results of simulating the Ising model on a $20 \times 20$ grid for $J = 1$. The predicted critical temperature is $T_c = 2.269$. 
 
