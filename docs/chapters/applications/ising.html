@@ -708,7 +708,7 @@ T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
 </section>
 <section id="gibbs-sampling" class="level2" data-number="14.4">
 <h2 data-number="14.4" class="anchored" data-anchor-id="gibbs-sampling"><span class="header-section-number">14.4</span> Gibbs Sampling</h2>
-<p>There are two natural ways of sampling from the distribution <span class="math inline">\(f(\sigma)\)</span>: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we’ll use Gibbs sampling.</p>
+<p>There are two natural ways of sampling from the distribution <span class="math inline">\(f(\sigma)\)</span>: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles.</p>
 <section id="conditional-distribution" class="level3" data-number="14.4.1">
 <h3 data-number="14.4.1" class="anchored" data-anchor-id="conditional-distribution"><span class="header-section-number">14.4.1</span> Conditional Distribution</h3>
 <p>Consider a single spin <span class="math inline">\(X_{i, j}\)</span>. Let <span class="math inline">\(\hat{X}_{i, j}\)</span> denote the set of spins at all sites except <span class="math inline">\((i, j)\)</span>. We want to find the conditional distribution of <span class="math inline">\(X_{i, j}\)</span> given <span class="math inline">\(\hat{X}_{i, j}\)</span>.</p>
@@ -733,9 +733,18 @@ P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 </section>
 <section id="physical-interpretation-of-the-effective-field" class="level4" data-number="14.4.1.2">
 <h4 data-number="14.4.1.2" class="anchored" data-anchor-id="physical-interpretation-of-the-effective-field"><span class="header-section-number">14.4.1.2</span> Physical Interpretation of the Effective Field</h4>
-<p>The effective field <span class="math inline">\(h_{i,j}\)</span> represents the “magnetic influence” of the neighboring spins: - When <span class="math inline">\(h_{i,j} &gt; 0\)</span>: Most neighbors are spin-up (<span class="math inline">\(+1\)</span>), favoring <span class="math inline">\(X_{i,j} = +1\)</span> - When <span class="math inline">\(h_{i,j} &lt; 0\)</span>: Most neighbors are spin-down (<span class="math inline">\(-1\)</span>), favoring <span class="math inline">\(X_{i,j} = -1\)</span><br>
-- When <span class="math inline">\(h_{i,j} = 0\)</span>: Equal influence from up and down neighbors, so <span class="math inline">\(P(X_{i,j} = +1) = 0.5\)</span></p>
-<p>The temperature <span class="math inline">\(T\)</span> controls how strongly the system responds to this local field: - Low <span class="math inline">\(T\)</span>: Sharp response, spins almost always align with neighbors - High <span class="math inline">\(T\)</span>: Weak response, spins behave more randomly regardless of neighbors</p>
+<p>The effective field <span class="math inline">\(h_{i,j}\)</span> represents the “magnetic influence” of the neighboring spins:</p>
+<ul>
+<li>When <span class="math inline">\(h_{i,j} &gt; 0\)</span>: Most neighbors are spin-up (<span class="math inline">\(+1\)</span>), favoring <span class="math inline">\(X_{i,j} = +1\)</span></li>
+<li>When <span class="math inline">\(h_{i,j} &lt; 0\)</span>: Most neighbors are spin-down (<span class="math inline">\(-1\)</span>), favoring <span class="math inline">\(X_{i,j} = -1\)</span><br>
+</li>
+<li>When <span class="math inline">\(h_{i,j} = 0\)</span>: Equal influence from up and down neighbors, so <span class="math inline">\(P(X_{i,j} = +1) = 0.5\)</span>.</li>
+</ul>
+<p>The temperature <span class="math inline">\(T\)</span> controls how strongly the system responds to this local field:</p>
+<ul>
+<li>Low <span class="math inline">\(T\)</span>: Sharp response, spins almost always align with neighbors</li>
+<li>High <span class="math inline">\(T\)</span>: Weak response, spins behave more randomly regardless of neighbors.</li>
+</ul>
 </section>
 </section>
 </section>
@@ -762,7 +771,11 @@ P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 <section id="acceptance-probability" class="level3" data-number="14.5.3">
 <h3 data-number="14.5.3" class="anchored" data-anchor-id="acceptance-probability"><span class="header-section-number">14.5.3</span> Acceptance Probability</h3>
 <p>The Metropolis acceptance probability is: <span class="math display">\[P_{\text{accept}} = \min\left(1, e^{-\Delta E/T}\right) = \min\left(1, e^{-2s \cdot h_{i,j}/T}\right)\]</span></p>
-<p>This has a simple interpretation: - <strong>Energy-lowering moves</strong> (<span class="math inline">\(\Delta E &lt; 0\)</span>): Always accepted (probability = 1) - <strong>Energy-raising moves</strong> (<span class="math inline">\(\Delta E &gt; 0\)</span>): Accepted with probability <span class="math inline">\(e^{-\Delta E/T}\)</span></p>
+<p>This has a simple interpretation:</p>
+<ul>
+<li><strong>Energy-lowering moves</strong> (<span class="math inline">\(\Delta E &lt; 0\)</span>): Always accepted (probability = 1)</li>
+<li><strong>Energy-raising moves</strong> (<span class="math inline">\(\Delta E &gt; 0\)</span>): Accepted with probability <span class="math inline">\(e^{-\Delta E/T}\)</span></li>
+</ul>
 <p>Higher temperatures make the algorithm more likely to accept energy-raising moves, allowing exploration of higher-energy configurations.</p>
 <div id="c717a478" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
@@ -843,14 +856,20 @@ P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 </section>
 <section id="wolff-algorithm-for-critical-temperature-sampling" class="level2" data-number="14.6">
 <h2 data-number="14.6" class="anchored" data-anchor-id="wolff-algorithm-for-critical-temperature-sampling"><span class="header-section-number">14.6</span> Wolff Algorithm for Critical Temperature Sampling</h2>
-<p>Near the critical temperature, both Gibbs sampling and single-spin Metropolis-Hastings suffer from <strong>critical slowing down</strong>. The correlation length ξ diverges as ξ ~ |T - T_c|^{-ν}, causing spins to become highly correlated over large distances. Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.</p>
+<p>Near the critical temperature, both Gibbs sampling and single-spin Metropolis–Hastings suffer from <strong>critical slowing down</strong>.<br>
+The correlation length <span class="math inline">\(\xi\)</span> diverges as <span class="math inline">\(\xi \sim |T - T_c|^{-\nu}\)</span>, causing spins to become highly correlated over large distances.<br>
+Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.</p>
 <p>The <strong>Wolff algorithm</strong>, developed by Ulli Wolff in 1989, solves this problem by identifying and flipping entire <strong>clusters</strong> of aligned spins simultaneously, dramatically reducing critical slowing down at low temperatures and near the critical point.</p>
 <section id="the-physical-motivation" class="level3" data-number="14.6.1">
 <h3 data-number="14.6.1" class="anchored" data-anchor-id="the-physical-motivation"><span class="header-section-number">14.6.1</span> The Physical Motivation</h3>
-<p>At low temperatures and near T_c, the system develops large domains of aligned spins that fluctuate together as coherent units. Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time. The Wolff algorithm instead:</p>
+<p>At low temperatures and near <span class="math inline">\(T_c\)</span>, the system develops large domains of aligned spins that fluctuate together as coherent units.<br>
+Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time.<br>
+The Wolff algorithm instead:</p>
 <ol type="1">
-<li>Identifies clusters of spins that “want” to flip together</li>
-<li>Respects the correlation structure by flipping entire domains</li>
+<li>Identifies clusters of spins that “want” to flip together<br>
+</li>
+<li>Respects the correlation structure by flipping entire domains<br>
+</li>
 <li>Maintains detailed balance while working with the physics rather than against it</li>
 </ol>
 <p>This approach is analogous to the difference between trying to turn a school of fish by grabbing individual fish versus guiding the entire school as a unit.</p>
@@ -858,58 +877,76 @@ P(X_{i, j} = -1 | \hat{X}_{i, j}) &amp;= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
 <section id="the-algorithm-2" class="level3" data-number="14.6.2">
 <h3 data-number="14.6.2" class="anchored" data-anchor-id="the-algorithm-2"><span class="header-section-number">14.6.2</span> The Algorithm</h3>
 <ol type="1">
-<li><p><strong>Seed selection</strong>: Randomly choose a starting spin s₀ at site (i₀, j₀)</p></li>
-<li><p><strong>Cluster growth</strong>: Use a breadth-first search to grow a cluster:</p>
+<li><p><strong>Seed selection:</strong> Randomly choose a starting spin <span class="math inline">\(s_0\)</span> at site <span class="math inline">\((i_0, j_0)\)</span>.</p></li>
+<li><p><strong>Cluster growth:</strong> Use a breadth-first search (BFS) to grow a cluster:</p>
 <ul>
-<li>Initialize a queue with the seed spin</li>
-<li>Mark the seed as visited</li>
+<li>Initialize a queue with the seed spin.<br>
+</li>
+<li>Mark the seed as visited.<br>
+</li>
 <li>While the queue is not empty:
 <ul>
-<li>Remove a spin from the queue</li>
-<li>Examine each of its four neighbors</li>
-<li>If a neighbor has the same orientation as the original seed spin AND has not been visited:
+<li>Remove a spin from the queue.<br>
+</li>
+<li>Examine each of its four neighbors.<br>
+</li>
+<li>If a neighbor has the same orientation as the original seed spin <strong>and</strong> has not been visited:
 <ul>
-<li>Add it to the cluster with probability P_add = 1 - e^{-2βJ}</li>
-<li>If added, mark as visited and add to the queue</li>
+<li>Add it to the cluster with probability <span class="math inline">\(P_{\text{add}} = 1 - e^{-2\beta J}\)</span>.</li>
+<li>If added, mark as visited and add to the queue.</li>
 </ul></li>
 </ul></li>
 </ul></li>
-<li><p><strong>Cluster flip</strong>: Flip all spins in the identified cluster simultaneously</p></li>
-<li><p><strong>Acceptance</strong>: The move is always accepted (acceptance probability = 1)</p></li>
+<li><p><strong>Cluster flip:</strong> Flip all spins in the identified cluster simultaneously.</p></li>
+<li><p><strong>Acceptance:</strong> The move is always accepted (acceptance probability <span class="math inline">\(= 1\)</span>).</p></li>
 </ol>
 </section>
 <section id="the-addition-probability" class="level3" data-number="14.6.3">
 <h3 data-number="14.6.3" class="anchored" data-anchor-id="the-addition-probability"><span class="header-section-number">14.6.3</span> The Addition Probability</h3>
-<p>The key insight is the addition probability P_add = 1 - e^{-2βJ}. This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence:</p>
-<p><strong>High temperature</strong> (T &gt;&gt; T_c):</p>
+<p>The key insight is the addition probability $<span class="math inline">\(P_{\text{add}} = 1 - e^{-2\beta J}\)</span>. This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence.</p>
+<section id="high-temperature-t-gg-t_c" class="level4" data-number="14.6.3.1">
+<h4 data-number="14.6.3.1" class="anchored" data-anchor-id="high-temperature-t-gg-t_c"><span class="header-section-number">14.6.3.1</span> High temperature (<span class="math inline">\(T \gg T_c\)</span>):</h4>
+<p><span class="math inline">\(\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad
+P_{\text{add}} \approx 2\beta J \approx 0.\)</span></p>
 <ul>
-<li>P_add ≈ 2βJ ≈ 0 (since β = 1/T is small)</li>
-<li>Clusters remain small, typically containing only 1-2 spins</li>
-<li>Behavior similar to single-spin updates</li>
+<li>Clusters remain small, typically containing only 1–2 spins.<br>
+</li>
+<li>Behavior similar to single-spin updates.</li>
 </ul>
-<p><strong>Low temperature</strong> (T &lt;&lt; T_c):</p>
+</section>
+<section id="low-temperature-t-ll-t_c" class="level4" data-number="14.6.3.2">
+<h4 data-number="14.6.3.2" class="anchored" data-anchor-id="low-temperature-t-ll-t_c"><span class="header-section-number">14.6.3.2</span> Low temperature (<span class="math inline">\(T \ll T_c\)</span>):</h4>
+<p><span class="math inline">\(P_{\text{add}} \approx 1 \quad (\text{since } 2\beta J \text{ is large}),\)</span></p>
 <ul>
-<li>P_add ≈ 1 (since 2βJ is large)</li>
-<li>Large aligned regions are almost always included in clusters</li>
-<li>Entire domains flip together efficiently, avoiding high-energy intermediate states</li>
+<li>Large aligned regions are almost always included in clusters.<br>
+</li>
+<li>Entire domains flip together efficiently, avoiding high-energy intermediate states.</li>
 </ul>
-<p><strong>Critical temperature</strong> (T ≈ T_c):</p>
+</section>
+<section id="critical-temperature-t-approx-t_c" class="level4" data-number="14.6.3.3">
+<h4 data-number="14.6.3.3" class="anchored" data-anchor-id="critical-temperature-t-approx-t_c"><span class="header-section-number">14.6.3.3</span> Critical temperature (<span class="math inline">\(T \approx T_c\)</span>):</h4>
 <ul>
-<li>P_add takes intermediate values</li>
-<li>Cluster sizes automatically match the natural correlation length ξ</li>
+<li><span class="math inline">\(P_{\text{add}}\)</span> takes intermediate values.<br>
+</li>
+<li>Cluster sizes automatically match the natural correlation length <span class="math inline">\(\xi\)</span>.<br>
+</li>
 <li>Optimal balance between exploration and respecting correlations.</li>
 </ul>
+</section>
 </section>
 <section id="physical-interpretation-of-clusters" class="level3" data-number="14.6.4">
 <h3 data-number="14.6.4" class="anchored" data-anchor-id="physical-interpretation-of-clusters"><span class="header-section-number">14.6.4</span> Physical Interpretation of Clusters</h3>
 <p>The clusters identified by the Wolff algorithm have physical meaning:</p>
 <ul>
-<li><strong>Small clusters</strong> (size ~ 1): High temperature regime, spins behave independently</li>
-<li><strong>Medium clusters</strong> (size ~ 10-100): Intermediate correlations, local domains</li>
-<li><strong>Large clusters</strong> (size ~ L²): Low temperature or near critical point, system-spanning correlations</li>
-<li><strong>Percolating clusters</strong>: Clusters that wrap around periodic boundaries indicate long-range order</li>
+<li><strong>Small clusters</strong> (<span class="math inline">\(\text{size} \sim 1\)</span>): high-temperature regime, spins behave independently.<br>
+</li>
+<li><strong>Medium clusters</strong> (<span class="math inline">\(\text{size} \sim 10\)</span>–<span class="math inline">\(100\)</span>): intermediate correlations, local domains.<br>
+</li>
+<li><strong>Large clusters</strong> (<span class="math inline">\(\text{size} \sim L^2\)</span>): low temperature or near critical point, system-spanning correlations.<br>
+</li>
+<li><strong>Percolating clusters:</strong> clusters that wrap around periodic boundaries indicate long-range order.</li>
 </ul>
-<p>The average cluster size ⟨s⟩ is related to the magnetic susceptibility: ⟨s⟩ ~ χ ~ |T - T_c|^{-γ}, providing a direct probe of critical behavior.</p>
+<p>The average cluster size <span class="math inline">\(\langle s \rangle\)</span> is related to the magnetic susceptibility: <span class="math inline">\(\langle s \rangle \sim \chi \sim |T - T_c|^{-\gamma}\)</span>, providing a direct probe of critical behavior.</p>
 </section>
 <section id="comparison-with-other-methods" class="level3" data-number="14.6.5">
 <h3 data-number="14.6.5" class="anchored" data-anchor-id="comparison-with-other-methods"><span class="header-section-number">14.6.5</span> Comparison with Other Methods</h3>

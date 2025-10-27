@@ -143,7 +143,7 @@ Of course, in our simulation, we'll be using finite sized lattices so we should 
 
 ## Gibbs Sampling
 
-There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. In this notebook, we'll use Gibbs sampling.
+There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. 
 
 
 ### Conditional Distribution
@@ -188,13 +188,15 @@ Thus the conditional distribution in @eq-conditional is a logistic function.
 #### Physical Interpretation of the Effective Field
 
 The effective field $h_{i,j}$ represents the "magnetic influence" of the neighboring spins:
+
 - When $h_{i,j} > 0$: Most neighbors are spin-up ($+1$), favoring $X_{i,j} = +1$
 - When $h_{i,j} < 0$: Most neighbors are spin-down ($-1$), favoring $X_{i,j} = -1$  
-- When $h_{i,j} = 0$: Equal influence from up and down neighbors, so $P(X_{i,j} = +1) = 0.5$
+- When $h_{i,j} = 0$: Equal influence from up and down neighbors, so $P(X_{i,j} = +1) = 0.5$.
 
 The temperature $T$ controls how strongly the system responds to this local field:
+
 - Low $T$: Sharp response, spins almost always align with neighbors
-- High $T$: Weak response, spins behave more randomly regardless of neighbors
+- High $T$: Weak response, spins behave more randomly regardless of neighbors.
 
 ## Metropolis-Hastings Algorithm
 
@@ -225,6 +227,7 @@ The Metropolis acceptance probability is:
 $$P_{\text{accept}} = \min\left(1, e^{-\Delta E/T}\right) = \min\left(1, e^{-2s \cdot h_{i,j}/T}\right)$$
 
 This has a simple interpretation:
+
 - **Energy-lowering moves** ($\Delta E < 0$): Always accepted (probability = 1)
 - **Energy-raising moves** ($\Delta E > 0$): Accepted with probability $e^{-\Delta E/T}$
 
@@ -271,70 +274,85 @@ plt.show()
 
 ## Wolff Algorithm for Critical Temperature Sampling
 
-Near the critical temperature, both Gibbs sampling and single-spin Metropolis-Hastings suffer from **critical slowing down**. The correlation length ξ diverges as ξ ~ |T - T_c|^{-ν}, causing spins to become highly correlated over large distances. Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.
+Near the critical temperature, both Gibbs sampling and single-spin Metropolis–Hastings suffer from **critical slowing down**.  
+The correlation length $\xi$ diverges as 
+$\xi \sim |T - T_c|^{-\nu}$,
+causing spins to become highly correlated over large distances.  
+Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.
 
 The **Wolff algorithm**, developed by Ulli Wolff in 1989, solves this problem by identifying and flipping entire **clusters** of aligned spins simultaneously, dramatically reducing critical slowing down at low temperatures and near the critical point.
 
 ### The Physical Motivation
 
-At low temperatures and near T_c, the system develops large domains of aligned spins that fluctuate together as coherent units. Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time. The Wolff algorithm instead:
+At low temperatures and near $T_c$, the system develops large domains of aligned spins that fluctuate together as coherent units.  
+Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time.  
+The Wolff algorithm instead:
 
-1. Identifies clusters of spins that "want" to flip together
-2. Respects the correlation structure by flipping entire domains
-3. Maintains detailed balance while working with the physics rather than against it
+1. Identifies clusters of spins that “want” to flip together  
+2. Respects the correlation structure by flipping entire domains  
+3. Maintains detailed balance while working with the physics rather than against it  
 
 This approach is analogous to the difference between trying to turn a school of fish by grabbing individual fish versus guiding the entire school as a unit.
 
 ### The Algorithm
 
-1. **Seed selection**: Randomly choose a starting spin s₀ at site (i₀, j₀)
+1. **Seed selection:** Randomly choose a starting spin $s_0$ at site $(i_0, j_0)$.
 
-2. **Cluster growth**: Use a breadth-first search to grow a cluster:
-   - Initialize a queue with the seed spin
-   - Mark the seed as visited
+2. **Cluster growth:** Use a breadth-first search (BFS) to grow a cluster:
+   - Initialize a queue with the seed spin.  
+   - Mark the seed as visited.  
    - While the queue is not empty:
-     - Remove a spin from the queue
-     - Examine each of its four neighbors
-     - If a neighbor has the same orientation as the original seed spin AND has not been visited:
-       - Add it to the cluster with probability P_add = 1 - e^{-2βJ}
-       - If added, mark as visited and add to the queue
+     - Remove a spin from the queue.  
+     - Examine each of its four neighbors.  
+     - If a neighbor has the same orientation as the original seed spin **and** has not been visited:
+       - Add it to the cluster with probability 
+         $P_{\text{add}} = 1 - e^{-2\beta J}$.
+       - If added, mark as visited and add to the queue.
 
-3. **Cluster flip**: Flip all spins in the identified cluster simultaneously
+3. **Cluster flip:** Flip all spins in the identified cluster simultaneously.
 
-4. **Acceptance**: The move is always accepted (acceptance probability = 1)
+4. **Acceptance:** The move is always accepted (acceptance probability $= 1$).
 
 ### The Addition Probability
 
-The key insight is the addition probability P_add = 1 - e^{-2βJ}. This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence:
+The key insight is the addition probability
+$$P_{\text{add}} = 1 - e^{-2\beta J}$.
+This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence.
 
-**High temperature** (T >> T_c): 
+#### High temperature ($T \gg T_c$):
 
-- P_add ≈ 2βJ ≈ 0 (since β = 1/T is small)
-- Clusters remain small, typically containing only 1-2 spins
-- Behavior similar to single-spin updates
+$\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad 
+P_{\text{add}} \approx 2\beta J \approx 0.$
 
-**Low temperature** (T << T_c):
+- Clusters remain small, typically containing only 1–2 spins.  
+- Behavior similar to single-spin updates.
 
-- P_add ≈ 1 (since 2βJ is large)
-- Large aligned regions are almost always included in clusters
-- Entire domains flip together efficiently, avoiding high-energy intermediate states
+#### Low temperature ($T \ll T_c$):
 
-**Critical temperature** (T ≈ T_c):
+$P_{\text{add}} \approx 1 \quad (\text{since } 2\beta J \text{ is large}),$
 
-- P_add takes intermediate values
-- Cluster sizes automatically match the natural correlation length ξ
+- Large aligned regions are almost always included in clusters.  
+- Entire domains flip together efficiently, avoiding high-energy intermediate states.
+
+#### Critical temperature ($T \approx T_c$):
+
+- $P_{\text{add}}$ takes intermediate values.  
+- Cluster sizes automatically match the natural correlation length $\xi$.  
 - Optimal balance between exploration and respecting correlations.
 
 ### Physical Interpretation of Clusters
 
 The clusters identified by the Wolff algorithm have physical meaning:
 
-- **Small clusters** (size ~ 1): High temperature regime, spins behave independently
-- **Medium clusters** (size ~ 10-100): Intermediate correlations, local domains
-- **Large clusters** (size ~ L²): Low temperature or near critical point, system-spanning correlations
-- **Percolating clusters**: Clusters that wrap around periodic boundaries indicate long-range order
+- **Small clusters** ($\text{size} \sim 1$): high-temperature regime, spins behave independently.  
+- **Medium clusters** ($\text{size} \sim 10$–$100$): intermediate correlations, local domains.  
+- **Large clusters** ($\text{size} \sim L^2$): low temperature or near critical point, system-spanning correlations.  
+- **Percolating clusters:** clusters that wrap around periodic boundaries indicate long-range order.
 
-The average cluster size ⟨s⟩ is related to the magnetic susceptibility: ⟨s⟩ ~ χ ~ |T - T_c|^{-γ}, providing a direct probe of critical behavior.
+The average cluster size $\langle s \rangle$ is related to the magnetic susceptibility:
+$\langle s \rangle \sim \chi \sim |T - T_c|^{-\gamma}$,
+providing a direct probe of critical behavior.
+
 
 ### Comparison with Other Methods
 
