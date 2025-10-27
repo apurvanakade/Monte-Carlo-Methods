@@ -25,7 +25,7 @@ Monte Carlo estimation addresses two distinct categories of problems:
 - Solutions to differential equations
 - High-dimensional optimization problems
 
-## The Monte Carlo Estimation Strategy
+## The Monte Carlo Estimation Strategy {#sec-monte-carlo-estimation-strategy}
 
 The key insight behind Monte Carlo estimation is transforming any estimation problem into a probabilistic framework, even when the original problem contains no randomness.
 

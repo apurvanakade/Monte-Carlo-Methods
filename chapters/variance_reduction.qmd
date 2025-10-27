@@ -8,8 +8,7 @@ execute:
 ---
 
 
-
-### Markov Chain Monte Carlo (MCMC)
+<!--
 
 When the random variables $X_i$ are not independent, the variance of the sum is given by 
 
@@ -39,24 +38,7 @@ $$
 
 :::
 
-::: {.exm-estimating-rare-events}
 
-**Example: Estimation of Rare-Event Probabilities.** Consider estimation of the tail probability $\ell = P(X > \gamma)$ of some random variable $X$ for a large number $\gamma$. 
-We can use the following estimator:
-$$
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} I_{> \gamma}(X_i),
-$$
-where $I_{> \gamma}(X_i)$ is an indicator function that is 1 if $X_i > \gamma$ and 0 otherwise. The variance of this estimator is given by
-
-$$
-\text{Var}(\hat{\ell}) = \frac{1}{N} \left( \ell (1 - \ell) \right).
-$$
-The relative width of the confidence interval is given by
-$$
-\text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
-$$
-When $\ell$ is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of $\ell$.
-:::
 
 ::: {.exm-magnetization-in-a-2d-ising-model}
 
@@ -74,6 +56,41 @@ $$
 which leads to much larger confidence intervals than we would expect from independent samples.
 :::
 
+--> 
+
+We have seen various techniques to sample from a target distribution.
+One of the main uses of sampling is to estimate some quantity $\mathbb{E}[f(X)]$. We saw various examples of this in @sec-monte-carlo-estimation-strategy all of which relied on the sample mean estimator 
+
+$$
+\hat{\ell} = \dfrac{1}{N}\sum \limits_{i=1}^{N}f(X_i).
+$$
+
+Many of the sampling techniques do not guarantee independence of samples. As such, the variance is given by
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
+$$
+
+On way to reduce the variance is to "thin the samples" by choosing samples. In this chapter, we'll look at other techniques that allow us to change how we sample to reduce estimator variance. 
+
+::: {.exm-estimating-rare-events}
+
+**Example: Estimation of Rare-Event Probabilities.** Let's start with an example. Consider estimation of the tail probability $\ell = P(X > \gamma)$ of some random variable $X$ for a large number $\gamma$. 
+We can use the following estimator:
+$$
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} I_{> \gamma}(X_i),
+$$
+where $I_{> \gamma}(X_i)$ is an indicator function that is 1 if $X_i > \gamma$ and 0 otherwise. The variance of this estimator is given by
+
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N} \left( \ell (1 - \ell) \right).
+$$
+The relative width of the confidence interval is given by
+$$
+\text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
+$$
+When $\ell$ is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of $\ell$.
+:::
+
 
 ## Importance Sampling
 
@@ -88,7 +105,7 @@ $$
 $$
 where $X_1, X_2, \ldots, X_N$ are i.i.d. samples from the distribution with pdf $q(x)$. 
 
-For clarity, we'll denote the estimator in @eq-crude-estimator as $\hat{\ell}_{crude}$ and the importance sampling estimator as $\hat{\ell}_{IS}$.
+For clarity, we'll denote the sample mean estimator as $\hat{\ell}_{crude}$ and the importance sampling estimator as $\hat{\ell}_{IS}$.
 :::
 
 

@@ -546,8 +546,7 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#markov-chain-monte-carlo-mcmc" id="toc-markov-chain-monte-carlo-mcmc" class="nav-link active" data-scroll-target="#markov-chain-monte-carlo-mcmc"><span class="header-section-number">12.0.1</span> Markov Chain Monte Carlo (MCMC)</a></li>
-  <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link" data-scroll-target="#importance-sampling"><span class="header-section-number">12.1</span> Importance Sampling</a>
+  <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link active" data-scroll-target="#importance-sampling"><span class="header-section-number">12.1</span> Importance Sampling</a>
   <ul class="collapse">
   <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">12.1.1</span> Remarks</a></li>
   </ul></li>
@@ -614,26 +613,65 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
-<section id="markov-chain-monte-carlo-mcmc" class="level3" data-number="12.0.1">
-<h3 data-number="12.0.1" class="anchored" data-anchor-id="markov-chain-monte-carlo-mcmc"><span class="header-section-number">12.0.1</span> Markov Chain Monte Carlo (MCMC)</h3>
-<p>When the random variables <span class="math inline">\(X_i\)</span> are not independent, the variance of the sum is given by</p>
+<!--
+
+When the random variables $X_i$ are not independent, the variance of the sum is given by 
+
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
+$$
+
+There are $n^2$ terms in the covariance sum, and in general, we cannot guarantee that the covariance is small. So the above confidence interval is not valid. In the case of ergodic Markov chains, the central limit theorem for Markov chains allows us to estimate the CI as 
+$$
+\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}}, \hat{\ell} + z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}} \right],
+$$
+where $N_{eff}$ is the effective sample size. We will not discuss the details of effective sample size here.
+
+::: {.exm-estimating-pi}
+
+**Example: Estimating $\pi$.** In the first example we saw for estimating $\pi$, we used the Monte Carlo method to estimate $\pi$ by simulating random points in a square and counting the number of points that fall within a circle. The estimator we used was
+
+$$
+\hat{\ell} = \frac{4}{N} \sum_{i=1}^{N} I(X_i),
+$$
+
+where $I(X_i)$ is an indicator function that is 1 if the point $X_i$ is inside the circle and 0 otherwise. The variance of this estimator is given by
+$$
+\text{Var}(\hat{\ell}) = \frac{16}{N} \left( \frac{\pi}{4} \left( 1 - \frac{\pi}{4} \right) \right).
+$$
+
+
+:::
+
+
+
+::: {.exm-magnetization-in-a-2d-ising-model}
+
+**Example: Magnetization in a 2D Ising Model.** In a previous worksheet, we used Gibbs sampling and Metropolis--Hastings sampling to estimate the magnetization of a 2D Ising model. We used the simple estimator
+$$
+\hat{M} = \frac{1}{N} \sum_{i=1}^{N} M(\sigma_i),
+$$
+where $M(\sigma_i)$ is the magnetization of the $i$-th sample.
+
+The samples $\sigma_i$ are not independent, and so the variance of the estimator will be
+
+$$
+\text{Var}(\hat{M}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(M(\sigma_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(M(\sigma_i), M(\sigma_j)),
+$$
+which leads to much larger confidence intervals than we would expect from independent samples.
+:::
+
+-->
+<p>We have seen various techniques to sample from a target distribution. One of the main uses of sampling is to estimate some quantity <span class="math inline">\(\mathbb{E}[f(X)]\)</span>. We saw various examples of this in <a href="estimation/index.html#sec-monte-carlo-estimation-strategy" class="quarto-xref"><span>Section 2</span></a> all of which relied on the sample mean estimator</p>
 <p><span class="math display">\[
+\hat{\ell} = \dfrac{1}{N}\sum \limits_{i=1}^{N}f(X_i).
+\]</span></p>
+<p>Many of the sampling techniques do not guarantee independence of samples. As such, the variance is given by <span class="math display">\[
 \text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
 \]</span></p>
-<p>There are <span class="math inline">\(n^2\)</span> terms in the covariance sum, and in general, we cannot guarantee that the covariance is small. So the above confidence interval is not valid. In the case of ergodic Markov chains, the central limit theorem for Markov chains allows us to estimate the CI as <span class="math display">\[
-\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}}, \hat{\ell} + z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}} \right],
-\]</span> where <span class="math inline">\(N_{eff}\)</span> is the effective sample size. We will not discuss the details of effective sample size here.</p>
-<div class="exm-estimating-pi">
-<p><strong>Example: Estimating <span class="math inline">\(\pi\)</span>.</strong> In the first example we saw for estimating <span class="math inline">\(\pi\)</span>, we used the Monte Carlo method to estimate <span class="math inline">\(\pi\)</span> by simulating random points in a square and counting the number of points that fall within a circle. The estimator we used was</p>
-<p><span class="math display">\[
-\hat{\ell} = \frac{4}{N} \sum_{i=1}^{N} I(X_i),
-\]</span></p>
-<p>where <span class="math inline">\(I(X_i)\)</span> is an indicator function that is 1 if the point <span class="math inline">\(X_i\)</span> is inside the circle and 0 otherwise. The variance of this estimator is given by <span class="math display">\[
-\text{Var}(\hat{\ell}) = \frac{16}{N} \left( \frac{\pi}{4} \left( 1 - \frac{\pi}{4} \right) \right).
-\]</span></p>
-</div>
+<p>On way to reduce the variance is to “thin the samples” by choosing samples. In this chapter, we’ll look at other techniques that allow us to change how we sample to reduce estimator variance.</p>
 <div class="exm-estimating-rare-events">
-<p><strong>Example: Estimation of Rare-Event Probabilities.</strong> Consider estimation of the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> of some random variable <span class="math inline">\(X\)</span> for a large number <span class="math inline">\(\gamma\)</span>. We can use the following estimator: <span class="math display">\[
+<p><strong>Example: Estimation of Rare-Event Probabilities.</strong> Let’s start with an example. Consider estimation of the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> of some random variable <span class="math inline">\(X\)</span> for a large number <span class="math inline">\(\gamma\)</span>. We can use the following estimator: <span class="math display">\[
 \hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} I_{&gt; \gamma}(X_i),
 \]</span> where <span class="math inline">\(I_{&gt; \gamma}(X_i)\)</span> is an indicator function that is 1 if <span class="math inline">\(X_i &gt; \gamma\)</span> and 0 otherwise. The variance of this estimator is given by</p>
 <p><span class="math display">\[
@@ -642,16 +680,6 @@ document.addEventListener("DOMContentLoaded", function() {
 \text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
 \]</span> When <span class="math inline">\(\ell\)</span> is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of <span class="math inline">\(\ell\)</span>.</p>
 </div>
-<div class="exm-magnetization-in-a-2d-ising-model">
-<p><strong>Example: Magnetization in a 2D Ising Model.</strong> In a previous worksheet, we used Gibbs sampling and Metropolis–Hastings sampling to estimate the magnetization of a 2D Ising model. We used the simple estimator <span class="math display">\[
-\hat{M} = \frac{1}{N} \sum_{i=1}^{N} M(\sigma_i),
-\]</span> where <span class="math inline">\(M(\sigma_i)\)</span> is the magnetization of the <span class="math inline">\(i\)</span>-th sample.</p>
-<p>The samples <span class="math inline">\(\sigma_i\)</span> are not independent, and so the variance of the estimator will be</p>
-<p><span class="math display">\[
-\text{Var}(\hat{M}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(M(\sigma_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(M(\sigma_i), M(\sigma_j)),
-\]</span> which leads to much larger confidence intervals than we would expect from independent samples.</p>
-</div>
-</section>
 <section id="importance-sampling" class="level2" data-number="12.1">
 <h2 data-number="12.1" class="anchored" data-anchor-id="importance-sampling"><span class="header-section-number">12.1</span> Importance Sampling</h2>
 <p>Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The idea is to reduce the number of low probability events that contribute to the variance of the estimator.</p>
@@ -660,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p><strong>Definition: Importance Sampling.</strong> Let <span class="math inline">\(X\)</span> be a random variable with probability density function (pdf) <span class="math inline">\(p(x)\)</span>, and let <span class="math inline">\(q(x)\)</span> be a proposal pdf such that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>. The importance sampling estimator of <span class="math inline">\(\ell = E[f(X)]\)</span> is given by <span class="math display">\[
 \hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
 \]</span> where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are i.i.d. samples from the distribution with pdf <span class="math inline">\(q(x)\)</span>.</p>
-<p>For clarity, we’ll denote the estimator in <span class="quarto-unresolved-ref">?eq-crude-estimator</span> as <span class="math inline">\(\hat{\ell}_{crude}\)</span> and the importance sampling estimator as <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
+<p>For clarity, we’ll denote the sample mean estimator as <span class="math inline">\(\hat{\ell}_{crude}\)</span> and the importance sampling estimator as <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
 </div>
 <p>Suppose <span class="math inline">\(N = 1\)</span> so that the estimator is given by <span class="math display">\[
 \hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)}.
