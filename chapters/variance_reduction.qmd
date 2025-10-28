@@ -1,5 +1,5 @@
 ---
-title: "Variance Reduction"
+title: "Variance Reduction Techniques"
 date: 2025-04-01
 toc: true
 
@@ -8,369 +8,738 @@ execute:
 ---
 
 
-<!--
-
-When the random variables $X_i$ are not independent, the variance of the sum is given by 
-
-$$
-\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
-$$
-
-There are $n^2$ terms in the covariance sum, and in general, we cannot guarantee that the covariance is small. So the above confidence interval is not valid. In the case of ergodic Markov chains, the central limit theorem for Markov chains allows us to estimate the CI as 
-$$
-\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}}, \hat{\ell} + z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}} \right],
-$$
-where $N_{eff}$ is the effective sample size. We will not discuss the details of effective sample size here.
-
-::: {.exm-estimating-pi}
-
-**Example: Estimating $\pi$.** In the first example we saw for estimating $\pi$, we used the Monte Carlo method to estimate $\pi$ by simulating random points in a square and counting the number of points that fall within a circle. The estimator we used was
-
-$$
-\hat{\ell} = \frac{4}{N} \sum_{i=1}^{N} I(X_i),
-$$
-
-where $I(X_i)$ is an indicator function that is 1 if the point $X_i$ is inside the circle and 0 otherwise. The variance of this estimator is given by
-$$
-\text{Var}(\hat{\ell}) = \frac{16}{N} \left( \frac{\pi}{4} \left( 1 - \frac{\pi}{4} \right) \right).
-$$
-
-
-:::
-
-
-
-::: {.exm-magnetization-in-a-2d-ising-model}
-
-**Example: Magnetization in a 2D Ising Model.** In a previous worksheet, we used Gibbs sampling and Metropolis--Hastings sampling to estimate the magnetization of a 2D Ising model. We used the simple estimator
-$$
-\hat{M} = \frac{1}{N} \sum_{i=1}^{N} M(\sigma_i),
-$$
-where $M(\sigma_i)$ is the magnetization of the $i$-th sample.
-
-The samples $\sigma_i$ are not independent, and so the variance of the estimator will be
-
-$$
-\text{Var}(\hat{M}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(M(\sigma_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(M(\sigma_i), M(\sigma_j)),
-$$
-which leads to much larger confidence intervals than we would expect from independent samples.
-:::
-
---> 
-
 We have seen various techniques to sample from a target distribution.
-One of the main uses of sampling is to estimate some quantity $\mathbb{E}[f(X)]$. We saw various examples of this in @sec-monte-carlo-estimation-strategy all of which relied on the sample mean estimator 
+One of the main uses of sampling is to estimate some quantity $\mathbb{E}[f(X)]$. Many applications rely on the sample mean estimator:
 
 $$
-\hat{\ell} = \dfrac{1}{N}\sum \limits_{i=1}^{N}f(X_i).
+\hat{\ell} = \frac{1}{N}\sum_{i=1}^{N}f(X_i).
 $$
 
-Many of the sampling techniques do not guarantee independence of samples. As such, the variance is given by
+Many sampling techniques do not guarantee independence of samples. As such, the variance is given by:
+
 $$
 \text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
 $$
 
-On way to reduce the variance is to "thin the samples" by choosing samples. In this chapter, we'll look at other techniques that allow us to change how we sample to reduce estimator variance. 
+One way to reduce the variance is to "thin the samples" by choosing samples. In this chapter, we'll look at other techniques that allow us to change how we sample to reduce estimator variance. 
 
 ::: {.exm-estimating-rare-events}
 
-**Example: Estimation of Rare-Event Probabilities.** Let's start with an example. Consider estimation of the tail probability $\ell = P(X > \gamma)$ of some random variable $X$ for a large number $\gamma$. 
+**Estimation of Rare-Event Probabilities.** Let's start with an example. Consider estimation of the tail probability $\ell = P(X > \gamma)$ of some random variable $X$ for a large number $\gamma$. 
 We can use the following estimator:
-$$
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} I_{> \gamma}(X_i),
-$$
-where $I_{> \gamma}(X_i)$ is an indicator function that is 1 if $X_i > \gamma$ and 0 otherwise. The variance of this estimator is given by
 
 $$
-\text{Var}(\hat{\ell}) = \frac{1}{N} \left( \ell (1 - \ell) \right).
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}_{> \gamma}(X_i),
 $$
-The relative width of the confidence interval is given by
+
+where $\mathbb{I}_{> \gamma}(X_i)$ is an indicator function that is 1 if $X_i > \gamma$ and 0 otherwise. The variance of this estimator is:
+
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N} \ell (1 - \ell).
+$$
+
+The relative width of the confidence interval is:
+
 $$
 \text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
 $$
+
 When $\ell$ is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of $\ell$.
 :::
 
-
 ## Importance Sampling
 
-Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The idea is to reduce the number of low probability events that contribute to the variance of the estimator. 
+Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The key insight is that we can sample from regions that contribute more to our estimate, then correct for this bias by weighting the samples appropriately.
 
-For example, when estimating the tail probability $\ell = P(X > \gamma)$, if $\ell$ is small, then most of the samples will be in the region $X \leq \gamma$, which contributes little to the estimate. However, we cannot just sample from the tail of the distribution as this would provide us no information about the rest of the distribution. Importance sampling allows us to sample from tail but then "fix" the estimate by weighting the samples appropriately.
+For example, when estimating the tail probability $\ell = P(X > \gamma)$, if $\ell$ is small, then most samples from the original distribution fall in the region $X \leq \gamma$, contributing nothing to the estimate. Importance sampling allows us to sample more frequently from the tail region while maintaining an unbiased estimate through proper weighting.
 
 ::: {.def-importance-sampling}
-**Definition: Importance Sampling.** Let $X$ be a random variable with probability density function (pdf) $p(x)$, and let $q(x)$ be a proposal pdf such that $q(x) > 0$ for all $x$ in the support of $p(x)$. The importance sampling estimator of $\ell = E[f(X)]$ is given by
+**Definition: Importance Sampling.** Let $X$ be a random variable with probability density function (pdf) $p(x)$, and let $q(x)$ be a proposal pdf such that $q(x) > 0$ for all $x$ where $p(x)f(x) \neq 0$. The importance sampling estimator of $\ell = \mathbb{E}_p[f(X)]$ is:
+
 $$
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
+\hat{\ell}_{\text{IS}} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
 $$
+
 where $X_1, X_2, \ldots, X_N$ are i.i.d. samples from the distribution with pdf $q(x)$. 
 
-For clarity, we'll denote the sample mean estimator as $\hat{\ell}_{crude}$ and the importance sampling estimator as $\hat{\ell}_{IS}$.
+For clarity, we denote:
+- $\hat{\ell}_{\text{crude}}$: the standard sample mean estimator using samples from $p(x)$
+- $\hat{\ell}_{\text{IS}}$: the importance sampling estimator using samples from $q(x)$
 :::
 
+### Unbiasedness of the Importance Sampling Estimator
 
+Consider the case where $N = 1$:
 
-Suppose $N = 1$ so that the estimator is given by
 $$
-\hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)}.
+\hat{\ell}_{\text{IS}} = f(X) \frac{p(X)}{q(X)}, \quad \text{where } X \sim q(x).
 $$
-Note that here $X \sim q(x)$ and NOT $p(x)$. We can check that this estimator is unbiased:
+
+We can verify that this estimator is unbiased:
+
 $$
 \begin{aligned}
-E_q[\hat{\ell}_{IS}] &= E_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
-&= \int f(x) \frac{p(x)}{q(x)} q(x) dx \\
-&= \int f(x) p(x) dx \\
-&= E[f(X)] \\
+\mathbb{E}_q[\hat{\ell}_{\text{IS}}] &= \mathbb{E}_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
+&= \int f(x) \frac{p(x)}{q(x)} q(x) \, dx \\
+&= \int f(x) p(x) \, dx \\
+&= \mathbb{E}_p[f(X)] \\
 &= \ell.
 \end{aligned}
 $$
 
-However,
-$$
-\begin{aligned}
-\text{Var}(\hat{\ell}_{IS}) 
-&\neq \text{Var}(\hat{\ell}_{crude}).
-\end{aligned}
-$$
+### Optimal Proposal Distribution
 
-This allows us to reduce the variance of the estimator by choosing $q(x)$ appropriately. 
-
-Suppose $f(X)$ is a non-negative function. Then if we choose 
+The variance of the importance sampling estimator depends on the choice of $q(x)$:
 
 $$
-q(x) \propto p(x) f(x),
+\text{Var}_q(\hat{\ell}_{\text{IS}}) \neq \text{Var}_p(\hat{\ell}_{\text{crude}}).
 $$
 
-then the importance sampling estimator for $N = 1$  
+For non-negative functions $f(x) \geq 0$, the optimal proposal distribution that minimizes variance is:
 
 $$
-\hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)} 
+q^*(x) \propto p(x) f(x).
 $$
 
-is a constant and has zero variance! When $H$ is not non-negative, we can show that 
+With this choice, the importance sampling estimator becomes a constant (zero variance!). For general functions, the optimal proposal is:
 
 $$
-q(x) \propto p(x) |f(x)|
+q^*(x) \propto p(x) |f(x)|.
 $$
 
-minimizes the variance of the estimator $\hat{\ell}_{IS}$. 
-
-
-However, note that our goal is to estimate $\ell = E[f(X)]$, which means that we do not know $f(x)$ in advance. So we cannot choose this $q(x)$ in advance. Even if we could, we might not be able to sample from $q(x)$ easily.
-In practice, we choose $q(x)$ to be a distribution that is easy to sample from and that is "close" to $p(x)$ in some sense. 
+However, these optimal choices require knowing the very quantity we're trying to estimate, making them impractical. In practice, we choose $q(x)$ to:
+1. Be easy to sample from
+2. Have heavier tails than $p(x)$ in regions where $|f(x)|$ is large
+3. Have a known normalizing constant
 
 ::: {.exm-importance-sampling}
-**Example: Importance Sampling for Rare Events.** Consider the problem of estimating the tail probability $\ell = P(X > \gamma)$ for a random variable $X$ with standard normal distribution. We can use importance sampling to estimate this probability by choosing a proposal distribution $q(x)$ that is concentrated in the tail region. One such distribution is the exponential distribution with parameter $\lambda$, which has pdf
-$$
-q(x) = \lambda e^{-\lambda (x-2)}, \quad x \ge 2.
-$$
-The plots below show the running averages of the crude and importance sampling estimators for $N = 2000$ samples. The importance sampling estimator is much more stable and converges to the true value of $\ell$ much faster than the crude estimator.
+**Importance Sampling for Rare Events.** Consider estimating the tail probability $\ell = P(X > 2)$ for $X \sim \mathcal{N}(0, 1)$. We use an exponential distribution shifted to start at 2 as our proposal:
 
+$$
+q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
+$$
+
+This proposal concentrates samples in the tail region where the indicator function is non-zero.
 :::
 
 ```{python}
-N = 4000
-shift = 2
-scale = 1
-```
+#| code-summary: "Show code for importance sampling example"
 
-```{python}
 import numpy as np
 from scipy.stats import norm, expon
 import matplotlib.pyplot as plt
 
-# Define parameters
-mu, sigma = 0, 1  # Normal distribution parameters
+# Set random seed for reproducibility
+np.random.seed(42)
 
-# Target PDF (Standard Normal)
+# Parameters
+N = 4000
+shift = 2
+scale = 1
+mu, sigma = 0, 1  # Standard normal parameters
+
+# Define distributions
 target_pdf = lambda x: norm.pdf(x, loc=mu, scale=sigma)
-
-# Proposal distribution (Exponential shifted by 2)
 proposal_pdf = lambda x: expon.pdf(x - shift, scale=scale) * (x > shift)
-proposal_rvs = lambda size: expon.rvs(scale=1, size=size) + shift
+proposal_rvs = lambda size: expon.rvs(scale=scale, size=size) + shift
 
 # Importance Sampling
-samples = proposal_rvs(N)
-weights = target_pdf(samples) / proposal_pdf(samples)
+samples_is = proposal_rvs(N)
+weights = target_pdf(samples_is) / proposal_pdf(samples_is)
 
 # Estimate probability P(X > 2)
-f = lambda x: x > 2  # Indicator function for P(X > 2)
-estimate = np.mean(f(samples) * weights)
+indicator = samples_is > 2  # Always true for our proposal
+estimate_is = np.mean(indicator * weights)
 
-# Crude Monte Carlo Sampling (Direct from Normal)
+# Crude Monte Carlo (direct sampling from normal)
 samples_crude = np.random.normal(loc=mu, scale=sigma, size=N)
-crude_estimate = np.mean(samples_crude > 2)
+estimate_crude = np.mean(samples_crude > 2)
 
 # Compute running averages
-running_average = np.cumsum(f(samples) * weights) / np.arange(1, N + 1)
-running_average_crude = np.cumsum(samples_crude > 2) / np.arange(1, N + 1)
+running_avg_is = np.cumsum(indicator * weights) / np.arange(1, N + 1)
+running_avg_crude = np.cumsum(samples_crude > 2) / np.arange(1, N + 1)
+
+# True value
+true_value = 1 - norm.cdf(2)
 ```
 
 ```{python}
+#| code-summary: "Show plotting code"
 
-# Plot results
+# Create figure with improved styling
 plt.figure(figsize=(12, 6))
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Plot running averages
+plt.plot(running_avg_crude, label=f'Crude MC (Final: {estimate_crude:.5f})', 
+         alpha=0.8, linewidth=2)
+plt.plot(running_avg_is, label=f'Importance Sampling (Final: {estimate_is:.5f})', 
+         alpha=0.8, linewidth=2)
+plt.axhline(y=true_value, color='red', linestyle='--', 
+            label=f'True Value: {true_value:.5f}', linewidth=2)
+
+# Formatting
+plt.xlabel('Number of Samples', fontsize=12)
+plt.ylabel('Running Average', fontsize=12)
+plt.title('Comparison of Estimators: Importance Sampling vs. Crude Monte Carlo', 
+          fontsize=14, pad=20)
+plt.legend(fontsize=11, loc='best')
 plt.ylim(-0.00, 0.04)
-plt.plot(running_average_crude, label=f'Crude Estimate Running Avg (Estimate: {crude_estimate:.5f})', alpha=0.8)
-plt.plot(running_average, label=f'Importance Sampling Running Avg (Estimate: {estimate:.5f})', alpha=0.8)
-plt.xlabel('Number of Samples')
-plt.ylabel('Running Average')
-plt.title('Comparison of Running Averages: Importance Sampling vs. Crude Monte Carlo')
-plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
 plt.show()
 
-# calculate the variance of the estimates
-variance_importance = np.var(f(samples) * weights) / N
-relative_error_importance = np.sqrt(variance_importance) / estimate
-print(f"Variance of Importance Sampling Estimate: {variance_importance:.5f}")
-print(f"Relative Error of Importance Sampling Estimate: {relative_error_importance:.5f}")
-
-# Calculate the relative error
+# Calculate and display variance metrics
+variance_is = np.var(indicator * weights) / N
 variance_crude = np.var(samples_crude > 2) / N
-relative_error_crude = np.sqrt(variance_crude) / crude_estimate
-print(f"Variance of Crude Monte Carlo Estimate: {variance_crude:.5f}")
-print(f"Relative Error of Crude Monte Carlo Estimate: {relative_error_crude:.5f}")
+relative_error_is = np.sqrt(variance_is) / estimate_is if estimate_is > 0 else np.inf
+relative_error_crude = np.sqrt(variance_crude) / estimate_crude if estimate_crude > 0 else np.inf
 
+print(f"\nImportance Sampling:")
+print(f"  Estimate: {estimate_is:.5f}")
+print(f"  Variance: {variance_is:.2e}")
+print(f"  Relative Error: {relative_error_is:.3f}")
+
+print(f"\nCrude Monte Carlo:")
+print(f"  Estimate: {estimate_crude:.5f}")
+print(f"  Variance: {variance_crude:.2e}")
+print(f"  Relative Error: {relative_error_crude:.3f}")
+
+print(f"\nVariance Reduction Factor: {variance_crude/variance_is:.1f}x")
 ```
 
-### Remarks
+### Key Considerations for Importance Sampling
 
-1. The optimal choice of the proposal distribution $q(x)$ is not always easy to find. Even if we can find it, we may not be able to sample from it easily. For importance sampling algorithm, we need to be able to sample from $q(x)$. Often, we use a distribution that is easy to sample from and that is "close" to $|f(x)|p(x)$ in some sense.
-2. Unlike rejection sampling and MCMC methods, for importance sampling we need to know the normalizing constant of the proposal distribution $q(x)$ in order to compute the weights. This means that we are fairly limited in the choice of $q(x)$. Some common choices are the exponential distribution, the normal distribution, and the uniform distribution, and a mixture of these distributions.
-3. In order for the estimator to be well-defined, we need to ensure that $q(x) > 0$ for all $x$ in the support of $f(x) p(x)$. As in the case of rare-event estimation, the support of $f(x) p(x)$ may be very small compared to the support of $p(x)$. We only need $q(x)$ to be positive in this smaller region.
+1. **Proposal Selection**: The optimal proposal $q^*(x) \propto p(x)|f(x)|$ is usually unknown. We must choose proposals that approximate this ideal while remaining tractable to sample from.
+
+2. **Normalizing Constants**: Unlike rejection sampling or MCMC, importance sampling requires knowing the normalizing constant of $q(x)$. This limits us to standard distributions like exponential, normal, uniform, or mixtures thereof.
+
+3. **Support Requirements**: The proposal must have positive density wherever $p(x)f(x) \neq 0$. For rare event estimation, this means ensuring $q(x) > 0$ in the tail regions of interest.
+
+4. **Weight Degeneracy**: Poor choice of $q(x)$ can lead to a few samples having very large weights, effectively reducing the sample size and increasing variance.
 
 ## Antithetic and Control Random Variates
 
-In this section, we will discuss two methods of variance reduction that are based on the idea of using correlated random variables: **antithetic variables** and **control variates**. 
-Recall that the variance of a sum of two random variables is given by
+These methods exploit correlation between random variables to reduce variance. Recall that for two random variables:
 
 $$
-\text{var}(X + Y) = \text{var}(X) + \text{var}(Y) + 2\text{cov}(X, Y).
+\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X, Y).
 $$
 
- Oftentimes, having correlated random variables in undesirable as it reduces to an increase in variance and a decrease in the effective sample size. However, in some cases, we can use this correlation to our advantage.
-
+While positive correlation increases variance, we can cleverly use negative correlation (antithetic variates) or known positive correlation (control variates) to our advantage.
 
 ### Antithetic Variates
-Antithetic variates are pairs of random variables that are negatively correlated. If we can find an estimator that uses sums to two antithetic random variables, we can reduce its variance.
 
-Consider the example of estimating the integral from @sec-estimating-integrals. Suppose $f(x)$ is a monotonic function over $[a, b]$. Then you'll show on the homework that if $X \sim U(a, b)$ then 
+The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.
 
-$$
-\text{cov}(f(X), f(a + b - X)) \le 0.
-$$
-
-We can see intuitively why this is happening - if $f(x)$ is increasing the $f(b - x)$ is decreasing and vice versa, and hence the two are negatively correlated. In this case, we can reduce the variance of the crude estimator by instead using 
+**Key Result**: For a monotonic function $f$ on $[a, b]$ and $X \sim \text{Uniform}(a, b)$:
 
 $$
-\hat{\ell}_{anti} = \dfrac{(b - a)}{N} \sum \limits_{i = 1}^{2N} \left(f(X) + f(a + b - X)\right)
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
 $$
 
-Note that if $X \sim U(a, b)$ then so is $b - X$ and so $\hat{\ell}_{anti}$ is an unbiased estimator. 
+This leads to the antithetic variates estimator:
+
+$$
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
+$$
+
+where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
 
 ::: {#thm-antithetic-variate}
-
-$\text{var}(\hat{\ell}_{anti}) \le \text{var}(\hat{\ell}_{crude})$.
-
+**Theorem**: For monotonic functions, $\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})$.
 :::
 
-
 ::: {#exm-antithetic-variables}
-
-**Example: Antithetic Variates.** Consider the problem of estimating the integral $\ell = \int_0^1 (1 + x^2)^{-1} dx$ using antithetic variates. The plots below show the running averages of the crude and antithetic variate estimators for $N = 100$ samples. The antithetic variate estimator achieves a $50x$ reduction in variance compared to the crude estimator.
-
+**Antithetic Variates.** We estimate $\ell = \int_0^1 \frac{1}{1 + x^2} dx$ using antithetic variates. Since $f(x) = \frac{1}{1 + x^2}$ is decreasing on $[0, 1]$, the pairs $(f(X), f(1-X))$ are negatively correlated.
 :::
 
 ```{python}
+#| code-summary: "Show code for antithetic variates example"
+
 # Function to integrate
 def f(x):
     return 1 / (1 + x**2)
+
+# Set random seed
+np.random.seed(42)
 
 # Number of samples
 N = 200
 
 # Standard Monte Carlo
 X_standard = np.random.uniform(0, 1, N)
-estimate_standard = np.mean(f(X_standard))
+estimates_standard = f(X_standard)
+estimate_standard = np.mean(estimates_standard)
 
 # Antithetic Variates Monte Carlo
 X = np.random.uniform(0, 1, N//2)
-X_antithetic = 1 - X  # Using antithetic variates
-estimate_antithetic = np.mean((f(X) + f(X_antithetic)) / 2)  # Averaging pairs
+X_antithetic = 1 - X  # Antithetic pairs
+estimates_anti = (f(X) + f(X_antithetic)) / 2
+estimate_antithetic = np.mean(estimates_anti)
 
-# Multiply by interval length (since we're integrating over [0,1])
-estimate_standard *= 1  
-estimate_antithetic *= 1  
+# True value (arctan(1) - arctan(0) = π/4)
+true_value = np.pi / 4
 
-# Compute variance for comparison
-var_standard = np.var(f(X_standard)) / N
-var_antithetic = np.var((f(X) + f(X_antithetic)) / 2) / (N//2)
+# Compute variances
+var_standard = np.var(estimates_standard) / N
+var_antithetic = np.var(estimates_anti) / (N//2)
 
+# Running averages
+running_avg_standard = np.cumsum(f(X_standard[:N//2])) / np.arange(1, N//2 + 1)
+running_avg_anti = np.cumsum(estimates_anti) / np.arange(1, N//2 + 1)
 ```
 
 ```{python}
+#| code-summary: "Show plotting code"
 
-# plot the running averages
-import matplotlib.pyplot as plt
+# Create figure
 plt.figure(figsize=(12, 6))
-plt.plot(np.cumsum(f(X_standard[:N//2])) / np.arange(1, N//2 + 1), label='Standard Monte Carlo Running Average')
-plt.plot(np.cumsum((f(X) + f(X_antithetic)) / 2) / np.arange(1, N//2 + 1), label='Antithetic Variates Running Average')
-plt.xlabel('Number of Samples')
-plt.ylabel('Running Average')
-plt.title('Running Averages: Standard Monte Carlo vs. Antithetic Variates')
-plt.legend()
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Plot running averages
+plt.plot(running_avg_standard, label='Standard Monte Carlo', 
+         alpha=0.8, linewidth=2)
+plt.plot(running_avg_anti, label='Antithetic Variates', 
+         alpha=0.8, linewidth=2)
+plt.axhline(y=true_value, color='red', linestyle='--', 
+            label=f'True Value: {true_value:.6f}', linewidth=2)
+
+# Formatting
+plt.xlabel('Number of Sample Pairs', fontsize=12)
+plt.ylabel('Running Average', fontsize=12)
+plt.title('Convergence Comparison: Standard MC vs. Antithetic Variates', 
+          fontsize=14, pad=20)
+plt.legend(fontsize=11, loc='best')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
 plt.show()
-```
 
-```{python}
+# Display results
+print(f"\nStandard Monte Carlo:")
+print(f"  Estimate: {estimate_standard:.6f}")
+print(f"  Variance: {var_standard:.6e}")
 
-print(f"Standard Monte Carlo Estimate: {estimate_standard:.6f}, Variance: {var_standard:.6e}")
-print(f"Antithetic Variates Estimate: {estimate_antithetic:.6f}, Variance: {var_antithetic:.6e}")
+print(f"\nAntithetic Variates:")
+print(f"  Estimate: {estimate_antithetic:.6f}")
+print(f"  Variance: {var_antithetic:.6e}")
+
+print(f"\nTrue Value: {true_value:.6f}")
 print(f"Variance Reduction Factor: {var_standard / var_antithetic:.2f}x")
-
 ```
 
 ### Control Variates
 
-Control random variables are examples of random variables that are positively correlated. In this case, the difference 
+Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to "correct" our estimates.
+
+Given a function $h(x)$ with known expectation $\mathbb{E}[h(X)] = h_0$, the control variate estimator is:
 
 $$
-\text{var}(X - Y) = \text{var}(X) + \text{var}(Y) - 2 \text{cov}(X, Y)
+\hat{\ell}_{\text{CV}} = \frac{1}{N} \sum_{i=1}^{N} \left[f(X_i) - \beta (h(X_i) - h_0)\right],
 $$
 
-will have lower variance. Let $X \sim p(x)$. Suppose we want to estimate $\ell = \mathbb{E}[f(x)]$ for some function $f(x)$. We can use a control variate $Y = h(X)$ for some function $h(x)$ such that 
+where $\beta$ is a parameter we can optimize.
 
-1. $\mathbb{E}[h(X)]$ is known, say $\mathbb{E}[h(X)] = h_0$.
-2. $h(x)$ is strongly positively correlated with $f(x)$, i.e., $\text{cov}(f(X), h(X)) \gg 0$.
-
-Then we can use the control variate estimator
+**Variance Analysis**: The variance of this estimator is:
 
 $$
-\hat{\ell}_\text{CV} = \frac{1}{n} \sum_{i=1}^n \left[f(X_i) - \beta (h(X_i) - h_0)\right]
+\text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
 $$
 
-where $\beta$ is a constant.
-It is easy to see that $\hat{\ell}_\text{CV}$ is an unbiased estimator of $\ell$. The variance of the control variate estimator is given by
+The optimal choice of $\beta$ that minimizes this variance is:
 
 $$
-\begin{aligned}
-\text{var}(\hat{\ell}_\text{CV}) 
-&= \frac{1}{n} \left[\text{var}(f(X)) + \beta^2 \text{var}(h(X)) - 2 \beta \text{cov}(f(X), h(X))\right] \\
-&= \frac{1}{n} \left[\text{var}(f(X)) + \beta \text{var}(h(X)) \left[ \beta - 2\frac{\text{cov}(f(X), h(X))}{\text{var}(h(X))}\right]\right]
-\end{aligned}
+\beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
 $$
 
-By choosing $\beta < 2\frac{\text{cov}(f(X), h(X))}{\text{var}(h(X))}$, we can reduce the variance of the control variate estimator. In practice, it is not easy to calculate the covariance between $f(X)$ and $h(X)$, so we 
-
-1. Pick a control variate $h(X)$ that is strongly correlated with $f(X)$, and whose expectation is known.
-2. Experiment with different values of $\beta$ to find the one that minimizes the variance of the control variate estimator.
+In practice, we often estimate $\beta^*$ from pilot samples or use a reasonable approximation.
 
 ::: {#exm-control-variates}
-
-In the example below, we estimate the integral of $x e^{-x}$ over the interval $[0, 1]$ using control function $g(x) = x$. We know that $\mathbb{E}[g(X)] = \frac{1}{2}$ so the estimator is given by
-$$
-\hat{\ell}_\text{CV} = \frac{1}{n} \sum_{i=1}^n \left[f(X_i) - \beta (g(X_i) - \frac{1}{2})\right]
-$$
-where $\beta$ is a constant and $X_i \sim \text{Uniform}(0, 1)$ are i.i.d. We choose $\beta \approx 0.35$ which minimizes the variance of the control variate estimator. This results in an 8-fold reduction in variance compared to the naive estimator.
-
+**Control Variates.** We estimate $\ell = \int_0^1 x e^{-x} dx$ using the control function $h(x) = x$. Since $X \sim \text{Uniform}(0,1)$, we know $\mathbb{E}[h(X)] = \frac{1}{2}$.
 :::
+
+```{python}
+#| code-summary: "Show code for control variates example"
+
+# Function to integrate
+def f(x):
+    return x * np.exp(-x)
+
+def h(x):
+    return x
+
+# Set random seed
+np.random.seed(42)
+
+# Number of samples
+N = 1000
+
+# Generate samples
+X = np.random.uniform(0, 1, N)
+
+# Known expectation of control variate
+h_0 = 0.5  # E[X] for X ~ Uniform(0,1)
+
+# Estimate optimal beta using pilot samples
+pilot_size = 100
+X_pilot = X[:pilot_size]
+f_pilot = f(X_pilot)
+h_pilot = h(X_pilot)
+beta_est = np.cov(f_pilot, h_pilot)[0,1] / np.var(h_pilot)
+
+# Try different beta values including the estimated one
+beta_values = [0, 0.2, beta_est, 0.5, 0.7]
+results = {}
+
+for beta in beta_values:
+    # Control variate estimator
+    cv_samples = f(X) - beta * (h(X) - h_0)
+    estimate = np.mean(cv_samples)
+    variance = np.var(cv_samples) / N
+    results[beta] = {'estimate': estimate, 'variance': variance}
+
+# Standard Monte Carlo
+standard_samples = f(X)
+estimate_standard = np.mean(standard_samples)
+var_standard = np.var(standard_samples) / N
+
+# True value: integral of x*e^(-x) from 0 to 1 = 1 - 2/e
+true_value = 1 - 2/np.e
+```
+
+```{python}
+#| code-summary: "Show plotting code"
+
+# Create figure for variance comparison
+plt.figure(figsize=(12, 6))
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Plot variance as function of beta
+beta_range = np.linspace(-0.5, 1.0, 100)
+variances = []
+
+for b in beta_range:
+    cv_samples = f(X) - b * (h(X) - h_0)
+    variances.append(np.var(cv_samples) / N)
+
+plt.plot(beta_range, variances, 'b-', linewidth=2, label='Variance')
+plt.axhline(y=var_standard, color='red', linestyle='--', 
+            label='Standard MC Variance', linewidth=2)
+plt.axvline(x=beta_est, color='green', linestyle=':', 
+            label=f'Estimated Optimal β = {beta_est:.3f}', linewidth=2)
+
+# Mark tested beta values
+for beta, res in results.items():
+    plt.plot(beta, res['variance'], 'ro', markersize=8)
+
+plt.xlabel('β', fontsize=12)
+plt.ylabel('Variance', fontsize=12)
+plt.title('Control Variate Variance as Function of β', fontsize=14, pad=20)
+plt.legend(fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Display results
+print(f"\nTrue Value: {true_value:.6f}")
+print(f"\nStandard Monte Carlo:")
+print(f"  Estimate: {estimate_standard:.6f}")
+print(f"  Variance: {var_standard:.6e}")
+
+print(f"\nControl Variates Results:")
+for beta, res in sorted(results.items()):
+    print(f"  β = {beta:.3f}: Estimate = {res['estimate']:.6f}, "
+          f"Variance = {res['variance']:.6e}, "
+          f"Reduction = {var_standard/res['variance']:.2f}x")
+```
+
+```{python}
+#| code-summary: "Show convergence comparison"
+
+# Plot convergence comparison
+plt.figure(figsize=(12, 6))
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Running averages
+running_avg_standard = np.cumsum(f(X)) / np.arange(1, N + 1)
+running_avg_cv = np.cumsum(f(X) - beta_est * (h(X) - h_0)) / np.arange(1, N + 1)
+
+plt.plot(running_avg_standard, label='Standard Monte Carlo', 
+         alpha=0.8, linewidth=2)
+plt.plot(running_avg_cv, label=f'Control Variate (β = {beta_est:.3f})', 
+         alpha=0.8, linewidth=2)
+plt.axhline(y=true_value, color='red', linestyle='--', 
+            label=f'True Value: {true_value:.6f}', linewidth=2)
+
+plt.xlabel('Number of Samples', fontsize=12)
+plt.ylabel('Running Average', fontsize=12)
+plt.title('Convergence: Standard MC vs. Control Variates', fontsize=14, pad=20)
+plt.legend(fontsize=11)
+plt.grid(True, alpha=0.3)
+plt.xlim(0, N)
+plt.tight_layout()
+plt.show()
+```
+
+
+### Common Random Numbers
+
+When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.
+
+**The Problem**: Suppose we want to estimate the difference $\delta = \mathbb{E}[f(X)] - \mathbb{E}[g(X)]$ where $X$ represents random inputs to two different systems. The naive approach uses independent samples:
+
+$$
+\hat{\delta}_{\text{indep}} = \frac{1}{N}\sum_{i=1}^{N} f(X_i) - \frac{1}{N}\sum_{i=1}^{N} g(Y_i),
+$$
+
+where $X_i$ and $Y_i$ are independent. The variance is:
+
+$$
+\text{Var}(\hat{\delta}_{\text{indep}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(Y))].
+$$
+
+**The CRN Solution**: Use the same random numbers for both systems:
+
+$$
+\hat{\delta}_{\text{CRN}} = \frac{1}{N}\sum_{i=1}^{N} [f(X_i) - g(X_i)],
+$$
+
+where the same $X_i$ is used for both $f$ and $g$. The variance becomes:
+
+$$
+\text{Var}(\hat{\delta}_{\text{CRN}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(X)) - 2\text{Cov}(f(X), g(X))].
+$$
+
+When $f(X)$ and $g(X)$ are positively correlated (which often happens when they represent similar systems), the variance reduction can be substantial.
+
+::: {#exm-common-random-numbers}
+**Comparing Queue Systems.** Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.
+:::
+
+```{python}
+#| code-summary: "Show code for common random numbers example"
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Set random seed
+np.random.seed(42)
+
+# Simulate M/M/1 queue waiting times
+def simulate_mm1_queue(arrival_times, service_requirements, service_rate):
+    """
+    Simulate M/M/1 queue and return waiting times.
+    arrival_times: inter-arrival times
+    service_requirements: service time requirements (before scaling by rate)
+    service_rate: the service rate of the system
+    """
+    n = len(arrival_times)
+    arrival_epochs = np.cumsum(arrival_times)
+    service_times = service_requirements / service_rate
+    
+    waiting_times = np.zeros(n)
+    departure_times = np.zeros(n)
+    
+    # First customer
+    waiting_times[0] = 0
+    departure_times[0] = arrival_epochs[0] + service_times[0]
+    
+    # Subsequent customers
+    for i in range(1, n):
+        # Waiting time = max(0, previous departure - current arrival)
+        waiting_times[i] = max(0, departure_times[i-1] - arrival_epochs[i])
+        departure_times[i] = arrival_epochs[i] + waiting_times[i] + service_times[i]
+    
+    return waiting_times
+
+# Parameters
+n_customers = 1000
+n_replications = 100
+arrival_rate = 1.0  # λ
+service_rate_1 = 1.5  # μ₁
+service_rate_2 = 2.0  # μ₂
+
+# True mean waiting times (M/M/1 formula: W = 1/(μ-λ))
+true_wait_1 = 1 / (service_rate_1 - arrival_rate)
+true_wait_2 = 1 / (service_rate_2 - arrival_rate)
+true_difference = true_wait_1 - true_wait_2
+
+print(f"Theoretical waiting times:")
+print(f"  System 1 (μ={service_rate_1}): {true_wait_1:.4f}")
+print(f"  System 2 (μ={service_rate_2}): {true_wait_2:.4f}")
+print(f"  Difference: {true_difference:.4f}")
+
+# Run simulations with both methods
+differences_crn = []
+differences_indep = []
+
+for rep in range(n_replications):
+    # Generate common random numbers
+    inter_arrivals = np.random.exponential(1/arrival_rate, n_customers)
+    service_requirements = np.random.exponential(1.0, n_customers)
+    
+    # CRN: Use same random numbers for both systems
+    wait_1_crn = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_1)
+    wait_2_crn = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_2)
+    differences_crn.append(np.mean(wait_1_crn) - np.mean(wait_2_crn))
+    
+    # Independent: Generate new random numbers for second system
+    inter_arrivals_2 = np.random.exponential(1/arrival_rate, n_customers)
+    service_requirements_2 = np.random.exponential(1.0, n_customers)
+    
+    wait_1_indep = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_1)
+    wait_2_indep = simulate_mm1_queue(inter_arrivals_2, service_requirements_2, service_rate_2)
+    differences_indep.append(np.mean(wait_1_indep) - np.mean(wait_2_indep))
+
+# Convert to arrays
+differences_crn = np.array(differences_crn)
+differences_indep = np.array(differences_indep)
+
+# Calculate statistics
+mean_crn = np.mean(differences_crn)
+var_crn = np.var(differences_crn)
+mean_indep = np.mean(differences_indep)
+var_indep = np.var(differences_indep)
+
+print(f"\nSimulation results ({n_replications} replications):")
+print(f"\nCommon Random Numbers:")
+print(f"  Mean difference: {mean_crn:.4f}")
+print(f"  Variance: {var_crn:.6f}")
+print(f"  Std deviation: {np.sqrt(var_crn):.4f}")
+
+print(f"\nIndependent Sampling:")
+print(f"  Mean difference: {mean_indep:.4f}")
+print(f"  Variance: {var_indep:.6f}")
+print(f"  Std deviation: {np.sqrt(var_indep):.4f}")
+
+print(f"\nVariance Reduction Factor: {var_indep/var_crn:.2f}x")
+```
+
+```{python}
+#| code-summary: "Show visualization code"
+
+# Generate a single simulation run for visualization
+np.random.seed(42)
+n_customers_viz = 50
+
+# Generate common random numbers
+inter_arrivals_viz = np.random.exponential(1/arrival_rate, n_customers_viz)
+service_requirements_viz = np.random.exponential(1.0, n_customers_viz)
+
+# Simulate both systems with CRN
+wait_1_viz = simulate_mm1_queue(inter_arrivals_viz, service_requirements_viz, service_rate_1)
+wait_2_viz = simulate_mm1_queue(inter_arrivals_viz, service_requirements_viz, service_rate_2)
+
+# Create visualization
+fig, (ax2, ax1) = plt.subplots(2, 1, figsize=(14, 12))
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Plot wait times for each customer
+customer_numbers = np.arange(1, n_customers_viz + 1)
+
+ax1.plot(customer_numbers, wait_1_viz, 'o-', alpha=0.7, label=f'System 1 (μ={service_rate_1})', 
+         markersize=4, linewidth=1)
+ax1.plot(customer_numbers, wait_2_viz, 's-', alpha=0.7, label=f'System 2 (μ={service_rate_2})', 
+         markersize=4, linewidth=1)
+
+# Add vertical lines to highlight specific customers
+highlight_customers = [10, 25, 40]
+for cust in highlight_customers:
+    ax1.axvline(x=cust, color='gray', linestyle=':', alpha=0.5)
+    # Add arrows showing the difference
+    y1 = wait_1_viz[cust-1]
+    y2 = wait_2_viz[cust-1]
+    ax1.annotate('', xy=(cust, y2), xytext=(cust, y1),
+                arrowprops=dict(arrowstyle='<->', color='red', alpha=0.7))
+
+ax1.set_xlabel('Customer Number', fontsize=12)
+ax1.set_ylabel('Waiting Time', fontsize=12)
+ax1.set_title('Paired Wait Times with Common Random Numbers', fontsize=14)
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Demonstrate correlation with more samples
+sample_size = 100
+inter_arrivals_demo = np.random.exponential(1/arrival_rate, sample_size)
+service_requirements_demo = np.random.exponential(1.0, sample_size)
+
+wait_1_demo = simulate_mm1_queue(inter_arrivals_demo, service_requirements_demo, service_rate_1)
+wait_2_demo = simulate_mm1_queue(inter_arrivals_demo, service_requirements_demo, service_rate_2)
+
+correlation = np.corrcoef(wait_1_demo, wait_2_demo)[0, 1]
+
+ax2.scatter(wait_1_demo, wait_2_demo, alpha=0.6)
+ax2.set_xlabel('Waiting Time - System 1', fontsize=12)
+ax2.set_ylabel('Waiting Time - System 2', fontsize=12)
+ax2.set_title(f'Correlation between Systems (ρ = {correlation:.3f})', fontsize=14)
+ax2.grid(True, alpha=0.3)
+
+# Add regression line
+z = np.polyfit(wait_1_demo, wait_2_demo, 1)
+p = np.poly1d(z)
+x_line = np.linspace(wait_1_demo.min(), wait_1_demo.max(), 100)
+ax2.plot(x_line, p(x_line), "r--", alpha=0.8, linewidth=2, 
+     label=f'Linear fit (y = {z[0]:.2f}x + {z[1]:.2f})')
+
+# Add diagonal reference line
+max_val = max(wait_1_demo.max(), wait_2_demo.max())
+ax2.legend()
+
+plt.tight_layout()
+plt.show()
+
+# Show the effectiveness of pairing
+print(f"\nExample differences for highlighted customers:")
+for cust in highlight_customers:
+    diff = wait_1_viz[cust-1] - wait_2_viz[cust-1]
+    print(f"  Customer {cust}: System 1 = {wait_1_viz[cust-1]:.3f}, "
+          f"System 2 = {wait_2_viz[cust-1]:.3f}, Difference = {diff:.3f}")
+```
+
+### When to Use Common Random Numbers
+
+CRN is most effective when:
+
+1. **Comparing Similar Systems**: The systems should respond similarly to the same random inputs, creating positive correlation.
+
+2. **Paired Comparisons**: When comparing multiple alternatives, use the same random numbers across all alternatives.
+
+3. **Sensitivity Analysis**: When studying how parameters affect system performance, CRN isolates the effect of parameter changes from random noise.
+
+**Implementation Tips**:
+
+1. **Synchronization**: Ensure random numbers are used for the same purposes in both systems (e.g., the i-th arrival in both systems uses the same random number).
+
+2. **Random Streams**: Use separate random number streams for different sources of randomness (e.g., arrivals vs. service times).
+
+3. **Variance Reduction Magnitude**: The reduction depends on the correlation between $f(X)$ and $g(X)$. Higher correlation yields greater reduction.
+
+**Limitations**:
+
+- CRN may not help (or could hurt) if the systems respond very differently to the same inputs
+- Requires careful implementation to maintain proper synchronization
+- May be complex to implement in large-scale simulations
+
+### Summary of Variance Reduction Methods
+
+1. **Importance Sampling**: 
+   - Best for rare events or when integrand is concentrated in specific regions
+   - Requires careful choice of proposal distribution
+   - Can achieve dramatic variance reduction but may fail catastrophically with poor proposals
+
+2. **Antithetic Variates**:
+   - Simple to implement for monotonic functions
+   - Guaranteed variance reduction (never worse than standard MC)
+   - Limited to specific function types and typically modest improvements
+
+3. **Control Variates**:
+   - Requires finding correlated functions with known expectations
+   - Can be very effective when good control variates are available
+   - Performance depends on correlation strength and optimal β selection
+
+4. **Common Random Numbers**:
+   - Ideal for comparing similar systems or policies
+   - Easy to implement in many simulation contexts
+   - Effectiveness depends on positive correlation between systems
+
+Each method has its strengths and ideal use cases. In practice, these methods can often be combined for even greater variance reduction.
