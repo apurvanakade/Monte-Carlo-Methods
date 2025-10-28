@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2025-04-01">
 
-<title>12&nbsp; Variance Reduction – Monte Carlo Methods Lecture Notes</title>
+<title>12&nbsp; Variance Reduction Techniques – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -44,9 +44,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-d49a37c80e95ea2516c73b6f7289119c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -106,9 +106,9 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../style.css">
-<meta property="og:title" content="12&nbsp; Variance Reduction – Monte Carlo Methods Lecture Notes">
+<meta property="og:title" content="12&nbsp; Variance Reduction Techniques – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
-<meta property="og:image" content="variance_reduction_files/figure-html/cell-4-output-1.png">
+<meta property="og:image" content="variance_reduction_files/figure-html/cell-3-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -308,7 +308,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/variance_reduction.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/variance_reduction.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -411,7 +411,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -548,12 +548,17 @@ window.Quarto = {
   <ul>
   <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link active" data-scroll-target="#importance-sampling"><span class="header-section-number">12.1</span> Importance Sampling</a>
   <ul class="collapse">
-  <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">12.1.1</span> Remarks</a></li>
+  <li><a href="#unbiasedness-of-the-importance-sampling-estimator" id="toc-unbiasedness-of-the-importance-sampling-estimator" class="nav-link" data-scroll-target="#unbiasedness-of-the-importance-sampling-estimator"><span class="header-section-number">12.1.1</span> Unbiasedness of the Importance Sampling Estimator</a></li>
+  <li><a href="#optimal-proposal-distribution" id="toc-optimal-proposal-distribution" class="nav-link" data-scroll-target="#optimal-proposal-distribution"><span class="header-section-number">12.1.2</span> Optimal Proposal Distribution</a></li>
+  <li><a href="#key-considerations-for-importance-sampling" id="toc-key-considerations-for-importance-sampling" class="nav-link" data-scroll-target="#key-considerations-for-importance-sampling"><span class="header-section-number">12.1.3</span> Key Considerations for Importance Sampling</a></li>
   </ul></li>
   <li><a href="#antithetic-and-control-random-variates" id="toc-antithetic-and-control-random-variates" class="nav-link" data-scroll-target="#antithetic-and-control-random-variates"><span class="header-section-number">12.2</span> Antithetic and Control Random Variates</a>
   <ul class="collapse">
   <li><a href="#antithetic-variates" id="toc-antithetic-variates" class="nav-link" data-scroll-target="#antithetic-variates"><span class="header-section-number">12.2.1</span> Antithetic Variates</a></li>
   <li><a href="#control-variates" id="toc-control-variates" class="nav-link" data-scroll-target="#control-variates"><span class="header-section-number">12.2.2</span> Control Variates</a></li>
+  <li><a href="#common-random-numbers" id="toc-common-random-numbers" class="nav-link" data-scroll-target="#common-random-numbers"><span class="header-section-number">12.2.3</span> Common Random Numbers</a></li>
+  <li><a href="#when-to-use-common-random-numbers" id="toc-when-to-use-common-random-numbers" class="nav-link" data-scroll-target="#when-to-use-common-random-numbers"><span class="header-section-number">12.2.4</span> When to Use Common Random Numbers</a></li>
+  <li><a href="#summary-of-variance-reduction-methods" id="toc-summary-of-variance-reduction-methods" class="nav-link" data-scroll-target="#summary-of-variance-reduction-methods"><span class="header-section-number">12.2.5</span> Summary of Variance Reduction Methods</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -590,7 +595,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></h1>
+<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></h1>
 </div>
 
 
@@ -613,219 +618,329 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
-<!--
-
-When the random variables $X_i$ are not independent, the variance of the sum is given by 
-
-$$
-\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
-$$
-
-There are $n^2$ terms in the covariance sum, and in general, we cannot guarantee that the covariance is small. So the above confidence interval is not valid. In the case of ergodic Markov chains, the central limit theorem for Markov chains allows us to estimate the CI as 
-$$
-\left[ \hat{\ell} -  z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}}, \hat{\ell} + z_{1-\alpha/2} \frac{S_{eff}}{\sqrt{N_{eff}}} \right],
-$$
-where $N_{eff}$ is the effective sample size. We will not discuss the details of effective sample size here.
-
-::: {.exm-estimating-pi}
-
-**Example: Estimating $\pi$.** In the first example we saw for estimating $\pi$, we used the Monte Carlo method to estimate $\pi$ by simulating random points in a square and counting the number of points that fall within a circle. The estimator we used was
-
-$$
-\hat{\ell} = \frac{4}{N} \sum_{i=1}^{N} I(X_i),
-$$
-
-where $I(X_i)$ is an indicator function that is 1 if the point $X_i$ is inside the circle and 0 otherwise. The variance of this estimator is given by
-$$
-\text{Var}(\hat{\ell}) = \frac{16}{N} \left( \frac{\pi}{4} \left( 1 - \frac{\pi}{4} \right) \right).
-$$
-
-
-:::
-
-
-
-::: {.exm-magnetization-in-a-2d-ising-model}
-
-**Example: Magnetization in a 2D Ising Model.** In a previous worksheet, we used Gibbs sampling and Metropolis--Hastings sampling to estimate the magnetization of a 2D Ising model. We used the simple estimator
-$$
-\hat{M} = \frac{1}{N} \sum_{i=1}^{N} M(\sigma_i),
-$$
-where $M(\sigma_i)$ is the magnetization of the $i$-th sample.
-
-The samples $\sigma_i$ are not independent, and so the variance of the estimator will be
-
-$$
-\text{Var}(\hat{M}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(M(\sigma_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(M(\sigma_i), M(\sigma_j)),
-$$
-which leads to much larger confidence intervals than we would expect from independent samples.
-:::
-
--->
-<p>We have seen various techniques to sample from a target distribution. One of the main uses of sampling is to estimate some quantity <span class="math inline">\(\mathbb{E}[f(X)]\)</span>. We saw various examples of this in <a href="estimation/index.html#sec-monte-carlo-estimation-strategy" class="quarto-xref"><span>Section 2</span></a> all of which relied on the sample mean estimator</p>
+<p>We have seen various techniques to sample from a target distribution. One of the main uses of sampling is to estimate some quantity <span class="math inline">\(\mathbb{E}[f(X)]\)</span>. Many applications rely on the sample mean estimator:</p>
 <p><span class="math display">\[
-\hat{\ell} = \dfrac{1}{N}\sum \limits_{i=1}^{N}f(X_i).
+\hat{\ell} = \frac{1}{N}\sum_{i=1}^{N}f(X_i).
 \]</span></p>
-<p>Many of the sampling techniques do not guarantee independence of samples. As such, the variance is given by <span class="math display">\[
+<p>Many sampling techniques do not guarantee independence of samples. As such, the variance is given by:</p>
+<p><span class="math display">\[
 \text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
 \]</span></p>
-<p>On way to reduce the variance is to “thin the samples” by choosing samples. In this chapter, we’ll look at other techniques that allow us to change how we sample to reduce estimator variance.</p>
+<p>One way to reduce the variance is to “thin the samples” by choosing samples. In this chapter, we’ll look at other techniques that allow us to change how we sample to reduce estimator variance.</p>
 <div class="exm-estimating-rare-events">
-<p><strong>Example: Estimation of Rare-Event Probabilities.</strong> Let’s start with an example. Consider estimation of the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> of some random variable <span class="math inline">\(X\)</span> for a large number <span class="math inline">\(\gamma\)</span>. We can use the following estimator: <span class="math display">\[
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} I_{&gt; \gamma}(X_i),
-\]</span> where <span class="math inline">\(I_{&gt; \gamma}(X_i)\)</span> is an indicator function that is 1 if <span class="math inline">\(X_i &gt; \gamma\)</span> and 0 otherwise. The variance of this estimator is given by</p>
+<p><strong>Estimation of Rare-Event Probabilities.</strong> Let’s start with an example. Consider estimation of the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> of some random variable <span class="math inline">\(X\)</span> for a large number <span class="math inline">\(\gamma\)</span>. We can use the following estimator:</p>
 <p><span class="math display">\[
-\text{Var}(\hat{\ell}) = \frac{1}{N} \left( \ell (1 - \ell) \right).
-\]</span> The relative width of the confidence interval is given by <span class="math display">\[
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}_{&gt; \gamma}(X_i),
+\]</span></p>
+<p>where <span class="math inline">\(\mathbb{I}_{&gt; \gamma}(X_i)\)</span> is an indicator function that is 1 if <span class="math inline">\(X_i &gt; \gamma\)</span> and 0 otherwise. The variance of this estimator is:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\ell}) = \frac{1}{N} \ell (1 - \ell).
+\]</span></p>
+<p>The relative width of the confidence interval is:</p>
+<p><span class="math display">\[
 \text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
-\]</span> When <span class="math inline">\(\ell\)</span> is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of <span class="math inline">\(\ell\)</span>.</p>
+\]</span></p>
+<p>When <span class="math inline">\(\ell\)</span> is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of <span class="math inline">\(\ell\)</span>.</p>
 </div>
 <section id="importance-sampling" class="level2" data-number="12.1">
 <h2 data-number="12.1" class="anchored" data-anchor-id="importance-sampling"><span class="header-section-number">12.1</span> Importance Sampling</h2>
-<p>Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The idea is to reduce the number of low probability events that contribute to the variance of the estimator.</p>
-<p>For example, when estimating the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span>, if <span class="math inline">\(\ell\)</span> is small, then most of the samples will be in the region <span class="math inline">\(X \leq \gamma\)</span>, which contributes little to the estimate. However, we cannot just sample from the tail of the distribution as this would provide us no information about the rest of the distribution. Importance sampling allows us to sample from tail but then “fix” the estimate by weighting the samples appropriately.</p>
+<p>Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The key insight is that we can sample from regions that contribute more to our estimate, then correct for this bias by weighting the samples appropriately.</p>
+<p>For example, when estimating the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span>, if <span class="math inline">\(\ell\)</span> is small, then most samples from the original distribution fall in the region <span class="math inline">\(X \leq \gamma\)</span>, contributing nothing to the estimate. Importance sampling allows us to sample more frequently from the tail region while maintaining an unbiased estimate through proper weighting.</p>
 <div class="def-importance-sampling">
-<p><strong>Definition: Importance Sampling.</strong> Let <span class="math inline">\(X\)</span> be a random variable with probability density function (pdf) <span class="math inline">\(p(x)\)</span>, and let <span class="math inline">\(q(x)\)</span> be a proposal pdf such that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(p(x)\)</span>. The importance sampling estimator of <span class="math inline">\(\ell = E[f(X)]\)</span> is given by <span class="math display">\[
-\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
-\]</span> where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are i.i.d. samples from the distribution with pdf <span class="math inline">\(q(x)\)</span>.</p>
-<p>For clarity, we’ll denote the sample mean estimator as <span class="math inline">\(\hat{\ell}_{crude}\)</span> and the importance sampling estimator as <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
+<p><strong>Definition: Importance Sampling.</strong> Let <span class="math inline">\(X\)</span> be a random variable with probability density function (pdf) <span class="math inline">\(p(x)\)</span>, and let <span class="math inline">\(q(x)\)</span> be a proposal pdf such that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> where <span class="math inline">\(p(x)f(x) \neq 0\)</span>. The importance sampling estimator of <span class="math inline">\(\ell = \mathbb{E}_p[f(X)]\)</span> is:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{IS}} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
+\]</span></p>
+<p>where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are i.i.d. samples from the distribution with pdf <span class="math inline">\(q(x)\)</span>.</p>
+<p>For clarity, we denote: - <span class="math inline">\(\hat{\ell}_{\text{crude}}\)</span>: the standard sample mean estimator using samples from <span class="math inline">\(p(x)\)</span> - <span class="math inline">\(\hat{\ell}_{\text{IS}}\)</span>: the importance sampling estimator using samples from <span class="math inline">\(q(x)\)</span></p>
 </div>
-<p>Suppose <span class="math inline">\(N = 1\)</span> so that the estimator is given by <span class="math display">\[
-\hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)}.
-\]</span> Note that here <span class="math inline">\(X \sim q(x)\)</span> and NOT <span class="math inline">\(p(x)\)</span>. We can check that this estimator is unbiased: <span class="math display">\[
+<section id="unbiasedness-of-the-importance-sampling-estimator" class="level3" data-number="12.1.1">
+<h3 data-number="12.1.1" class="anchored" data-anchor-id="unbiasedness-of-the-importance-sampling-estimator"><span class="header-section-number">12.1.1</span> Unbiasedness of the Importance Sampling Estimator</h3>
+<p>Consider the case where <span class="math inline">\(N = 1\)</span>:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{IS}} = f(X) \frac{p(X)}{q(X)}, \quad \text{where } X \sim q(x).
+\]</span></p>
+<p>We can verify that this estimator is unbiased:</p>
+<p><span class="math display">\[
 \begin{aligned}
-E_q[\hat{\ell}_{IS}] &amp;= E_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
-&amp;= \int f(x) \frac{p(x)}{q(x)} q(x) dx \\
-&amp;= \int f(x) p(x) dx \\
-&amp;= E[f(X)] \\
+\mathbb{E}_q[\hat{\ell}_{\text{IS}}] &amp;= \mathbb{E}_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
+&amp;= \int f(x) \frac{p(x)}{q(x)} q(x) \, dx \\
+&amp;= \int f(x) p(x) \, dx \\
+&amp;= \mathbb{E}_p[f(X)] \\
 &amp;= \ell.
 \end{aligned}
 \]</span></p>
-<p>However, <span class="math display">\[
-\begin{aligned}
-\text{Var}(\hat{\ell}_{IS})
-&amp;\neq \text{Var}(\hat{\ell}_{crude}).
-\end{aligned}
-\]</span></p>
-<p>This allows us to reduce the variance of the estimator by choosing <span class="math inline">\(q(x)\)</span> appropriately.</p>
-<p>Suppose <span class="math inline">\(f(X)\)</span> is a non-negative function. Then if we choose</p>
+</section>
+<section id="optimal-proposal-distribution" class="level3" data-number="12.1.2">
+<h3 data-number="12.1.2" class="anchored" data-anchor-id="optimal-proposal-distribution"><span class="header-section-number">12.1.2</span> Optimal Proposal Distribution</h3>
+<p>The variance of the importance sampling estimator depends on the choice of <span class="math inline">\(q(x)\)</span>:</p>
 <p><span class="math display">\[
-q(x) \propto p(x) f(x),
+\text{Var}_q(\hat{\ell}_{\text{IS}}) \neq \text{Var}_p(\hat{\ell}_{\text{crude}}).
 \]</span></p>
-<p>then the importance sampling estimator for <span class="math inline">\(N = 1\)</span></p>
+<p>For non-negative functions <span class="math inline">\(f(x) \geq 0\)</span>, the optimal proposal distribution that minimizes variance is:</p>
 <p><span class="math display">\[
-\hat{\ell}_{IS} = f(X) \frac{p(X)}{q(X)}
+q^*(x) \propto p(x) f(x).
 \]</span></p>
-<p>is a constant and has zero variance! When <span class="math inline">\(H\)</span> is not non-negative, we can show that</p>
+<p>With this choice, the importance sampling estimator becomes a constant (zero variance!). For general functions, the optimal proposal is:</p>
 <p><span class="math display">\[
-q(x) \propto p(x) |f(x)|
+q^*(x) \propto p(x) |f(x)|.
 \]</span></p>
-<p>minimizes the variance of the estimator <span class="math inline">\(\hat{\ell}_{IS}\)</span>.</p>
-<p>However, note that our goal is to estimate <span class="math inline">\(\ell = E[f(X)]\)</span>, which means that we do not know <span class="math inline">\(f(x)\)</span> in advance. So we cannot choose this <span class="math inline">\(q(x)\)</span> in advance. Even if we could, we might not be able to sample from <span class="math inline">\(q(x)\)</span> easily. In practice, we choose <span class="math inline">\(q(x)\)</span> to be a distribution that is easy to sample from and that is “close” to <span class="math inline">\(p(x)\)</span> in some sense.</p>
+<p>However, these optimal choices require knowing the very quantity we’re trying to estimate, making them impractical. In practice, we choose <span class="math inline">\(q(x)\)</span> to: 1. Be easy to sample from 2. Have heavier tails than <span class="math inline">\(p(x)\)</span> in regions where <span class="math inline">\(|f(x)|\)</span> is large 3. Have a known normalizing constant</p>
 <div class="exm-importance-sampling">
-<p><strong>Example: Importance Sampling for Rare Events.</strong> Consider the problem of estimating the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> for a random variable <span class="math inline">\(X\)</span> with standard normal distribution. We can use importance sampling to estimate this probability by choosing a proposal distribution <span class="math inline">\(q(x)\)</span> that is concentrated in the tail region. One such distribution is the exponential distribution with parameter <span class="math inline">\(\lambda\)</span>, which has pdf <span class="math display">\[
-q(x) = \lambda e^{-\lambda (x-2)}, \quad x \ge 2.
-\]</span> The plots below show the running averages of the crude and importance sampling estimators for <span class="math inline">\(N = 2000\)</span> samples. The importance sampling estimator is much more stable and converges to the true value of <span class="math inline">\(\ell\)</span> much faster than the crude estimator.</p>
+<p><strong>Importance Sampling for Rare Events.</strong> Consider estimating the tail probability <span class="math inline">\(\ell = P(X &gt; 2)\)</span> for <span class="math inline">\(X \sim \mathcal{N}(0, 1)\)</span>. We use an exponential distribution shifted to start at 2 as our proposal:</p>
+<p><span class="math display">\[
+q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
+\]</span></p>
+<p>This proposal concentrates samples in the tail region where the indicator function is non-zero.</p>
 </div>
-<div id="a8b60bc3" class="cell" data-execution_count="4">
+<div id="805a7e51" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="variance_reduction_files/figure-html/cell-4-output-1.png" width="978" height="523" class="figure-img"></p>
+<p><img src="variance_reduction_files/figure-html/cell-3-output-1.png" width="1142" height="568" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Variance of Importance Sampling Estimate: 0.00000
-Relative Error of Importance Sampling Estimate: 0.01247
-Variance of Crude Monte Carlo Estimate: 0.00001
-Relative Error of Crude Monte Carlo Estimate: 0.09231</code></pre>
+<pre><code>
+Importance Sampling:
+  Estimate: 0.02290
+  Variance: 7.94e-08
+  Relative Error: 0.012
+
+Crude Monte Carlo:
+  Estimate: 0.02350
+  Variance: 5.74e-06
+  Relative Error: 0.102
+
+Variance Reduction Factor: 72.2x</code></pre>
 </div>
 </div>
-<section id="remarks" class="level3" data-number="12.1.1">
-<h3 data-number="12.1.1" class="anchored" data-anchor-id="remarks"><span class="header-section-number">12.1.1</span> Remarks</h3>
+</section>
+<section id="key-considerations-for-importance-sampling" class="level3" data-number="12.1.3">
+<h3 data-number="12.1.3" class="anchored" data-anchor-id="key-considerations-for-importance-sampling"><span class="header-section-number">12.1.3</span> Key Considerations for Importance Sampling</h3>
 <ol type="1">
-<li>The optimal choice of the proposal distribution <span class="math inline">\(q(x)\)</span> is not always easy to find. Even if we can find it, we may not be able to sample from it easily. For importance sampling algorithm, we need to be able to sample from <span class="math inline">\(q(x)\)</span>. Often, we use a distribution that is easy to sample from and that is “close” to <span class="math inline">\(|f(x)|p(x)\)</span> in some sense.</li>
-<li>Unlike rejection sampling and MCMC methods, for importance sampling we need to know the normalizing constant of the proposal distribution <span class="math inline">\(q(x)\)</span> in order to compute the weights. This means that we are fairly limited in the choice of <span class="math inline">\(q(x)\)</span>. Some common choices are the exponential distribution, the normal distribution, and the uniform distribution, and a mixture of these distributions.</li>
-<li>In order for the estimator to be well-defined, we need to ensure that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> in the support of <span class="math inline">\(f(x) p(x)\)</span>. As in the case of rare-event estimation, the support of <span class="math inline">\(f(x) p(x)\)</span> may be very small compared to the support of <span class="math inline">\(p(x)\)</span>. We only need <span class="math inline">\(q(x)\)</span> to be positive in this smaller region.</li>
+<li><p><strong>Proposal Selection</strong>: The optimal proposal <span class="math inline">\(q^*(x) \propto p(x)|f(x)|\)</span> is usually unknown. We must choose proposals that approximate this ideal while remaining tractable to sample from.</p></li>
+<li><p><strong>Normalizing Constants</strong>: Unlike rejection sampling or MCMC, importance sampling requires knowing the normalizing constant of <span class="math inline">\(q(x)\)</span>. This limits us to standard distributions like exponential, normal, uniform, or mixtures thereof.</p></li>
+<li><p><strong>Support Requirements</strong>: The proposal must have positive density wherever <span class="math inline">\(p(x)f(x) \neq 0\)</span>. For rare event estimation, this means ensuring <span class="math inline">\(q(x) &gt; 0\)</span> in the tail regions of interest.</p></li>
+<li><p><strong>Weight Degeneracy</strong>: Poor choice of <span class="math inline">\(q(x)\)</span> can lead to a few samples having very large weights, effectively reducing the sample size and increasing variance.</p></li>
 </ol>
 </section>
 </section>
 <section id="antithetic-and-control-random-variates" class="level2" data-number="12.2">
 <h2 data-number="12.2" class="anchored" data-anchor-id="antithetic-and-control-random-variates"><span class="header-section-number">12.2</span> Antithetic and Control Random Variates</h2>
-<p>In this section, we will discuss two methods of variance reduction that are based on the idea of using correlated random variables: <strong>antithetic variables</strong> and <strong>control variates</strong>. Recall that the variance of a sum of two random variables is given by</p>
+<p>These methods exploit correlation between random variables to reduce variance. Recall that for two random variables:</p>
 <p><span class="math display">\[
-\text{var}(X + Y) = \text{var}(X) + \text{var}(Y) + 2\text{cov}(X, Y).
+\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X, Y).
 \]</span></p>
-<p>Oftentimes, having correlated random variables in undesirable as it reduces to an increase in variance and a decrease in the effective sample size. However, in some cases, we can use this correlation to our advantage.</p>
+<p>While positive correlation increases variance, we can cleverly use negative correlation (antithetic variates) or known positive correlation (control variates) to our advantage.</p>
 <section id="antithetic-variates" class="level3" data-number="12.2.1">
 <h3 data-number="12.2.1" class="anchored" data-anchor-id="antithetic-variates"><span class="header-section-number">12.2.1</span> Antithetic Variates</h3>
-<p>Antithetic variates are pairs of random variables that are negatively correlated. If we can find an estimator that uses sums to two antithetic random variables, we can reduce its variance.</p>
-<p>Consider the example of estimating the integral from <span class="quarto-unresolved-ref">?sec-estimating-integrals</span>. Suppose <span class="math inline">\(f(x)\)</span> is a monotonic function over <span class="math inline">\([a, b]\)</span>. Then you’ll show on the homework that if <span class="math inline">\(X \sim U(a, b)\)</span> then</p>
+<p>The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.</p>
+<p><strong>Key Result</strong>: For a monotonic function <span class="math inline">\(f\)</span> on <span class="math inline">\([a, b]\)</span> and <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>:</p>
 <p><span class="math display">\[
-\text{cov}(f(X), f(a + b - X)) \le 0.
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
 \]</span></p>
-<p>We can see intuitively why this is happening - if <span class="math inline">\(f(x)\)</span> is increasing the <span class="math inline">\(f(b - x)\)</span> is decreasing and vice versa, and hence the two are negatively correlated. In this case, we can reduce the variance of the crude estimator by instead using</p>
+<p>This leads to the antithetic variates estimator:</p>
 <p><span class="math display">\[
-\hat{\ell}_{anti} = \dfrac{(b - a)}{N} \sum \limits_{i = 1}^{2N} \left(f(X) + f(a + b - X)\right)
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
 \]</span></p>
-<p>Note that if <span class="math inline">\(X \sim U(a, b)\)</span> then so is <span class="math inline">\(b - X\)</span> and so <span class="math inline">\(\hat{\ell}_{anti}\)</span> is an unbiased estimator.</p>
+<p>where <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>.</p>
 <div id="thm-antithetic-variate" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 12.1</strong></span> <span class="math inline">\(\text{var}(\hat{\ell}_{anti}) \le \text{var}(\hat{\ell}_{crude})\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem 12.1</strong></span> <strong>Theorem</strong>: For monotonic functions, <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})\)</span>.</p>
 </div>
 <div id="exm-antithetic-variables" class="theorem example">
-<p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Example: Antithetic Variates.</strong> Consider the problem of estimating the integral <span class="math inline">\(\ell = \int_0^1 (1 + x^2)^{-1} dx\)</span> using antithetic variates. The plots below show the running averages of the crude and antithetic variate estimators for <span class="math inline">\(N = 100\)</span> samples. The antithetic variate estimator achieves a <span class="math inline">\(50x\)</span> reduction in variance compared to the crude estimator.</p>
+<p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
 </div>
-<div id="130c824c" class="cell" data-execution_count="6">
+<div id="736256bb" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="variance_reduction_files/figure-html/cell-6-output-1.png" width="969" height="523" class="figure-img"></p>
+<p><img src="variance_reduction_files/figure-html/cell-5-output-1.png" width="1142" height="568" class="figure-img"></p>
 </figure>
 </div>
 </div>
-</div>
-<div id="6e069168" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-stdout">
-<pre><code>Standard Monte Carlo Estimate: 0.770064, Variance: 1.180981e-04
-Antithetic Variates Estimate: 0.787292, Variance: 1.917273e-06
-Variance Reduction Factor: 61.60x</code></pre>
+<pre><code>
+Standard Monte Carlo:
+  Estimate: 0.793935
+  Variance: 1.340866e-04
+
+Antithetic Variates:
+  Estimate: 0.784943
+  Variance: 2.182878e-06
+
+True Value: 0.785398
+Variance Reduction Factor: 61.43x</code></pre>
 </div>
 </div>
 </section>
 <section id="control-variates" class="level3" data-number="12.2.2">
 <h3 data-number="12.2.2" class="anchored" data-anchor-id="control-variates"><span class="header-section-number">12.2.2</span> Control Variates</h3>
-<p>Control random variables are examples of random variables that are positively correlated. In this case, the difference</p>
+<p>Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to “correct” our estimates.</p>
+<p>Given a function <span class="math inline">\(h(x)\)</span> with known expectation <span class="math inline">\(\mathbb{E}[h(X)] = h_0\)</span>, the control variate estimator is:</p>
 <p><span class="math display">\[
-\text{var}(X - Y) = \text{var}(X) + \text{var}(Y) - 2 \text{cov}(X, Y)
+\hat{\ell}_{\text{CV}} = \frac{1}{N} \sum_{i=1}^{N} \left[f(X_i) - \beta (h(X_i) - h_0)\right],
 \]</span></p>
-<p>will have lower variance. Let <span class="math inline">\(X \sim p(x)\)</span>. Suppose we want to estimate <span class="math inline">\(\ell = \mathbb{E}[f(x)]\)</span> for some function <span class="math inline">\(f(x)\)</span>. We can use a control variate <span class="math inline">\(Y = h(X)\)</span> for some function <span class="math inline">\(h(x)\)</span> such that</p>
-<ol type="1">
-<li><span class="math inline">\(\mathbb{E}[h(X)]\)</span> is known, say <span class="math inline">\(\mathbb{E}[h(X)] = h_0\)</span>.</li>
-<li><span class="math inline">\(h(x)\)</span> is strongly positively correlated with <span class="math inline">\(f(x)\)</span>, i.e., <span class="math inline">\(\text{cov}(f(X), h(X)) \gg 0\)</span>.</li>
-</ol>
-<p>Then we can use the control variate estimator</p>
+<p>where <span class="math inline">\(\beta\)</span> is a parameter we can optimize.</p>
+<p><strong>Variance Analysis</strong>: The variance of this estimator is:</p>
 <p><span class="math display">\[
-\hat{\ell}_\text{CV} = \frac{1}{n} \sum_{i=1}^n \left[f(X_i) - \beta (h(X_i) - h_0)\right]
+\text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
 \]</span></p>
-<p>where <span class="math inline">\(\beta\)</span> is a constant. It is easy to see that <span class="math inline">\(\hat{\ell}_\text{CV}\)</span> is an unbiased estimator of <span class="math inline">\(\ell\)</span>. The variance of the control variate estimator is given by</p>
+<p>The optimal choice of <span class="math inline">\(\beta\)</span> that minimizes this variance is:</p>
 <p><span class="math display">\[
-\begin{aligned}
-\text{var}(\hat{\ell}_\text{CV})
-&amp;= \frac{1}{n} \left[\text{var}(f(X)) + \beta^2 \text{var}(h(X)) - 2 \beta \text{cov}(f(X), h(X))\right] \\
-&amp;= \frac{1}{n} \left[\text{var}(f(X)) + \beta \text{var}(h(X)) \left[ \beta - 2\frac{\text{cov}(f(X), h(X))}{\text{var}(h(X))}\right]\right]
-\end{aligned}
+\beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
 \]</span></p>
-<p>By choosing <span class="math inline">\(\beta &lt; 2\frac{\text{cov}(f(X), h(X))}{\text{var}(h(X))}\)</span>, we can reduce the variance of the control variate estimator. In practice, it is not easy to calculate the covariance between <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(h(X)\)</span>, so we</p>
-<ol type="1">
-<li>Pick a control variate <span class="math inline">\(h(X)\)</span> that is strongly correlated with <span class="math inline">\(f(X)\)</span>, and whose expectation is known.</li>
-<li>Experiment with different values of <span class="math inline">\(\beta\)</span> to find the one that minimizes the variance of the control variate estimator.</li>
-</ol>
+<p>In practice, we often estimate <span class="math inline">\(\beta^*\)</span> from pilot samples or use a reasonable approximation.</p>
 <div id="exm-control-variates" class="theorem example">
-<p><span class="theorem-title"><strong>Example 12.2</strong></span> In the example below, we estimate the integral of <span class="math inline">\(x e^{-x}\)</span> over the interval <span class="math inline">\([0, 1]\)</span> using control function <span class="math inline">\(g(x) = x\)</span>. We know that <span class="math inline">\(\mathbb{E}[g(X)] = \frac{1}{2}\)</span> so the estimator is given by <span class="math display">\[
-\hat{\ell}_\text{CV} = \frac{1}{n} \sum_{i=1}^n \left[f(X_i) - \beta (g(X_i) - \frac{1}{2})\right]
-\]</span> where <span class="math inline">\(\beta\)</span> is a constant and <span class="math inline">\(X_i \sim \text{Uniform}(0, 1)\)</span> are i.i.d. We choose <span class="math inline">\(\beta \approx 0.35\)</span> which minimizes the variance of the control variate estimator. This results in an 8-fold reduction in variance compared to the naive estimator.</p>
+<p><span class="theorem-title"><strong>Example 12.2</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
 </div>
+<div id="a360aca7" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="variance_reduction_files/figure-html/cell-7-output-1.png" width="1142" height="568" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+True Value: 0.264241
+
+Standard Monte Carlo:
+  Estimate: 0.259941
+  Variance: 1.148343e-05
+
+Control Variates Results:
+  β = 0.000: Estimate = 0.259941, Variance = 1.148343e-05, Reduction = 1.00x
+  β = 0.200: Estimate = 0.261890, Variance = 3.098287e-06, Reduction = 3.71x
+  β = 0.358: Estimate = 0.263430, Variance = 1.296755e-06, Reduction = 8.86x
+  β = 0.500: Estimate = 0.264813, Variance = 3.309411e-06, Reduction = 3.47x
+  β = 0.700: Estimate = 0.266761, Variance = 1.197605e-05, Reduction = 0.96x</code></pre>
+</div>
+</div>
+<div id="9dc24624" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="variance_reduction_files/figure-html/cell-8-output-1.png" width="1142" height="568" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="common-random-numbers" class="level3" data-number="12.2.3">
+<h3 data-number="12.2.3" class="anchored" data-anchor-id="common-random-numbers"><span class="header-section-number">12.2.3</span> Common Random Numbers</h3>
+<p>When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.</p>
+<p><strong>The Problem</strong>: Suppose we want to estimate the difference <span class="math inline">\(\delta = \mathbb{E}[f(X)] - \mathbb{E}[g(X)]\)</span> where <span class="math inline">\(X\)</span> represents random inputs to two different systems. The naive approach uses independent samples:</p>
+<p><span class="math display">\[
+\hat{\delta}_{\text{indep}} = \frac{1}{N}\sum_{i=1}^{N} f(X_i) - \frac{1}{N}\sum_{i=1}^{N} g(Y_i),
+\]</span></p>
+<p>where <span class="math inline">\(X_i\)</span> and <span class="math inline">\(Y_i\)</span> are independent. The variance is:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\delta}_{\text{indep}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(Y))].
+\]</span></p>
+<p><strong>The CRN Solution</strong>: Use the same random numbers for both systems:</p>
+<p><span class="math display">\[
+\hat{\delta}_{\text{CRN}} = \frac{1}{N}\sum_{i=1}^{N} [f(X_i) - g(X_i)],
+\]</span></p>
+<p>where the same <span class="math inline">\(X_i\)</span> is used for both <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span>. The variance becomes:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\delta}_{\text{CRN}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(X)) - 2\text{Cov}(f(X), g(X))].
+\]</span></p>
+<p>When <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(g(X)\)</span> are positively correlated (which often happens when they represent similar systems), the variance reduction can be substantial.</p>
+<div id="exm-common-random-numbers" class="theorem example">
+<p><span class="theorem-title"><strong>Example 12.3</strong></span> <strong>Comparing Queue Systems.</strong> Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.</p>
+</div>
+<div id="1f71dc48" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-stdout">
+<pre><code>Theoretical waiting times:
+  System 1 (μ=1.5): 2.0000
+  System 2 (μ=2.0): 1.0000
+  Difference: 1.0000
+
+Simulation results (100 replications):
+
+Common Random Numbers:
+  Mean difference: 0.8210
+  Variance: 0.057241
+  Std deviation: 0.2393
+
+Independent Sampling:
+  Mean difference: 0.8118
+  Variance: 0.106401
+  Std deviation: 0.3262
+
+Variance Reduction Factor: 1.86x</code></pre>
+</div>
+</div>
+<div id="816a219b" class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="variance_reduction_files/figure-html/cell-10-output-1.png" width="1334" height="1144" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Example differences for highlighted customers:
+  Customer 10: System 1 = 0.443, System 2 = 0.000, Difference = 0.443
+  Customer 25: System 1 = 3.433, System 2 = 1.358, Difference = 2.075
+  Customer 40: System 1 = 1.168, System 2 = 0.511, Difference = 0.657</code></pre>
+</div>
+</div>
+</section>
+<section id="when-to-use-common-random-numbers" class="level3" data-number="12.2.4">
+<h3 data-number="12.2.4" class="anchored" data-anchor-id="when-to-use-common-random-numbers"><span class="header-section-number">12.2.4</span> When to Use Common Random Numbers</h3>
+<p>CRN is most effective when:</p>
+<ol type="1">
+<li><p><strong>Comparing Similar Systems</strong>: The systems should respond similarly to the same random inputs, creating positive correlation.</p></li>
+<li><p><strong>Paired Comparisons</strong>: When comparing multiple alternatives, use the same random numbers across all alternatives.</p></li>
+<li><p><strong>Sensitivity Analysis</strong>: When studying how parameters affect system performance, CRN isolates the effect of parameter changes from random noise.</p></li>
+</ol>
+<p><strong>Implementation Tips</strong>:</p>
+<ol type="1">
+<li><p><strong>Synchronization</strong>: Ensure random numbers are used for the same purposes in both systems (e.g., the i-th arrival in both systems uses the same random number).</p></li>
+<li><p><strong>Random Streams</strong>: Use separate random number streams for different sources of randomness (e.g., arrivals vs.&nbsp;service times).</p></li>
+<li><p><strong>Variance Reduction Magnitude</strong>: The reduction depends on the correlation between <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(g(X)\)</span>. Higher correlation yields greater reduction.</p></li>
+</ol>
+<p><strong>Limitations</strong>:</p>
+<ul>
+<li>CRN may not help (or could hurt) if the systems respond very differently to the same inputs</li>
+<li>Requires careful implementation to maintain proper synchronization</li>
+<li>May be complex to implement in large-scale simulations</li>
+</ul>
+</section>
+<section id="summary-of-variance-reduction-methods" class="level3" data-number="12.2.5">
+<h3 data-number="12.2.5" class="anchored" data-anchor-id="summary-of-variance-reduction-methods"><span class="header-section-number">12.2.5</span> Summary of Variance Reduction Methods</h3>
+<ol type="1">
+<li><strong>Importance Sampling</strong>:
+<ul>
+<li>Best for rare events or when integrand is concentrated in specific regions</li>
+<li>Requires careful choice of proposal distribution</li>
+<li>Can achieve dramatic variance reduction but may fail catastrophically with poor proposals</li>
+</ul></li>
+<li><strong>Antithetic Variates</strong>:
+<ul>
+<li>Simple to implement for monotonic functions</li>
+<li>Guaranteed variance reduction (never worse than standard MC)</li>
+<li>Limited to specific function types and typically modest improvements</li>
+</ul></li>
+<li><strong>Control Variates</strong>:
+<ul>
+<li>Requires finding correlated functions with known expectations</li>
+<li>Can be very effective when good control variates are available</li>
+<li>Performance depends on correlation strength and optimal β selection</li>
+</ul></li>
+<li><strong>Common Random Numbers</strong>:
+<ul>
+<li>Ideal for comparing similar systems or policies</li>
+<li>Easy to implement in many simulation contexts</li>
+<li>Effectiveness depends on positive correlation between systems</li>
+</ul></li>
+</ol>
+<p>Each method has its strengths and ideal use cases. In practice, these methods can often be combined for even greater variance reduction.</p>
 
 
 </section>
