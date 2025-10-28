@@ -657,17 +657,6 @@
     ]
   },
   {
-    "objectID": "chapters/applications/mmn.html",
-    "href": "chapters/applications/mmn.html",
-    "title": "15  M/M/n Queue",
-    "section": "",
-    "text": "The M/M/n queue is a discrete stochastic process that models a queue with n servers. There are three parameters:\n\n\\(n\\): the number of servers\n\\(\\lambda\\): the arrival rate of customers\n\\(\\mu\\): the service rate of each server\n\nThe “M” in M/M/n stands for “memoryless” or Markovian. The M/M/n queue models the following process: - customers arrive at the queue according to a Poisson process with rate \\(\\lambda\\). - Each customer is served by one of the n servers, and the service times are exponentially distributed with rate \\(\\mu\\). - If all servers are busy, the customer waits in line until a server becomes available.\nWe are interested in testing the performance of the queue as function of the three parameters. There are various performance measures we can compute, including: - The average number of customers in the waiting line - The average time a customer spends waiting in line - The usage of the servers - The probability that a customer has to wait in line\nThere are two approaches we can take to simulate an M/M/n queue\n\nProcess driven\nEvent driven\n\n\n\nSimulated 1000 customers\nAverage wait time     : 0.4640\nAverage sojourn time  : 1.1262\nServer utilization    : 0.6667 (theoretical)",
-    "crumbs": [
-      "Applications",
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>M/M/n Queue</span>"
-    ]
-  },
-  {
     "objectID": "chapters/applications/bootstrap.html",
     "href": "chapters/applications/bootstrap.html",
     "title": "16  Bootstrap",
