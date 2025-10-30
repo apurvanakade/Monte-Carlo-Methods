@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-08-02">
 
-<title>18&nbsp; Particle Filters – Monte Carlo Methods Lecture Notes</title>
+<title>18&nbsp; Particle Filtering - Sequential Importance Sampling – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -108,7 +108,9 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../style.css">
-<meta property="og:title" content="18&nbsp; Particle Filters – Monte Carlo Methods Lecture Notes">
+<meta property="og:title" content="18&nbsp; Particle Filtering - Sequential Importance Sampling – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="">
+<meta property="og:image" content="particle_filters_files/figure-html/cell-3-output-1.png">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -308,7 +310,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filtering - Sequential Importance Sampling</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -411,7 +413,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -433,12 +435,6 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -469,24 +465,6 @@ window.Quarto = {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">simulated_annealing.html</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">cross_entropy.html</span></span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -529,8 +507,29 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">18.1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#the-challenge" id="toc-the-challenge" class="nav-link" data-scroll-target="#the-challenge"><span class="header-section-number">18.1.1</span> The Challenge</a></li>
+  <li><a href="#the-particle-filter-solution" id="toc-the-particle-filter-solution" class="nav-link" data-scroll-target="#the-particle-filter-solution"><span class="header-section-number">18.1.2</span> The Particle Filter Solution</a></li>
+  <li><a href="#applications" id="toc-applications" class="nav-link" data-scroll-target="#applications"><span class="header-section-number">18.1.3</span> Applications</a></li>
+  </ul></li>
+  <li><a href="#background-state-space-models-and-hidden-markov-models" id="toc-background-state-space-models-and-hidden-markov-models" class="nav-link" data-scroll-target="#background-state-space-models-and-hidden-markov-models"><span class="header-section-number">18.2</span> Background: State-Space Models and Hidden Markov Models</a>
+  <ul class="collapse">
+  <li><a href="#state-space-model-framework" id="toc-state-space-model-framework" class="nav-link" data-scroll-target="#state-space-model-framework"><span class="header-section-number">18.2.1</span> State-Space Model Framework</a></li>
+  <li><a href="#probabilistic-formulation" id="toc-probabilistic-formulation" class="nav-link" data-scroll-target="#probabilistic-formulation"><span class="header-section-number">18.2.2</span> Probabilistic Formulation</a></li>
+  <li><a href="#markov-assumptions" id="toc-markov-assumptions" class="nav-link" data-scroll-target="#markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</a></li>
+  <li><a href="#hidden-markov-models-hmms" id="toc-hidden-markov-models-hmms" class="nav-link" data-scroll-target="#hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</a></li>
+  <li><a href="#inference-problems" id="toc-inference-problems" class="nav-link" data-scroll-target="#inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</a></li>
+  <li><a href="#the-filtering-recursion" id="toc-the-filtering-recursion" class="nav-link" data-scroll-target="#the-filtering-recursion"><span class="header-section-number">18.2.6</span> The Filtering Recursion</a></li>
+  </ul></li>
+  <li><a href="#particle-filter-implementation" id="toc-particle-filter-implementation" class="nav-link" data-scroll-target="#particle-filter-implementation"><span class="header-section-number">18.3</span> Particle Filter Implementation</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -562,9 +561,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script>
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filtering - Sequential Importance Sampling</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></h1>
+<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filtering - Sequential Importance Sampling</span></h1>
 </div>
 
 
@@ -593,8 +592,335 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
+<section id="introduction" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">18.1</span> Introduction</h2>
+<p>Particle filtering, also known as Sequential Monte Carlo (SMC) or Sequential Importance Sampling, is a powerful computational method for performing inference in dynamic systems where we have:</p>
+<ol type="1">
+<li><strong>Sequential observations</strong> arriving over time</li>
+<li><strong>Hidden state variables</strong> that evolve according to some dynamics</li>
+<li><strong>Nonlinear or non-Gaussian</strong> relationships that make analytical solutions intractable</li>
+</ol>
+<p>Consider a hidden Markov model where we observe a sequence <span class="math inline">\(y_{1:T} = \{y_1, y_2, \ldots, y_T\}\)</span> and want to infer the hidden states <span class="math inline">\(x_{1:T} = \{x_1, x_2, \ldots, x_T\}\)</span>. The system is characterized by:</p>
+<ul>
+<li><strong>State transition model</strong>: <span class="math inline">\(p(x_t | x_{t-1})\)</span> - how the hidden state evolves</li>
+<li><strong>Observation model</strong>: <span class="math inline">\(p(y_t | x_t)\)</span> - how observations relate to hidden states<br>
+</li>
+<li><strong>Initial state distribution</strong>: <span class="math inline">\(p(x_0)\)</span></li>
+</ul>
+<p>Our goal is to compute the <strong>filtering distribution</strong> <span class="math inline">\(p(x_t | y_{1:t})\)</span>, which represents our belief about the current state given all observations up to time <span class="math inline">\(t\)</span>.</p>
+<section id="the-challenge" class="level3" data-number="18.1.1">
+<h3 data-number="18.1.1" class="anchored" data-anchor-id="the-challenge"><span class="header-section-number">18.1.1</span> The Challenge</h3>
+<p>For linear-Gaussian systems, the Kalman filter provides an exact analytical solution. However, for nonlinear or non-Gaussian systems, the filtering distribution cannot be computed analytically. The key challenges are:</p>
+<ol type="1">
+<li><strong>Intractable integrals</strong>: Computing <span class="math inline">\(p(x_t | y_{1:t})\)</span> requires high-dimensional integration</li>
+<li><strong>Sequential nature</strong>: We need real-time updates as new observations arrive</li>
+<li><strong>Curse of dimensionality</strong>: Grid-based methods become infeasible in high dimensions</li>
+</ol>
+</section>
+<section id="the-particle-filter-solution" class="level3" data-number="18.1.2">
+<h3 data-number="18.1.2" class="anchored" data-anchor-id="the-particle-filter-solution"><span class="header-section-number">18.1.2</span> The Particle Filter Solution</h3>
+<p>Particle filters address these challenges by representing the filtering distribution using a set of <strong>particles</strong> (samples) with associated <strong>weights</strong>:</p>
+<p><span class="math display">\[
+p(x_t | y_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(x_t - x_t^{(i)}),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\{x_t^{(i)}\}_{i=1}^{N}\)</span> are particles representing possible states</li>
+<li><span class="math inline">\(\{w_t^{(i)}\}_{i=1}^{N}\)</span> are normalized weights such that <span class="math inline">\(\sum_{i=1}^{N} w_t^{(i)} = 1\)</span></li>
+<li><span class="math inline">\(\delta(\cdot)\)</span> is the Dirac delta function</li>
+</ul>
+<p>This Monte Carlo approximation allows us to:</p>
+<ul>
+<li>Handle arbitrary nonlinearities and noise distributions</li>
+<li>Update beliefs sequentially as new data arrives</li>
+<li>Compute expectations: <span class="math inline">\(\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(x_t^{(i)})\)</span></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Key Insight</strong>: Particle filters extend importance sampling to sequential settings, where we maintain and update a particle approximation over time rather than drawing fresh samples for each time step.</p>
+</div>
+</div>
+</section>
+<section id="applications" class="level3" data-number="18.1.3">
+<h3 data-number="18.1.3" class="anchored" data-anchor-id="applications"><span class="header-section-number">18.1.3</span> Applications</h3>
+<p>Particle filters are widely used in:</p>
+<ul>
+<li><strong>Object tracking</strong> in computer vision</li>
+<li><strong>Robot localization</strong> and SLAM (Simultaneous Localization and Mapping)</li>
+<li><strong>Financial modeling</strong> with stochastic volatility</li>
+<li><strong>Signal processing</strong> and communications</li>
+<li><strong>Epidemiological modeling</strong> and disease spread</li>
+<li><strong>Weather forecasting</strong> and climate modeling</li>
+</ul>
+<p>The flexibility to handle complex, nonlinear dynamics makes particle filters indispensable when Kalman filters fail.</p>
+</section>
+</section>
+<section id="background-state-space-models-and-hidden-markov-models" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="background-state-space-models-and-hidden-markov-models"><span class="header-section-number">18.2</span> Background: State-Space Models and Hidden Markov Models</h2>
+<section id="state-space-model-framework" class="level3" data-number="18.2.1">
+<h3 data-number="18.2.1" class="anchored" data-anchor-id="state-space-model-framework"><span class="header-section-number">18.2.1</span> State-Space Model Framework</h3>
+<p>A <strong>state-space model</strong> (SSM) provides a general framework for modeling dynamic systems with hidden states. The model consists of two key components:</p>
+<p><strong>State Evolution (Process Model)</strong>: <span class="math display">\[
+x_t = f_t(x_{t-1}, v_t),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(x_t \in \mathbb{R}^{d_x}\)</span> is the hidden state at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(f_t(\cdot, \cdot)\)</span> is the state transition function (possibly time-varying)</li>
+<li><span class="math inline">\(v_t\)</span> is the process noise</li>
+</ul>
+<p><strong>Observation Model (Measurement Model)</strong>: <span class="math display">\[
+y_t = h_t(x_t, w_t),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(y_t \in \mathbb{R}^{d_y}\)</span> is the observation at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(h_t(\cdot, \cdot)\)</span> is the observation function (possibly time-varying)</li>
+<li><span class="math inline">\(w_t\)</span> is the observation noise</li>
+</ul>
+<p>The noise terms <span class="math inline">\(v_t\)</span> and <span class="math inline">\(w_t\)</span> are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.</p>
+</section>
+<section id="probabilistic-formulation" class="level3" data-number="18.2.2">
+<h3 data-number="18.2.2" class="anchored" data-anchor-id="probabilistic-formulation"><span class="header-section-number">18.2.2</span> Probabilistic Formulation</h3>
+<p>In probabilistic terms, the state-space model is characterized by:</p>
+<p><strong>State Transition Density</strong>: <span class="math display">\[
+p(x_t | x_{t-1}) = p(x_t | x_{t-1}, \theta),
+\]</span></p>
+<p><strong>Observation Density</strong>: <span class="math display">\[
+p(y_t | x_t) = p(y_t | x_t, \theta),
+\]</span></p>
+<p><strong>Initial State Distribution</strong>: <span class="math display">\[
+p(x_0) = p(x_0 | \theta),
+\]</span></p>
+<p>where <span class="math inline">\(\theta\)</span> represents model parameters (assumed known for now).</p>
+</section>
+<section id="markov-assumptions" class="level3" data-number="18.2.3">
+<h3 data-number="18.2.3" class="anchored" data-anchor-id="markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</h3>
+<p>The state-space model embodies two crucial Markov assumptions:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Markov Property for States</strong>: The future state depends only on the current state, not the entire history: <span class="math display">\[
+p(x_t | x_{0:t-1}) = p(x_t | x_{t-1})
+\]</span></p>
+<p><strong>Conditional Independence of Observations</strong>: Given the current state, the observation is independent of all other states and observations: <span class="math display">\[
+p(y_t | x_{0:t}, y_{1:t-1}) = p(y_t | x_t)
+\]</span></p>
+</div>
+</div>
+<p>These assumptions lead to the <strong>joint distribution</strong> of states and observations:</p>
+<p><span class="math display">\[
+p(x_{0:T}, y_{1:T}) = p(x_0) \prod_{t=1}^{T} p(x_t | x_{t-1}) p(y_t | x_t)
+\]</span></p>
+</section>
+<section id="hidden-markov-models-hmms" class="level3" data-number="18.2.4">
+<h3 data-number="18.2.4" class="anchored" data-anchor-id="hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</h3>
+<p>When the state space is <strong>discrete</strong> and <strong>finite</strong>, i.e., <span class="math inline">\(x_t \in \{1, 2, \ldots, K\}\)</span>, the state-space model becomes a <strong>Hidden Markov Model</strong>. HMMs are characterized by:</p>
+<p><strong>Transition Matrix</strong>: <span class="math display">\[
+A_{ij} = P(x_t = j | x_{t-1} = i), \quad \sum_{j=1}^{K} A_{ij} = 1
+\]</span></p>
+<p><strong>Emission Matrix</strong>: <span class="math display">\[
+B_{jk} = P(y_t = k | x_t = j) \quad \text{(for discrete observations)}
+\]</span></p>
+<p><strong>Initial Distribution</strong>: <span class="math display">\[
+\pi_i = P(x_0 = i), \quad \sum_{i=1}^{K} \pi_i = 1
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Example: Weather Tracking
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider a simple weather model where:</p>
+<ul>
+<li>Hidden states: <span class="math inline">\(x_t \in \{\text{Sunny}, \text{Rainy}\}\)</span></li>
+<li>Observations: <span class="math inline">\(y_t \in \{\text{Dry}, \text{Wet}\}\)</span> (ground condition)</li>
+</ul>
+<p>The transition matrix might be: <span class="math display">\[
+A = \begin{pmatrix}
+0.8 &amp; 0.2 \\
+0.3 &amp; 0.7
+\end{pmatrix}
+\]</span></p>
+<p>The emission matrix might be: <span class="math display">\[
+B = \begin{pmatrix}
+0.9 &amp; 0.1 \\
+0.2 &amp; 0.8
+\end{pmatrix}
+\]</span></p>
+<p>This captures the intuition that sunny days tend to follow sunny days, and wet ground is more likely when it’s raining.</p>
+</div>
+</div>
+<div id="exm-object-tracking" class="theorem example">
+<p><span class="theorem-title"><strong>Example 18.1</strong></span> <strong>2D Object Tracking</strong></p>
+<p>Consider tracking a moving object (e.g., aircraft, vehicle, or person) in a 2D plane using noisy position measurements from sensors like radar or GPS.</p>
+<p><strong>State</strong>: Position and velocity <span class="math inline">\(x_t = [p_x, p_y, v_x, v_y]^T \in \mathbb{R}^4\)</span></p>
+<p><strong>State Evolution</strong>: The object follows a constant velocity model with random acceleration disturbances: <span class="math display">\[
+x_t = F x_{t-1} + G a_t
+\]</span></p>
+<p>where: <span class="math display">\[
+F = \begin{pmatrix}
+1 &amp; 0 &amp; \Delta t &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; \Delta t \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}, \quad
+G = \begin{pmatrix}
+\frac{(\Delta t)^2}{2} &amp; 0 \\
+0 &amp; \frac{(\Delta t)^2}{2} \\
+\Delta t &amp; 0 \\
+0 &amp; \Delta t
+\end{pmatrix}
+\]</span></p>
+<p>and <span class="math inline">\(a_t = [a_x, a_y]^T \sim \mathcal{N}(0, \sigma_a^2 I)\)</span> represents random acceleration.</p>
+<p><strong>Observations</strong>: Noisy position measurements from sensors: <span class="math display">\[
+y_t = H x_t + w_t = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \end{pmatrix} x_t + w_t
+\]</span></p>
+<p>where <span class="math inline">\(w_t \sim \mathcal{N}(0, R)\)</span> with <span class="math inline">\(R = \text{diag}(\sigma_x^2, \sigma_y^2)\)</span>.</p>
+</div>
+</section>
+<section id="inference-problems" class="level3" data-number="18.2.5">
+<h3 data-number="18.2.5" class="anchored" data-anchor-id="inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</h3>
+<p>Given the state-space model, we are interested in several inference problems:</p>
+<p><strong>1. Filtering</strong>: Estimate the current state given past and current observations: <span class="math display">\[
+p(x_t | y_{1:t})
+\]</span></p>
+<p><strong>2. Prediction</strong>: Predict future states given current information: <span class="math display">\[
+p(x_{t+k} | y_{1:t}), \quad k &gt; 0
+\]</span></p>
+<p><strong>3. Smoothing</strong>: Estimate past states given all observations: <span class="math display">\[
+p(x_t | y_{1:T}), \quad t &lt; T
+\]</span></p>
+<p><strong>4. Marginal Likelihood</strong>: Compute the probability of the observed sequence: <span class="math display">\[
+p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
+\]</span></p>
+</section>
+<section id="the-filtering-recursion" class="level3" data-number="18.2.6">
+<h3 data-number="18.2.6" class="anchored" data-anchor-id="the-filtering-recursion"><span class="header-section-number">18.2.6</span> The Filtering Recursion</h3>
+<p>The filtering distribution <span class="math inline">\(p(x_t | y_{1:t})\)</span> can be computed recursively using <strong>Bayes’ theorem</strong> and the <strong>Chapman-Kolmogorov equation</strong>:</p>
+<p><strong>Prediction Step</strong>: <span class="math display">\[
+p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
+\]</span></p>
+<p><strong>Update Step</strong>: <span class="math display">\[
+p(x_t | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | y_{1:t-1})}{p(y_t | y_{1:t-1})}
+\]</span></p>
+<p>where the <strong>marginal likelihood</strong> (evidence) is: <span class="math display">\[
+p(y_t | y_{1:t-1}) = \int p(y_t | x_t) p(x_t | y_{1:t-1}) dx_t
+\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+The Particle Filter Algorithm (Sequential Importance Sampling with Resampling)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Input</strong>:</p>
+<ul>
+<li>Initial particles <span class="math inline">\(\{x_0^{(i)}\}_{i=1}^N \sim p(x_0)\)</span> with weights <span class="math inline">\(w_0^{(i)} = 1/N\)</span></li>
+<li>Observations <span class="math inline">\(y_{1:T}\)</span></li>
+<li>Number of particles <span class="math inline">\(N\)</span></li>
+</ul>
+<p><strong>For each time step <span class="math inline">\(t = 1, 2, \ldots, T\)</span>:</strong></p>
+<section id="step-1-prediction-propagate-particles" class="level3" data-number="18.2.7">
+<h3 data-number="18.2.7" class="anchored" data-anchor-id="step-1-prediction-propagate-particles"><span class="header-section-number">18.2.7</span> Step 1: Prediction (Propagate Particles)</h3>
+<p>For each particle <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[
+x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})
+\]</span></p>
+<p>Sample new particle locations according to the state transition model.</p>
+</section>
+<section id="step-2-update-compute-importance-weights" class="level3" data-number="18.2.8">
+<h3 data-number="18.2.8" class="anchored" data-anchor-id="step-2-update-compute-importance-weights"><span class="header-section-number">18.2.8</span> Step 2: Update (Compute Importance Weights)</h3>
+<p>For each particle <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
+\]</span></p>
+<p>Compute unnormalized weights by multiplying previous weights with the likelihood of the current observation.</p>
+</section>
+<section id="step-3-normalize-weights" class="level3" data-number="18.2.9">
+<h3 data-number="18.2.9" class="anchored" data-anchor-id="step-3-normalize-weights"><span class="header-section-number">18.2.9</span> Step 3: Normalize Weights</h3>
+<p><span class="math display">\[
+w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}
+\]</span></p>
+<p>Ensure weights sum to 1.</p>
+</section>
+<section id="step-4-estimate-filtering-distribution" class="level3" data-number="18.2.10">
+<h3 data-number="18.2.10" class="anchored" data-anchor-id="step-4-estimate-filtering-distribution"><span class="header-section-number">18.2.10</span> Step 4: Estimate Filtering Distribution</h3>
+<p>The filtering distribution is approximated as: <span class="math display">\[
+p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
+\]</span></p>
+<p>Expectations can be computed as: <span class="math display">\[
+\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^N w_t^{(i)} f(x_t^{(i)})
+\]</span></p>
+</section>
+<section id="step-5-resampling-optional-but-recommended" class="level3" data-number="18.2.11">
+<h3 data-number="18.2.11" class="anchored" data-anchor-id="step-5-resampling-optional-but-recommended"><span class="header-section-number">18.2.11</span> Step 5: Resampling (Optional but Recommended)</h3>
+<p><strong>Check degeneracy</strong>: Compute effective sample size <span class="math display">\[
+N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^{(i)})^2}
+\]</span></p>
+<p><strong>If</strong> <span class="math inline">\(N_{\text{eff}} &lt; N_{\text{threshold}}\)</span> (e.g., <span class="math inline">\(N/2\)</span>): 1. Resample <span class="math inline">\(N\)</span> particles <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span> 2. Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></p>
+<p><strong>Output</strong>: Particle approximation <span class="math inline">\(\{x_t^{(i)}, w_t^{(i)}\}_{i=1}^N\)</span> of <span class="math inline">\(p(x_t | y_{1:t})\)</span> at each time <span class="math inline">\(t\)</span>.</p>
+</section>
+</div>
+</div>
+</section>
+</section>
+<section id="particle-filter-implementation" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="particle-filter-implementation"><span class="header-section-number">18.3</span> Particle Filter Implementation</h2>
+<p>The following implementation demonstrates a complete particle filter for 2D object tracking. The demonstration tracks an object moving in 2D space with:</p>
+<ul>
+<li><strong>Process noise</strong>: Models random accelerations (<span class="math inline">\(\sigma_a = 0.5\)</span>)</li>
+<li><strong>Observation noise</strong>: GPS-like position measurements (<span class="math inline">\(\sigma_r = 1.0\)</span>)</li>
+<li><strong>Particles</strong>: 500 particles provide good approximation quality</li>
+<li><strong>Duration</strong>: 30 time steps with unit time intervals</li>
+</ul>
+<p>The visualization shows the particle filter’s ability to track the true trajectory despite noisy observations, with automatic resampling maintaining particle diversity throughout the simulation.</p>
+<div id="b01528a8" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-stdout">
+<pre><code>Particle filter completed. Resampled at 24 time steps.</code></pre>
+</div>
+</div>
+<div id="3ee13131" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="particle_filters_files/figure-html/cell-3-output-1.png" width="1430" height="1141" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Particle Filter Performance:
+  Number of particles: 500
+  Final position error: 2.276
+  Mean position error: 1.097
+  RMSE position error: 1.261
+  Resampling frequency: 24/30 time steps</code></pre>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1016,8 +1342,8 @@ document.addEventListener("DOMContentLoaded", function() {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../chapters/optimization/index.html" class="pagination-link" aria-label="index.html">
-        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">index.html</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../chapters/optimization/index.html" class="pagination-link" aria-label="Optimization">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
