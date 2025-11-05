@@ -840,7 +840,7 @@ p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
 <li><strong>Better exploration</strong>: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.</li>
 <li><strong>Computational efficiency</strong>: It might be computationally expensive to evolve a lot of particles according to the state evolution model.</li>
 </ul>
-<p><strong>Example</strong>: Imagine tracking a car that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they’d all get low weights. A smarter proposal would generate particles closer to where the observation suggests the car actually is.</p>
+<p><strong>Example</strong>: If you are tracking an object in the 2D plane that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they’d all get low weights. A smarter proposal would generate particles closer to where the observation suggests the object actually is.</p>
 <p>When we do this, we need to correct our weights using <strong>importance sampling</strong>:</p>
 <p><span class="math display">\[
 \boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)}) \cdot \frac{ p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
@@ -944,7 +944,7 @@ r_t^{(i)} = y_t - H x_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} -
 <li><strong>Duration</strong>: 30 time steps with unit time intervals</li>
 </ul>
 <p>The visualization shows the particle filter’s ability to track the true trajectory despite noisy observations, with automatic resampling maintaining particle diversity throughout the simulation.</p>
-<div id="bee5d1f3" class="cell" data-execution_count="2">
+<div id="bee5d1f3" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

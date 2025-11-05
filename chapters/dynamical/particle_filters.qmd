@@ -294,7 +294,7 @@ Sometimes we want to be smarter about where we place new particles instead of ju
 - **Better exploration**: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.
 - **Computational efficiency**: It might be computationally expensive to evolve a lot of particles according to the state evolution model. 
 
-**Example**: Imagine tracking a car that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they'd all get low weights. A smarter proposal would generate particles closer to where the observation suggests the car actually is.
+**Example**: If you are tracking an object in the 2D plane that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they'd all get low weights. A smarter proposal would generate particles closer to where the observation suggests the object actually is.
 
 When we do this, we need to correct our weights using **importance sampling**:
 
