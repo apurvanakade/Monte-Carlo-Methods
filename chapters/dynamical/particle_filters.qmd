@@ -262,116 +262,56 @@ $$
 
 ### Particle Filtering
 
-**Bayes' Theorem for Filtering**: We derive the filtering update using Bayes' theorem. The joint probability of state and observation factorizes as:
+**The Bootstrap Filter - The Simple Case**: 
 
-$$
-p(x_t, y_t | y_{1:t-1}) = p(y_t | x_t, y_{1:t-1}) p(x_t | y_{1:t-1}) = p(y_t | x_t) p(x_t | y_{1:t-1})
-$$
+The most intuitive approach is the bootstrap filter. Here, we generate new particles by simply following the natural dynamics of the system (the state evolution model), then update weights based on how well each particle explains the new observation.
 
-where the second equality uses the conditional independence assumption $y_t \perp y_{1:t-1} | x_t$ (observations are independent given the state). We can also write:
-
+**Bootstrap Weight Update**:
 $$
-p(x_t, y_t | y_{1:t-1}) = p(x_t | y_t, y_{1:t-1}) p(y_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
 $$
 
-Equating these expressions gives:
+**What this means**:
+
+- $w_{t-1}^{(i)}$: Previous weight of particle $i$
+- $p(y_t | x_t^{(i)})$: **Likelihood** - How well particle $i$ explains the new observation
+- Particles that better match the observation get higher weights
+- We normalize so all weights sum to 1: $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$
+
+**Why This Works**: 
+We're essentially asking "given what we observed, which particles were in the right place?" Particles that predicted something close to the actual observation become more important.
+
+---
+
+**General Formula - Correcting for Different Proposals**: 
+
+Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a **proposal distribution** $q(x_t^{(i)} | \cdot)$ that incorporates the current observation to guide particles toward more promising regions.
+
+**Why Use a Different Proposal?**
+
+- **Bootstrap problem**: If the observation is very informative but the system dynamics are very noisy, most particles following natural dynamics will end up far from where the observation suggests they should be.
+- **Efficiency**: We waste computational effort on particles that will get very low weights.
+- **Better exploration**: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.
+- **Computational efficiency**: It might be computationally expensive to evolve a lot of particles according to the state evolution model. 
+
+**Example**: Imagine tracking a car that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they'd all get low weights. A smarter proposal would generate particles closer to where the observation suggests the car actually is.
+
+When we do this, we need to correct our weights using **importance sampling**:
 
 $$
-p(y_t | x_t) p(x_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)}) \cdot \frac{ p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
 $$
 
-Solving for the posterior $p(x_t | y_{1:t})$ yields **Bayes' theorem**:
+**What the correction does**:
 
-$$
-p(x_t | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | y_{1:t-1})}{p(y_t | y_{1:t-1})}
-$$
+- $p(x_t^{(i)} | x_{t-1}^{(i)})$: **Transition probability** - How likely this particle movement is under the true dynamics
+- $q(x_t^{(i)} | \cdot)$: **Proposal probability** - How likely this particle movement is under our artificial proposal
+- The ratio $\frac{p(\cdot)}{q(\cdot)}$ corrects for the bias introduced by not sampling from the natural dynamics
 
-where $p(y_t | x_t)$ is the **likelihood**, $p(x_t | y_{1:t-1})$ is the **prior**, and the **marginal likelihood** (evidence) is:
+**Intuition**: If we artificially push particles toward certain regions (high $q$), we need to down-weight them proportionally. If we place particles in regions that are naturally likely (high $p$), we up-weight them.
 
-$$
-p(y_t | y_{1:t-1}) = \int p(y_t | x_t) p(x_t | y_{1:t-1}) dx_t
-$$
+The bootstrap filter is the special case where $q(x_t^{(i)} | \cdot) = p(x_t^{(i)} | x_{t-1}^{(i)})$, so the transition probabilities cancel out and we get the simpler formula.
 
-The prior for the next time step comes from the **Chapman-Kolmogorov equation**:
-
-$$
-p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
-$$
-
-This **prediction step** propagates the previous posterior through the state transition model $p(x_t | x_{t-1})$.
-
-**Sequential Monte Carlo Approximation**: We maintain a particle approximation of the joint posterior:
-
-$$
-p(x_{0:t} | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_{0:t} - x_{0:t}^{(i)})
-$$
-
-where $\{x_{0:t}^{(i)}\}_{i=1}^N$ are particle trajectories and $\{w_t^{(i)}\}_{i=1}^N$ are normalized importance weights with $\sum_{i=1}^N w_t^{(i)} = 1$.
-
-**Proposal Distribution**: Since we cannot sample directly from the posterior $p(x_{0:t} | y_{1:t})$, we use **importance sampling** with a **proposal distribution** $q(x_{0:t} | y_{1:t})$ from which we can easily sample. The proposal distribution is an auxiliary distribution that we design to be:
-
-1. Easy to sample from: $x_{0:t}^{(i)} \sim q(x_{0:t} | y_{1:t})$
-2. Similar to the target posterior $p(x_{0:t} | y_{1:t})$ for efficiency
-
-The proposal typically factors sequentially as:
-
-$$
-q(x_{0:t} | y_{1:t}) = q(x_0) \prod_{s=1}^t q(x_s | x_{0:s-1}, y_{1:s})
-$$
-
-allowing us to extend existing particle trajectories $x_{0:t-1}^{(i)}$ by sampling $x_t^{(i)} \sim q(x_t | x_{0:t-1}^{(i)}, y_{1:t})$.
-
-**Recursive Weight Update**: The importance weight for the joint trajectory is:
-
-$$
-w_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})}
-$$
-
-Using the factorization $p(x_{0:t} | y_{1:t}) = p(x_t | x_{0:t-1}, y_{1:t}) p(x_{0:t-1} | y_{1:t})$ and the Markov property, we have:
-
-$$
-p(x_{0:t} | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | x_{t-1}) p(x_{0:t-1} | y_{1:t-1})}{p(y_t | y_{1:t-1})}
-$$
-
-For a proposal that factors as $q(x_{0:t} | y_{1:t}) = q(x_t | x_{0:t-1}, y_{1:t}) q(x_{0:t-1} | y_{1:t-1})$, the unnormalized importance weight is:
-
-$$
-\tilde{w}_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})} = \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)}) p(x_{0:t-1}^{(i)} | y_{1:t-1})}{p(y_t | y_{1:t-1}) q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) q(x_{0:t-1}^{(i)} | y_{1:t-1})}
-$$
-
-Since $p(y_t | y_{1:t-1})$ is constant across particles and $\frac{p(x_{0:t-1}^{(i)} | y_{1:t-1})}{q(x_{0:t-1}^{(i)} | y_{1:t-1})} \propto w_{t-1}^{(i)}$, we obtain the **recursive weight update**:
-
-$$
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
-$$
-
-**Bootstrap Filter**: The **bootstrap proposal** is the most common choice, setting the proposal equal to the state transition model:
-
-$$
-q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) = p(x_t^{(i)} | x_{t-1}^{(i)})
-$$
-
-This choice ignores the current observation $y_t$ when proposing new particles, but has the advantage that the transition density cancels in the weight update:
-
-$$
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{p(x_t^{(i)} | x_{t-1}^{(i)})} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
-$$
-
-The normalized weights are $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$.
-
-**Marginal Filtering Distribution**: The marginal filtering distribution is recovered by:
-
-$$
-p(x_t | y_{1:t}) = \int p(x_{0:t} | y_{1:t}) dx_{0:t-1} \approx \sum_{i=1}^N w_t^{(i)} \int \delta(x_{0:t} - x_{0:t}^{(i)}) dx_{0:t-1} = \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
-$$
-
-**Optimal Proposal**: The proposal that minimizes the variance of importance weights is the **optimal proposal**:
-
-$$
-q_{\text{opt}}(x_t | x_{0:t-1}, y_{1:t}) = p(x_t | x_{t-1}, y_t) = \frac{p(y_t | x_t) p(x_t | x_{t-1})}{\int p(y_t | x_t') p(x_t' | x_{t-1}) dx_t'}
-$$
-
-This incorporates the current observation $y_t$ into the proposal, giving weights $w_t^{(i)} = \int p(y_t | x_t) p(x_t | x_{t-1}^{(i)}) dx_t$, but requires sampling from $p(x_t | x_{t-1}, y_t)$ and computing the normalizing integral, which are often intractable.
 
 ::: {.callout-note}
 ## Algorithm
@@ -393,8 +333,33 @@ This incorporates the current observation $y_t$ into the proposal, giving weight
 
 The **effective sample size** $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2$ measures particle diversity, with $N_{\text{eff}} = 1$ indicating complete degeneracy (one particle has weight 1) and $N_{\text{eff}} = N$ indicating uniform weights.
 
-**Resampling** addresses degeneracy by drawing new particles $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from the discrete distribution $\sum_{j=1}^N w_t^{(j)} \delta(x_t - x_t^{(j)})$. Multinomial resampling gives $\mathbb{E}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}$ and $\text{Var}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}(1 - w_t^{(j)})$. After resampling, all weights are reset to $1/N$, eliminating weight degeneracy but introducing additional Monte Carlo variance.
+**Connection to Variance**: The effective sample size is inversely related to the variance of the weight distribution. For a discrete probability mass function with weights $\{w^{(i)}\}$, the variance is:
 
+$$\text{Var}(w) = \sum_{i=1}^N (w^{(i)})^2 - \left(\sum_{i=1}^N w^{(i)}\right)^2$$
+
+Since the weights are normalized ($\sum_{i=1}^N w^{(i)} = 1$), this becomes:
+
+$$\text{Var}(w) = \sum_{i=1}^N (w^{(i)})^2 - 1$$
+
+Therefore: $\sum_{i=1}^N (w^{(i)})^2 = \text{Var}(w) + 1$
+
+This shows that $N_{\text{eff}} = \frac{1}{\text{Var}(w) + 1}$, meaning:
+
+- **High variance** in weights → **Low** $N_{\text{eff}}$ → Few effective particles
+- **Low variance** in weights → **High** $N_{\text{eff}}$ → Many effective particles
+
+When weights are highly unequal (high variance), most particles contribute little to the approximation, reducing the effective sample size. When weights are nearly uniform (low variance), all particles contribute meaningfully.
+
+**Resampling** addresses degeneracy by drawing new particles $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from the weighted particle distribution. We sample particles proportionally to their weights - particles with higher weights are more likely to be selected multiple times, while particles with low weights may disappear.
+
+**Multinomial Resampling**: The most common approach samples each new particle independently:
+
+- **Expected copies**: $\mathbb{E}[\text{number of copies of particle } j] = N w_t^{(j)}$
+- **Variance in copies**: $\text{Var}[\text{number of copies of particle } j] = N w_t^{(j)}(1 - w_t^{(j)})$
+
+**After resampling**: All weights are reset to uniform $w_t^{(i)} = 1/N$, since we now have an unweighted sample from the posterior approximation.
+
+**Trade-off**: Resampling eliminates weight degeneracy (restores $N_{\text{eff}} = N$) but introduces additional Monte Carlo variance due to the random sampling process. Good particles may be lost by chance, and the particle diversity decreases as multiple copies of the same particle are created.
 
 ### Particle Filtering for 2D Object Tracking
 
@@ -615,8 +580,6 @@ for t in range(T):
     mean, cov = pf.estimate()
     estimates[t] = mean
     estimate_covs.append(cov)
-
-print(f"Particle filter completed. Resampled at {len(resampled_steps)} time steps.")
 ```
 
 ```{python}
@@ -734,6 +697,5 @@ print(f"\nParticle Filter Performance:")
 print(f"  Number of particles: {n_particles}")
 print(f"  Final position error: {final_pos_error:.3f}")
 print(f"  Mean position error: {mean_pos_error:.3f}")
-print(f"  RMSE position error: {rmse_pos:.3f}")
 print(f"  Resampling frequency: {len(resampled_steps)}/{T} time steps")
 ```
