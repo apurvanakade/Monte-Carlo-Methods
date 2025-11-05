@@ -45,9 +45,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-d49a37c80e95ea2516c73b6f7289119c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-1ab6eca9cd14c1e3331140e5a6d0686a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -525,7 +525,8 @@ window.Quarto = {
   <li><a href="#markov-assumptions" id="toc-markov-assumptions" class="nav-link" data-scroll-target="#markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</a></li>
   <li><a href="#hidden-markov-models-hmms" id="toc-hidden-markov-models-hmms" class="nav-link" data-scroll-target="#hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</a></li>
   <li><a href="#inference-problems" id="toc-inference-problems" class="nav-link" data-scroll-target="#inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</a></li>
-  <li><a href="#the-filtering-recursion" id="toc-the-filtering-recursion" class="nav-link" data-scroll-target="#the-filtering-recursion"><span class="header-section-number">18.2.6</span> The Filtering Recursion</a></li>
+  <li><a href="#particle-filtering" id="toc-particle-filtering" class="nav-link" data-scroll-target="#particle-filtering"><span class="header-section-number">18.2.6</span> Particle Filtering</a></li>
+  <li><a href="#particle-filtering-for-2d-object-tracking" id="toc-particle-filtering-for-2d-object-tracking" class="nav-link" data-scroll-target="#particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.2.7</span> Particle Filtering for 2D Object Tracking</a></li>
   </ul></li>
   <li><a href="#particle-filter-implementation" id="toc-particle-filter-implementation" class="nav-link" data-scroll-target="#particle-filter-implementation"><span class="header-section-number">18.3</span> Particle Filter Implementation</a></li>
   </ul>
@@ -814,75 +815,143 @@ p(x_t | y_{1:T}), \quad t &lt; T
 p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
 \]</span></p>
 </section>
-<section id="the-filtering-recursion" class="level3" data-number="18.2.6">
-<h3 data-number="18.2.6" class="anchored" data-anchor-id="the-filtering-recursion"><span class="header-section-number">18.2.6</span> The Filtering Recursion</h3>
-<p>The filtering distribution <span class="math inline">\(p(x_t | y_{1:t})\)</span> can be computed recursively using <strong>Bayes’ theorem</strong> and the <strong>Chapman-Kolmogorov equation</strong>:</p>
-<p><strong>Prediction Step</strong>: <span class="math display">\[
-p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
+<section id="particle-filtering" class="level3" data-number="18.2.6">
+<h3 data-number="18.2.6" class="anchored" data-anchor-id="particle-filtering"><span class="header-section-number">18.2.6</span> Particle Filtering</h3>
+<p><strong>Bayes’ Theorem for Filtering</strong>: We derive the filtering update using Bayes’ theorem. The joint probability of state and observation factorizes as:</p>
+<p><span class="math display">\[
+p(x_t, y_t | y_{1:t-1}) = p(y_t | x_t, y_{1:t-1}) p(x_t | y_{1:t-1}) = p(y_t | x_t) p(x_t | y_{1:t-1})
 \]</span></p>
-<p><strong>Update Step</strong>: <span class="math display">\[
+<p>where the second equality uses the conditional independence assumption <span class="math inline">\(y_t \perp y_{1:t-1} | x_t\)</span> (observations are independent given the state). We can also write:</p>
+<p><span class="math display">\[
+p(x_t, y_t | y_{1:t-1}) = p(x_t | y_t, y_{1:t-1}) p(y_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+\]</span></p>
+<p>Equating these expressions gives:</p>
+<p><span class="math display">\[
+p(y_t | x_t) p(x_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+\]</span></p>
+<p>Solving for the posterior <span class="math inline">\(p(x_t | y_{1:t})\)</span> yields <strong>Bayes’ theorem</strong>:</p>
+<p><span class="math display">\[
 p(x_t | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | y_{1:t-1})}{p(y_t | y_{1:t-1})}
 \]</span></p>
-<p>where the <strong>marginal likelihood</strong> (evidence) is: <span class="math display">\[
+<p>where <span class="math inline">\(p(y_t | x_t)\)</span> is the <strong>likelihood</strong>, <span class="math inline">\(p(x_t | y_{1:t-1})\)</span> is the <strong>prior</strong>, and the <strong>marginal likelihood</strong> (evidence) is:</p>
+<p><span class="math display">\[
 p(y_t | y_{1:t-1}) = \int p(y_t | x_t) p(x_t | y_{1:t-1}) dx_t
 \]</span></p>
+<p>The prior for the next time step comes from the <strong>Chapman-Kolmogorov equation</strong>:</p>
+<p><span class="math display">\[
+p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
+\]</span></p>
+<p>This <strong>prediction step</strong> propagates the previous posterior through the state transition model <span class="math inline">\(p(x_t | x_{t-1})\)</span>.</p>
+<p><strong>Sequential Monte Carlo Approximation</strong>: We maintain a particle approximation of the joint posterior:</p>
+<p><span class="math display">\[
+p(x_{0:t} | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_{0:t} - x_{0:t}^{(i)})
+\]</span></p>
+<p>where <span class="math inline">\(\{x_{0:t}^{(i)}\}_{i=1}^N\)</span> are particle trajectories and <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span> are normalized importance weights with <span class="math inline">\(\sum_{i=1}^N w_t^{(i)} = 1\)</span>.</p>
+<p><strong>Proposal Distribution</strong>: Since we cannot sample directly from the posterior <span class="math inline">\(p(x_{0:t} | y_{1:t})\)</span>, we use <strong>importance sampling</strong> with a <strong>proposal distribution</strong> <span class="math inline">\(q(x_{0:t} | y_{1:t})\)</span> from which we can easily sample. The proposal distribution is an auxiliary distribution that we design to be:</p>
+<ol type="1">
+<li>Easy to sample from: <span class="math inline">\(x_{0:t}^{(i)} \sim q(x_{0:t} | y_{1:t})\)</span></li>
+<li>Similar to the target posterior <span class="math inline">\(p(x_{0:t} | y_{1:t})\)</span> for efficiency</li>
+</ol>
+<p>The proposal typically factors sequentially as:</p>
+<p><span class="math display">\[
+q(x_{0:t} | y_{1:t}) = q(x_0) \prod_{s=1}^t q(x_s | x_{0:s-1}, y_{1:s})
+\]</span></p>
+<p>allowing us to extend existing particle trajectories <span class="math inline">\(x_{0:t-1}^{(i)}\)</span> by sampling <span class="math inline">\(x_t^{(i)} \sim q(x_t | x_{0:t-1}^{(i)}, y_{1:t})\)</span>.</p>
+<p><strong>Recursive Weight Update</strong>: The importance weight for the joint trajectory is:</p>
+<p><span class="math display">\[
+w_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})}
+\]</span></p>
+<p>Using the factorization <span class="math inline">\(p(x_{0:t} | y_{1:t}) = p(x_t | x_{0:t-1}, y_{1:t}) p(x_{0:t-1} | y_{1:t})\)</span> and the Markov property, we have:</p>
+<p><span class="math display">\[
+p(x_{0:t} | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | x_{t-1}) p(x_{0:t-1} | y_{1:t-1})}{p(y_t | y_{1:t-1})}
+\]</span></p>
+<p>For a proposal that factors as <span class="math inline">\(q(x_{0:t} | y_{1:t}) = q(x_t | x_{0:t-1}, y_{1:t}) q(x_{0:t-1} | y_{1:t-1})\)</span>, the unnormalized importance weight is:</p>
+<p><span class="math display">\[
+\tilde{w}_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})} = \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)}) p(x_{0:t-1}^{(i)} | y_{1:t-1})}{p(y_t | y_{1:t-1}) q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) q(x_{0:t-1}^{(i)} | y_{1:t-1})}
+\]</span></p>
+<p>Since <span class="math inline">\(p(y_t | y_{1:t-1})\)</span> is constant across particles and <span class="math inline">\(\frac{p(x_{0:t-1}^{(i)} | y_{1:t-1})}{q(x_{0:t-1}^{(i)} | y_{1:t-1})} \propto w_{t-1}^{(i)}\)</span>, we obtain the <strong>recursive weight update</strong>:</p>
+<p><span class="math display">\[
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
+\]</span></p>
+<p><strong>Bootstrap Filter</strong>: The <strong>bootstrap proposal</strong> is the most common choice, setting the proposal equal to the state transition model:</p>
+<p><span class="math display">\[
+q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) = p(x_t^{(i)} | x_{t-1}^{(i)})
+\]</span></p>
+<p>This choice ignores the current observation <span class="math inline">\(y_t\)</span> when proposing new particles, but has the advantage that the transition density cancels in the weight update:</p>
+<p><span class="math display">\[
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{p(x_t^{(i)} | x_{t-1}^{(i)})} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
+\]</span></p>
+<p>The normalized weights are <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span>.</p>
+<p><strong>Marginal Filtering Distribution</strong>: The marginal filtering distribution is recovered by:</p>
+<p><span class="math display">\[
+p(x_t | y_{1:t}) = \int p(x_{0:t} | y_{1:t}) dx_{0:t-1} \approx \sum_{i=1}^N w_t^{(i)} \int \delta(x_{0:t} - x_{0:t}^{(i)}) dx_{0:t-1} = \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
+\]</span></p>
+<p><strong>Optimal Proposal</strong>: The proposal that minimizes the variance of importance weights is the <strong>optimal proposal</strong>:</p>
+<p><span class="math display">\[
+q_{\text{opt}}(x_t | x_{0:t-1}, y_{1:t}) = p(x_t | x_{t-1}, y_t) = \frac{p(y_t | x_t) p(x_t | x_{t-1})}{\int p(y_t | x_t') p(x_t' | x_{t-1}) dx_t'}
+\]</span></p>
+<p>This incorporates the current observation <span class="math inline">\(y_t\)</span> into the proposal, giving weights <span class="math inline">\(w_t^{(i)} = \int p(y_t | x_t) p(x_t | x_{t-1}^{(i)}) dx_t\)</span>, but requires sampling from <span class="math inline">\(p(x_t | x_{t-1}, y_t)\)</span> and computing the normalizing integral, which are often intractable.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-The Particle Filter Algorithm (Sequential Importance Sampling with Resampling)
+Algorithm
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Input</strong>:</p>
+<p><strong>Input</strong>: <span class="math inline">\(\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(y_{1:T}\)</span></p>
+<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
+<ol type="1">
+<li><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})\)</span></li>
+<li><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})\)</span></li>
+<li><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
+<li><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:
 <ul>
-<li>Initial particles <span class="math inline">\(\{x_0^{(i)}\}_{i=1}^N \sim p(x_0)\)</span> with weights <span class="math inline">\(w_0^{(i)} = 1/N\)</span></li>
-<li>Observations <span class="math inline">\(y_{1:T}\)</span></li>
-<li>Number of particles <span class="math inline">\(N\)</span></li>
-</ul>
-<p><strong>For each time step <span class="math inline">\(t = 1, 2, \ldots, T\)</span>:</strong></p>
-<section id="step-1-prediction-propagate-particles" class="level3" data-number="18.2.7">
-<h3 data-number="18.2.7" class="anchored" data-anchor-id="step-1-prediction-propagate-particles"><span class="header-section-number">18.2.7</span> Step 1: Prediction (Propagate Particles)</h3>
-<p>For each particle <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[
-x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})
-\]</span></p>
-<p>Sample new particle locations according to the state transition model.</p>
+<li>Draw <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ol>
+<p><strong>Output</strong>: <span class="math inline">\(p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})\)</span></p>
+</div>
+</div>
+<p>The <strong>effective sample size</strong> <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2\)</span> measures particle diversity, with <span class="math inline">\(N_{\text{eff}} = 1\)</span> indicating complete degeneracy (one particle has weight 1) and <span class="math inline">\(N_{\text{eff}} = N\)</span> indicating uniform weights.</p>
+<p><strong>Resampling</strong> addresses degeneracy by drawing new particles <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from the discrete distribution <span class="math inline">\(\sum_{j=1}^N w_t^{(j)} \delta(x_t - x_t^{(j)})\)</span>. Multinomial resampling gives <span class="math inline">\(\mathbb{E}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}\)</span> and <span class="math inline">\(\text{Var}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}(1 - w_t^{(j)})\)</span>. After resampling, all weights are reset to <span class="math inline">\(1/N\)</span>, eliminating weight degeneracy but introducing additional Monte Carlo variance.</p>
 </section>
-<section id="step-2-update-compute-importance-weights" class="level3" data-number="18.2.8">
-<h3 data-number="18.2.8" class="anchored" data-anchor-id="step-2-update-compute-importance-weights"><span class="header-section-number">18.2.8</span> Step 2: Update (Compute Importance Weights)</h3>
-<p>For each particle <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[
+<section id="particle-filtering-for-2d-object-tracking" class="level3" data-number="18.2.7">
+<h3 data-number="18.2.7" class="anchored" data-anchor-id="particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.2.7</span> Particle Filtering for 2D Object Tracking</h3>
+<p><strong>Weight Update Derivation</strong>: For the bootstrap proposal <span class="math inline">\(q(x_t | x_{t-1}, y_{1:t}) = p(x_t | x_{t-1})\)</span>, the weight update simplifies to:</p>
+<p><span class="math display">\[
 \tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
 \]</span></p>
-<p>Compute unnormalized weights by multiplying previous weights with the likelihood of the current observation.</p>
-</section>
-<section id="step-3-normalize-weights" class="level3" data-number="18.2.9">
-<h3 data-number="18.2.9" class="anchored" data-anchor-id="step-3-normalize-weights"><span class="header-section-number">18.2.9</span> Step 3: Normalize Weights</h3>
+<p>For the tracking model, the likelihood is:</p>
 <p><span class="math display">\[
-w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}
+p(y_t | x_t^{(i)}) = \mathcal{N}(y_t; H x_t^{(i)}, R)
 \]</span></p>
-<p>Ensure weights sum to 1.</p>
-</section>
-<section id="step-4-estimate-filtering-distribution" class="level3" data-number="18.2.10">
-<h3 data-number="18.2.10" class="anchored" data-anchor-id="step-4-estimate-filtering-distribution"><span class="header-section-number">18.2.10</span> Step 4: Estimate Filtering Distribution</h3>
-<p>The filtering distribution is approximated as: <span class="math display">\[
-p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
+<p>where <span class="math inline">\(H x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^T\)</span> extracts the position components from the state vector <span class="math inline">\(x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^T\)</span>. The observation residual is:</p>
+<p><span class="math display">\[
+r_t^{(i)} = y_t - H x_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
 \]</span></p>
-<p>Expectations can be computed as: <span class="math display">\[
-\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^N w_t^{(i)} f(x_t^{(i)})
+<p>Therefore, the weight update becomes:</p>
+<p><span class="math display">\[
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |R|}} \exp\left(-\frac{1}{2} (r_t^{(i)})^T R^{-1} r_t^{(i)}\right)
 \]</span></p>
-</section>
-<section id="step-5-resampling-optional-but-recommended" class="level3" data-number="18.2.11">
-<h3 data-number="18.2.11" class="anchored" data-anchor-id="step-5-resampling-optional-but-recommended"><span class="header-section-number">18.2.11</span> Step 5: Resampling (Optional but Recommended)</h3>
-<p><strong>Check degeneracy</strong>: Compute effective sample size <span class="math display">\[
-N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^{(i)})^2}
-\]</span></p>
-<p><strong>If</strong> <span class="math inline">\(N_{\text{eff}} &lt; N_{\text{threshold}}\)</span> (e.g., <span class="math inline">\(N/2\)</span>): 1. Resample <span class="math inline">\(N\)</span> particles <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span> 2. Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></p>
-<p><strong>Output</strong>: Particle approximation <span class="math inline">\(\{x_t^{(i)}, w_t^{(i)}\}_{i=1}^N\)</span> of <span class="math inline">\(p(x_t | y_{1:t})\)</span> at each time <span class="math inline">\(t\)</span>.</p>
-</section>
-</div>
-</div>
+<p><strong>Bootstrap Particle Filter Algorithm</strong>:</p>
+<p><strong>Input</strong>: <span class="math inline">\(\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(y_{1:T}\)</span></p>
+<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
+<ol type="1">
+<li><p><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[x_t^{(i)} = F x_{t-1}^{(i)} + \epsilon_t^{(i)}, \quad \epsilon_t^{(i)} \sim \mathcal{N}(0, Q)\]</span></p></li>
+<li><p><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R)\]</span></p></li>
+<li><p><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}\]</span></p></li>
+<li><p><strong>Estimate</strong>: <span class="math display">\[\hat{x}_t = \sum_{i=1}^N w_t^{(i)} x_t^{(i)}\]</span></p></li>
+<li><p><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:</p>
+<ul>
+<li>Draw <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ol>
+<p><strong>Output</strong>: Position estimate <span class="math inline">\(\hat{p}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^T\)</span> and velocity estimate <span class="math inline">\(\hat{v}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^T\)</span></p>
 </section>
 </section>
 <section id="particle-filter-implementation" class="level2" data-number="18.3">
@@ -895,16 +964,16 @@ N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^{(i)})^2}
 <li><strong>Duration</strong>: 30 time steps with unit time intervals</li>
 </ul>
 <p>The visualization shows the particle filter’s ability to track the true trajectory despite noisy observations, with automatic resampling maintaining particle diversity throughout the simulation.</p>
-<div id="b01528a8" class="cell" data-execution_count="2">
+<div id="8ef5c7f4" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-stdout">
 <pre><code>Particle filter completed. Resampled at 24 time steps.</code></pre>
 </div>
 </div>
-<div id="3ee13131" class="cell" data-execution_count="3">
+<div id="3a306953" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="particle_filters_files/figure-html/cell-3-output-1.png" width="1430" height="1141" class="figure-img"></p>
+<p><img src="particle_filters_files/figure-html/cell-3-output-1.png" width="1431" height="1144" class="figure-img"></p>
 </figure>
 </div>
 </div>

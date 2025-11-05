@@ -254,83 +254,199 @@ $$
 p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
 $$
 
-### The Filtering Recursion
 
-The filtering distribution $p(x_t | y_{1:t})$ can be computed recursively using **Bayes' theorem** and the **Chapman-Kolmogorov equation**:
 
-**Prediction Step**:
+
+
+
+
+### Particle Filtering
+
+**Bayes' Theorem for Filtering**: We derive the filtering update using Bayes' theorem. The joint probability of state and observation factorizes as:
+
 $$
-p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
+p(x_t, y_t | y_{1:t-1}) = p(y_t | x_t, y_{1:t-1}) p(x_t | y_{1:t-1}) = p(y_t | x_t) p(x_t | y_{1:t-1})
 $$
 
-**Update Step**:
+where the second equality uses the conditional independence assumption $y_t \perp y_{1:t-1} | x_t$ (observations are independent given the state). We can also write:
+
+$$
+p(x_t, y_t | y_{1:t-1}) = p(x_t | y_t, y_{1:t-1}) p(y_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+$$
+
+Equating these expressions gives:
+
+$$
+p(y_t | x_t) p(x_t | y_{1:t-1}) = p(x_t | y_{1:t}) p(y_t | y_{1:t-1})
+$$
+
+Solving for the posterior $p(x_t | y_{1:t})$ yields **Bayes' theorem**:
+
 $$
 p(x_t | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | y_{1:t-1})}{p(y_t | y_{1:t-1})}
 $$
 
-where the **marginal likelihood** (evidence) is:
+where $p(y_t | x_t)$ is the **likelihood**, $p(x_t | y_{1:t-1})$ is the **prior**, and the **marginal likelihood** (evidence) is:
+
 $$
 p(y_t | y_{1:t-1}) = \int p(y_t | x_t) p(x_t | y_{1:t-1}) dx_t
 $$
 
+The prior for the next time step comes from the **Chapman-Kolmogorov equation**:
+
+$$
+p(x_t | y_{1:t-1}) = \int p(x_t | x_{t-1}) p(x_{t-1} | y_{1:t-1}) dx_{t-1}
+$$
+
+This **prediction step** propagates the previous posterior through the state transition model $p(x_t | x_{t-1})$.
+
+**Sequential Monte Carlo Approximation**: We maintain a particle approximation of the joint posterior:
+
+$$
+p(x_{0:t} | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_{0:t} - x_{0:t}^{(i)})
+$$
+
+where $\{x_{0:t}^{(i)}\}_{i=1}^N$ are particle trajectories and $\{w_t^{(i)}\}_{i=1}^N$ are normalized importance weights with $\sum_{i=1}^N w_t^{(i)} = 1$.
+
+**Proposal Distribution**: Since we cannot sample directly from the posterior $p(x_{0:t} | y_{1:t})$, we use **importance sampling** with a **proposal distribution** $q(x_{0:t} | y_{1:t})$ from which we can easily sample. The proposal distribution is an auxiliary distribution that we design to be:
+
+1. Easy to sample from: $x_{0:t}^{(i)} \sim q(x_{0:t} | y_{1:t})$
+2. Similar to the target posterior $p(x_{0:t} | y_{1:t})$ for efficiency
+
+The proposal typically factors sequentially as:
+
+$$
+q(x_{0:t} | y_{1:t}) = q(x_0) \prod_{s=1}^t q(x_s | x_{0:s-1}, y_{1:s})
+$$
+
+allowing us to extend existing particle trajectories $x_{0:t-1}^{(i)}$ by sampling $x_t^{(i)} \sim q(x_t | x_{0:t-1}^{(i)}, y_{1:t})$.
+
+**Recursive Weight Update**: The importance weight for the joint trajectory is:
+
+$$
+w_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})}
+$$
+
+Using the factorization $p(x_{0:t} | y_{1:t}) = p(x_t | x_{0:t-1}, y_{1:t}) p(x_{0:t-1} | y_{1:t})$ and the Markov property, we have:
+
+$$
+p(x_{0:t} | y_{1:t}) = \frac{p(y_t | x_t) p(x_t | x_{t-1}) p(x_{0:t-1} | y_{1:t-1})}{p(y_t | y_{1:t-1})}
+$$
+
+For a proposal that factors as $q(x_{0:t} | y_{1:t}) = q(x_t | x_{0:t-1}, y_{1:t}) q(x_{0:t-1} | y_{1:t-1})$, the unnormalized importance weight is:
+
+$$
+\tilde{w}_t^{(i)} = \frac{p(x_{0:t}^{(i)} | y_{1:t})}{q(x_{0:t}^{(i)} | y_{1:t})} = \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)}) p(x_{0:t-1}^{(i)} | y_{1:t-1})}{p(y_t | y_{1:t-1}) q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) q(x_{0:t-1}^{(i)} | y_{1:t-1})}
+$$
+
+Since $p(y_t | y_{1:t-1})$ is constant across particles and $\frac{p(x_{0:t-1}^{(i)} | y_{1:t-1})}{q(x_{0:t-1}^{(i)} | y_{1:t-1})} \propto w_{t-1}^{(i)}$, we obtain the **recursive weight update**:
+
+$$
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
+$$
+
+**Bootstrap Filter**: The **bootstrap proposal** is the most common choice, setting the proposal equal to the state transition model:
+
+$$
+q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t}) = p(x_t^{(i)} | x_{t-1}^{(i)})
+$$
+
+This choice ignores the current observation $y_t$ when proposing new particles, but has the advantage that the transition density cancels in the weight update:
+
+$$
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot \frac{p(y_t | x_t^{(i)}) p(x_t^{(i)} | x_{t-1}^{(i)})}{p(x_t^{(i)} | x_{t-1}^{(i)})} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
+$$
+
+The normalized weights are $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$.
+
+**Marginal Filtering Distribution**: The marginal filtering distribution is recovered by:
+
+$$
+p(x_t | y_{1:t}) = \int p(x_{0:t} | y_{1:t}) dx_{0:t-1} \approx \sum_{i=1}^N w_t^{(i)} \int \delta(x_{0:t} - x_{0:t}^{(i)}) dx_{0:t-1} = \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
+$$
+
+**Optimal Proposal**: The proposal that minimizes the variance of importance weights is the **optimal proposal**:
+
+$$
+q_{\text{opt}}(x_t | x_{0:t-1}, y_{1:t}) = p(x_t | x_{t-1}, y_t) = \frac{p(y_t | x_t) p(x_t | x_{t-1})}{\int p(y_t | x_t') p(x_t' | x_{t-1}) dx_t'}
+$$
+
+This incorporates the current observation $y_t$ into the proposal, giving weights $w_t^{(i)} = \int p(y_t | x_t) p(x_t | x_{t-1}^{(i)}) dx_t$, but requires sampling from $p(x_t | x_{t-1}, y_t)$ and computing the normalizing integral, which are often intractable.
 
 ::: {.callout-note}
-## The Particle Filter Algorithm (Sequential Importance Sampling with Resampling)
+## Algorithm
 
-**Input**: 
+**Input**: $\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $y_{1:T}$
 
-- Initial particles $\{x_0^{(i)}\}_{i=1}^N \sim p(x_0)$ with weights $w_0^{(i)} = 1/N$
-- Observations $y_{1:T}$
-- Number of particles $N$
+**For** $t = 1, \ldots, T$:
 
-**For each time step $t = 1, 2, \ldots, T$:**
+1. **Predict**: For $i = 1, \ldots, N$: $x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})$
+2. **Weight**: For $i = 1, \ldots, N$: $\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})$
+3. **Normalize**: For $i = 1, \ldots, N$: $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$
+4. **Resample**: If $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 < N_{\text{threshold}}$:
+   - Draw $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from $\{x_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
+   - Set $x_t^{(i)} = \tilde{x}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
 
-### Step 1: Prediction (Propagate Particles)
-For each particle $i = 1, \ldots, N$:
-$$
-x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})
-$$
+**Output**: $p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})$
+:::
 
-Sample new particle locations according to the state transition model.
 
-### Step 2: Update (Compute Importance Weights)
-For each particle $i = 1, \ldots, N$:
+The **effective sample size** $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2$ measures particle diversity, with $N_{\text{eff}} = 1$ indicating complete degeneracy (one particle has weight 1) and $N_{\text{eff}} = N$ indicating uniform weights.
+
+**Resampling** addresses degeneracy by drawing new particles $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from the discrete distribution $\sum_{j=1}^N w_t^{(j)} \delta(x_t - x_t^{(j)})$. Multinomial resampling gives $\mathbb{E}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}$ and $\text{Var}[\#\{i : \tilde{x}_t^{(i)} = x_t^{(j)}\}] = N w_t^{(j)}(1 - w_t^{(j)})$. After resampling, all weights are reset to $1/N$, eliminating weight degeneracy but introducing additional Monte Carlo variance.
+
+
+### Particle Filtering for 2D Object Tracking
+
+**Weight Update Derivation**: For the bootstrap proposal $q(x_t | x_{t-1}, y_{1:t}) = p(x_t | x_{t-1})$, the weight update simplifies to:
+
 $$
 \tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
 $$
 
-Compute unnormalized weights by multiplying previous weights with the likelihood of the current observation.
+For the tracking model, the likelihood is:
 
-### Step 3: Normalize Weights
 $$
-w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}
-$$
-
-Ensure weights sum to 1.
-
-### Step 4: Estimate Filtering Distribution
-The filtering distribution is approximated as:
-$$
-p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})
+p(y_t | x_t^{(i)}) = \mathcal{N}(y_t; H x_t^{(i)}, R)
 $$
 
-Expectations can be computed as:
+where $H x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^T$ extracts the position components from the state vector $x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^T$. The observation residual is:
+
 $$
-\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^N w_t^{(i)} f(x_t^{(i)})
+r_t^{(i)} = y_t - H x_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
 $$
 
-### Step 5: Resampling (Optional but Recommended)
-**Check degeneracy**: Compute effective sample size
+Therefore, the weight update becomes:
+
 $$
-N_{\text{eff}} = \frac{1}{\sum_{i=1}^N (w_t^{(i)})^2}
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |R|}} \exp\left(-\frac{1}{2} (r_t^{(i)})^T R^{-1} r_t^{(i)}\right)
 $$
 
-**If** $N_{\text{eff}} < N_{\text{threshold}}$ (e.g., $N/2$):
-1. Resample $N$ particles $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from $\{x_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
-2. Set $x_t^{(i)} = \tilde{x}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
+**Bootstrap Particle Filter Algorithm**:
 
-**Output**: Particle approximation $\{x_t^{(i)}, w_t^{(i)}\}_{i=1}^N$ of $p(x_t | y_{1:t})$ at each time $t$.
-:::
+**Input**: $\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $y_{1:T}$
+
+**For** $t = 1, \ldots, T$:
+
+1. **Predict**: For $i = 1, \ldots, N$:
+   $$x_t^{(i)} = F x_{t-1}^{(i)} + \epsilon_t^{(i)}, \quad \epsilon_t^{(i)} \sim \mathcal{N}(0, Q)$$
+
+2. **Weight**: For $i = 1, \ldots, N$:
+   $$\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R)$$
+
+3. **Normalize**: For $i = 1, \ldots, N$:
+   $$w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}$$
+
+4. **Estimate**: 
+   $$\hat{x}_t = \sum_{i=1}^N w_t^{(i)} x_t^{(i)}$$
+
+5. **Resample**: If $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 < N_{\text{threshold}}$:
+   - Draw $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from $\{x_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
+   - Set $x_t^{(i)} = \tilde{x}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
+
+**Output**: Position estimate $\hat{p}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^T$ and velocity estimate $\hat{v}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^T$
+
+
 
 ## Particle Filter Implementation
 
