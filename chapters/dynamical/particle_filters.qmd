@@ -16,19 +16,19 @@ Particle filtering, also known as Sequential Monte Carlo (SMC) or Sequential Imp
 2. **Hidden state variables** that evolve according to some dynamics
 3. **Nonlinear or non-Gaussian** relationships that make analytical solutions intractable
 
-Consider a hidden Markov model where we observe a sequence $y_{1:T} = \{y_1, y_2, \ldots, y_T\}$ and want to infer the hidden states $x_{1:T} = \{x_1, x_2, \ldots, x_T\}$. The system is characterized by:
+Consider a hidden Markov model where we observe a sequence $\mathbf{y}_{1:T} = \{\mathbf{y}_1, \mathbf{y}_2, \ldots, \mathbf{y}_T\}$ and want to infer the hidden states $\mathbf{x}_{1:T} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T\}$. The system is characterized by:
 
-- **State transition model**: $p(x_t | x_{t-1})$ - how the hidden state evolves
-- **Observation model**: $p(y_t | x_t)$ - how observations relate to hidden states  
-- **Initial state distribution**: $p(x_0)$
+- **State transition model**: $p(\mathbf{x}_t | \mathbf{x}_{t-1})$ - how the hidden state evolves
+- **Observation model**: $p(\mathbf{y}_t | \mathbf{x}_t)$ - how observations relate to hidden states  
+- **Initial state distribution**: $p(\mathbf{x}_0)$
 
-Our goal is to compute the **filtering distribution** $p(x_t | y_{1:t})$, which represents our belief about the current state given all observations up to time $t$.
+Our goal is to compute the **filtering distribution** $p(\mathbf{x}_t | \mathbf{y}_{1:t})$, which represents our belief about the current state given all observations up to time $t$.
 
 ### The Challenge
 
 For linear-Gaussian systems, the Kalman filter provides an exact analytical solution. However, for nonlinear or non-Gaussian systems, the filtering distribution cannot be computed analytically. The key challenges are:
 
-1. **Intractable integrals**: Computing $p(x_t | y_{1:t})$ requires high-dimensional integration
+1. **Intractable integrals**: Computing $p(\mathbf{x}_t | \mathbf{y}_{1:t})$ requires high-dimensional integration
 2. **Sequential nature**: We need real-time updates as new observations arrive
 3. **Curse of dimensionality**: Grid-based methods become infeasible in high dimensions
 
@@ -37,12 +37,12 @@ For linear-Gaussian systems, the Kalman filter provides an exact analytical solu
 Particle filters address these challenges by representing the filtering distribution using a set of **particles** (samples) with associated **weights**:
 
 $$
-p(x_t | y_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(x_t - x_t^{(i)}),
+p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)}),
 $$
 
 where:
 
-- $\{x_t^{(i)}\}_{i=1}^{N}$ are particles representing possible states
+- $\{\mathbf{x}_t^{(i)}\}_{i=1}^{N}$ are particles representing possible states
 - $\{w_t^{(i)}\}_{i=1}^{N}$ are normalized weights such that $\sum_{i=1}^{N} w_t^{(i)} = 1$
 - $\delta(\cdot)$ is the Dirac delta function
 
@@ -50,7 +50,7 @@ This Monte Carlo approximation allows us to:
 
 - Handle arbitrary nonlinearities and noise distributions
 - Update beliefs sequentially as new data arrives
-- Compute expectations: $\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(x_t^{(i)})$
+- Compute expectations: $\mathbb{E}[f(\mathbf{x}_t) | \mathbf{y}_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(\mathbf{x}_t^{(i)})$
 
 ::: {.callout-note}
 **Key Insight**: Particle filters extend importance sampling to sequential settings, where we maintain and update a particle approximation over time rather than drawing fresh samples for each time step.
@@ -69,7 +69,6 @@ Particle filters are widely used in:
 
 The flexibility to handle complex, nonlinear dynamics makes particle filters indispensable when Kalman filters fail.
 
-
 ## Background: State-Space Models and Hidden Markov Models
 
 ### State-Space Model Framework
@@ -78,27 +77,27 @@ A **state-space model** (SSM) provides a general framework for modeling dynamic 
 
 **State Evolution (Process Model)**:
 $$
-x_t = f_t(x_{t-1}, v_t),
+\mathbf{x}_t = \mathbf{f}_t(\mathbf{x}_{t-1}, \mathbf{v}_t),
 $$
 
 where:
 
-- $x_t \in \mathbb{R}^{d_x}$ is the hidden state at time $t$
-- $f_t(\cdot, \cdot)$ is the state transition function (possibly time-varying)
-- $v_t$ is the process noise
+- $\mathbf{x}_t \in \mathbb{R}^{d_x}$ is the hidden state at time $t$
+- $\mathbf{f}_t(\cdot, \cdot)$ is the state transition function (possibly time-varying)
+- $\mathbf{v}_t$ is the process noise
 
 **Observation Model (Measurement Model)**:
 $$
-y_t = h_t(x_t, w_t),
+\mathbf{y}_t = \mathbf{h}_t(\mathbf{x}_t, \mathbf{w}_t),
 $$
 
 where:
 
-- $y_t \in \mathbb{R}^{d_y}$ is the observation at time $t$
-- $h_t(\cdot, \cdot)$ is the observation function (possibly time-varying)
-- $w_t$ is the observation noise
+- $\mathbf{y}_t \in \mathbb{R}^{d_y}$ is the observation at time $t$
+- $\mathbf{h}_t(\cdot, \cdot)$ is the observation function (possibly time-varying)
+- $\mathbf{w}_t$ is the observation noise
 
-The noise terms $v_t$ and $w_t$ are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.
+The noise terms $\mathbf{v}_t$ and $\mathbf{w}_t$ are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.
 
 ### Probabilistic Formulation
 
@@ -106,20 +105,20 @@ In probabilistic terms, the state-space model is characterized by:
 
 **State Transition Density**:
 $$
-p(x_t | x_{t-1}) = p(x_t | x_{t-1}, \theta),
+p(\mathbf{x}_t | \mathbf{x}_{t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1}, \boldsymbol{\theta}),
 $$
 
 **Observation Density**:
 $$
-p(y_t | x_t) = p(y_t | x_t, \theta),
+p(\mathbf{y}_t | \mathbf{x}_t) = p(\mathbf{y}_t | \mathbf{x}_t, \boldsymbol{\theta}),
 $$
 
 **Initial State Distribution**:
 $$
-p(x_0) = p(x_0 | \theta),
+p(\mathbf{x}_0) = p(\mathbf{x}_0 | \boldsymbol{\theta}),
 $$
 
-where $\theta$ represents model parameters (assumed known for now).
+where $\boldsymbol{\theta}$ represents model parameters (assumed known for now).
 
 ### Markov Assumptions
 
@@ -128,19 +127,19 @@ The state-space model embodies two crucial Markov assumptions:
 ::: {.callout-important}
 **Markov Property for States**: The future state depends only on the current state, not the entire history:
 $$
-p(x_t | x_{0:t-1}) = p(x_t | x_{t-1})
+p(\mathbf{x}_t | \mathbf{x}_{0:t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})
 $$
 
 **Conditional Independence of Observations**: Given the current state, the observation is independent of all other states and observations:
 $$
-p(y_t | x_{0:t}, y_{1:t-1}) = p(y_t | x_t)
+p(\mathbf{y}_t | \mathbf{x}_{0:t}, \mathbf{y}_{1:t-1}) = p(\mathbf{y}_t | \mathbf{x}_t)
 $$
 :::
 
 These assumptions lead to the **joint distribution** of states and observations:
 
 $$
-p(x_{0:T}, y_{1:T}) = p(x_0) \prod_{t=1}^{T} p(x_t | x_{t-1}) p(y_t | x_t)
+p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) = p(\mathbf{x}_0) \prod_{t=1}^{T} p(\mathbf{x}_t | \mathbf{x}_{t-1}) p(\mathbf{y}_t | \mathbf{x}_t)
 $$
 
 ### Hidden Markov Models (HMMs)
@@ -171,7 +170,7 @@ Consider a simple weather model where:
 
 The transition matrix might be:
 $$
-A = \begin{pmatrix}
+\mathbf{A} = \begin{pmatrix}
 0.8 & 0.2 \\
 0.3 & 0.7
 \end{pmatrix}
@@ -179,7 +178,7 @@ $$
 
 The emission matrix might be:
 $$
-B = \begin{pmatrix}
+\mathbf{B} = \begin{pmatrix}
 0.9 & 0.1 \\
 0.2 & 0.8
 \end{pmatrix}
@@ -188,28 +187,27 @@ $$
 This captures the intuition that sunny days tend to follow sunny days, and wet ground is more likely when it's raining.
 :::
 
-
 ::: {#exm-object-tracking}
-**2D Object Tracking**
+## Example: 2D Object Tracking
 
 Consider tracking a moving object (e.g., aircraft, vehicle, or person) in a 2D plane using noisy position measurements from sensors like radar or GPS.
 
-**State**: Position and velocity $x_t = [p_x, p_y, v_x, v_y]^T \in \mathbb{R}^4$
+**State**: Position and velocity $\mathbf{x}_t = [p_x, p_y, v_x, v_y]^{\top} \in \mathbb{R}^4$
 
 **State Evolution**: The object follows a constant velocity model with random acceleration disturbances:
 $$
-x_t = F x_{t-1} + G a_t
+\mathbf{x}_t = \mathbf{F} \mathbf{x}_{t-1} + \mathbf{G} \mathbf{a}_t
 $$
 
 where:
 $$
-F = \begin{pmatrix}
+\mathbf{F} = \begin{pmatrix}
 1 & 0 & \Delta t & 0 \\
 0 & 1 & 0 & \Delta t \\
 0 & 0 & 1 & 0 \\
 0 & 0 & 0 & 1
 \end{pmatrix}, \quad
-G = \begin{pmatrix}
+\mathbf{G} = \begin{pmatrix}
 \frac{(\Delta t)^2}{2} & 0 \\
 0 & \frac{(\Delta t)^2}{2} \\
 \Delta t & 0 \\
@@ -217,15 +215,14 @@ G = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-and $a_t = [a_x, a_y]^T \sim \mathcal{N}(0, \sigma_a^2 I)$ represents random acceleration.
+and $\mathbf{a}_t = [a_x, a_y]^{\top} \sim \mathcal{N}(\mathbf{0}, \sigma_a^2 \mathbf{I})$ represents random acceleration.
 
 **Observations**: Noisy position measurements from sensors:
 $$
-y_t = H x_t + w_t = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{pmatrix} x_t + w_t
+\mathbf{y}_t = \mathbf{H} \mathbf{x}_t + \mathbf{w}_t = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{pmatrix} \mathbf{x}_t + \mathbf{w}_t
 $$
 
-where $w_t \sim \mathcal{N}(0, R)$ with $R = \text{diag}(\sigma_x^2, \sigma_y^2)$.
-
+where $\mathbf{w}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R})$ with $\mathbf{R} = \text{diag}(\sigma_x^2, \sigma_y^2)$.
 :::
 
 ### Inference Problems
@@ -234,100 +231,75 @@ Given the state-space model, we are interested in several inference problems:
 
 **1. Filtering**: Estimate the current state given past and current observations:
 $$
-p(x_t | y_{1:t})
+p(\mathbf{x}_t | \mathbf{y}_{1:t})
 $$
 
 **2. Prediction**: Predict future states given current information:
 $$
-p(x_{t+k} | y_{1:t}), \quad k > 0
+p(\mathbf{x}_{t+k} | \mathbf{y}_{1:t}), \quad k > 0
 $$
 
 **3. Smoothing**: Estimate past states given all observations:
 $$
-p(x_t | y_{1:T}), \quad t < T
+p(\mathbf{x}_t | \mathbf{y}_{1:T}), \quad t < T
 $$
 
 **4. Marginal Likelihood**: Compute the probability of the observed sequence:
 $$
-p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
+p(\mathbf{y}_{1:T}) = \int p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) d\mathbf{x}_{0:T}
 $$
 
+## Particle Filtering Algorithm
 
-
-
-
-
-
-### Particle Filtering
-
-**The Bootstrap Filter - The Simple Case**: 
+### The Bootstrap Filter - The Simple Case
 
 The most intuitive approach is the bootstrap filter. Here, we generate new particles by simply following the natural dynamics of the system (the state evolution model), then update weights based on how well each particle explains the new observation.
 
 **Bootstrap Weight Update**:
 $$
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})}
 $$
 
 **What this means**:
 
 - $w_{t-1}^{(i)}$: Previous weight of particle $i$
-- $p(y_t | x_t^{(i)})$: **Likelihood** - How well particle $i$ explains the new observation
+- $p(\mathbf{y}_t | \mathbf{x}_t^{(i)})$: **Likelihood** - How well particle $i$ explains the new observation
 - Particles that better match the observation get higher weights
 - We normalize so all weights sum to 1: $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$
 
 **Why This Works**: 
 We're essentially asking "given what we observed, which particles were in the right place?" Particles that predicted something close to the actual observation become more important.
 
----
+### General Formula - Correcting for Different Proposals
 
-**General Formula - Correcting for Different Proposals**: 
-
-Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a **proposal distribution** $q(x_t^{(i)} | \cdot)$ that incorporates the current observation to guide particles toward more promising regions.
+Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a **proposal distribution** $q(\mathbf{x}_t^{(i)} | \cdot)$ that incorporates the current observation to guide particles toward more promising regions.
 
 **Why Use a Different Proposal?**
 
 - **Bootstrap problem**: If the observation is very informative but the system dynamics are very noisy, most particles following natural dynamics will end up far from where the observation suggests they should be.
 - **Efficiency**: We waste computational effort on particles that will get very low weights.
 - **Better exploration**: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.
-- **Computational efficiency**: It might be computationally expensive to evolve a lot of particles according to the state evolution model. 
+- **Computational efficiency**: It might be computationally expensive to evolve many particles according to the state evolution model. 
 
 **Example**: If you are tracking an object in the 2D plane that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they'd all get low weights. A smarter proposal would generate particles closer to where the observation suggests the object actually is.
 
 When we do this, we need to correct our weights using **importance sampling**:
 
 $$
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)}) \cdot \frac{ p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) \cdot \frac{ p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})}{q(\mathbf{x}_t^{(i)} | \mathbf{x}_{0:t-1}^{(i)}, \mathbf{y}_{1:t})}}
 $$
 
 **What the correction does**:
 
-- $p(x_t^{(i)} | x_{t-1}^{(i)})$: **Transition probability** - How likely this particle movement is under the true dynamics
-- $q(x_t^{(i)} | \cdot)$: **Proposal probability** - How likely this particle movement is under our artificial proposal
+- $p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})$: **Transition probability** - How likely this particle movement is under the true dynamics
+- $q(\mathbf{x}_t^{(i)} | \cdot)$: **Proposal probability** - How likely this particle movement is under our artificial proposal
 - The ratio $\frac{p(\cdot)}{q(\cdot)}$ corrects for the bias introduced by not sampling from the natural dynamics
 
 **Intuition**: If we artificially push particles toward certain regions (high $q$), we need to down-weight them proportionally. If we place particles in regions that are naturally likely (high $p$), we up-weight them.
 
-The bootstrap filter is the special case where $q(x_t^{(i)} | \cdot) = p(x_t^{(i)} | x_{t-1}^{(i)})$, so the transition probabilities cancel out and we get the simpler formula.
+The bootstrap filter is the special case where $q(\mathbf{x}_t^{(i)} | \cdot) = p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})$, so the transition probabilities cancel out and we get the simpler formula.
 
-
-::: {.callout-note}
-## Algorithm
-
-**Input**: $\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $y_{1:T}$
-
-**For** $t = 1, \ldots, T$:
-
-1. **Predict**: For $i = 1, \ldots, N$: $x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})$
-2. **Weight**: For $i = 1, \ldots, N$: $\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})$
-3. **Normalize**: For $i = 1, \ldots, N$: $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$
-4. **Resample**: If $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 < N_{\text{threshold}}$:
-   - Draw $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from $\{x_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
-   - Set $x_t^{(i)} = \tilde{x}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
-
-**Output**: $p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})$
-:::
-
+### Effective Sample Size and Resampling
 
 The **effective sample size** $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2$ measures particle diversity, with $N_{\text{eff}} = 1$ indicating complete degeneracy (one particle has weight 1) and $N_{\text{eff}} = N$ indicating uniform weights.
 
@@ -348,68 +320,79 @@ This shows that $N_{\text{eff}} = \frac{1}{\text{Var}(w) + 1}$, meaning:
 
 When weights are highly unequal (high variance), most particles contribute little to the approximation, reducing the effective sample size. When weights are nearly uniform (low variance), all particles contribute meaningfully.
 
-**Resampling** addresses degeneracy by drawing new particles $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from the weighted particle distribution. We sample particles proportionally to their weights - particles with higher weights are more likely to be selected multiple times, while particles with low weights may disappear.
+**Resampling** fixes the weight imbalance by creating a new set of particles $\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N$. We randomly select particles based on their weights - particles with higher weights get picked more often, while particles with low weights may be discarded.
 
-**Multinomial Resampling**: The most common approach samples each new particle independently:
+We draw $N$ new particles from the current set, where each particle's chance of being selected equals its weight. A particle with weight 0.4 has a 40% chance of being chosen on each draw. After resampling all particles get equal weight $w_t^{(i)} = 1/N$ since they now represent an unweighted sample from our belief distribution.
 
-- **Expected copies**: $\mathbb{E}[\text{number of copies of particle } j] = N w_t^{(j)}$
-- **Variance in copies**: $\text{Var}[\text{number of copies of particle } j] = N w_t^{(j)}(1 - w_t^{(j)})$
+Resampling solves the weight problem (restores $N_{\text{eff}} = N$) but introduces randomness. Sometimes good particles are lost by bad luck, and we end up with multiple copies of the same particle, reducing diversity.
 
-**After resampling**: All weights are reset to uniform $w_t^{(i)} = 1/N$, since we now have an unweighted sample from the posterior approximation.
+::: {.callout-note}
+## Bootstrap Particle Filter Algorithm
 
-**Trade-off**: Resampling eliminates weight degeneracy (restores $N_{\text{eff}} = N$) but introduces additional Monte Carlo variance due to the random sampling process. Good particles may be lost by chance, and the particle diversity decreases as multiple copies of the same particle are created.
+**Input**: $\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $\mathbf{y}_{1:T}$
+
+**For** $t = 1, \ldots, T$:
+
+1. **Predict**: For $i = 1, \ldots, N$: $\mathbf{x}_t^{(i)} \sim p(\mathbf{x}_t | \mathbf{x}_{t-1}^{(i)})$
+2. **Weight**: For $i = 1, \ldots, N$: $\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})$
+3. **Normalize**: For $i = 1, \ldots, N$: $w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}$
+4. **Resample**: If $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 < N_{\text{threshold}}$:
+   - Draw $\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N$ from $\{\mathbf{x}_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
+   - Set $\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
+
+**Output**: $p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)})$
+:::
+
 
 ### Particle Filtering for 2D Object Tracking
 
-**Weight Update Derivation**: For the bootstrap proposal $q(x_t | x_{t-1}, y_{1:t}) = p(x_t | x_{t-1})$, the weight update simplifies to:
+**Weight Update Derivation**: For the bootstrap proposal $q(\mathbf{x}_t | \mathbf{x}_{t-1}, \mathbf{y}_{1:t}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})$, the weight update simplifies to:
 
 $$
-\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})
 $$
 
 For the tracking model, the likelihood is:
 
 $$
-p(y_t | x_t^{(i)}) = \mathcal{N}(y_t; H x_t^{(i)}, R)
+p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) = \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})
 $$
 
-where $H x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^T$ extracts the position components from the state vector $x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^T$. The observation residual is:
+where $\mathbf{H} \mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^{\top}$ extracts the position components from the state vector $\mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^{\top}$. The observation residual is:
 
 $$
-r_t^{(i)} = y_t - H x_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
+\mathbf{r}_t^{(i)} = \mathbf{y}_t - \mathbf{H} \mathbf{x}_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
 $$
 
 Therefore, the weight update becomes:
 
 $$
-\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |R|}} \exp\left(-\frac{1}{2} (r_t^{(i)})^T R^{-1} r_t^{(i)}\right)
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R}) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |\mathbf{R}|}} \exp\left(-\frac{1}{2} (\mathbf{r}_t^{(i)})^{\top} \mathbf{R}^{-1} \mathbf{r}_t^{(i)}\right)
 $$
 
-**Bootstrap Particle Filter Algorithm**:
+**Bootstrap Particle Filter Algorithm for Object Tracking**:
 
-**Input**: $\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $y_{1:T}$
+**Input**: $\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N$, observations $\mathbf{y}_{1:T}$
 
 **For** $t = 1, \ldots, T$:
 
 1. **Predict**: For $i = 1, \ldots, N$:
-   $$x_t^{(i)} = F x_{t-1}^{(i)} + \epsilon_t^{(i)}, \quad \epsilon_t^{(i)} \sim \mathcal{N}(0, Q)$$
+   $$\mathbf{x}_t^{(i)} = \mathbf{F} \mathbf{x}_{t-1}^{(i)} + \boldsymbol{\epsilon}_t^{(i)}, \quad \boldsymbol{\epsilon}_t^{(i)} \sim \mathcal{N}(\mathbf{0}, \mathbf{Q})$$
 
 2. **Weight**: For $i = 1, \ldots, N$:
-   $$\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R)$$
+   $$\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})$$
 
 3. **Normalize**: For $i = 1, \ldots, N$:
    $$w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}$$
 
 4. **Estimate**: 
-   $$\hat{x}_t = \sum_{i=1}^N w_t^{(i)} x_t^{(i)}$$
+   $$\hat{\mathbf{x}}_t = \sum_{i=1}^N w_t^{(i)} \mathbf{x}_t^{(i)}$$
 
 5. **Resample**: If $N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 < N_{\text{threshold}}$:
-   - Draw $\{\tilde{x}_t^{(i)}\}_{i=1}^N$ from $\{x_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
-   - Set $x_t^{(i)} = \tilde{x}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
+   - Draw $\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N$ from $\{\mathbf{x}_t^{(i)}\}_{i=1}^N$ with probabilities $\{w_t^{(i)}\}_{i=1}^N$
+   - Set $\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}$ and $w_t^{(i)} = 1/N$ for all $i$
 
-**Output**: Position estimate $\hat{p}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^T$ and velocity estimate $\hat{v}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^T$
-
-
+**Output**: Position estimate $\hat{\mathbf{p}}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^{\top}$ and velocity estimate $\hat{\mathbf{v}}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^{\top}$
 
 ## Particle Filter Implementation
 
@@ -697,3 +680,36 @@ print(f"  Final position error: {final_pos_error:.3f}")
 print(f"  Mean position error: {mean_pos_error:.3f}")
 print(f"  Resampling frequency: {len(resampled_steps)}/{T} time steps")
 ```
+
+## Conclusion
+
+Particle filters provide a powerful and flexible framework for tracking hidden states in complex dynamic systems. Unlike the Kalman filter, which requires linear dynamics and Gaussian noise, particle filters can handle arbitrary nonlinearities and any noise distribution by representing beliefs as a cloud of weighted samples.
+
+### Key Strengths
+
+- **Flexibility**: Works with any state evolution and observation model.
+- **Intuitive**: The particle representation mirrors how we naturally think about uncertainty.
+- **Scalable**: Performance degrades gracefully as system complexity increases.
+- **Real-time capable**: Sequential updates make it suitable for online applications.
+
+### Limitations and Challenges
+
+- **Computational cost**: Requires many particles for good approximation, especially in high dimensions.
+- **Sample impoverishment**: Resampling can reduce particle diversity over time.
+- **Curse of dimensionality**: Performance degrades exponentially with state dimension.
+- **Tuning required**: Number of particles and resampling thresholds need careful selection.
+
+### When to Use Particle Filters
+
+Particle filters excel when:
+
+- The system is **nonlinear** or has **non-Gaussian noise**.
+- You need **real-time** state estimation.
+- The state space is **moderate dimensional** (typically < 10-20 dimensions).
+- **Computational resources** are available for running many particles.
+
+Consider alternatives when:
+
+- The system is linear-Gaussian (use Kalman filter).
+- The state space is very high-dimensional (consider ensemble methods).
+- Computational resources are severely limited.

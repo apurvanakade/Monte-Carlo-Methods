@@ -530,10 +530,21 @@ window.Quarto = {
   <li><a href="#markov-assumptions" id="toc-markov-assumptions" class="nav-link" data-scroll-target="#markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</a></li>
   <li><a href="#hidden-markov-models-hmms" id="toc-hidden-markov-models-hmms" class="nav-link" data-scroll-target="#hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</a></li>
   <li><a href="#inference-problems" id="toc-inference-problems" class="nav-link" data-scroll-target="#inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</a></li>
-  <li><a href="#particle-filtering" id="toc-particle-filtering" class="nav-link" data-scroll-target="#particle-filtering"><span class="header-section-number">18.2.6</span> Particle Filtering</a></li>
-  <li><a href="#particle-filtering-for-2d-object-tracking" id="toc-particle-filtering-for-2d-object-tracking" class="nav-link" data-scroll-target="#particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.2.7</span> Particle Filtering for 2D Object Tracking</a></li>
   </ul></li>
-  <li><a href="#particle-filter-implementation" id="toc-particle-filter-implementation" class="nav-link" data-scroll-target="#particle-filter-implementation"><span class="header-section-number">18.3</span> Particle Filter Implementation</a></li>
+  <li><a href="#particle-filtering-algorithm" id="toc-particle-filtering-algorithm" class="nav-link" data-scroll-target="#particle-filtering-algorithm"><span class="header-section-number">18.3</span> Particle Filtering Algorithm</a>
+  <ul class="collapse">
+  <li><a href="#the-bootstrap-filter---the-simple-case" id="toc-the-bootstrap-filter---the-simple-case" class="nav-link" data-scroll-target="#the-bootstrap-filter---the-simple-case"><span class="header-section-number">18.3.1</span> The Bootstrap Filter - The Simple Case</a></li>
+  <li><a href="#general-formula---correcting-for-different-proposals" id="toc-general-formula---correcting-for-different-proposals" class="nav-link" data-scroll-target="#general-formula---correcting-for-different-proposals"><span class="header-section-number">18.3.2</span> General Formula - Correcting for Different Proposals</a></li>
+  <li><a href="#effective-sample-size-and-resampling" id="toc-effective-sample-size-and-resampling" class="nav-link" data-scroll-target="#effective-sample-size-and-resampling"><span class="header-section-number">18.3.3</span> Effective Sample Size and Resampling</a></li>
+  <li><a href="#particle-filtering-for-2d-object-tracking" id="toc-particle-filtering-for-2d-object-tracking" class="nav-link" data-scroll-target="#particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.3.4</span> Particle Filtering for 2D Object Tracking</a></li>
+  </ul></li>
+  <li><a href="#particle-filter-implementation" id="toc-particle-filter-implementation" class="nav-link" data-scroll-target="#particle-filter-implementation"><span class="header-section-number">18.4</span> Particle Filter Implementation</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">18.5</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-strengths" id="toc-key-strengths" class="nav-link" data-scroll-target="#key-strengths"><span class="header-section-number">18.5.1</span> Key Strengths</a></li>
+  <li><a href="#limitations-and-challenges" id="toc-limitations-and-challenges" class="nav-link" data-scroll-target="#limitations-and-challenges"><span class="header-section-number">18.5.2</span> Limitations and Challenges</a></li>
+  <li><a href="#when-to-use-particle-filters" id="toc-when-to-use-particle-filters" class="nav-link" data-scroll-target="#when-to-use-particle-filters"><span class="header-section-number">18.5.3</span> When to Use Particle Filters</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -606,19 +617,19 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><strong>Hidden state variables</strong> that evolve according to some dynamics</li>
 <li><strong>Nonlinear or non-Gaussian</strong> relationships that make analytical solutions intractable</li>
 </ol>
-<p>Consider a hidden Markov model where we observe a sequence <span class="math inline">\(y_{1:T} = \{y_1, y_2, \ldots, y_T\}\)</span> and want to infer the hidden states <span class="math inline">\(x_{1:T} = \{x_1, x_2, \ldots, x_T\}\)</span>. The system is characterized by:</p>
+<p>Consider a hidden Markov model where we observe a sequence <span class="math inline">\(\mathbf{y}_{1:T} = \{\mathbf{y}_1, \mathbf{y}_2, \ldots, \mathbf{y}_T\}\)</span> and want to infer the hidden states <span class="math inline">\(\mathbf{x}_{1:T} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T\}\)</span>. The system is characterized by:</p>
 <ul>
-<li><strong>State transition model</strong>: <span class="math inline">\(p(x_t | x_{t-1})\)</span> - how the hidden state evolves</li>
-<li><strong>Observation model</strong>: <span class="math inline">\(p(y_t | x_t)\)</span> - how observations relate to hidden states<br>
+<li><strong>State transition model</strong>: <span class="math inline">\(p(\mathbf{x}_t | \mathbf{x}_{t-1})\)</span> - how the hidden state evolves</li>
+<li><strong>Observation model</strong>: <span class="math inline">\(p(\mathbf{y}_t | \mathbf{x}_t)\)</span> - how observations relate to hidden states<br>
 </li>
-<li><strong>Initial state distribution</strong>: <span class="math inline">\(p(x_0)\)</span></li>
+<li><strong>Initial state distribution</strong>: <span class="math inline">\(p(\mathbf{x}_0)\)</span></li>
 </ul>
-<p>Our goal is to compute the <strong>filtering distribution</strong> <span class="math inline">\(p(x_t | y_{1:t})\)</span>, which represents our belief about the current state given all observations up to time <span class="math inline">\(t\)</span>.</p>
+<p>Our goal is to compute the <strong>filtering distribution</strong> <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t})\)</span>, which represents our belief about the current state given all observations up to time <span class="math inline">\(t\)</span>.</p>
 <section id="the-challenge" class="level3" data-number="18.1.1">
 <h3 data-number="18.1.1" class="anchored" data-anchor-id="the-challenge"><span class="header-section-number">18.1.1</span> The Challenge</h3>
 <p>For linear-Gaussian systems, the Kalman filter provides an exact analytical solution. However, for nonlinear or non-Gaussian systems, the filtering distribution cannot be computed analytically. The key challenges are:</p>
 <ol type="1">
-<li><strong>Intractable integrals</strong>: Computing <span class="math inline">\(p(x_t | y_{1:t})\)</span> requires high-dimensional integration</li>
+<li><strong>Intractable integrals</strong>: Computing <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t})\)</span> requires high-dimensional integration</li>
 <li><strong>Sequential nature</strong>: We need real-time updates as new observations arrive</li>
 <li><strong>Curse of dimensionality</strong>: Grid-based methods become infeasible in high dimensions</li>
 </ol>
@@ -627,11 +638,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <h3 data-number="18.1.2" class="anchored" data-anchor-id="the-particle-filter-solution"><span class="header-section-number">18.1.2</span> The Particle Filter Solution</h3>
 <p>Particle filters address these challenges by representing the filtering distribution using a set of <strong>particles</strong> (samples) with associated <strong>weights</strong>:</p>
 <p><span class="math display">\[
-p(x_t | y_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(x_t - x_t^{(i)}),
+p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)}),
 \]</span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(\{x_t^{(i)}\}_{i=1}^{N}\)</span> are particles representing possible states</li>
+<li><span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^{N}\)</span> are particles representing possible states</li>
 <li><span class="math inline">\(\{w_t^{(i)}\}_{i=1}^{N}\)</span> are normalized weights such that <span class="math inline">\(\sum_{i=1}^{N} w_t^{(i)} = 1\)</span></li>
 <li><span class="math inline">\(\delta(\cdot)\)</span> is the Dirac delta function</li>
 </ul>
@@ -639,7 +650,7 @@ p(x_t | y_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(x_t - x_t^{(i)}),
 <ul>
 <li>Handle arbitrary nonlinearities and noise distributions</li>
 <li>Update beliefs sequentially as new data arrives</li>
-<li>Compute expectations: <span class="math inline">\(\mathbb{E}[f(x_t) | y_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(x_t^{(i)})\)</span></li>
+<li>Compute expectations: <span class="math inline">\(\mathbb{E}[f(\mathbf{x}_t) | \mathbf{y}_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(\mathbf{x}_t^{(i)})\)</span></li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -675,38 +686,38 @@ Note
 <h3 data-number="18.2.1" class="anchored" data-anchor-id="state-space-model-framework"><span class="header-section-number">18.2.1</span> State-Space Model Framework</h3>
 <p>A <strong>state-space model</strong> (SSM) provides a general framework for modeling dynamic systems with hidden states. The model consists of two key components:</p>
 <p><strong>State Evolution (Process Model)</strong>: <span class="math display">\[
-x_t = f_t(x_{t-1}, v_t),
+\mathbf{x}_t = \mathbf{f}_t(\mathbf{x}_{t-1}, \mathbf{v}_t),
 \]</span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(x_t \in \mathbb{R}^{d_x}\)</span> is the hidden state at time <span class="math inline">\(t\)</span></li>
-<li><span class="math inline">\(f_t(\cdot, \cdot)\)</span> is the state transition function (possibly time-varying)</li>
-<li><span class="math inline">\(v_t\)</span> is the process noise</li>
+<li><span class="math inline">\(\mathbf{x}_t \in \mathbb{R}^{d_x}\)</span> is the hidden state at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mathbf{f}_t(\cdot, \cdot)\)</span> is the state transition function (possibly time-varying)</li>
+<li><span class="math inline">\(\mathbf{v}_t\)</span> is the process noise</li>
 </ul>
 <p><strong>Observation Model (Measurement Model)</strong>: <span class="math display">\[
-y_t = h_t(x_t, w_t),
+\mathbf{y}_t = \mathbf{h}_t(\mathbf{x}_t, \mathbf{w}_t),
 \]</span></p>
 <p>where:</p>
 <ul>
-<li><span class="math inline">\(y_t \in \mathbb{R}^{d_y}\)</span> is the observation at time <span class="math inline">\(t\)</span></li>
-<li><span class="math inline">\(h_t(\cdot, \cdot)\)</span> is the observation function (possibly time-varying)</li>
-<li><span class="math inline">\(w_t\)</span> is the observation noise</li>
+<li><span class="math inline">\(\mathbf{y}_t \in \mathbb{R}^{d_y}\)</span> is the observation at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mathbf{h}_t(\cdot, \cdot)\)</span> is the observation function (possibly time-varying)</li>
+<li><span class="math inline">\(\mathbf{w}_t\)</span> is the observation noise</li>
 </ul>
-<p>The noise terms <span class="math inline">\(v_t\)</span> and <span class="math inline">\(w_t\)</span> are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.</p>
+<p>The noise terms <span class="math inline">\(\mathbf{v}_t\)</span> and <span class="math inline">\(\mathbf{w}_t\)</span> are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.</p>
 </section>
 <section id="probabilistic-formulation" class="level3" data-number="18.2.2">
 <h3 data-number="18.2.2" class="anchored" data-anchor-id="probabilistic-formulation"><span class="header-section-number">18.2.2</span> Probabilistic Formulation</h3>
 <p>In probabilistic terms, the state-space model is characterized by:</p>
 <p><strong>State Transition Density</strong>: <span class="math display">\[
-p(x_t | x_{t-1}) = p(x_t | x_{t-1}, \theta),
+p(\mathbf{x}_t | \mathbf{x}_{t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1}, \boldsymbol{\theta}),
 \]</span></p>
 <p><strong>Observation Density</strong>: <span class="math display">\[
-p(y_t | x_t) = p(y_t | x_t, \theta),
+p(\mathbf{y}_t | \mathbf{x}_t) = p(\mathbf{y}_t | \mathbf{x}_t, \boldsymbol{\theta}),
 \]</span></p>
 <p><strong>Initial State Distribution</strong>: <span class="math display">\[
-p(x_0) = p(x_0 | \theta),
+p(\mathbf{x}_0) = p(\mathbf{x}_0 | \boldsymbol{\theta}),
 \]</span></p>
-<p>where <span class="math inline">\(\theta\)</span> represents model parameters (assumed known for now).</p>
+<p>where <span class="math inline">\(\boldsymbol{\theta}\)</span> represents model parameters (assumed known for now).</p>
 </section>
 <section id="markov-assumptions" class="level3" data-number="18.2.3">
 <h3 data-number="18.2.3" class="anchored" data-anchor-id="markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</h3>
@@ -722,16 +733,16 @@ Important
 </div>
 <div class="callout-body-container callout-body">
 <p><strong>Markov Property for States</strong>: The future state depends only on the current state, not the entire history: <span class="math display">\[
-p(x_t | x_{0:t-1}) = p(x_t | x_{t-1})
+p(\mathbf{x}_t | \mathbf{x}_{0:t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})
 \]</span></p>
 <p><strong>Conditional Independence of Observations</strong>: Given the current state, the observation is independent of all other states and observations: <span class="math display">\[
-p(y_t | x_{0:t}, y_{1:t-1}) = p(y_t | x_t)
+p(\mathbf{y}_t | \mathbf{x}_{0:t}, \mathbf{y}_{1:t-1}) = p(\mathbf{y}_t | \mathbf{x}_t)
 \]</span></p>
 </div>
 </div>
 <p>These assumptions lead to the <strong>joint distribution</strong> of states and observations:</p>
 <p><span class="math display">\[
-p(x_{0:T}, y_{1:T}) = p(x_0) \prod_{t=1}^{T} p(x_t | x_{t-1}) p(y_t | x_t)
+p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) = p(\mathbf{x}_0) \prod_{t=1}^{T} p(\mathbf{x}_t | \mathbf{x}_{t-1}) p(\mathbf{y}_t | \mathbf{x}_t)
 \]</span></p>
 </section>
 <section id="hidden-markov-models-hmms" class="level3" data-number="18.2.4">
@@ -762,13 +773,13 @@ Example: Weather Tracking
 <li>Observations: <span class="math inline">\(y_t \in \{\text{Dry}, \text{Wet}\}\)</span> (ground condition)</li>
 </ul>
 <p>The transition matrix might be: <span class="math display">\[
-A = \begin{pmatrix}
+\mathbf{A} = \begin{pmatrix}
 0.8 &amp; 0.2 \\
 0.3 &amp; 0.7
 \end{pmatrix}
 \]</span></p>
 <p>The emission matrix might be: <span class="math display">\[
-B = \begin{pmatrix}
+\mathbf{B} = \begin{pmatrix}
 0.9 &amp; 0.1 \\
 0.2 &amp; 0.8
 \end{pmatrix}
@@ -777,112 +788,92 @@ B = \begin{pmatrix}
 </div>
 </div>
 <div id="exm-object-tracking" class="theorem example">
-<p><span class="theorem-title"><strong>Example 18.1</strong></span> <strong>2D Object Tracking</strong></p>
-<p>Consider tracking a moving object (e.g., aircraft, vehicle, or person) in a 2D plane using noisy position measurements from sensors like radar or GPS.</p>
-<p><strong>State</strong>: Position and velocity <span class="math inline">\(x_t = [p_x, p_y, v_x, v_y]^T \in \mathbb{R}^4\)</span></p>
+<p><span class="theorem-title"><strong>Example 18.1 (Example: 2D Object Tracking)</strong></span> Consider tracking a moving object (e.g., aircraft, vehicle, or person) in a 2D plane using noisy position measurements from sensors like radar or GPS.</p>
+<p><strong>State</strong>: Position and velocity <span class="math inline">\(\mathbf{x}_t = [p_x, p_y, v_x, v_y]^{\top} \in \mathbb{R}^4\)</span></p>
 <p><strong>State Evolution</strong>: The object follows a constant velocity model with random acceleration disturbances: <span class="math display">\[
-x_t = F x_{t-1} + G a_t
+\mathbf{x}_t = \mathbf{F} \mathbf{x}_{t-1} + \mathbf{G} \mathbf{a}_t
 \]</span></p>
 <p>where: <span class="math display">\[
-F = \begin{pmatrix}
+\mathbf{F} = \begin{pmatrix}
 1 &amp; 0 &amp; \Delta t &amp; 0 \\
 0 &amp; 1 &amp; 0 &amp; \Delta t \\
 0 &amp; 0 &amp; 1 &amp; 0 \\
 0 &amp; 0 &amp; 0 &amp; 1
 \end{pmatrix}, \quad
-G = \begin{pmatrix}
+\mathbf{G} = \begin{pmatrix}
 \frac{(\Delta t)^2}{2} &amp; 0 \\
 0 &amp; \frac{(\Delta t)^2}{2} \\
 \Delta t &amp; 0 \\
 0 &amp; \Delta t
 \end{pmatrix}
 \]</span></p>
-<p>and <span class="math inline">\(a_t = [a_x, a_y]^T \sim \mathcal{N}(0, \sigma_a^2 I)\)</span> represents random acceleration.</p>
+<p>and <span class="math inline">\(\mathbf{a}_t = [a_x, a_y]^{\top} \sim \mathcal{N}(\mathbf{0}, \sigma_a^2 \mathbf{I})\)</span> represents random acceleration.</p>
 <p><strong>Observations</strong>: Noisy position measurements from sensors: <span class="math display">\[
-y_t = H x_t + w_t = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \end{pmatrix} x_t + w_t
+\mathbf{y}_t = \mathbf{H} \mathbf{x}_t + \mathbf{w}_t = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \end{pmatrix} \mathbf{x}_t + \mathbf{w}_t
 \]</span></p>
-<p>where <span class="math inline">\(w_t \sim \mathcal{N}(0, R)\)</span> with <span class="math inline">\(R = \text{diag}(\sigma_x^2, \sigma_y^2)\)</span>.</p>
+<p>where <span class="math inline">\(\mathbf{w}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R})\)</span> with <span class="math inline">\(\mathbf{R} = \text{diag}(\sigma_x^2, \sigma_y^2)\)</span>.</p>
 </div>
 </section>
 <section id="inference-problems" class="level3" data-number="18.2.5">
 <h3 data-number="18.2.5" class="anchored" data-anchor-id="inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</h3>
 <p>Given the state-space model, we are interested in several inference problems:</p>
 <p><strong>1. Filtering</strong>: Estimate the current state given past and current observations: <span class="math display">\[
-p(x_t | y_{1:t})
+p(\mathbf{x}_t | \mathbf{y}_{1:t})
 \]</span></p>
 <p><strong>2. Prediction</strong>: Predict future states given current information: <span class="math display">\[
-p(x_{t+k} | y_{1:t}), \quad k &gt; 0
+p(\mathbf{x}_{t+k} | \mathbf{y}_{1:t}), \quad k &gt; 0
 \]</span></p>
 <p><strong>3. Smoothing</strong>: Estimate past states given all observations: <span class="math display">\[
-p(x_t | y_{1:T}), \quad t &lt; T
+p(\mathbf{x}_t | \mathbf{y}_{1:T}), \quad t &lt; T
 \]</span></p>
 <p><strong>4. Marginal Likelihood</strong>: Compute the probability of the observed sequence: <span class="math display">\[
-p(y_{1:T}) = \int p(x_{0:T}, y_{1:T}) dx_{0:T}
+p(\mathbf{y}_{1:T}) = \int p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) d\mathbf{x}_{0:T}
 \]</span></p>
 </section>
-<section id="particle-filtering" class="level3" data-number="18.2.6">
-<h3 data-number="18.2.6" class="anchored" data-anchor-id="particle-filtering"><span class="header-section-number">18.2.6</span> Particle Filtering</h3>
-<p><strong>The Bootstrap Filter - The Simple Case</strong>:</p>
+</section>
+<section id="particle-filtering-algorithm" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="particle-filtering-algorithm"><span class="header-section-number">18.3</span> Particle Filtering Algorithm</h2>
+<section id="the-bootstrap-filter---the-simple-case" class="level3" data-number="18.3.1">
+<h3 data-number="18.3.1" class="anchored" data-anchor-id="the-bootstrap-filter---the-simple-case"><span class="header-section-number">18.3.1</span> The Bootstrap Filter - The Simple Case</h3>
 <p>The most intuitive approach is the bootstrap filter. Here, we generate new particles by simply following the natural dynamics of the system (the state evolution model), then update weights based on how well each particle explains the new observation.</p>
 <p><strong>Bootstrap Weight Update</strong>: <span class="math display">\[
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})}
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})}
 \]</span></p>
 <p><strong>What this means</strong>:</p>
 <ul>
 <li><span class="math inline">\(w_{t-1}^{(i)}\)</span>: Previous weight of particle <span class="math inline">\(i\)</span></li>
-<li><span class="math inline">\(p(y_t | x_t^{(i)})\)</span>: <strong>Likelihood</strong> - How well particle <span class="math inline">\(i\)</span> explains the new observation</li>
+<li><span class="math inline">\(p(\mathbf{y}_t | \mathbf{x}_t^{(i)})\)</span>: <strong>Likelihood</strong> - How well particle <span class="math inline">\(i\)</span> explains the new observation</li>
 <li>Particles that better match the observation get higher weights</li>
 <li>We normalize so all weights sum to 1: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
 </ul>
 <p><strong>Why This Works</strong>: We’re essentially asking “given what we observed, which particles were in the right place?” Particles that predicted something close to the actual observation become more important.</p>
-<hr>
-<p><strong>General Formula - Correcting for Different Proposals</strong>:</p>
-<p>Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a <strong>proposal distribution</strong> <span class="math inline">\(q(x_t^{(i)} | \cdot)\)</span> that incorporates the current observation to guide particles toward more promising regions.</p>
+</section>
+<section id="general-formula---correcting-for-different-proposals" class="level3" data-number="18.3.2">
+<h3 data-number="18.3.2" class="anchored" data-anchor-id="general-formula---correcting-for-different-proposals"><span class="header-section-number">18.3.2</span> General Formula - Correcting for Different Proposals</h3>
+<p>Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a <strong>proposal distribution</strong> <span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot)\)</span> that incorporates the current observation to guide particles toward more promising regions.</p>
 <p><strong>Why Use a Different Proposal?</strong></p>
 <ul>
 <li><strong>Bootstrap problem</strong>: If the observation is very informative but the system dynamics are very noisy, most particles following natural dynamics will end up far from where the observation suggests they should be.</li>
 <li><strong>Efficiency</strong>: We waste computational effort on particles that will get very low weights.</li>
 <li><strong>Better exploration</strong>: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.</li>
-<li><strong>Computational efficiency</strong>: It might be computationally expensive to evolve a lot of particles according to the state evolution model.</li>
+<li><strong>Computational efficiency</strong>: It might be computationally expensive to evolve many particles according to the state evolution model.</li>
 </ul>
 <p><strong>Example</strong>: If you are tracking an object in the 2D plane that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they’d all get low weights. A smarter proposal would generate particles closer to where the observation suggests the object actually is.</p>
 <p>When we do this, we need to correct our weights using <strong>importance sampling</strong>:</p>
 <p><span class="math display">\[
-\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)}) \cdot \frac{ p(x_t^{(i)} | x_{t-1}^{(i)})}{q(x_t^{(i)} | x_{0:t-1}^{(i)}, y_{1:t})}}
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) \cdot \frac{ p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})}{q(\mathbf{x}_t^{(i)} | \mathbf{x}_{0:t-1}^{(i)}, \mathbf{y}_{1:t})}}
 \]</span></p>
 <p><strong>What the correction does</strong>:</p>
 <ul>
-<li><span class="math inline">\(p(x_t^{(i)} | x_{t-1}^{(i)})\)</span>: <strong>Transition probability</strong> - How likely this particle movement is under the true dynamics</li>
-<li><span class="math inline">\(q(x_t^{(i)} | \cdot)\)</span>: <strong>Proposal probability</strong> - How likely this particle movement is under our artificial proposal</li>
+<li><span class="math inline">\(p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})\)</span>: <strong>Transition probability</strong> - How likely this particle movement is under the true dynamics</li>
+<li><span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot)\)</span>: <strong>Proposal probability</strong> - How likely this particle movement is under our artificial proposal</li>
 <li>The ratio <span class="math inline">\(\frac{p(\cdot)}{q(\cdot)}\)</span> corrects for the bias introduced by not sampling from the natural dynamics</li>
 </ul>
 <p><strong>Intuition</strong>: If we artificially push particles toward certain regions (high <span class="math inline">\(q\)</span>), we need to down-weight them proportionally. If we place particles in regions that are naturally likely (high <span class="math inline">\(p\)</span>), we up-weight them.</p>
-<p>The bootstrap filter is the special case where <span class="math inline">\(q(x_t^{(i)} | \cdot) = p(x_t^{(i)} | x_{t-1}^{(i)})\)</span>, so the transition probabilities cancel out and we get the simpler formula.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Algorithm
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>Input</strong>: <span class="math inline">\(\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(y_{1:T}\)</span></p>
-<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
-<ol type="1">
-<li><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(x_t^{(i)} \sim p(x_t | x_{t-1}^{(i)})\)</span></li>
-<li><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})\)</span></li>
-<li><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
-<li><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:
-<ul>
-<li>Draw <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
-<li>Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
-</ul></li>
-</ol>
-<p><strong>Output</strong>: <span class="math inline">\(p(x_t | y_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(x_t - x_t^{(i)})\)</span></p>
-</div>
-</div>
+<p>The bootstrap filter is the special case where <span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot) = p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})\)</span>, so the transition probabilities cancel out and we get the simpler formula.</p>
+</section>
+<section id="effective-sample-size-and-resampling" class="level3" data-number="18.3.3">
+<h3 data-number="18.3.3" class="anchored" data-anchor-id="effective-sample-size-and-resampling"><span class="header-section-number">18.3.3</span> Effective Sample Size and Resampling</h3>
 <p>The <strong>effective sample size</strong> <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2\)</span> measures particle diversity, with <span class="math inline">\(N_{\text{eff}} = 1\)</span> indicating complete degeneracy (one particle has weight 1) and <span class="math inline">\(N_{\text{eff}} = N\)</span> indicating uniform weights.</p>
 <p><strong>Connection to Variance</strong>: The effective sample size is inversely related to the variance of the weight distribution. For a discrete probability mass function with weights <span class="math inline">\(\{w^{(i)}\}\)</span>, the variance is:</p>
 <p><span class="math display">\[\text{Var}(w) = \sum_{i=1}^N (w^{(i)})^2 - \left(\sum_{i=1}^N w^{(i)}\right)^2\]</span></p>
@@ -895,52 +886,72 @@ Algorithm
 <li><strong>Low variance</strong> in weights → <strong>High</strong> <span class="math inline">\(N_{\text{eff}}\)</span> → Many effective particles</li>
 </ul>
 <p>When weights are highly unequal (high variance), most particles contribute little to the approximation, reducing the effective sample size. When weights are nearly uniform (low variance), all particles contribute meaningfully.</p>
-<p><strong>Resampling</strong> addresses degeneracy by drawing new particles <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from the weighted particle distribution. We sample particles proportionally to their weights - particles with higher weights are more likely to be selected multiple times, while particles with low weights may disappear.</p>
-<p><strong>Multinomial Resampling</strong>: The most common approach samples each new particle independently:</p>
+<p><strong>Resampling</strong> fixes the weight imbalance by creating a new set of particles <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span>. We randomly select particles based on their weights - particles with higher weights get picked more often, while particles with low weights may be discarded.</p>
+<p>We draw <span class="math inline">\(N\)</span> new particles from the current set, where each particle’s chance of being selected equals its weight. A particle with weight 0.4 has a 40% chance of being chosen on each draw. After resampling all particles get equal weight <span class="math inline">\(w_t^{(i)} = 1/N\)</span> since they now represent an unweighted sample from our belief distribution.</p>
+<p>Resampling solves the weight problem (restores <span class="math inline">\(N_{\text{eff}} = N\)</span>) but introduces randomness. Sometimes good particles are lost by bad luck, and we end up with multiple copies of the same particle, reducing diversity.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Bootstrap Particle Filter Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Input</strong>: <span class="math inline">\(\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(\mathbf{y}_{1:T}\)</span></p>
+<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
+<ol type="1">
+<li><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\mathbf{x}_t^{(i)} \sim p(\mathbf{x}_t | \mathbf{x}_{t-1}^{(i)})\)</span></li>
+<li><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})\)</span></li>
+<li><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
+<li><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:
 <ul>
-<li><strong>Expected copies</strong>: <span class="math inline">\(\mathbb{E}[\text{number of copies of particle } j] = N w_t^{(j)}\)</span></li>
-<li><strong>Variance in copies</strong>: <span class="math inline">\(\text{Var}[\text{number of copies of particle } j] = N w_t^{(j)}(1 - w_t^{(j)})\)</span></li>
-</ul>
-<p><strong>After resampling</strong>: All weights are reset to uniform <span class="math inline">\(w_t^{(i)} = 1/N\)</span>, since we now have an unweighted sample from the posterior approximation.</p>
-<p><strong>Trade-off</strong>: Resampling eliminates weight degeneracy (restores <span class="math inline">\(N_{\text{eff}} = N\)</span>) but introduces additional Monte Carlo variance due to the random sampling process. Good particles may be lost by chance, and the particle diversity decreases as multiple copies of the same particle are created.</p>
+<li>Draw <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ol>
+<p><strong>Output</strong>: <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)})\)</span></p>
+</div>
+</div>
 </section>
-<section id="particle-filtering-for-2d-object-tracking" class="level3" data-number="18.2.7">
-<h3 data-number="18.2.7" class="anchored" data-anchor-id="particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.2.7</span> Particle Filtering for 2D Object Tracking</h3>
-<p><strong>Weight Update Derivation</strong>: For the bootstrap proposal <span class="math inline">\(q(x_t | x_{t-1}, y_{1:t}) = p(x_t | x_{t-1})\)</span>, the weight update simplifies to:</p>
+<section id="particle-filtering-for-2d-object-tracking" class="level3" data-number="18.3.4">
+<h3 data-number="18.3.4" class="anchored" data-anchor-id="particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.3.4</span> Particle Filtering for 2D Object Tracking</h3>
+<p><strong>Weight Update Derivation</strong>: For the bootstrap proposal <span class="math inline">\(q(\mathbf{x}_t | \mathbf{x}_{t-1}, \mathbf{y}_{1:t}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})\)</span>, the weight update simplifies to:</p>
 <p><span class="math display">\[
-\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(y_t | x_t^{(i)})
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})
 \]</span></p>
 <p>For the tracking model, the likelihood is:</p>
 <p><span class="math display">\[
-p(y_t | x_t^{(i)}) = \mathcal{N}(y_t; H x_t^{(i)}, R)
+p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) = \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})
 \]</span></p>
-<p>where <span class="math inline">\(H x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^T\)</span> extracts the position components from the state vector <span class="math inline">\(x_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^T\)</span>. The observation residual is:</p>
+<p>where <span class="math inline">\(\mathbf{H} \mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^{\top}\)</span> extracts the position components from the state vector <span class="math inline">\(\mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^{\top}\)</span>. The observation residual is:</p>
 <p><span class="math display">\[
-r_t^{(i)} = y_t - H x_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
+\mathbf{r}_t^{(i)} = \mathbf{y}_t - \mathbf{H} \mathbf{x}_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
 \]</span></p>
 <p>Therefore, the weight update becomes:</p>
 <p><span class="math display">\[
-\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |R|}} \exp\left(-\frac{1}{2} (r_t^{(i)})^T R^{-1} r_t^{(i)}\right)
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R}) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |\mathbf{R}|}} \exp\left(-\frac{1}{2} (\mathbf{r}_t^{(i)})^{\top} \mathbf{R}^{-1} \mathbf{r}_t^{(i)}\right)
 \]</span></p>
-<p><strong>Bootstrap Particle Filter Algorithm</strong>:</p>
-<p><strong>Input</strong>: <span class="math inline">\(\{x_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(y_{1:T}\)</span></p>
+<p><strong>Bootstrap Particle Filter Algorithm for Object Tracking</strong>:</p>
+<p><strong>Input</strong>: <span class="math inline">\(\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(\mathbf{y}_{1:T}\)</span></p>
 <p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
 <ol type="1">
-<li><p><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[x_t^{(i)} = F x_{t-1}^{(i)} + \epsilon_t^{(i)}, \quad \epsilon_t^{(i)} \sim \mathcal{N}(0, Q)\]</span></p></li>
-<li><p><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(y_t; H x_t^{(i)}, R)\]</span></p></li>
+<li><p><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\mathbf{x}_t^{(i)} = \mathbf{F} \mathbf{x}_{t-1}^{(i)} + \boldsymbol{\epsilon}_t^{(i)}, \quad \boldsymbol{\epsilon}_t^{(i)} \sim \mathcal{N}(\mathbf{0}, \mathbf{Q})\]</span></p></li>
+<li><p><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})\]</span></p></li>
 <li><p><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}\]</span></p></li>
-<li><p><strong>Estimate</strong>: <span class="math display">\[\hat{x}_t = \sum_{i=1}^N w_t^{(i)} x_t^{(i)}\]</span></p></li>
+<li><p><strong>Estimate</strong>: <span class="math display">\[\hat{\mathbf{x}}_t = \sum_{i=1}^N w_t^{(i)} \mathbf{x}_t^{(i)}\]</span></p></li>
 <li><p><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:</p>
 <ul>
-<li>Draw <span class="math inline">\(\{\tilde{x}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{x_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
-<li>Set <span class="math inline">\(x_t^{(i)} = \tilde{x}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+<li>Draw <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
 </ul></li>
 </ol>
-<p><strong>Output</strong>: Position estimate <span class="math inline">\(\hat{p}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^T\)</span> and velocity estimate <span class="math inline">\(\hat{v}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^T\)</span></p>
+<p><strong>Output</strong>: Position estimate <span class="math inline">\(\hat{\mathbf{p}}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^{\top}\)</span> and velocity estimate <span class="math inline">\(\hat{\mathbf{v}}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^{\top}\)</span></p>
 </section>
 </section>
-<section id="particle-filter-implementation" class="level2" data-number="18.3">
-<h2 data-number="18.3" class="anchored" data-anchor-id="particle-filter-implementation"><span class="header-section-number">18.3</span> Particle Filter Implementation</h2>
+<section id="particle-filter-implementation" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="particle-filter-implementation"><span class="header-section-number">18.4</span> Particle Filter Implementation</h2>
 <p>The following implementation demonstrates a complete particle filter for 2D object tracking. The demonstration tracks an object moving in 2D space with:</p>
 <ul>
 <li><strong>Process noise</strong>: Models random accelerations (<span class="math inline">\(\sigma_a = 0.5\)</span>)</li>
@@ -966,8 +977,46 @@ Particle Filter Performance:
   Resampling frequency: 24/30 time steps</code></pre>
 </div>
 </div>
+</section>
+<section id="conclusion" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">18.5</span> Conclusion</h2>
+<p>Particle filters provide a powerful and flexible framework for tracking hidden states in complex dynamic systems. Unlike the Kalman filter, which requires linear dynamics and Gaussian noise, particle filters can handle arbitrary nonlinearities and any noise distribution by representing beliefs as a cloud of weighted samples.</p>
+<section id="key-strengths" class="level3" data-number="18.5.1">
+<h3 data-number="18.5.1" class="anchored" data-anchor-id="key-strengths"><span class="header-section-number">18.5.1</span> Key Strengths</h3>
+<ul>
+<li><strong>Flexibility</strong>: Works with any state evolution and observation model.</li>
+<li><strong>Intuitive</strong>: The particle representation mirrors how we naturally think about uncertainty.</li>
+<li><strong>Scalable</strong>: Performance degrades gracefully as system complexity increases.</li>
+<li><strong>Real-time capable</strong>: Sequential updates make it suitable for online applications.</li>
+</ul>
+</section>
+<section id="limitations-and-challenges" class="level3" data-number="18.5.2">
+<h3 data-number="18.5.2" class="anchored" data-anchor-id="limitations-and-challenges"><span class="header-section-number">18.5.2</span> Limitations and Challenges</h3>
+<ul>
+<li><strong>Computational cost</strong>: Requires many particles for good approximation, especially in high dimensions.</li>
+<li><strong>Sample impoverishment</strong>: Resampling can reduce particle diversity over time.</li>
+<li><strong>Curse of dimensionality</strong>: Performance degrades exponentially with state dimension.</li>
+<li><strong>Tuning required</strong>: Number of particles and resampling thresholds need careful selection.</li>
+</ul>
+</section>
+<section id="when-to-use-particle-filters" class="level3" data-number="18.5.3">
+<h3 data-number="18.5.3" class="anchored" data-anchor-id="when-to-use-particle-filters"><span class="header-section-number">18.5.3</span> When to Use Particle Filters</h3>
+<p>Particle filters excel when:</p>
+<ul>
+<li>The system is <strong>nonlinear</strong> or has <strong>non-Gaussian noise</strong>.</li>
+<li>You need <strong>real-time</strong> state estimation.</li>
+<li>The state space is <strong>moderate dimensional</strong> (typically &lt; 10-20 dimensions).</li>
+<li><strong>Computational resources</strong> are available for running many particles.</li>
+</ul>
+<p>Consider alternatives when:</p>
+<ul>
+<li>The system is linear-Gaussian (use Kalman filter).</li>
+<li>The state space is very high-dimensional (consider ensemble methods).</li>
+<li>Computational resources are severely limited.</li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
