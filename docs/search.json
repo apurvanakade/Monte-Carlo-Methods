@@ -657,17 +657,6 @@
     ]
   },
   {
-    "objectID": "chapters/applications/bootstrap.html",
-    "href": "chapters/applications/bootstrap.html",
-    "title": "16  Bootstrap",
-    "section": "",
-    "text": "Sample Mean: 1.967\nTrue CI: [1.5979144  2.34577445]\nBootstrap CI: [1.62388954 2.35938801]\nNormal-Theory CI: [1.60463905 2.32850834]\n\n\n\n\n\n\n\n\n\n\n\nTrue CI: [1.5979144  2.34577445]\nBootstrap CI: [1.62388954 2.35938801]\nNormal-Theory CI: [1.60463905 2.32850834]\nNaive CI: [-1.65277273  5.58592012]\n\n\n\n\n\n\n\n\n\n\n\nSample Mean: 1.619\nTrue CI:          [0.96432733 3.4209794 ]\nBootstrap CI:     [0.98059327 2.28526628]\nNormal-Theory CI: [0.92412973 2.31300113]",
-    "crumbs": [
-      "Applications",
-      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Bootstrap</span>"
-    ]
-  },
-  {
     "objectID": "chapters/references.html",
     "href": "chapters/references.html",
     "title": "22  References",
