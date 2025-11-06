@@ -694,26 +694,6 @@ T_n \pm z_{\alpha/2} \cdot \text{se}_{\text{boot}}(T_n)
 \]</span></p>
 <p>where <span class="math inline">\(T^*_{(q)}\)</span> is the <span class="math inline">\(q\)</span>-th quantile of the bootstrap distribution <span class="math inline">\(\{T^{*(1)}, \ldots, T^{*(B)}\}\)</span>.</p>
 </section>
-<section id="bias-corrected-and-accelerated-bca-method" class="level4" data-number="16.2.4.3">
-<h4 data-number="16.2.4.3" class="anchored" data-anchor-id="bias-corrected-and-accelerated-bca-method"><span class="header-section-number">16.2.4.3</span> 3. Bias-Corrected and Accelerated (BCa) Method</h4>
-<p>The most sophisticated method, which corrects for bias and skewness:</p>
-<p><span class="math display">\[
-\text{CI}_{1-\alpha} = [T^*_{(\alpha_1)}, T^*_{(\alpha_2)}]
-\]</span></p>
-<p>where: <span class="math display">\[
-\alpha_1 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{\alpha/2})}\right)
-\]</span></p>
-<p><span class="math display">\[
-\alpha_2 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{1-\alpha/2})}\right)
-\]</span></p>
-<p>The <strong>bias-correction</strong> <span class="math inline">\(\hat{z}_0\)</span> is: <span class="math display">\[
-\hat{z}_0 = \Phi^{-1}\left(\frac{\#\{T^{*(b)} &lt; T_n\}}{B}\right)
-\]</span></p>
-<p>The <strong>acceleration</strong> <span class="math inline">\(\hat{a}\)</span> accounts for the rate of change of the standard error: <span class="math display">\[
-\hat{a} = \frac{\sum_{i=1}^{n} (T_{(i)} - \bar{T}_{(\cdot)})^3}{6[\sum_{i=1}^{n} (T_{(i)} - \bar{T}_{(\cdot)})^2]^{3/2}}
-\]</span></p>
-<p>where <span class="math inline">\(T_{(i)}\)</span> is the statistic computed with the <span class="math inline">\(i\)</span>-th observation deleted (jackknife values).</p>
-</section>
 </section>
 <section id="example-bootstrap-for-sample-mean" class="level3" data-number="16.2.5">
 <h3 data-number="16.2.5" class="anchored" data-anchor-id="example-bootstrap-for-sample-mean"><span class="header-section-number">16.2.5</span> Example: Bootstrap for Sample Mean</h3>
@@ -764,7 +744,7 @@ T_n \pm z_{\alpha/2} \cdot \text{se}_{\text{boot}}(T_n)
 <li>Estimate the parameters of the assumed distribution.</li>
 <li>Generate bootstrap samples from the fitted parametric distribution.</li>
 </ol>
-<div id="1a6cdc55" class="cell" data-execution_count="1">
+<div id="1a6cdc55" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -866,7 +846,7 @@ Parametric Bootstrap Algorithm
 <li>Resample pairs <span class="math inline">\((\mathbf{x}_i, y_i)\)</span> with replacement.</li>
 <li>Fit regression to bootstrap sample.</li>
 </ol>
-<div id="fde9008d" class="cell" data-execution_count="2">
+<div id="fde9008d" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

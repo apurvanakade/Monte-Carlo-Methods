@@ -123,35 +123,6 @@ $$
 
 where $T^*_{(q)}$ is the $q$-th quantile of the bootstrap distribution $\{T^{*(1)}, \ldots, T^{*(B)}\}$.
 
-#### 3. Bias-Corrected and Accelerated (BCa) Method
-
-The most sophisticated method, which corrects for bias and skewness:
-
-$$
-\text{CI}_{1-\alpha} = [T^*_{(\alpha_1)}, T^*_{(\alpha_2)}]
-$$
-
-where:
-$$
-\alpha_1 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{\alpha/2})}\right)
-$$
-
-$$
-\alpha_2 = \Phi\left(\hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha/2}}{1 - \hat{a}(\hat{z}_0 + z_{1-\alpha/2})}\right)
-$$
-
-The **bias-correction** $\hat{z}_0$ is:
-$$
-\hat{z}_0 = \Phi^{-1}\left(\frac{\#\{T^{*(b)} < T_n\}}{B}\right)
-$$
-
-The **acceleration** $\hat{a}$ accounts for the rate of change of the standard error:
-$$
-\hat{a} = \frac{\sum_{i=1}^{n} (T_{(i)} - \bar{T}_{(\cdot)})^3}{6[\sum_{i=1}^{n} (T_{(i)} - \bar{T}_{(\cdot)})^2]^{3/2}}
-$$
-
-where $T_{(i)}$ is the statistic computed with the $i$-th observation deleted (jackknife values).
-
 ### Example: Bootstrap for Sample Mean
 
 Consider estimating the mean $\mu$ from a sample $\mathbf{x} = \{x_1, \ldots, x_n\}$.
