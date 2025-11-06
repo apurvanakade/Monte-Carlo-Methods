@@ -652,8 +652,9 @@ for t in range(T):
         n_eff_history.append(max(50, prev_n_eff * 0.9))
 
 ax4.plot(range(T), n_eff_history, 'purple', linewidth=2, label='Effective Sample Size')
-ax4.axhline(y=n_particles/2, color='red', linestyle='--', 
+ax4.axhline(y=n_particles*0.9, color='red', linestyle='--', 
            label='Resampling Threshold')
+ax4.set_ylim(n_particles*0.8 - 10, n_particles + 10)
 
 # Mark resampling steps
 for step in resampled_steps:

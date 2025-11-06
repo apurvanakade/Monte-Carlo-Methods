@@ -51,7 +51,6 @@ book:
   appendices:
     - appendices/probability.qmd
     - appendices/markov_chains.qmd
-    - appendices/hidden_markov.qmd
   page-footer: "© 2025 Apurva Nakade. All rights reserved."
 
 
