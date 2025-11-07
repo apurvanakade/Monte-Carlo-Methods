@@ -435,12 +435,6 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -452,6 +446,12 @@ window.Quarto = {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -490,12 +490,6 @@ window.Quarto = {
   <div class="sidebar-item-container"> 
   <a href="../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../appendices/hidden_markov.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Hidden Markov Chains</span></span></a>
   </div>
 </li>
       </ul>
@@ -657,7 +651,7 @@ q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
 \]</span></p>
 <p>This proposal concentrates samples in the tail region where the indicator function is non-zero.</p>
 </div>
-<div id="c0a85814" class="cell" data-execution_count="2">
+<div id="c0a85814" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -716,7 +710,7 @@ Variance Reduction Factor: 72.2x</code></pre>
 <div id="exm-antithetic-variables" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
 </div>
-<div id="a6093397" class="cell" data-execution_count="4">
+<div id="a6093397" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -759,7 +753,7 @@ Variance Reduction Factor: 61.43x</code></pre>
 <div id="exm-control-variates" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.2</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
 </div>
-<div id="36a05bc8" class="cell" data-execution_count="6">
+<div id="36a05bc8" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -783,7 +777,7 @@ Control Variates Results:
   β = 0.700: Estimate = 0.266761, Variance = 1.197605e-05, Reduction = 0.96x</code></pre>
 </div>
 </div>
-<div id="de6a075f" class="cell" data-execution_count="7">
+<div id="de6a075f" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -816,7 +810,7 @@ Control Variates Results:
 <div id="exm-common-random-numbers" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.3</strong></span> <strong>Comparing Queue Systems.</strong> Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.</p>
 </div>
-<div id="63174ffb" class="cell" data-execution_count="8">
+<div id="63174ffb" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-stdout">
 <pre><code>Theoretical waiting times:
   System 1 (μ=1.5): 2.0000
@@ -838,7 +832,7 @@ Independent Sampling:
 Variance Reduction Factor: 1.86x</code></pre>
 </div>
 </div>
-<div id="c79342a6" class="cell" data-execution_count="9">
+<div id="c79342a6" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

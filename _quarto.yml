@@ -59,6 +59,7 @@ bibliography:
 
 format:
   html:
+    reader-mode: true
     theme:
       light: [cosmo, brand]
       dark: [superhero, brand]
@@ -66,6 +67,9 @@ format:
       - style.css
     include-before-body: header-scripts.html
     documentclass: scrreprt
+    bread-crumbs: true
+    back-to-top-navigation: true
+    
 
 
 execute:
