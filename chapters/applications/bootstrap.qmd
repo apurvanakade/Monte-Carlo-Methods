@@ -5,8 +5,6 @@ toc: true
 
 execute:
   echo: false
-
-draft: true
 ---
 
 ## Introduction
