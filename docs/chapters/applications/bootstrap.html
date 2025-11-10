@@ -523,19 +523,17 @@ window.Quarto = {
   <li><a href="#bootstrap-confidence-intervals" id="toc-bootstrap-confidence-intervals" class="nav-link" data-scroll-target="#bootstrap-confidence-intervals"><span class="header-section-number">16.2.4</span> Bootstrap Confidence Intervals</a></li>
   <li><a href="#example-bootstrap-for-sample-mean" id="toc-example-bootstrap-for-sample-mean" class="nav-link" data-scroll-target="#example-bootstrap-for-sample-mean"><span class="header-section-number">16.2.5</span> Example: Bootstrap for Sample Mean</a></li>
   <li><a href="#bootstrap-hypothesis-testing" id="toc-bootstrap-hypothesis-testing" class="nav-link" data-scroll-target="#bootstrap-hypothesis-testing"><span class="header-section-number">16.2.6</span> Bootstrap Hypothesis Testing</a></li>
-  <li><a href="#limitations-of-non-parametric-bootstrap" id="toc-limitations-of-non-parametric-bootstrap" class="nav-link" data-scroll-target="#limitations-of-non-parametric-bootstrap"><span class="header-section-number">16.2.7</span> Limitations of Non-parametric Bootstrap</a></li>
+  <li><a href="#limitations-and-considerations" id="toc-limitations-and-considerations" class="nav-link" data-scroll-target="#limitations-and-considerations"><span class="header-section-number">16.2.7</span> Limitations and Considerations</a></li>
   </ul></li>
   <li><a href="#parametric-bootstrap" id="toc-parametric-bootstrap" class="nav-link" data-scroll-target="#parametric-bootstrap"><span class="header-section-number">16.3</span> Parametric Bootstrap</a>
   <ul class="collapse">
   <li><a href="#motivation-and-framework" id="toc-motivation-and-framework" class="nav-link" data-scroll-target="#motivation-and-framework"><span class="header-section-number">16.3.1</span> Motivation and Framework</a></li>
   <li><a href="#parametric-bootstrap-procedure" id="toc-parametric-bootstrap-procedure" class="nav-link" data-scroll-target="#parametric-bootstrap-procedure"><span class="header-section-number">16.3.2</span> Parametric Bootstrap Procedure</a></li>
-  <li><a href="#mathematical-properties" id="toc-mathematical-properties" class="nav-link" data-scroll-target="#mathematical-properties"><span class="header-section-number">16.3.3</span> Mathematical Properties</a></li>
+  <li><a href="#when-to-use-parametric-bootstrap" id="toc-when-to-use-parametric-bootstrap" class="nav-link" data-scroll-target="#when-to-use-parametric-bootstrap"><span class="header-section-number">16.3.3</span> When to Use Parametric Bootstrap</a></li>
   <li><a href="#example-normal-distribution" id="toc-example-normal-distribution" class="nav-link" data-scroll-target="#example-normal-distribution"><span class="header-section-number">16.3.4</span> Example: Normal Distribution</a></li>
-  <li><a href="#example-linear-regression" id="toc-example-linear-regression" class="nav-link" data-scroll-target="#example-linear-regression"><span class="header-section-number">16.3.5</span> Example: Linear Regression</a></li>
+  <li><a href="#example-exponential-distribution" id="toc-example-exponential-distribution" class="nav-link" data-scroll-target="#example-exponential-distribution"><span class="header-section-number">16.3.5</span> Example: Exponential Distribution</a></li>
   <li><a href="#comparison-parametric-vs-non-parametric" id="toc-comparison-parametric-vs-non-parametric" class="nav-link" data-scroll-target="#comparison-parametric-vs-non-parametric"><span class="header-section-number">16.3.6</span> Comparison: Parametric vs Non-parametric</a></li>
-  <li><a href="#model-based-bootstrap-extensions" id="toc-model-based-bootstrap-extensions" class="nav-link" data-scroll-target="#model-based-bootstrap-extensions"><span class="header-section-number">16.3.7</span> Model-based Bootstrap Extensions</a></li>
-  <li><a href="#choosing-between-bootstrap-methods" id="toc-choosing-between-bootstrap-methods" class="nav-link" data-scroll-target="#choosing-between-bootstrap-methods"><span class="header-section-number">16.3.8</span> Choosing Between Bootstrap Methods</a></li>
-  <li><a href="#connection-back-to-particle-filtering" id="toc-connection-back-to-particle-filtering" class="nav-link" data-scroll-target="#connection-back-to-particle-filtering"><span class="header-section-number">16.3.9</span> Connection Back to Particle Filtering</a></li>
+  <li><a href="#choosing-between-bootstrap-methods" id="toc-choosing-between-bootstrap-methods" class="nav-link" data-scroll-target="#choosing-between-bootstrap-methods"><span class="header-section-number">16.3.7</span> Choosing Between Bootstrap Methods</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -607,12 +605,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><strong>Bootstrap methods</strong> resample from observed data to approximate the sampling distribution of statistics.</li>
 </ul>
 <p>In particle filtering, we saw how resampling addresses particle degeneracy - when most particles have negligible weights. Similarly, bootstrap resampling addresses the problem of not knowing the true population distribution by treating our sample as a “mini-population” to resample from.</p>
-<p>The <strong>multinomial resampling</strong> we used in particle filters is essentially the same procedure used in non-parametric bootstrapping: we draw samples with replacement according to a probability distribution (uniform weights in bootstrap, importance weights in particle filtering).</p>
 </section>
 <section id="the-bootstrap-principle" class="level3" data-number="16.1.2">
 <h3 data-number="16.1.2" class="anchored" data-anchor-id="the-bootstrap-principle"><span class="header-section-number">16.1.2</span> The Bootstrap Principle</h3>
 <p>Consider a sample <span class="math inline">\(\mathbf{X} = \{X_1, X_2, \ldots, X_n\}\)</span> drawn from an unknown distribution <span class="math inline">\(F\)</span>. We want to understand the sampling distribution of some statistic <span class="math inline">\(T(\mathbf{X})\)</span> - for example, the sample mean, median, or a regression coefficient.</p>
-<p>The <strong>bootstrap principle</strong> states that: &gt; The relationship between the sample and the population mirrors the relationship between a bootstrap sample and the original sample.</p>
+<p>The <strong>bootstrap principle</strong> states that:</p>
+<blockquote class="blockquote">
+<p>The relationship between the sample and the population mirrors the relationship between a bootstrap sample and the original sample.</p>
+</blockquote>
 <p>Mathematically: <span class="math display">\[
 \text{Population} \rightarrow \text{Sample} \quad \text{as} \quad \text{Sample} \rightarrow \text{Bootstrap Sample}
 \]</span></p>
@@ -623,21 +623,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <h2 data-number="16.2" class="anchored" data-anchor-id="non-parametric-bootstrap"><span class="header-section-number">16.2</span> Non-parametric Bootstrap</h2>
 <section id="the-empirical-distribution-function" class="level3" data-number="16.2.1">
 <h3 data-number="16.2.1" class="anchored" data-anchor-id="the-empirical-distribution-function"><span class="header-section-number">16.2.1</span> The Empirical Distribution Function</h3>
-<p>The foundation of non-parametric bootstrapping is the <strong>empirical distribution function</strong> (EDF). Given a sample <span class="math inline">\(\mathbf{x} = \{x_1, x_2, \ldots, x_n\}\)</span>, the EDF is defined as:</p>
+<p>The foundation of non-parametric bootstrapping lies in the <strong>empirical distribution function</strong> (EDF). For a given sample <span class="math inline">\(\mathbf{x} = \{x_1, x_2, \ldots, x_n\}\)</span>, the EDF is defined as:</p>
 <p><span class="math display">\[
 \hat{F}_n(t) = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}(x_i \leq t)
 \]</span></p>
-<p>where <span class="math inline">\(\mathbf{1}(\cdot)\)</span> is the indicator function. The EDF assigns probability <span class="math inline">\(1/n\)</span> to each observed data point, making it a discrete uniform distribution over the sample values.</p>
-<p><strong>Key Properties of the EDF</strong>:</p>
-<ul>
-<li><strong>Unbiased</strong>: <span class="math inline">\(\mathbb{E}[\hat{F}_n(t)] = F(t)\)</span> for all <span class="math inline">\(t\)</span>.</li>
-<li><strong>Consistent</strong>: <span class="math inline">\(\hat{F}_n(t) \rightarrow F(t)\)</span> almost surely as <span class="math inline">\(n \rightarrow \infty\)</span>.</li>
-<li><strong>Glivenko-Cantelli</strong>: <span class="math inline">\(\sup_t |\hat{F}_n(t) - F(t)| \rightarrow 0\)</span> almost surely.</li>
-</ul>
+<p>The EDF serves as our best non-parametric estimate of the true population distribution <span class="math inline">\(F\)</span>. It assigns equal probability <span class="math inline">\(1/n\)</span> to each observed data point, effectively treating our sample as if it were the entire population. This approach makes no assumptions about the underlying distributional form, making it widely applicable across different data types and statistical problems.</p>
 </section>
 <section id="bootstrap-sampling-procedure" class="level3" data-number="16.2.2">
 <h3 data-number="16.2.2" class="anchored" data-anchor-id="bootstrap-sampling-procedure"><span class="header-section-number">16.2.2</span> Bootstrap Sampling Procedure</h3>
-<p>The non-parametric bootstrap generates <strong>bootstrap samples</strong> by sampling with replacement from the original data, exactly like the resampling step in particle filtering:</p>
+<p>The non-parametric bootstrap method generates new samples by resampling with replacement from the original data. This process mimics drawing new samples from the population, but uses the empirical distribution as a surrogate for the unknown true distribution.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -651,213 +645,175 @@ Non-parametric Bootstrap Algorithm
 <p><strong>Input</strong>: Original sample <span class="math inline">\(\mathbf{x} = \{x_1, x_2, \ldots, x_n\}\)</span>, number of bootstrap samples <span class="math inline">\(B\)</span></p>
 <p><strong>For</strong> <span class="math inline">\(b = 1, 2, \ldots, B\)</span>:</p>
 <ol type="1">
-<li><strong>Resample</strong>: Draw <span class="math inline">\(\mathbf{x}^{*(b)} = \{x_1^{*(b)}, x_2^{*(b)}, \ldots, x_n^{*(b)}\}\)</span> by sampling <span class="math inline">\(n\)</span> observations with replacement from <span class="math inline">\(\mathbf{x}\)</span>.</li>
-<li><strong>Compute</strong>: Calculate the statistic <span class="math inline">\(T^{*(b)} = T(\mathbf{x}^{*(b)})\)</span>.</li>
+<li><strong>Resample</strong>: Draw <span class="math inline">\(n\)</span> observations with replacement from <span class="math inline">\(\mathbf{x}\)</span> to obtain <span class="math inline">\(\mathbf{x}^{*(b)} = \{x_1^{*(b)}, x_2^{*(b)}, \ldots, x_n^{*(b)}\}\)</span></li>
+<li><strong>Compute</strong>: Calculate the statistic of interest <span class="math inline">\(T^{*(b)} = T(\mathbf{x}^{*(b)})\)</span></li>
 </ol>
 <p><strong>Output</strong>: Bootstrap distribution <span class="math inline">\(\{T^{*(1)}, T^{*(2)}, \ldots, T^{*(B)}\}\)</span></p>
 </div>
 </div>
-<p>Each bootstrap sample <span class="math inline">\(\mathbf{x}^{*(b)}\)</span> has the same size as the original sample but may contain repeated observations and miss others entirely.</p>
+<p>Each bootstrap sample <span class="math inline">\(\mathbf{x}^{*(b)}\)</span> has the same size as the original sample but may contain repeated observations while omitting others entirely. The collection of bootstrap statistics <span class="math inline">\(\{T^{*(1)}, T^{*(2)}, \ldots, T^{*(B)}\}\)</span> forms an approximation to the sampling distribution of <span class="math inline">\(T\)</span>.</p>
 </section>
 <section id="mathematical-foundation" class="level3" data-number="16.2.3">
 <h3 data-number="16.2.3" class="anchored" data-anchor-id="mathematical-foundation"><span class="header-section-number">16.2.3</span> Mathematical Foundation</h3>
-<p>Let <span class="math inline">\(T_n = T(\mathbf{X})\)</span> be a statistic computed from the original sample, and <span class="math inline">\(T_n^* = T(\mathbf{X}^*)\)</span> be the same statistic computed from a bootstrap sample. The bootstrap approximation is:</p>
-<p><span class="math display">\[
-\mathcal{L}(T_n^* | \mathbf{X}) \approx \mathcal{L}(T_n | F)
-\]</span></p>
-<p>where <span class="math inline">\(\mathcal{L}(\cdot | \cdot)\)</span> denotes the conditional distribution.</p>
+<p>The central principle underlying the bootstrap is that the distribution of bootstrap statistics <span class="math inline">\(T_n^*\)</span> approximates the true sampling distribution of <span class="math inline">\(T_n\)</span>. Formally, we rely on the approximation that the bootstrap distribution conditional on the observed data mimics the sampling distribution conditional on the true population.</p>
+<p>From the bootstrap samples, we can estimate key properties of our statistic:</p>
 <p><strong>Bootstrap Estimate of Bias</strong>: <span class="math display">\[
-\text{bias}_{\text{boot}}(T_n) = \mathbb{E}[T_n^* | \mathbf{X}] - T_n = \frac{1}{B} \sum_{b=1}^{B} T^{*(b)} - T_n
+\text{bias}_{\text{boot}}(T_n) = \mathbb{E}[T_n^* | \mathbf{x}] - T_n = \frac{1}{B} \sum_{b=1}^{B} T^{*(b)} - T_n
 \]</span></p>
 <p><strong>Bootstrap Estimate of Variance</strong>: <span class="math display">\[
-\text{var}_{\text{boot}}(T_n) = \text{Var}(T_n^* | \mathbf{X}) = \frac{1}{B-1} \sum_{b=1}^{B} (T^{*(b)} - \bar{T}^*)^2
+\text{var}_{\text{boot}}(T_n) = \text{Var}(T_n^* | \mathbf{x}) = \frac{1}{B-1} \sum_{b=1}^{B} (T^{*(b)} - \bar{T}^*)^2
 \]</span></p>
-<p>where <span class="math inline">\(\bar{T}^* = \frac{1}{B} \sum_{b=1}^{B} T^{*(b)}\)</span>.</p>
+<p>where <span class="math inline">\(\bar{T}^* = \frac{1}{B} \sum_{b=1}^{B} T^{*(b)}\)</span> represents the mean of the bootstrap statistics.</p>
 </section>
 <section id="bootstrap-confidence-intervals" class="level3" data-number="16.2.4">
 <h3 data-number="16.2.4" class="anchored" data-anchor-id="bootstrap-confidence-intervals"><span class="header-section-number">16.2.4</span> Bootstrap Confidence Intervals</h3>
-<p>The bootstrap enables several methods for constructing confidence intervals:</p>
+<p>The bootstrap enables multiple approaches for constructing confidence intervals, each with different assumptions and properties.</p>
 <section id="normal-approximation-method" class="level4" data-number="16.2.4.1">
-<h4 data-number="16.2.4.1" class="anchored" data-anchor-id="normal-approximation-method"><span class="header-section-number">16.2.4.1</span> 1. Normal Approximation Method</h4>
-<p>Assumes the bootstrap distribution is approximately normal:</p>
+<h4 data-number="16.2.4.1" class="anchored" data-anchor-id="normal-approximation-method"><span class="header-section-number">16.2.4.1</span> Normal Approximation Method</h4>
+<p>When the bootstrap distribution is approximately normal, we can construct confidence intervals using:</p>
 <p><span class="math display">\[
-T_n \pm z_{\alpha/2} \cdot \text{se}_{\text{boot}}(T_n)
+\text{CI}_{1-\alpha} = T_n \pm z_{\alpha/2} \cdot \sqrt{\text{var}_{\text{boot}}(T_n)}
 \]</span></p>
-<p>where <span class="math inline">\(\text{se}_{\text{boot}}(T_n) = \sqrt{\text{var}_{\text{boot}}(T_n)}\)</span> and <span class="math inline">\(z_{\alpha/2}\)</span> is the <span class="math inline">\((1-\alpha/2)\)</span> quantile of the standard normal distribution.</p>
+<p>where <span class="math inline">\(z_{\alpha/2}\)</span> is the <span class="math inline">\((1-\alpha/2)\)</span> quantile of the standard normal distribution.</p>
 </section>
 <section id="percentile-method" class="level4" data-number="16.2.4.2">
-<h4 data-number="16.2.4.2" class="anchored" data-anchor-id="percentile-method"><span class="header-section-number">16.2.4.2</span> 2. Percentile Method</h4>
-<p>Uses the quantiles of the bootstrap distribution directly:</p>
+<h4 data-number="16.2.4.2" class="anchored" data-anchor-id="percentile-method"><span class="header-section-number">16.2.4.2</span> Percentile Method</h4>
+<p>The percentile method uses the empirical quantiles of the bootstrap distribution directly:</p>
 <p><span class="math display">\[
 \text{CI}_{1-\alpha} = [T^*_{(\alpha/2)}, T^*_{(1-\alpha/2)}]
 \]</span></p>
-<p>where <span class="math inline">\(T^*_{(q)}\)</span> is the <span class="math inline">\(q\)</span>-th quantile of the bootstrap distribution <span class="math inline">\(\{T^{*(1)}, \ldots, T^{*(B)}\}\)</span>.</p>
+<p>where <span class="math inline">\(T^*_{(q)}\)</span> denotes the <span class="math inline">\(q\)</span>-th quantile of the ordered bootstrap statistics. This method requires no distributional assumptions and automatically accounts for skewness in the bootstrap distribution.</p>
 </section>
 </section>
 <section id="example-bootstrap-for-sample-mean" class="level3" data-number="16.2.5">
 <h3 data-number="16.2.5" class="anchored" data-anchor-id="example-bootstrap-for-sample-mean"><span class="header-section-number">16.2.5</span> Example: Bootstrap for Sample Mean</h3>
-<p>Consider estimating the mean <span class="math inline">\(\mu\)</span> from a sample <span class="math inline">\(\mathbf{x} = \{x_1, \ldots, x_n\}\)</span>.</p>
-<p><strong>Original Statistic</strong>: <span class="math inline">\(\bar{x} = \frac{1}{n}\sum_{i=1}^n x_i\)</span></p>
-<p><strong>Bootstrap Procedure</strong>:</p>
-<ol type="1">
-<li>For <span class="math inline">\(b = 1, \ldots, B\)</span>: Sample <span class="math inline">\(\mathbf{x}^{*(b)}\)</span> with replacement from <span class="math inline">\(\mathbf{x}\)</span>.</li>
-<li>Compute <span class="math inline">\(\bar{x}^{*(b)} = \frac{1}{n}\sum_{i=1}^n x_i^{*(b)}\)</span>.</li>
-</ol>
-<p><strong>Theoretical Results</strong>:</p>
+<p>Consider the problem of estimating the population mean <span class="math inline">\(\mu\)</span> from a sample <span class="math inline">\(\mathbf{x} = \{x_1, \ldots, x_n\}\)</span>.</p>
+<p><strong>Original Statistic</strong>: The sample mean is <span class="math inline">\(\bar{x} = \frac{1}{n}\sum_{i=1}^n x_i\)</span></p>
+<p><strong>Bootstrap Procedure</strong>: For each bootstrap replicate <span class="math inline">\(b\)</span>, we compute the bootstrap sample mean: <span class="math display">\[\bar{x}^{*(b)} = \frac{1}{n}\sum_{i=1}^n x_i^{*(b)}\]</span></p>
+<p><strong>Theoretical Properties</strong>: The bootstrap method yields several important results:</p>
 <ul>
-<li><span class="math inline">\(\mathbb{E}[\bar{x}^* | \mathbf{x}] = \bar{x}\)</span> (unbiased).</li>
-<li><span class="math inline">\(\text{Var}(\bar{x}^* | \mathbf{x}) = \frac{1}{n}\hat{\sigma}^2\)</span> where <span class="math inline">\(\hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i - \bar{x})^2\)</span>.</li>
+<li><p><strong>Unbiasedness</strong>: <span class="math inline">\(\mathbb{E}[\bar{x}^* | \mathbf{x}] = \bar{x}\)</span>.</p></li>
+<li><p><strong>Variance</strong>: <span class="math inline">\(\text{Var}(\bar{x}^* | \mathbf{x}) = \frac{\hat{\sigma}^2}{n}\)</span> where <span class="math inline">\(\hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i - \bar{x})^2\)</span>.</p></li>
 </ul>
-<p>This matches the classical result, demonstrating bootstrap consistency for the sample mean.</p>
+<p>This demonstrates that the bootstrap variance estimate matches the classical theoretical result, providing evidence for the method’s validity in this fundamental case.</p>
 </section>
 <section id="bootstrap-hypothesis-testing" class="level3" data-number="16.2.6">
 <h3 data-number="16.2.6" class="anchored" data-anchor-id="bootstrap-hypothesis-testing"><span class="header-section-number">16.2.6</span> Bootstrap Hypothesis Testing</h3>
-<p>The bootstrap can also be used for hypothesis testing. Consider testing <span class="math inline">\(H_0: \theta = \theta_0\)</span> versus <span class="math inline">\(H_1: \theta \neq \theta_0\)</span>.</p>
-<p><strong>Bootstrap p-value</strong>:</p>
+<p>The bootstrap framework extends naturally to hypothesis testing scenarios. Consider testing the null hypothesis <span class="math inline">\(H_0: \theta = \theta_0\)</span> against the alternative <span class="math inline">\(H_1: \theta \neq \theta_0\)</span>.</p>
+<p><strong>Bootstrap p-value Procedure</strong>:</p>
 <ol type="1">
-<li>Compute the test statistic <span class="math inline">\(T_{\text{obs}} = T(\mathbf{x})\)</span> from the original sample.</li>
-<li>Generate bootstrap samples under <span class="math inline">\(H_0\)</span> (this may require centering or other transformations).</li>
-<li>Compute bootstrap test statistics <span class="math inline">\(\{T^{*(1)}, \ldots, T^{*(B)}\}\)</span>.</li>
-<li>Calculate the p-value: <span class="math inline">\(p = \frac{\#\{|T^{*(b)}| \geq |T_{\text{obs}}|\}}{B}\)</span>.</li>
+<li><p>Compute the observed test statistic <span class="math inline">\(T_{\text{obs}} = T(\mathbf{x})\)</span> from the original sample</p></li>
+<li><p>Generate bootstrap samples under the null hypothesis (often requiring data transformation to satisfy <span class="math inline">\(H_0\)</span>)</p></li>
+<li><p>Compute bootstrap test statistics <span class="math inline">\(\{T^{*(1)}, \ldots, T^{*(B)}\}\)</span> from each bootstrap sample</p></li>
+<li><p>Calculate the bootstrap p-value: <span class="math inline">\(p_{\text{boot}} = \frac{\#\{|T^{*(b)}| \geq |T_{\text{obs}}|\}}{B}\)</span></p></li>
 </ol>
+<p>This approach provides a distribution-free method for computing p-values when the null distribution of the test statistic is unknown or intractable.</p>
 </section>
-<section id="limitations-of-non-parametric-bootstrap" class="level3" data-number="16.2.7">
-<h3 data-number="16.2.7" class="anchored" data-anchor-id="limitations-of-non-parametric-bootstrap"><span class="header-section-number">16.2.7</span> Limitations of Non-parametric Bootstrap</h3>
-<ol type="1">
-<li><strong>Boundary problems</strong>: Poor performance when the parameter is near a boundary.</li>
-<li><strong>Extreme values</strong>: May not capture tail behavior well with finite samples.</li>
-<li><strong>Dependence structures</strong>: Assumes observations are i.i.d.</li>
-<li><strong>Computational cost</strong>: Requires <span class="math inline">\(B \times n\)</span> resampling operations.</li>
-<li><strong>Discrete distributions</strong>: Can be problematic for discrete data with few unique values.</li>
-</ol>
+<section id="limitations-and-considerations" class="level3" data-number="16.2.7">
+<h3 data-number="16.2.7" class="anchored" data-anchor-id="limitations-and-considerations"><span class="header-section-number">16.2.7</span> Limitations and Considerations</h3>
+<p>While the non-parametric bootstrap is remarkably versatile, several limitations should be considered:</p>
+<p><strong>Methodological Limitations</strong>:</p>
+<ul>
+<li><p><strong>Boundary effects</strong>: Performance degrades when the parameter of interest lies near natural boundaries.</p></li>
+<li><p><strong>Extreme value behavior</strong>: May inadequately capture tail behavior with finite samples.</p></li>
+<li><p><strong>Independence assumption</strong>: Assumes observations are independent and identically distributed.</p></li>
+</ul>
+<p><strong>Computational Considerations</strong>:</p>
+<ul>
+<li><p><strong>Computational intensity</strong>: Requires <span class="math inline">\(B \times n\)</span> resampling operations, which can be substantial for large datasets.</p></li>
+<li><p><strong>Bootstrap sample size</strong>: Choice of <span class="math inline">\(B\)</span> involves trade-offs between accuracy and computational cost.</p></li>
+</ul>
+<p><strong>Data-specific Issues</strong>:</p>
+<ul>
+<li><p><strong>Discrete distributions</strong>: Can perform poorly with discrete data having few unique values.</p></li>
+<li><p><strong>Small sample sizes</strong>: May not provide adequate approximation when <span class="math inline">\(n\)</span> is very small.</p></li>
+</ul>
+<p>Despite these limitations, the non-parametric bootstrap remains one of the most widely applicable and robust methods for statistical inference, particularly when distributional assumptions are questionable or when analytical results are unavailable.</p>
+<div id="22be3566" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="bootstrap_files/figure-html/cell-2-output-1.png" width="1142" height="946" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="bootstrap_files/figure-html/cell-2-output-2.png" width="950" height="759" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="parametric-bootstrap" class="level2" data-number="16.3">
 <h2 data-number="16.3" class="anchored" data-anchor-id="parametric-bootstrap"><span class="header-section-number">16.3</span> Parametric Bootstrap</h2>
 <section id="motivation-and-framework" class="level3" data-number="16.3.1">
 <h3 data-number="16.3.1" class="anchored" data-anchor-id="motivation-and-framework"><span class="header-section-number">16.3.1</span> Motivation and Framework</h3>
-<p>While the non-parametric bootstrap makes minimal distributional assumptions, there are situations where we have good reason to believe the data follows a specific parametric family. The <strong>parametric bootstrap</strong> leverages this knowledge to potentially improve bootstrap performance.</p>
-<p>This approach mirrors the distinction we saw in particle filtering between the <strong>bootstrap filter</strong> (which samples from the natural dynamics) and filters that use <strong>informed proposal distributions</strong> (which incorporate additional information to guide sampling).</p>
-<p><strong>Key Idea</strong>: Instead of resampling from the empirical distribution, we:</p>
+<p>The <strong>parametric bootstrap</strong> assumes your data follows a specific distribution (like normal or exponential). Instead of resampling from your original data, you:</p>
 <ol type="1">
-<li>Estimate the parameters of the assumed distribution.</li>
-<li>Generate bootstrap samples from the fitted parametric distribution.</li>
+<li>Estimate the parameters of the assumed distribution</li>
+<li>Generate new samples from that fitted distribution</li>
 </ol>
-<div id="1a6cdc55" class="cell" data-execution_count="2">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="bootstrap_files/figure-html/cell-2-output-1.png" width="1906" height="946" class="figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="bootstrap_files/figure-html/cell-2-output-2.png" width="1147" height="757" class="figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Key Insights:
-• Even with very small samples (n=3), bootstrap gives approximately normal distribution
-• As sample size increases, bootstrap distribution becomes more concentrated around true mean
-• Bootstrap standard error decreases as 1/√n (Central Limit Theorem)
-• Bootstrap distribution matches theoretical normal distribution remarkably well</code></pre>
-</div>
-</div>
+<p>This is like using additional knowledge to guide your bootstrap sampling, similar to how informed proposal distributions improve particle filtering.</p>
 </section>
 <section id="parametric-bootstrap-procedure" class="level3" data-number="16.3.2">
 <h3 data-number="16.3.2" class="anchored" data-anchor-id="parametric-bootstrap-procedure"><span class="header-section-number">16.3.2</span> Parametric Bootstrap Procedure</h3>
-<p>Assume the data <span class="math inline">\(\mathbf{X} = \{X_1, \ldots, X_n\}\)</span> follows a distribution <span class="math inline">\(F_{\boldsymbol{\theta}}\)</span> with parameter vector <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Parametric Bootstrap Algorithm
+Algorithm: Parametric Bootstrap
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Input</strong>: Original sample <span class="math inline">\(\mathbf{x} = \{x_1, x_2, \ldots, x_n\}\)</span>, parametric family <span class="math inline">\(F_{\boldsymbol{\theta}}\)</span>, number of bootstrap samples <span class="math inline">\(B\)</span></p>
+<p><strong>Input</strong>: Original sample <span class="math inline">\(\mathbf{x}\)</span>, assumed distribution family, number of bootstrap samples <span class="math inline">\(B\)</span></p>
 <ol type="1">
-<li><strong>Estimate</strong>: Compute parameter estimate <span class="math inline">\(\hat{\boldsymbol{\theta}} = \hat{\boldsymbol{\theta}}(\mathbf{x})\)</span> (e.g., MLE).</li>
+<li><strong>Estimate</strong>: Fit the distribution to get parameter estimate <span class="math inline">\(\hat{\boldsymbol{\theta}}\)</span></li>
 </ol>
 <p><strong>For</strong> <span class="math inline">\(b = 1, 2, \ldots, B\)</span>:</p>
 <ol start="2" type="1">
-<li><strong>Generate</strong>: Draw <span class="math inline">\(\mathbf{x}^{*(b)} = \{x_1^{*(b)}, x_2^{*(b)}, \ldots, x_n^{*(b)}\}\)</span> from <span class="math inline">\(F_{\hat{\boldsymbol{\theta}}}\)</span>.</li>
-<li><strong>Compute</strong>: Calculate the statistic <span class="math inline">\(T^{*(b)} = T(\mathbf{x}^{*(b)})\)</span>.</li>
+<li><strong>Generate</strong>: Draw new sample <span class="math inline">\(\mathbf{x}^{*(b)}\)</span> from the fitted distribution</li>
+<li><strong>Compute</strong>: Calculate statistic <span class="math inline">\(T^{*(b)} = T(\mathbf{x}^{*(b)})\)</span></li>
 </ol>
 <p><strong>Output</strong>: Bootstrap distribution <span class="math inline">\(\{T^{*(1)}, T^{*(2)}, \ldots, T^{*(B)}\}\)</span></p>
 </div>
 </div>
 </section>
-<section id="mathematical-properties" class="level3" data-number="16.3.3">
-<h3 data-number="16.3.3" class="anchored" data-anchor-id="mathematical-properties"><span class="header-section-number">16.3.3</span> Mathematical Properties</h3>
-<p>The parametric bootstrap approximation is: <span class="math display">\[
-\mathcal{L}(T_n^* | \hat{\boldsymbol{\theta}}) \approx \mathcal{L}(T_n | \boldsymbol{\theta})
-\]</span></p>
-<p><strong>Advantages over Non-parametric Bootstrap</strong>:</p>
-<ul>
-<li><strong>Efficiency</strong>: Can be more accurate when the parametric assumption is correct.</li>
-<li><strong>Extrapolation</strong>: Better at capturing tail behavior and extreme values.</li>
-<li><strong>Smoothness</strong>: Generates continuous bootstrap distributions even from discrete data.</li>
-<li><strong>Small samples</strong>: Often performs better with limited data.</li>
-</ul>
-<p><strong>Disadvantages</strong>:</p>
-<ul>
-<li><strong>Model dependence</strong>: Performance degrades if parametric assumption is wrong.</li>
-<li><strong>Bias</strong>: Can introduce bias if the model is misspecified.</li>
-</ul>
+<section id="when-to-use-parametric-bootstrap" class="level3" data-number="16.3.3">
+<h3 data-number="16.3.3" class="anchored" data-anchor-id="when-to-use-parametric-bootstrap"><span class="header-section-number">16.3.3</span> When to Use Parametric Bootstrap</h3>
+<p><strong>Advantages</strong>: - More accurate when your distributional assumption is correct - Better at capturing extreme values and tail behavior<br>
+- Works better with small sample sizes - Produces smooth distributions even from discrete data</p>
+<p><strong>Disadvantages</strong>: - Poor performance if you choose the wrong distribution - Can introduce bias from model misspecification</p>
 </section>
 <section id="example-normal-distribution" class="level3" data-number="16.3.4">
 <h3 data-number="16.3.4" class="anchored" data-anchor-id="example-normal-distribution"><span class="header-section-number">16.3.4</span> Example: Normal Distribution</h3>
-<p>Suppose <span class="math inline">\(X_1, \ldots, X_n \sim \mathcal{N}(\mu, \sigma^2)\)</span> and we want to bootstrap the sample variance <span class="math inline">\(S^2\)</span>.</p>
-<p><strong>Parameter Estimation</strong>: <span class="math display">\[
-\hat{\mu} = \bar{x} = \frac{1}{n}\sum_{i=1}^n x_i, \quad \hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i - \bar{x})^2
-\]</span></p>
-<p><strong>Bootstrap Procedure</strong>:</p>
-<ol type="1">
-<li>For <span class="math inline">\(b = 1, \ldots, B\)</span>: Generate <span class="math inline">\(x_1^{*(b)}, \ldots, x_n^{*(b)} \sim \mathcal{N}(\hat{\mu}, \hat{\sigma}^2)\)</span>.</li>
-<li>Compute <span class="math inline">\((S^2)^{*(b)} = \frac{1}{n-1}\sum_{i=1}^n (x_i^{*(b)} - \bar{x}^{*(b)})^2\)</span>.</li>
-</ol>
-<p><strong>Theoretical Result</strong>: For the normal distribution, we know that: <span class="math display">\[
-\frac{(n-1)S^2}{\sigma^2} \sim \chi^2_{n-1}
-\]</span></p>
-<p>The parametric bootstrap will approximate this distribution, while the non-parametric bootstrap provides a discrete approximation based on the specific sample values.</p>
+<p>Suppose your data is normally distributed and you want to bootstrap the sample variance <span class="math inline">\(S^2\)</span>.</p>
+<p><strong>Step 1 - Estimate parameters</strong>: <span class="math display">\[\hat{\mu} = \bar{x}, \quad \hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n (x_i - \bar{x})^2\]</span></p>
+<p><strong>Step 2 - Bootstrap procedure</strong>: Generate each bootstrap sample from <span class="math inline">\(\mathcal{N}(\hat{\mu}, \hat{\sigma}^2)\)</span> and compute the variance.</p>
+<p>The parametric bootstrap will approximate the known <span class="math inline">\(\chi^2\)</span> distribution, while non-parametric bootstrap gives a discrete approximation.</p>
 </section>
-<section id="example-linear-regression" class="level3" data-number="16.3.5">
-<h3 data-number="16.3.5" class="anchored" data-anchor-id="example-linear-regression"><span class="header-section-number">16.3.5</span> Example: Linear Regression</h3>
-<p>Consider the linear model <span class="math inline">\(\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}\)</span> where <span class="math inline">\(\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \sigma^2\mathbf{I})\)</span>.</p>
-<p><strong>Parameter Estimation</strong>: <span class="math display">\[
-\hat{\boldsymbol{\beta}} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}, \quad \hat{\sigma}^2 = \frac{1}{n-p}\|\mathbf{y} - \mathbf{X}\hat{\boldsymbol{\beta}}\|^2
-\]</span></p>
-<p><strong>Parametric Bootstrap Approaches</strong>:</p>
-<p><strong>Method 1 - Residual Bootstrap</strong>:</p>
-<ol type="1">
-<li>Compute fitted values <span class="math inline">\(\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol{\beta}}\)</span> and residuals <span class="math inline">\(\hat{\boldsymbol{\epsilon}} = \mathbf{y} - \hat{\mathbf{y}}\)</span>.</li>
-<li>For each bootstrap: <span class="math inline">\(\mathbf{y}^{*(b)} = \hat{\mathbf{y}} + \boldsymbol{\epsilon}^{*(b)}\)</span> where <span class="math inline">\(\boldsymbol{\epsilon}^{*(b)} \sim \mathcal{N}(\mathbf{0}, \hat{\sigma}^2\mathbf{I})\)</span>.</li>
-<li>Compute <span class="math inline">\(\hat{\boldsymbol{\beta}}^{*(b)} = (\mathbf{X}^{\top}\mathbf{X})^{-1}\mathbf{X}^{\top}\mathbf{y}^{*(b)}\)</span>.</li>
-</ol>
-<p><strong>Method 2 - Pairs Bootstrap</strong> (semi-parametric):</p>
-<ol type="1">
-<li>Resample pairs <span class="math inline">\((\mathbf{x}_i, y_i)\)</span> with replacement.</li>
-<li>Fit regression to bootstrap sample.</li>
-</ol>
-<div id="fde9008d" class="cell" data-execution_count="3">
+<section id="example-exponential-distribution" class="level3" data-number="16.3.5">
+<h3 data-number="16.3.5" class="anchored" data-anchor-id="example-exponential-distribution"><span class="header-section-number">16.3.5</span> Example: Exponential Distribution</h3>
+<p>For exponentially distributed data, bootstrap the sample mean <span class="math inline">\(\bar{X}\)</span>.</p>
+<p><strong>Parameter estimate</strong>: <span class="math inline">\(\hat{\lambda} = \frac{1}{\bar{x}}\)</span></p>
+<p><strong>Bootstrap procedure</strong>: Generate each bootstrap sample from <span class="math inline">\(\text{Exp}(\hat{\lambda})\)</span>.</p>
+<p>When the exponential assumption is correct, this provides exact inference using the known <span class="math inline">\(\chi^2\)</span> distribution properties.</p>
+<div id="4ac82b0a" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="bootstrap_files/figure-html/cell-3-output-1.png" width="1334" height="936" class="figure-img"></p>
+<p><img src="bootstrap_files/figure-html/cell-3-output-1.png" width="1142" height="470" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>DRAMATIC DIFFERENCE:
-• Normal data: Non-param vs Param difference = 0.17
-• Exponential data: Non-param vs Param difference = 0.50 (10x larger!)
-• Parametric bootstrap severely underestimates the 90th percentile when assumption is wrong</code></pre>
+<pre><code>True P(X &gt; 8): 0.0228
+Non-parametric estimate: 0.0000 (bias: 0.0228)
+Parametric estimate: 0.0104 (bias: 0.0124)</code></pre>
 </div>
 </div>
 </section>
@@ -910,18 +866,9 @@ Parametric Bootstrap Algorithm
 </tbody>
 </table>
 </section>
-<section id="model-based-bootstrap-extensions" class="level3" data-number="16.3.7">
-<h3 data-number="16.3.7" class="anchored" data-anchor-id="model-based-bootstrap-extensions"><span class="header-section-number">16.3.7</span> Model-based Bootstrap Extensions</h3>
-<p><strong>Semiparametric Bootstrap</strong>: Combines parametric and non-parametric elements. For example, in regression:</p>
-<ul>
-<li>Use parametric assumptions for the error distribution.</li>
-<li>Use non-parametric resampling for the covariate distribution.</li>
-</ul>
-<p><strong>Bayesian Bootstrap</strong>: Treats the empirical distribution as a realization from a Dirichlet process, providing a Bayesian interpretation of the bootstrap.</p>
-<p><strong>Wild Bootstrap</strong>: Used for heteroscedastic regression models, where residuals are multiplied by random weights rather than resampled.</p>
-</section>
-<section id="choosing-between-bootstrap-methods" class="level3" data-number="16.3.8">
-<h3 data-number="16.3.8" class="anchored" data-anchor-id="choosing-between-bootstrap-methods"><span class="header-section-number">16.3.8</span> Choosing Between Bootstrap Methods</h3>
+<section id="choosing-between-bootstrap-methods" class="level3" data-number="16.3.7">
+<h3 data-number="16.3.7" class="anchored" data-anchor-id="choosing-between-bootstrap-methods"><span class="header-section-number">16.3.7</span> Choosing Between Bootstrap Methods</h3>
+<p>The choice between parametric and non-parametric bootstrap depends on the balance between model assumptions and statistical efficiency.</p>
 <p><strong>Use Non-parametric Bootstrap when</strong>:</p>
 <ul>
 <li>Uncertain about distributional assumptions.</li>
@@ -944,16 +891,6 @@ Parametric Bootstrap Algorithm
 <li>If different: investigate model assumptions or prefer non-parametric.</li>
 <li>Use residual plots and goodness-of-fit tests to validate parametric assumptions.</li>
 </ol>
-</section>
-<section id="connection-back-to-particle-filtering" class="level3" data-number="16.3.9">
-<h3 data-number="16.3.9" class="anchored" data-anchor-id="connection-back-to-particle-filtering"><span class="header-section-number">16.3.9</span> Connection Back to Particle Filtering</h3>
-<p>The choice between parametric and non-parametric bootstrap mirrors the choice between different proposal distributions in particle filtering:</p>
-<ul>
-<li><strong>Non-parametric bootstrap</strong> ≈ <strong>Bootstrap particle filter</strong>: Uses the “natural” sampling distribution (empirical distribution or system dynamics).</li>
-<li><strong>Parametric bootstrap</strong> ≈ <strong>Optimal proposal</strong>: Uses additional information (parametric model or observations) to guide sampling more efficiently.</li>
-</ul>
-<p>Just as particle filters must balance computational efficiency with robustness to model misspecification, bootstrap methods face the same trade-off between parametric efficiency and non-parametric robustness.</p>
-<p>The bootstrap, in both its parametric and non-parametric forms, provides a unified framework for statistical inference that bridges classical theory with modern computational methods. Its flexibility and intuitive appeal have made it one of the most important statistical innovations of the late 20th century, with deep connections to other resampling-based methods like particle filtering.</p>
 
 
 </section>
