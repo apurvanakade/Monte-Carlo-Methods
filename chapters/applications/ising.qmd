@@ -79,6 +79,18 @@ We model the system using $N^2$ random variables $X_{i, j}$. Each $X_{i, j}$ is 
 
 In order to describe the system mathematically, we need to provide the joint probability distribution of the random variables $X_{i, j}$. This is done using the Hamiltonian of the system and the Boltzmann distribution.
 
+
+### Magnetization
+
+The magnetization of the system is given by
+
+$$
+M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
+$$
+
+If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
+
+
 ### Hamiltonian
 
 The Hamiltonian of the system is given by
@@ -111,20 +123,10 @@ $$
 As $T \to 0$, the term with the highest value of $-H(\sigma)$ will dominate the sum in the denominator. But the term with the highest value of $-H(\sigma)$ is the one that minimizes $H(\sigma)$. So,
 
 $$
-\lim \limits_{T \to \infty} f(\sigma) = \lim \limits_{T \to \infty}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to \infty}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
+\lim \limits_{T \to 0} f(\sigma) = \lim \limits_{T \to 0}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to 0}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
 $$
 
 If $H(\sigma)_{\min} = H(\sigma)$, then the probability of the system being in that state is $1$ and $0$ otherwise. This means that at low temperatures, the system will be in a state that minimizes the energy. But as $T$ increases, more and more high energy states become probable. So temperature can be thought of as adding variability to the system.
-
-### Magnetization
-
-The magnetization of the system is given by
-
-$$
-M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
-$$
-
-If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
 
 
 ## Phase Transitions

@@ -513,10 +513,10 @@ window.Quarto = {
   <li><a href="#the-physical-ising-model" id="toc-the-physical-ising-model" class="nav-link active" data-scroll-target="#the-physical-ising-model"><span class="header-section-number">14.1</span> The Physical Ising Model</a></li>
   <li><a href="#the-mathematical-ising-model" id="toc-the-mathematical-ising-model" class="nav-link" data-scroll-target="#the-mathematical-ising-model"><span class="header-section-number">14.2</span> The Mathematical Ising Model</a>
   <ul class="collapse">
-  <li><a href="#hamiltonian" id="toc-hamiltonian" class="nav-link" data-scroll-target="#hamiltonian"><span class="header-section-number">14.2.1</span> Hamiltonian</a></li>
-  <li><a href="#boltzmann-distribution" id="toc-boltzmann-distribution" class="nav-link" data-scroll-target="#boltzmann-distribution"><span class="header-section-number">14.2.2</span> Boltzmann Distribution</a></li>
-  <li><a href="#low-temperature" id="toc-low-temperature" class="nav-link" data-scroll-target="#low-temperature"><span class="header-section-number">14.2.3</span> Low Temperature</a></li>
-  <li><a href="#magnetization" id="toc-magnetization" class="nav-link" data-scroll-target="#magnetization"><span class="header-section-number">14.2.4</span> Magnetization</a></li>
+  <li><a href="#magnetization" id="toc-magnetization" class="nav-link" data-scroll-target="#magnetization"><span class="header-section-number">14.2.1</span> Magnetization</a></li>
+  <li><a href="#hamiltonian" id="toc-hamiltonian" class="nav-link" data-scroll-target="#hamiltonian"><span class="header-section-number">14.2.2</span> Hamiltonian</a></li>
+  <li><a href="#boltzmann-distribution" id="toc-boltzmann-distribution" class="nav-link" data-scroll-target="#boltzmann-distribution"><span class="header-section-number">14.2.3</span> Boltzmann Distribution</a></li>
+  <li><a href="#low-temperature" id="toc-low-temperature" class="nav-link" data-scroll-target="#low-temperature"><span class="header-section-number">14.2.4</span> Low Temperature</a></li>
   </ul></li>
   <li><a href="#phase-transitions" id="toc-phase-transitions" class="nav-link" data-scroll-target="#phase-transitions"><span class="header-section-number">14.3</span> Phase Transitions</a></li>
   <li><a href="#gibbs-sampling" id="toc-gibbs-sampling" class="nav-link" data-scroll-target="#gibbs-sampling"><span class="header-section-number">14.4</span> Gibbs Sampling</a>
@@ -624,41 +624,41 @@ document.addEventListener("DOMContentLoaded", function() {
 <h2 data-number="14.2" class="anchored" data-anchor-id="the-mathematical-ising-model"><span class="header-section-number">14.2</span> The Mathematical Ising Model</h2>
 <p>We model the system using <span class="math inline">\(N^2\)</span> random variables <span class="math inline">\(X_{i, j}\)</span>. Each <span class="math inline">\(X_{i, j}\)</span> is a binary random variable that takes the value <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The configuration of the system is given by the <span class="math inline">\(N^2\)</span> length vector <span class="math inline">\(\mathbf{X} = (X_{1, 1}, X_{1, 2}, \ldots, X_{N, N})\)</span>. There are <span class="math inline">\(2^{N^2}\)</span> possible configurations of the system i.e.&nbsp;the state space has size <span class="math inline">\(2^{N^2}\)</span>. We can imagine each configuration as being the vertex of a hypercube in <span class="math inline">\(N^2\)</span> dimensions with vertices <span class="math inline">\((\pm 1, \pm 1, \ldots, \pm 1)\)</span>. We’ll let the variable <span class="math inline">\(\sigma\)</span> denote a configuration of the system. So <span class="math inline">\(\sigma\)</span> is a vector of length <span class="math inline">\(N^2\)</span> with entries in <span class="math inline">\(\{-1, 1\}\)</span>.</p>
 <p>In order to describe the system mathematically, we need to provide the joint probability distribution of the random variables <span class="math inline">\(X_{i, j}\)</span>. This is done using the Hamiltonian of the system and the Boltzmann distribution.</p>
-<section id="hamiltonian" class="level3" data-number="14.2.1">
-<h3 data-number="14.2.1" class="anchored" data-anchor-id="hamiltonian"><span class="header-section-number">14.2.1</span> Hamiltonian</h3>
+<section id="magnetization" class="level3" data-number="14.2.1">
+<h3 data-number="14.2.1" class="anchored" data-anchor-id="magnetization"><span class="header-section-number">14.2.1</span> Magnetization</h3>
+<p>The magnetization of the system is given by</p>
+<p><span class="math display">\[
+M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
+\]</span></p>
+<p>If the system is magnetized, then <span class="math inline">\(M(\sigma)\)</span> will be close to <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution <span class="math inline">\(f(\sigma)\)</span> and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.</p>
+</section>
+<section id="hamiltonian" class="level3" data-number="14.2.2">
+<h3 data-number="14.2.2" class="anchored" data-anchor-id="hamiltonian"><span class="header-section-number">14.2.2</span> Hamiltonian</h3>
 <p>The Hamiltonian of the system is given by</p>
 <p><span class="math display">\[
 H(\sigma) = -J \sum \limits_{(i, j) \text{ and } (i', j') \text{ are neighbors}} X_{i, j} X_{i', j'}
 \]</span></p>
 <p>where the sum is over all pairs of neighboring particles. The Hamiltonian is just a measure of the energy of the system. Note that because <span class="math inline">\(J\)</span> is positive, the energy is minimized when neighboring particles have the same spin.</p>
 </section>
-<section id="boltzmann-distribution" class="level3" data-number="14.2.2">
-<h3 data-number="14.2.2" class="anchored" data-anchor-id="boltzmann-distribution"><span class="header-section-number">14.2.2</span> Boltzmann Distribution</h3>
+<section id="boltzmann-distribution" class="level3" data-number="14.2.3">
+<h3 data-number="14.2.3" class="anchored" data-anchor-id="boltzmann-distribution"><span class="header-section-number">14.2.3</span> Boltzmann Distribution</h3>
 <p>The probability of the system being in a particular configuration <span class="math inline">\(\sigma\)</span> is given by the Boltzmann distribution:</p>
 <p><span class="math display">\[
 f(\sigma) = \frac{e^{-H(\sigma)/T}}{Z}
 \]</span></p>
 <p>where <span class="math inline">\(T\)</span> is the temperature, and <span class="math inline">\(Z\)</span> is the normalization constant called the partition function. This is the joint probability mass function of the random variables <span class="math inline">\(X_{i, j}\)</span>. The partition function <span class="math inline">\(Z\)</span> is not easy to compute, but thankfully we do not need it to sample from the joint distribution.</p>
 </section>
-<section id="low-temperature" class="level3" data-number="14.2.3">
-<h3 data-number="14.2.3" class="anchored" data-anchor-id="low-temperature"><span class="header-section-number">14.2.3</span> Low Temperature</h3>
+<section id="low-temperature" class="level3" data-number="14.2.4">
+<h3 data-number="14.2.4" class="anchored" data-anchor-id="low-temperature"><span class="header-section-number">14.2.4</span> Low Temperature</h3>
 <p>If we plugin the partition function explicitly, we can see that the probability distribution becomes</p>
 <p><span class="math display">\[
 f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum \limits_{\sigma'}e^{-H(\sigma')/T}}.
 \]</span></p>
 <p>As <span class="math inline">\(T \to 0\)</span>, the term with the highest value of <span class="math inline">\(-H(\sigma)\)</span> will dominate the sum in the denominator. But the term with the highest value of <span class="math inline">\(-H(\sigma)\)</span> is the one that minimizes <span class="math inline">\(H(\sigma)\)</span>. So,</p>
 <p><span class="math display">\[
-\lim \limits_{T \to \infty} f(\sigma) = \lim \limits_{T \to \infty}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to \infty}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
+\lim \limits_{T \to 0} f(\sigma) = \lim \limits_{T \to 0}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to 0}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
 \]</span></p>
 <p>If <span class="math inline">\(H(\sigma)_{\min} = H(\sigma)\)</span>, then the probability of the system being in that state is <span class="math inline">\(1\)</span> and <span class="math inline">\(0\)</span> otherwise. This means that at low temperatures, the system will be in a state that minimizes the energy. But as <span class="math inline">\(T\)</span> increases, more and more high energy states become probable. So temperature can be thought of as adding variability to the system.</p>
-</section>
-<section id="magnetization" class="level3" data-number="14.2.4">
-<h3 data-number="14.2.4" class="anchored" data-anchor-id="magnetization"><span class="header-section-number">14.2.4</span> Magnetization</h3>
-<p>The magnetization of the system is given by</p>
-<p><span class="math display">\[
-M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
-\]</span></p>
-<p>If the system is magnetized, then <span class="math inline">\(M(\sigma)\)</span> will be close to <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution <span class="math inline">\(f(\sigma)\)</span> and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.</p>
 </section>
 </section>
 <section id="phase-transitions" class="level2" data-number="14.3">
