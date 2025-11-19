@@ -17,18 +17,21 @@ import matplotlib.pyplot as plt
 The Ising model is a simple model of ferromagnetism from statistical mechanics. The setup is as follows:
 
 1. **Particles**: 
-   We have a lattice of $N$ particles, each of which can be have one of two states of magnetization: spin up ($X = 1$) or spin down ($X = -1$). For simplicity, we assume the grid is "wrapped" so that the top and bottom edges are connected, and the left and right edges are connected. **This means that each site has four neighbors.** Such a grid is called a torus.
+   We have a lattice of $N \times N$ particles, each of which can have one of two states of magnetization: spin up ($X = 1$) or spin down ($X = -1$). For simplicity, we assume the grid is "wrapped" so that the top and bottom edges are connected, and the left and right edges are connected. **This means that each site has four neighbors.** Such a grid is called a torus.
+
 2. **Coupling constant**: 
-   Two adjacent particles have a tendency to have spins aligned. This tendency is quantified by a coupling constant $J$. If two adjacent particles have the same spin, the energy of the system is lowered by $-J$, and if they have opposite spins, the energy is raised by $J$. Any physical system tends to minimize its energy, so the system will tend to have neighboring particles with the same spin.
+   Two adjacent particles have a tendency to align their spins. This tendency is quantified by a coupling constant $J > 0$. If two adjacent particles have the same spin, the energy of the system is lowered by $-J$, and if they have opposite spins, the energy is raised by $J$. Any physical system tends to minimize its energy, so the system will tend to have neighboring particles with the same spin.
+
 3. **External magnetic field**: 
-   For the same of simplicity we'll assume that there is no external force field. 
+   For the sake of simplicity, we'll assume that there is no external magnetic field.
+
 4. **Temperature**:
    Temperature adds randomness to the system. At 0K, all the particles have their spins aligned. As the temperature increases, the particles start to flip their spins. The higher the temperature, the more likely it is for neighboring particles to have opposite spins.
+
 5. **Magnetization**: 
-   If the system is in a state where most of the particles have the same spin, the system is said to be magnetized. 
+   If the system is in a state where most of the particles have the same spin, the system is said to be magnetized.
 
-Next we create a mathematical model to describe the system.
-
+Next, we create a mathematical model to describe the system.
 
 ```{python}
 import numpy as np
@@ -74,32 +77,29 @@ plot_ising_model(ising_grid)
 
 ## The Mathematical Ising Model
 
-We model the system using $N^2$ random variables $X_{i, j}$. Each $X_{i, j}$ is a binary random variable that takes the value $1$ or $-1$. The configuration of the system is given by the $N^2$ length vector $\mathbf{X} = (X_{1, 1}, X_{1, 2}, \ldots, X_{N, N})$. There are $2^{N^2}$ possible configurations of the system i.e. the state space has size $2^{N^2}$. We can imagine each configuration as being the vertex of a hypercube in $N^2$ dimensions with vertices $(\pm 1, \pm 1, \ldots, \pm 1)$. We'll let the variable $\sigma$ denote a configuration of the system. So $\sigma$ is a vector of length $N^2$ with entries in $\{-1, 1\}$.
-
+We model the system using $N^2$ random variables $X_{i, j}$ where $i, j \in \{1, 2, \ldots, N\}$. Each $X_{i, j}$ is a binary random variable that takes the value $1$ or $-1$. The configuration of the system is given by the $N^2$-length vector $\mathbf{X} = (X_{1, 1}, X_{1, 2}, \ldots, X_{N, N})$. There are $2^{N^2}$ possible configurations of the system, i.e., the state space has size $2^{N^2}$. We can imagine each configuration as being a vertex of a hypercube in $N^2$ dimensions with vertices $(\pm 1, \pm 1, \ldots, \pm 1)$. We'll let the variable $\sigma$ denote a configuration of the system. So $\sigma$ is a vector of length $N^2$ with entries in $\{-1, 1\}$.
 
 In order to describe the system mathematically, we need to provide the joint probability distribution of the random variables $X_{i, j}$. This is done using the Hamiltonian of the system and the Boltzmann distribution.
-
 
 ### Magnetization
 
 The magnetization of the system is given by
 
 $$
-M(\sigma) = \frac{1}{N^2} \sum \limits_{i, j} X_{i, j}
+M(\sigma) = \frac{1}{N^2} \sum_{i=1}^{N} \sum_{j=1}^{N} X_{i, j}
 $$
 
-If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
-
+If the system is magnetized, then $M(\sigma)$ will be close to $1$ or $-1$. Our goal is to find the expected value of the magnetization of the system. To do this, we need to sample from the distribution $f(\sigma)$ and then compute the magnetization of each sample. The average of these magnetizations will be the expected magnetization of the system.
 
 ### Hamiltonian
 
 The Hamiltonian of the system is given by
 
 $$
-H(\sigma) = -J \sum \limits_{(i, j) \text{ and } (i', j') \text{ are neighbors}} X_{i, j} X_{i', j'}
+H(\sigma) = -J \sum_{\langle i,j \rangle} X_{i} X_{j}
 $$
 
-where the sum is over all pairs of neighboring particles. The Hamiltonian is just a measure of the energy of the system. Note that because $J$ is positive, the energy is minimized when neighboring particles have the same spin.
+where the sum is over all pairs of neighboring particles (denoted by $\langle i,j \rangle$). The Hamiltonian is a measure of the energy of the system. Note that because $J > 0$, the energy is minimized when neighboring particles have the same spin.
 
 ### Boltzmann Distribution
 
@@ -109,48 +109,53 @@ $$
 f(\sigma) = \frac{e^{-H(\sigma)/T}}{Z}
 $$
 
-where $T$ is the temperature, and $Z$ is the normalization constant called the partition function.
+where $T$ is the temperature, and $Z$ is the normalization constant called the partition function:
+
+$$
+Z = \sum_{\sigma'} e^{-H(\sigma')/T}
+$$
+
 This is the joint probability mass function of the random variables $X_{i, j}$. The partition function $Z$ is not easy to compute, but thankfully we do not need it to sample from the joint distribution.
 
-### Low Temperature
+### Low Temperature Behavior
 
-If we plugin the partition function explicitly, we can see that the probability distribution becomes
-
-$$
-f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum \limits_{\sigma'}e^{-H(\sigma')/T}}.
-$$
-
-As $T \to 0$, the term with the highest value of $-H(\sigma)$ will dominate the sum in the denominator. But the term with the highest value of $-H(\sigma)$ is the one that minimizes $H(\sigma)$. So,
+If we write the partition function explicitly, we can see that the probability distribution becomes
 
 $$
-\lim \limits_{T \to 0} f(\sigma) = \lim \limits_{T \to 0}  \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma)_{\min}/T}} = \lim \limits_{T \to 0}  e^{(H(\sigma)_{\min} - H(\sigma))/T}.
+f(\sigma) = \frac{e^{-H(\sigma)/T}}{\sum_{\sigma'}e^{-H(\sigma')/T}}.
 $$
 
-If $H(\sigma)_{\min} = H(\sigma)$, then the probability of the system being in that state is $1$ and $0$ otherwise. This means that at low temperatures, the system will be in a state that minimizes the energy. But as $T$ increases, more and more high energy states become probable. So temperature can be thought of as adding variability to the system.
+As $T \to 0$, the term with the smallest value of $H(\sigma)$ will dominate the sum in the denominator. Let $H_{\min} = \min_{\sigma} H(\sigma)$. Then,
 
+$$
+\lim_{T \to 0} f(\sigma) = \begin{cases}
+\frac{1}{|\{\sigma : H(\sigma) = H_{\min}\}|} & \text{if } H(\sigma) = H_{\min} \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+This means that at low temperatures, the system will be in a state that minimizes the energy with equal probability among all minimum energy states. As $T$ increases, more and more high-energy states become probable. So temperature can be thought of as adding variability to the system.
 
 ## Phase Transitions
 
 It was discovered that the Ising model for a 2D grid exhibits a phenomenon called **phase transition**. 
 If we slowly increase the temperature, we expect the magnetization to decrease. What is surprising is that the magnetization decreases smoothly until a certain temperature, after which it drops suddenly. This sudden drop is called a phase transition. The temperature at which this happens is called the **critical temperature**.
 
-
-It is possible to calculate the critical temperature theoretically, in the limit when the size of the lattice $\to \infty$. This limiting critical temperature for a square lattice is given by
+It is possible to calculate the critical temperature theoretically in the limit when the size of the lattice $N \to \infty$. This limiting critical temperature for a square lattice is given by
 
 $$
-T_c = \dfrac{2J}{\log(1 + \sqrt{2})}.
+T_c = \frac{2J}{\ln(1 + \sqrt{2})}.
 $$
 
-Of course, in our simulation, we'll be using finite sized lattices so we should expect some deviation from this result.
+Of course, in our simulation, we'll be using finite-sized lattices, so we should expect some deviation from this result.
 
 ## Gibbs Sampling
 
-There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles. 
-
+There are two natural ways of sampling from the distribution $f(\sigma)$: Metropolis-Hastings and Gibbs sampling. In the Metropolis-Hastings approach, we randomly choose a particle and flip its spin. We then accept or reject the new configuration based on the Metropolis-Hastings acceptance probability. In the Gibbs sampling approach, we update the entire grid of particles one at a time. We update each particle by sampling from the conditional distribution of that particle given the rest of the particles.
 
 ### Conditional Distribution
 
-Consider a single spin $X_{i, j}$. Let $\hat{X}_{i, j}$ denote the set of spins at all sites except $(i, j)$. We want to find the conditional distribution of $X_{i, j}$ given $\hat{X}_{i, j}$.
+Consider a single spin $X_{i, j}$. Let $\mathbf{X}_{-(i,j)}$ denote the set of spins at all sites except $(i, j)$. We want to find the conditional distribution of $X_{i, j}$ given $\mathbf{X}_{-(i,j)}$.
 
 #### Derivation from Boltzmann Distribution
 
@@ -165,27 +170,26 @@ $$H_{\text{local}} = -J \cdot X_{i,j} \sum_{(i',j') \in \text{neighbors}(i,j)} X
 Here, $h_{i,j} = J(X_{i-1,j} + X_{i+1,j} + X_{i,j-1} + X_{i,j+1})$ is the **effective field** at site $(i,j)$.
 
 Using the Boltzmann distribution:
-$$P(X_{i,j} = s | \hat{X}_{i,j}) = \frac{e^{-H(\sigma)/T}}{e^{-H(\sigma_{+1})/T} + e^{-H(\sigma_{-1})/T}}$$
+$$P(X_{i,j} = s | \mathbf{X}_{-(i,j)}) = \frac{e^{-H(\sigma_s)/T}}{e^{-H(\sigma_{+1})/T} + e^{-H(\sigma_{-1})/T}}$$
 
-where $\sigma_{+1}$ and $\sigma_{-1}$ are configurations with $X_{i,j} = +1$ and $X_{i,j} = -1$ respectively.
+where $\sigma_{+1}$ and $\sigma_{-1}$ are configurations with $X_{i,j} = +1$ and $X_{i,j} = -1$, respectively.
 
 Since $H_{\text{rest}}$ cancels out in the ratio:
-$$P(X_{i,j} = +1 | \hat{X}_{i,j}) = \frac{e^{h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{-2h_{i,j}/T}}$$
+$$P(X_{i,j} = +1 | \mathbf{X}_{-(i,j)}) = \frac{e^{h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{-2h_{i,j}/T}}$$
 
 Similarly:
-$$P(X_{i,j} = -1 | \hat{X}_{i,j}) = \frac{e^{-h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{2h_{i,j}/T}}$$
+$$P(X_{i,j} = -1 | \mathbf{X}_{-(i,j)}) = \frac{e^{-h_{i,j}/T}}{e^{h_{i,j}/T} + e^{-h_{i,j}/T}} = \frac{1}{1 + e^{2h_{i,j}/T}}$$
 
 This gives us our final result:
 
 $$
 \begin{aligned}
-P(X_{i, j} = 1 | \hat{X}_{i, j}) &= \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}, \\
-P(X_{i, j} = -1 | \hat{X}_{i, j}) &= 1 - P(X_{i, j} = 1 | \hat{X}_{i, j}).
+P(X_{i, j} = 1 | \mathbf{X}_{-(i,j)}) &= \frac{1}{1 + \exp(-2 h_{i, j} / T)}, \\
+P(X_{i, j} = -1 | \mathbf{X}_{-(i,j)}) &= 1 - P(X_{i, j} = 1 | \mathbf{X}_{-(i,j)}).
 \end{aligned}
 $$ {#eq-conditional}
 
-
-Thus the conditional distribution in @eq-conditional is a logistic function. 
+Thus, the conditional distribution in @eq-conditional is a logistic function.
 
 #### Physical Interpretation of the Effective Field
 
@@ -193,12 +197,12 @@ The effective field $h_{i,j}$ represents the "magnetic influence" of the neighbo
 
 - When $h_{i,j} > 0$: Most neighbors are spin-up ($+1$), favoring $X_{i,j} = +1$
 - When $h_{i,j} < 0$: Most neighbors are spin-down ($-1$), favoring $X_{i,j} = -1$  
-- When $h_{i,j} = 0$: Equal influence from up and down neighbors, so $P(X_{i,j} = +1) = 0.5$.
+- When $h_{i,j} = 0$: Equal influence from up and down neighbors, so $P(X_{i,j} = +1) = 0.5$
 
 The temperature $T$ controls how strongly the system responds to this local field:
 
 - Low $T$: Sharp response, spins almost always align with neighbors
-- High $T$: Weak response, spins behave more randomly regardless of neighbors.
+- High $T$: Weak response, spins behave more randomly regardless of neighbors
 
 ## Metropolis-Hastings Algorithm
 
@@ -217,7 +221,7 @@ The Metropolis-Hastings algorithm for the Ising model works as follows:
 
 When we flip spin $X_{i,j}$ from $s$ to $-s$, only the energy terms involving this spin change. The energy change is:
 
-$$\Delta E = E_{\text{new}} - E_{\text{old}} = -J(-s)\sum_{\text{neighbors}} X_{i',j'} - (-J \cdot s \sum_{\text{neighbors}} X_{i',j'})$$
+$$\Delta E = E_{\text{new}} - E_{\text{old}} = -J(-s)\sum_{\text{neighbors}} X_{i',j'} - \left(-J \cdot s \sum_{\text{neighbors}} X_{i',j'}\right)$$
 
 $$\Delta E = 2J \cdot s \sum_{\text{neighbors}} X_{i',j'} = 2s \cdot h_{i,j}$$
 
@@ -235,33 +239,16 @@ This has a simple interpretation:
 
 Higher temperatures make the algorithm more likely to accept energy-raising moves, allowing exploration of higher-energy configurations.
 
-```{python}
-# draw graph of logistic function 
+### Gibbs Sampling Algorithm
 
-x = np.linspace(-10, 10, 100)
-y = 1 / (1 + np.exp(-x))
-
-plt.plot(x, y)
-plt.axhline(0.5, color='red', linestyle='--', label='x=0.5, y=0.5')
-plt.xlabel('x')
-plt.ylabel('1 / (1 + exp(-x))')
-plt.title('Logistic function')
-plt.legend()
-plt.grid()
-plt.show()
-```
-
-### The Algorithm
-
-1. Initialize the grid of spins $X_i$ for $i = 1$ to $N$ randomly.
-2. For $i = 1$ to $N$
-   1. For $j = 1$ to $N$
+1. Initialize the grid of spins $X_{i,j}$ for $i, j = 1$ to $N$ randomly.
+2. For $i = 1$ to $N$:
+   1. For $j = 1$ to $N$:
       1. Compute the effective field $h_{i, j}$.
-      2. Generate a random number $u$ from a uniform distribution.
-      3. Set $X_{i, j}$ to $1$ if $u < \dfrac{1}{1 + \exp(-2 h_{i, j} / T)}$ and $-1$ otherwise.
+      2. Generate a random number $u$ from a uniform distribution on $[0,1]$.
+      3. Set $X_{i, j}$ to $1$ if $u < \frac{1}{1 + \exp(-2 h_{i, j} / T)}$ and $-1$ otherwise.
 3. Compute the magnetization of the system.
 4. Repeat steps 2 and 3.
-
 
 ### Comparison with Gibbs Sampling
 
@@ -272,13 +259,13 @@ plt.show()
 | Acceptance rate | Always 100% (every update accepted) | Variable (depends on T and local environment) |
 | Implementation | More complex (logistic function) | Simpler (just energy differences) |
 | Generalizability | Requires known conditional distributions | Works for any energy function |
-| Efficiency near T_c | Generally faster convergence | Can have low acceptance rates |
+| Efficiency near $T_c$ | Generally faster convergence | Can have low acceptance rates |
 
 ## Wolff Algorithm for Critical Temperature Sampling
 
 Near the critical temperature, both Gibbs sampling and single-spin Metropolis–Hastings suffer from **critical slowing down**.  
 The correlation length $\xi$ diverges as 
-$\xi \sim |T - T_c|^{-\nu}$,
+$$\xi \sim |T - T_c|^{-\nu},$$
 causing spins to become highly correlated over large distances.  
 Single-spin updates can no longer efficiently explore the configuration space because flipping individual spins disrupts large correlated regions, leading to extremely long equilibration times.
 
@@ -290,7 +277,7 @@ At low temperatures and near $T_c$, the system develops large domains of aligned
 Traditional single-spin algorithms fight against these natural correlations by attempting to flip spins one at a time.  
 The Wolff algorithm instead:
 
-1. Identifies clusters of spins that “want” to flip together  
+1. Identifies clusters of spins that "want" to flip together  
 2. Respects the correlation structure by flipping entire domains  
 3. Maintains detailed balance while working with the physics rather than against it  
 
@@ -308,7 +295,8 @@ This approach is analogous to the difference between trying to turn a school of 
      - Examine each of its four neighbors.  
      - If a neighbor has the same orientation as the original seed spin **and** has not been visited:
        - Add it to the cluster with probability 
-         $P_{\text{add}} = 1 - e^{-2\beta J}$.
+         $$P_{\text{add}} = 1 - e^{-2\beta J}$$
+         where $\beta = 1/T$.
        - If added, mark as visited and add to the queue.
 
 3. **Cluster flip:** Flip all spins in the identified cluster simultaneously.
@@ -318,20 +306,20 @@ This approach is analogous to the difference between trying to turn a school of 
 ### The Addition Probability
 
 The key insight is the addition probability
-$$P_{\text{add}} = 1 - e^{-2\beta J}$.
+$$P_{\text{add}} = 1 - e^{-2\beta J}.$$
 This probability is carefully chosen to maintain detailed balance and has intuitive temperature dependence.
 
 #### High temperature ($T \gg T_c$):
 
-$\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad 
-P_{\text{add}} \approx 2\beta J \approx 0.$
+$$\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad 
+P_{\text{add}} \approx 2\beta J \approx 0.$$
 
 - Clusters remain small, typically containing only 1–2 spins.  
 - Behavior similar to single-spin updates.
 
 #### Low temperature ($T \ll T_c$):
 
-$P_{\text{add}} \approx 1 \quad (\text{since } 2\beta J \text{ is large}),$
+$$P_{\text{add}} \approx 1 \quad (\text{since } 2\beta J \text{ is large}),$$
 
 - Large aligned regions are almost always included in clusters.  
 - Entire domains flip together efficiently, avoiding high-energy intermediate states.
@@ -346,30 +334,27 @@ $P_{\text{add}} \approx 1 \quad (\text{since } 2\beta J \text{ is large}),$
 
 The clusters identified by the Wolff algorithm have physical meaning:
 
-- **Small clusters** ($\text{size} \sim 1$): high-temperature regime, spins behave independently.  
-- **Medium clusters** ($\text{size} \sim 10$–$100$): intermediate correlations, local domains.  
-- **Large clusters** ($\text{size} \sim L^2$): low temperature or near critical point, system-spanning correlations.  
+- **Small clusters** (size $\sim 1$): high-temperature regime, spins behave independently.  
+- **Medium clusters** (size $\sim 10$–$100$): intermediate correlations, local domains.  
+- **Large clusters** (size $\sim L^2$): low temperature or near critical point, system-spanning correlations.  
 - **Percolating clusters:** clusters that wrap around periodic boundaries indicate long-range order.
 
 The average cluster size $\langle s \rangle$ is related to the magnetic susceptibility:
-$\langle s \rangle \sim \chi \sim |T - T_c|^{-\gamma}$,
+$$\langle s \rangle \sim \chi \sim |T - T_c|^{-\gamma},$$
 providing a direct probe of critical behavior.
-
 
 ### Comparison with Other Methods
 
 | Aspect | Single-Spin | Wolff Algorithm |
 |--------|-------------|-----------------|
-| **Update size** | Always 1 spin | Variable (1 to L² spins) |
+| **Update size** | Always 1 spin | Variable (1 to $L^2$ spins) |
 | **Acceptance rate** | Variable (very low at low T) | Always 100% |
 | **Critical slowing down** | Severe | Minimal |
 | **Implementation** | Simple | Moderate complexity |
 | **Memory usage** | Minimal | Moderate (cluster storage) |
 | **Efficiency at high T** | Good | Similar |
-| **Efficiency near T_c** | Very poor | Excellent |
+| **Efficiency near $T_c$** | Very poor | Excellent |
 | **Efficiency at low T** | Poor | Excellent |
-
-
 
 ## Simulation Results
 
@@ -377,8 +362,8 @@ Below are the results of simulating the Ising model on a $20 \times 20$ grid for
 
 We can see that at $T=1.5$, the system is magnetized and the magnetization is more or less constant and close to 1 or -1 over various runs. At $T=2.5$, the system is not magnetized and the average magnetization is close to 0. It fluctuates wildly over various runs.
 
-If we gradually increase the temperature from $T=1$ to $T=3$, we can see that the magnetization decreases smoothly until $T=2$ after which it drops suddenly. This is the phase transition.
-Below the graph are the snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.
+If we gradually increase the temperature from $T=1$ to $T=3$, we can see that the magnetization decreases smoothly until $T=2$, after which it drops suddenly. This is the phase transition.
+Below the graph are snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.
 
 ```{python}
 import numpy as np
