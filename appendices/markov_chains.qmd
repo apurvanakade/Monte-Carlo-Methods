@@ -762,4 +762,3 @@ In this module, we have established the foundational theory of Markov chains tha
 The theory developed here forms the backbone for advanced MCMC algorithms such as Metropolis-Hastings, Gibbs sampling, and Hamiltonian Monte Carlo. Each of these methods constructs specific transition kernels designed to have desired stationary distributions while maintaining good mixing properties. Understanding the fundamental principles of Markov chain theory is essential for both implementing these algorithms correctly and diagnosing their performance in practice.
 :::
 
-The interplay between theory and computation in Markov chain Monte Carlo exemplifies the power of probability theory in solving practical problems. While we must always be mindful of the assumptions underlying our theoretical guarantees, the robustness of these methods across diverse applications demonstrates the value of this mathematical framework.
