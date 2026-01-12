@@ -14,5 +14,3 @@ format:
 These are the lecture notes for *Monte Carlo Methods* (EN.553.433). The notes are loosely based on course materials by [Dr. Jim Spall](https://sites.google.com/view/james-spall/teaching) and the textbook by Rubinstein & Kroese [@rubinstein2017].
 
 These notes represent only half of the course content. The remaining material consists of Jupyter notebooks assigned as homework, which are not published online.
-
-Thanks to Kyle Beaty for help with cleaning these notes.

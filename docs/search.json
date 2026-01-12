@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Monte Carlo Methods Lecture Notes",
     "section": "",
-    "text": "Preface\n⚠️ Note: These notes are very much under construction and subject to significant changes.\nThese are the lecture notes for Monte Carlo Methods (EN.553.433). The notes are loosely based on course materials by Dr. Jim Spall and the textbook by Rubinstein & Kroese (Rubinstein and Kroese 2017).\nThese notes represent only half of the course content. The remaining material consists of Jupyter notebooks assigned as homework, which are not published online.\nThanks to Kyle Beaty for help with cleaning these notes.\n\n\n\n\nRubinstein, R. Y., and D. P. Kroese. 2017. Simulation and the Monte Carlo Method. 3rd ed. USA: Wiley.",
+    "text": "Preface\n⚠️ Note: These notes are very much under construction and subject to significant changes.\nThese are the lecture notes for Monte Carlo Methods (EN.553.433). The notes are loosely based on course materials by Dr. Jim Spall and the textbook by Rubinstein & Kroese (Rubinstein and Kroese 2017).\nThese notes represent only half of the course content. The remaining material consists of Jupyter notebooks assigned as homework, which are not published online.\n\n\n\n\nRubinstein, R. Y., and D. P. Kroese. 2017. Simulation and the Monte Carlo Method. 3rd ed. USA: Wiley.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]
