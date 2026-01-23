@@ -113,7 +113,7 @@ $$\mathbb{E}[\hat{\pi}_N] = 4\mathbb{E}\left[\frac{1}{N}\sum_{i=1}^{N} I_i\right
 Since $I \sim \text{Bernoulli}(\pi/4)$, we can compute the variance. The indicator has variance $\text{Var}(I) = \frac{\pi}{4}(1 - \frac{\pi}{4}) = \frac{\pi(4-\pi)}{16}$, which gives our estimator variance:
 $$\text{Var}(\hat{\pi}_N) = 16 \cdot \frac{\text{Var}(I)}{N} = \frac{\pi(4-\pi)}{N}$$
 
-The standard error is therefore $\text{SE}(\hat{\pi}_N) = \sqrt{\frac{\pi(4-\pi)}{N}} \approx \frac{1.64}{\sqrt{N}}$.
+The standard error is therefore $\text{SE}(\hat{\pi}_N) = \sqrt{\frac{\pi(4-\pi)}{N}}$.
 
 ::: {.callout-important}
 ## Convergence Rate
