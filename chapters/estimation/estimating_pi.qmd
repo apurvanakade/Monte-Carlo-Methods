@@ -16,41 +16,129 @@ Adjust the slider below to see how the Monte Carlo estimates are calculated for 
 <!-- Load Pyodide (shared across apps) -->
 <script src="app/pyodide_loader.js"></script>
 
-<div style="margin: 20px 0;">
-    <label for="pi-n-slider">Sample Size: </label>
-    <input type="range" id="pi-n-slider" min="100" max="10000" step="100" value="1000" style="width: 400px;">
-    <span id="pi-n-value" style="margin-left: 10px; font-weight: bold;">1,000</span>
-</div>
+<style>
+    .pi-app-container {
+        max-width: 100%;
+        margin: 20px 0;
+    }
+    
+    .pi-slider-container {
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .pi-slider-container input[type="range"] {
+        flex: 1;
+        min-width: 200px;
+        max-width: 400px;
+    }
+    
+    .pi-viz-container {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    .pi-canvas-wrapper {
+        flex: 1;
+        min-width: 280px;
+        max-width: 600px;
+    }
+    
+    #pi-canvas {
+        border: 1px solid #ddd;
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .pi-stats-table {
+        flex: 0 1 auto;
+        min-width: 250px;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .pi-stats-table th {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 2px solid #333;
+    }
+    
+    .pi-stats-table td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .pi-stats-table td:last-child {
+        text-align: right;
+        font-family: monospace;
+    }
+    
+    .pi-stats-table tr:last-child td {
+        font-weight: bold;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+        .pi-viz-container {
+            flex-direction: column;
+        }
+        
+        .pi-canvas-wrapper {
+            max-width: 100%;
+        }
+        
+        .pi-stats-table {
+            width: 100%;
+            margin-top: 0;
+        }
+    }
+</style>
 
-<div id="pi-loading" style="padding: 20px; text-align: center; color: #666;">
-    <p>Loading interactive visualization...</p>
-</div>
+<div class="pi-app-container">
+    <div class="pi-slider-container">
+        <label for="pi-n-slider">Sample Size: </label>
+        <input type="range" id="pi-n-slider" min="100" max="10000" step="100" value="1000">
+        <span id="pi-n-value" style="font-weight: bold;">1,000</span>
+    </div>
 
-<div id="pi-viz" style="display: none;">
-    <div style="display: flex; gap: 20px; align-items: flex-start;">
-        <canvas id="pi-canvas" style="border: 1px solid #ddd; max-width: 600px;"></canvas>
-        <table style="border-collapse: collapse; margin-top: 20px;">
-            <tr>
-                <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Metric</th>
-                <th style="text-align: right; padding: 8px; border-bottom: 2px solid #333;">Value</th>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Points Inside Circle</td>
-                <td id="pi-points-inside" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Total Points</td>
-                <td id="pi-total-points" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Ratio (= π/4)</td>
-                <td id="pi-ratio" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px; font-weight: bold;">π Estimate</td>
-                <td id="pi-estimate" style="text-align: right; padding: 8px; font-family: monospace; font-weight: bold;">-</td>
-            </tr>
-        </table>
+    <div id="pi-loading" style="padding: 20px; text-align: center; color: #666;">
+        <p>Loading interactive visualization...</p>
+    </div>
+
+    <div id="pi-viz" style="display: none;">
+        <div class="pi-viz-container">
+            <div class="pi-canvas-wrapper">
+                <canvas id="pi-canvas"></canvas>
+            </div>
+            <table class="pi-stats-table">
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Points Inside Circle</td>
+                    <td id="pi-points-inside">-</td>
+                </tr>
+                <tr>
+                    <td>Total Points</td>
+                    <td id="pi-total-points">-</td>
+                </tr>
+                <tr>
+                    <td>Ratio (= π/4)</td>
+                    <td id="pi-ratio">-</td>
+                </tr>
+                <tr>
+                    <td>π Estimate</td>
+                    <td id="pi-estimate">-</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
