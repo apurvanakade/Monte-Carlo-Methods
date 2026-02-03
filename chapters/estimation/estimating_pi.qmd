@@ -7,76 +7,342 @@ execute:
   echo: false
 ---
 
-```{python}
-#| label: fig-estimate-pi-combined
-#| fig-cap: "Estimating π using Monte Carlo method with different sample sizes"
+::: {.callout-note icon=false}
+## Interactive Demo
+
+Adjust the slider below to see how sample size affects the π estimation:
+
+```{=html}
+<div style="margin: 20px 0;">
+    <label for="pi-n-slider">Sample Size (N):</label>
+    <input type="range" id="pi-n-slider" min="10" max="10000" step="100" value="1000" style="width: 300px;">
+    <span id="pi-n-value" style="margin-left: 10px; font-weight: bold;">1,000</span>
+</div>
+
+<div id="pi-loading" style="padding: 20px; text-align: center;">
+    <p>Loading Python environment...</p>
+</div>
+
+<div id="pi-main-content" style="display: none; margin: 20px 0;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+        <div>
+            <canvas id="pi-canvas" style="border: 1px solid #ccc;"></canvas>
+        </div>
+        
+        <div>
+            <h4 style="margin-top: 0;">Results</h4>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">Sample Size:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-n">-</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">Points Inside:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-inside">-</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">π Estimate:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-estimate">-</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">True π:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-true">-</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">Absolute Error:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-error">-</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Standard Error:</td>
+                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-stderr">-</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Disable RequireJS for Pyodide loading
+    var saveDefine = window.define;
+    window.define = undefined;
+    
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
+    script.onload = function() {
+        // Restore RequireJS
+        window.define = saveDefine;
+        initializePyodideApp();
+    };
+    script.onerror = function() {
+        document.getElementById('pi-loading').innerHTML = '<p style="color: red;">Failed to load Pyodide. Please check your internet connection.</p>';
+    };
+    document.head.appendChild(script);
+})();
+
+async function initializePyodideApp() {
+    let pyodide;
+    let pyReady = false;
+    let updateTimeout;
+    let isUpdating = false;
+
+    async function initPyodide() {
+        try {
+            console.log('Loading Pyodide...');
+            pyodide = await loadPyodide();
+            
+            console.log('Loading packages (this may take a moment)...');
+            document.getElementById('pi-loading').innerHTML = '<p>Loading Python packages (numpy, matplotlib)...</p>';
+            await pyodide.loadPackage(['numpy', 'matplotlib']);
+            await pyodide.loadPackage(['numpy', 'matplotlib']);
+            
+            console.log('Initializing simulation...');
+            document.getElementById('pi-loading').innerHTML = '<p>Initializing simulation...</p>';
+            
+            // Load computation module
+            await pyodide.runPythonAsync(`
 import numpy as np
+
+class MonteCarloSimulation:
+    def __init__(self, seed=0, radius=1):
+        np.random.seed(seed)
+        self.radius = radius
+    
+    def run(self, n_samples):
+        x = np.random.uniform(-self.radius, self.radius, n_samples)
+        y = np.random.uniform(-self.radius, self.radius, n_samples)
+        
+        distances = np.sqrt(x**2 + y**2)
+        inside_circle = distances <= self.radius
+        n_inside = np.sum(inside_circle)
+        
+        pi_estimate = 4 * n_inside / n_samples
+        abs_error = abs(pi_estimate - np.pi)
+        std_error = np.sqrt(pi_estimate * (4 - pi_estimate) / n_samples)
+        
+        return {
+            'x': x,
+            'y': y,
+            'inside_circle': inside_circle,
+            'n_samples': n_samples,
+            'n_inside': int(n_inside),
+            'pi_estimate': float(pi_estimate),
+            'abs_error': float(abs_error),
+            'std_error': float(std_error),
+            'radius': self.radius
+        }
+
+simulator = MonteCarloSimulation()
+            `);
+            
+            console.log('Initializing visualizer...');
+            // Load visualization module
+            await pyodide.runPythonAsync(`
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
+class MonteCarloVisualizer:
+    def __init__(self, figsize=(6, 6), dpi=100):
+        self.figsize = figsize
+        self.dpi = dpi
+    
+    def render(self, simulation_data):
+        x = simulation_data['x']
+        y = simulation_data['y']
+        inside_circle = simulation_data['inside_circle']
+        radius = simulation_data['radius']
+        
+        fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
+        
+        theta = np.linspace(0, 2*np.pi, 100)
+        ax.plot(radius*np.cos(theta), radius*np.sin(theta), 'k-', linewidth=2)
+        ax.plot([-radius, -radius, radius, radius, -radius], 
+                [-radius, radius, radius, -radius, -radius], 
+                'k-', linewidth=2)
+        
+        colors = np.where(inside_circle, 'red', 'blue')
+        ax.scatter(x, y, c=colors, s=2, alpha=0.6)
+        
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.axis('equal')
+        ax.grid(True, alpha=0.2)
+        
+        canvas = FigureCanvasAgg(fig)
+        canvas.draw()
+        renderer = canvas.get_renderer()
+        
+        raw_data = renderer.tostring_rgb()
+        size = canvas.get_width_height()
+        
+        im = np.frombuffer(raw_data, dtype=np.uint8)
+        im = im.reshape(*reversed(size), 3)
+        
+        plt.close(fig)
+        return im
+
+visualizer = MonteCarloVisualizer()
+            `);
+            
+            console.log('Pyodide ready!');
+            pyReady = true;
+        } catch (err) {
+            console.error('Error initializing Pyodide:', err);
+            throw err;
+        }
+    }
+
+    async function updatePlot(N) {
+        if (!pyReady || isUpdating) return null;
+        
+        isUpdating = true;
+        
+        try {
+            const result = await pyodide.runPythonAsync(`
+sim_data = simulator.run(${N})
+image = visualizer.render(sim_data)
+
+{
+    'image': image,
+    'n_inside': sim_data['n_inside'],
+    'pi_estimate': sim_data['pi_estimate'],
+    'abs_error': sim_data['abs_error'],
+    'std_error': sim_data['std_error']
+}
+            `);
+            
+            isUpdating = false;
+            return result.toJs({ dict_converter: Object.fromEntries });
+        } catch (err) {
+            console.error('Error generating plot:', err);
+            isUpdating = false;
+            throw err;
+        }
+    }
+
+    function renderImageToCanvas(canvas, imageData) {
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = imageData.length;
+        canvas.height = imageData[0].length;
+        
+        const canvasImageData = ctx.createImageData(canvas.width, canvas.height);
+        const pixelData = canvasImageData.data;
+        
+        let pixelIndex = 0;
+        for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+                pixelData[pixelIndex++] = imageData[x][y][0];
+                pixelData[pixelIndex++] = imageData[x][y][1];
+                pixelData[pixelIndex++] = imageData[x][y][2];
+                pixelData[pixelIndex++] = 255;
+            }
+        }
+        
+        ctx.putImageData(canvasImageData, 0, 0);
+    }
+
+    function updateStats(stats, N) {
+        document.getElementById('pi-stat-n').textContent = N.toLocaleString();
+        document.getElementById('pi-stat-inside').textContent = stats.n_inside.toLocaleString();
+        document.getElementById('pi-stat-estimate').textContent = stats.pi_estimate.toFixed(6);
+        document.getElementById('pi-stat-true').textContent = Math.PI.toFixed(6);
+        document.getElementById('pi-stat-error').textContent = stats.abs_error.toFixed(6);
+        document.getElementById('pi-stat-stderr').textContent = stats.std_error.toFixed(6);
+    }
+
+    const canvas = document.getElementById('pi-canvas');
+
+    function handleSliderChange(e) {
+        const N = parseInt(e.target.value);
+        document.getElementById('pi-n-value').textContent = N.toLocaleString();
+        
+        canvas.classList.add('updating');
+        
+        clearTimeout(updateTimeout);
+        updateTimeout = setTimeout(async () => {
+            try {
+                const data = await updatePlot(N);
+                if (data) {
+                    renderImageToCanvas(canvas, data.image);
+                    updateStats(data, N);
+                    canvas.classList.remove('updating');
+                }
+            } catch (err) {
+                console.error('Update failed:', err);
+            }
+        }, 100);
+    }
+
+    async function init() {
+        try {
+            await initPyodide();
+            
+            document.getElementById('pi-loading').style.display = 'none';
+            document.getElementById('pi-main-content').style.display = 'block';
+            
+            document.getElementById('pi-n-slider').addEventListener('input', handleSliderChange);
+            
+            const data = await updatePlot(1000);
+            if (data) {
+                renderImageToCanvas(canvas, data.image);
+                updateStats(data, 1000);
+            }
+        } catch (err) {
+            console.error('Initialization failed:', err);
+            document.getElementById('pi-loading').innerHTML = '<p style="color: red;">Error loading Python environment. Please refresh the page.</p>';
+        }
+    }
+
+    init();
+}
+</script>
+```
+:::
+
+The visualization above demonstrates the Monte Carlo simulation in action. As you increase the sample size, the estimate becomes more accurate, though the convergence rate remains $O(1/\sqrt{N})$.
+
+```{python}
+#| label: tbl-estimate-pi
+#| tbl-cap: "Monte Carlo π estimation results for different sample sizes"
+import numpy as np
 import pandas as pd
 
-# Parameters
+# Set random seed for reproducibility
 np.random.seed(0)
-r = 1
-N_values = [100, 10000]
 
-# Create side-by-side plots
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
-
-# Store results for table
-results = []
-
-for i, N in enumerate(N_values):
-    # Generate N random points in [-r, r] × [-r, r]
-    X = np.random.uniform(-r, r, N)
-    Y = np.random.uniform(-r, r, N)
+def estimate_pi(n_samples, radius=1):
+    """Estimate π using Monte Carlo method."""
+    # Generate random points in [-r, r] × [-r, r]
+    x = np.random.uniform(-radius, radius, n_samples)
+    y = np.random.uniform(-radius, radius, n_samples)
     
-    # Classify points: inside circle (red) or outside (blue)
-    inside_circle = X**2 + Y**2 <= r**2
-    colors = np.where(inside_circle, 'red', 'blue')
-    
-    # Plot on the appropriate subplot
-    ax = axes[i]
-    
-    # Draw circle and square
-    theta = np.linspace(0, 2*np.pi, 100)
-    ax.plot(r*np.cos(theta), r*np.sin(theta), 'k-', linewidth=2)
-    ax.plot([-r, -r, r, r, -r], [-r, r, r, -r, -r], 'k-', linewidth=2)
-    
-    # Plot points
-    ax.scatter(X, Y, c=colors, s=4, alpha=0.6)
+    # Count points inside circle
+    inside_circle = x**2 + y**2 <= radius**2
+    n_inside = np.sum(inside_circle)
     
     # Estimate π
-    n_inside = np.sum(inside_circle)
-    pi_estimate = 4 * n_inside / N
+    pi_estimate = 4 * n_inside / n_samples
     
-    ax.set_title(f'N = {N:,}\nπ ≈ {pi_estimate:.4f}')
-    ax.set_xlabel('')
-    ax.set_ylabel('')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.axis('equal')
-    ax.grid(True, alpha=0.3)
-    
-    # Store results
+    # Calculate errors
     abs_error = abs(pi_estimate - np.pi)
-    std_error = np.sqrt(pi_estimate * (4 - pi_estimate) / N)
+    std_error = np.sqrt(pi_estimate * (4 - pi_estimate) / n_samples)
     
-    results.append({
-        'Sample Size': f"{N:,}",
+    return {
+        'Sample Size': f"{n_samples:,}",
         'Points Inside': f"{n_inside:,}",
-        'π Estimate': f"{pi_estimate:.4f}",
-        'Absolute Error': f"{abs_error:.4f}",
-        'Standard Error': f"{std_error:.4f}"
-    })
+        'π Estimate': f"{pi_estimate:.6f}",
+        'Absolute Error': f"{abs_error:.6f}",
+        'Standard Error': f"{std_error:.6f}"
+    }
 
-plt.tight_layout()
-plt.show()
+# Run simulations with different sample sizes
+sample_sizes = [100, 1000, 10000, 100000]
+results = [estimate_pi(n) for n in sample_sizes]
 
-# Create and display results table
+# Display results table
 df = pd.DataFrame(results)
-print("Monte Carlo π Estimation Results")
-print("=" * 50)
-print(df.to_string(index=False))
+df
 ```
 
 
