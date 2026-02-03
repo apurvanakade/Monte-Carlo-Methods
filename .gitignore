@@ -3,4 +3,8 @@
 .DS_Store
 /_book/
 /_freeze/
-/.jupyter_cache/
+.jupyter_cache/
+*_files/
+__pycache__/
+*.pyc
+/docs/

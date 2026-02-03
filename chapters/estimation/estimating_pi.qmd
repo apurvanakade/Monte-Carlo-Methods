@@ -5,344 +5,57 @@ author: Apurva Nakade
 toc: true  
 execute:
   echo: false
+resources:
+  - app/*
 ---
 
-::: {.callout-note icon=false}
-## Interactive Demo
+Adjust the slider below to see how the Monte Carlo estimates are calculated for $\pi$.
 
-Adjust the slider below to see how sample size affects the π estimation:
 
 ```{=html}
+<!-- Load Pyodide (shared across apps) -->
+<script src="app/pyodide_loader.js"></script>
+
 <div style="margin: 20px 0;">
-    <label for="pi-n-slider">Sample Size (N):</label>
-    <input type="range" id="pi-n-slider" min="10" max="10000" step="100" value="1000" style="width: 300px;">
+    <label for="pi-n-slider">Sample Size: </label>
+    <input type="range" id="pi-n-slider" min="100" max="10000" step="100" value="1000" style="width: 400px;">
     <span id="pi-n-value" style="margin-left: 10px; font-weight: bold;">1,000</span>
 </div>
 
-<div id="pi-loading" style="padding: 20px; text-align: center;">
-    <p>Loading Python environment...</p>
+<div id="pi-loading" style="padding: 20px; text-align: center; color: #666;">
+    <p>Loading interactive visualization...</p>
 </div>
 
-<div id="pi-main-content" style="display: none; margin: 20px 0;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
-        <div>
-            <canvas id="pi-canvas" style="border: 1px solid #ccc;"></canvas>
-        </div>
-        
-        <div>
-            <h4 style="margin-top: 0;">Results</h4>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">Sample Size:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-n">-</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">Points Inside:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-inside">-</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">π Estimate:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-estimate">-</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">True π:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-true">-</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">Absolute Error:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-error">-</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px;">Standard Error:</td>
-                    <td style="padding: 8px; font-weight: bold;" id="pi-stat-stderr">-</td>
-                </tr>
-            </table>
-        </div>
+<div id="pi-viz" style="display: none;">
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+        <canvas id="pi-canvas" style="border: 1px solid #ddd; max-width: 600px;"></canvas>
+        <table style="border-collapse: collapse; margin-top: 20px;">
+            <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 2px solid #333;">Metric</th>
+                <th style="text-align: right; padding: 8px; border-bottom: 2px solid #333;">Value</th>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Points Inside Circle</td>
+                <td id="pi-points-inside" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Total Points</td>
+                <td id="pi-total-points" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">Ratio (= π/4)</td>
+                <td id="pi-ratio" style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd; font-family: monospace;">-</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">π Estimate</td>
+                <td id="pi-estimate" style="text-align: right; padding: 8px; font-family: monospace; font-weight: bold;">-</td>
+            </tr>
+        </table>
     </div>
 </div>
 
-<script>
-(function() {
-    // Disable RequireJS for Pyodide loading
-    var saveDefine = window.define;
-    window.define = undefined;
-    
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js';
-    script.onload = function() {
-        // Restore RequireJS
-        window.define = saveDefine;
-        initializePyodideApp();
-    };
-    script.onerror = function() {
-        document.getElementById('pi-loading').innerHTML = '<p style="color: red;">Failed to load Pyodide. Please check your internet connection.</p>';
-    };
-    document.head.appendChild(script);
-})();
-
-async function initializePyodideApp() {
-    let pyodide;
-    let pyReady = false;
-    let updateTimeout;
-    let isUpdating = false;
-
-    async function initPyodide() {
-        try {
-            console.log('Loading Pyodide...');
-            pyodide = await loadPyodide();
-            
-            console.log('Loading packages (this may take a moment)...');
-            document.getElementById('pi-loading').innerHTML = '<p>Loading Python packages (numpy, matplotlib)...</p>';
-            await pyodide.loadPackage(['numpy', 'matplotlib']);
-            await pyodide.loadPackage(['numpy', 'matplotlib']);
-            
-            console.log('Initializing simulation...');
-            document.getElementById('pi-loading').innerHTML = '<p>Initializing simulation...</p>';
-            
-            // Load computation module
-            await pyodide.runPythonAsync(`
-import numpy as np
-
-class MonteCarloSimulation:
-    def __init__(self, seed=0, radius=1):
-        np.random.seed(seed)
-        self.radius = radius
-    
-    def run(self, n_samples):
-        x = np.random.uniform(-self.radius, self.radius, n_samples)
-        y = np.random.uniform(-self.radius, self.radius, n_samples)
-        
-        distances = np.sqrt(x**2 + y**2)
-        inside_circle = distances <= self.radius
-        n_inside = np.sum(inside_circle)
-        
-        pi_estimate = 4 * n_inside / n_samples
-        abs_error = abs(pi_estimate - np.pi)
-        std_error = np.sqrt(pi_estimate * (4 - pi_estimate) / n_samples)
-        
-        return {
-            'x': x,
-            'y': y,
-            'inside_circle': inside_circle,
-            'n_samples': n_samples,
-            'n_inside': int(n_inside),
-            'pi_estimate': float(pi_estimate),
-            'abs_error': float(abs_error),
-            'std_error': float(std_error),
-            'radius': self.radius
-        }
-
-simulator = MonteCarloSimulation()
-            `);
-            
-            console.log('Initializing visualizer...');
-            // Load visualization module
-            await pyodide.runPythonAsync(`
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-
-class MonteCarloVisualizer:
-    def __init__(self, figsize=(6, 6), dpi=100):
-        self.figsize = figsize
-        self.dpi = dpi
-    
-    def render(self, simulation_data):
-        x = simulation_data['x']
-        y = simulation_data['y']
-        inside_circle = simulation_data['inside_circle']
-        radius = simulation_data['radius']
-        
-        fig, ax = plt.subplots(figsize=self.figsize, dpi=self.dpi)
-        
-        theta = np.linspace(0, 2*np.pi, 100)
-        ax.plot(radius*np.cos(theta), radius*np.sin(theta), 'k-', linewidth=2)
-        ax.plot([-radius, -radius, radius, radius, -radius], 
-                [-radius, radius, radius, -radius, -radius], 
-                'k-', linewidth=2)
-        
-        colors = np.where(inside_circle, 'red', 'blue')
-        ax.scatter(x, y, c=colors, s=2, alpha=0.6)
-        
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.axis('equal')
-        ax.grid(True, alpha=0.2)
-        
-        canvas = FigureCanvasAgg(fig)
-        canvas.draw()
-        renderer = canvas.get_renderer()
-        
-        raw_data = renderer.tostring_rgb()
-        size = canvas.get_width_height()
-        
-        im = np.frombuffer(raw_data, dtype=np.uint8)
-        im = im.reshape(*reversed(size), 3)
-        
-        plt.close(fig)
-        return im
-
-visualizer = MonteCarloVisualizer()
-            `);
-            
-            console.log('Pyodide ready!');
-            pyReady = true;
-        } catch (err) {
-            console.error('Error initializing Pyodide:', err);
-            throw err;
-        }
-    }
-
-    async function updatePlot(N) {
-        if (!pyReady || isUpdating) return null;
-        
-        isUpdating = true;
-        
-        try {
-            const result = await pyodide.runPythonAsync(`
-sim_data = simulator.run(${N})
-image = visualizer.render(sim_data)
-
-{
-    'image': image,
-    'n_inside': sim_data['n_inside'],
-    'pi_estimate': sim_data['pi_estimate'],
-    'abs_error': sim_data['abs_error'],
-    'std_error': sim_data['std_error']
-}
-            `);
-            
-            isUpdating = false;
-            return result.toJs({ dict_converter: Object.fromEntries });
-        } catch (err) {
-            console.error('Error generating plot:', err);
-            isUpdating = false;
-            throw err;
-        }
-    }
-
-    function renderImageToCanvas(canvas, imageData) {
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = imageData.length;
-        canvas.height = imageData[0].length;
-        
-        const canvasImageData = ctx.createImageData(canvas.width, canvas.height);
-        const pixelData = canvasImageData.data;
-        
-        let pixelIndex = 0;
-        for (let y = 0; y < canvas.height; y++) {
-            for (let x = 0; x < canvas.width; x++) {
-                pixelData[pixelIndex++] = imageData[x][y][0];
-                pixelData[pixelIndex++] = imageData[x][y][1];
-                pixelData[pixelIndex++] = imageData[x][y][2];
-                pixelData[pixelIndex++] = 255;
-            }
-        }
-        
-        ctx.putImageData(canvasImageData, 0, 0);
-    }
-
-    function updateStats(stats, N) {
-        document.getElementById('pi-stat-n').textContent = N.toLocaleString();
-        document.getElementById('pi-stat-inside').textContent = stats.n_inside.toLocaleString();
-        document.getElementById('pi-stat-estimate').textContent = stats.pi_estimate.toFixed(6);
-        document.getElementById('pi-stat-true').textContent = Math.PI.toFixed(6);
-        document.getElementById('pi-stat-error').textContent = stats.abs_error.toFixed(6);
-        document.getElementById('pi-stat-stderr').textContent = stats.std_error.toFixed(6);
-    }
-
-    const canvas = document.getElementById('pi-canvas');
-
-    function handleSliderChange(e) {
-        const N = parseInt(e.target.value);
-        document.getElementById('pi-n-value').textContent = N.toLocaleString();
-        
-        canvas.classList.add('updating');
-        
-        clearTimeout(updateTimeout);
-        updateTimeout = setTimeout(async () => {
-            try {
-                const data = await updatePlot(N);
-                if (data) {
-                    renderImageToCanvas(canvas, data.image);
-                    updateStats(data, N);
-                    canvas.classList.remove('updating');
-                }
-            } catch (err) {
-                console.error('Update failed:', err);
-            }
-        }, 100);
-    }
-
-    async function init() {
-        try {
-            await initPyodide();
-            
-            document.getElementById('pi-loading').style.display = 'none';
-            document.getElementById('pi-main-content').style.display = 'block';
-            
-            document.getElementById('pi-n-slider').addEventListener('input', handleSliderChange);
-            
-            const data = await updatePlot(1000);
-            if (data) {
-                renderImageToCanvas(canvas, data.image);
-                updateStats(data, 1000);
-            }
-        } catch (err) {
-            console.error('Initialization failed:', err);
-            document.getElementById('pi-loading').innerHTML = '<p style="color: red;">Error loading Python environment. Please refresh the page.</p>';
-        }
-    }
-
-    init();
-}
-</script>
-```
-:::
-
-The visualization above demonstrates the Monte Carlo simulation in action. As you increase the sample size, the estimate becomes more accurate, though the convergence rate remains $O(1/\sqrt{N})$.
-
-```{python}
-#| label: tbl-estimate-pi
-#| tbl-cap: "Monte Carlo π estimation results for different sample sizes"
-import numpy as np
-import pandas as pd
-
-# Set random seed for reproducibility
-np.random.seed(0)
-
-def estimate_pi(n_samples, radius=1):
-    """Estimate π using Monte Carlo method."""
-    # Generate random points in [-r, r] × [-r, r]
-    x = np.random.uniform(-radius, radius, n_samples)
-    y = np.random.uniform(-radius, radius, n_samples)
-    
-    # Count points inside circle
-    inside_circle = x**2 + y**2 <= radius**2
-    n_inside = np.sum(inside_circle)
-    
-    # Estimate π
-    pi_estimate = 4 * n_inside / n_samples
-    
-    # Calculate errors
-    abs_error = abs(pi_estimate - np.pi)
-    std_error = np.sqrt(pi_estimate * (4 - pi_estimate) / n_samples)
-    
-    return {
-        'Sample Size': f"{n_samples:,}",
-        'Points Inside': f"{n_inside:,}",
-        'π Estimate': f"{pi_estimate:.6f}",
-        'Absolute Error': f"{abs_error:.6f}",
-        'Standard Error': f"{std_error:.6f}"
-    }
-
-# Run simulations with different sample sizes
-sample_sizes = [100, 1000, 10000, 100000]
-results = [estimate_pi(n) for n in sample_sizes]
-
-# Display results table
-df = pd.DataFrame(results)
-df
+<!-- Load app-specific code -->
+<script src="app/pi_app.js"></script>
 ```
 
 
@@ -391,6 +104,76 @@ $$\sqrt{N}(\hat{\pi}_N - \pi) \xrightarrow{d} \mathcal{N}(0, \pi(4-\pi))$$
 
 This provides approximate confidence intervals:
 $$\hat{\pi}_N \pm z_{\alpha/2} \sqrt{\frac{\pi(4-\pi)}{N}}$$
+
+## Convergence Analysis
+
+To empirically demonstrate the convergence properties, we generate multiple π estimates for various sample sizes and examine how the confidence intervals narrow as $N$ increases.
+
+```{python}
+#| label: fig-pi-convergence
+#| fig-cap: "Convergence analysis of Monte Carlo π estimation. Top: single run estimates with theoretical 95% confidence intervals. Bottom: confidence interval width decay showing the O(1/√N) convergence rate on log-log scale."
+
+import sys
+sys.path.insert(0, 'app')
+from monte_carlo_pi import analyze_convergence
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Analysis parameters
+N_MIN = 100
+N_MAX = 10000
+N_STEP = 100
+CONFIDENCE_LEVEL = 0.95
+RANDOM_SEED = 42
+
+# Generate sample sizes and run analysis
+sample_sizes = np.arange(N_MIN, N_MAX + 1, N_STEP)
+results = analyze_convergence(sample_sizes, CONFIDENCE_LEVEL, RANDOM_SEED)
+
+# Unpack results
+estimates = results['estimates']
+ci_widths = results['ci_widths']
+lower_bounds = results['lower_bounds']
+upper_bounds = results['upper_bounds']
+
+# Create visualization with two vertically stacked subplots
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
+
+# Top plot: Convergence with confidence intervals
+ax1.fill_between(sample_sizes, lower_bounds, upper_bounds, 
+                 alpha=0.3, color='blue', label=f'{int(CONFIDENCE_LEVEL*100)}% CI')
+ax1.plot(sample_sizes, estimates, 'b-', linewidth=2, label='Single Run Estimate', zorder=5)
+ax1.axhline(y=np.pi, color='red', linestyle='--', linewidth=2, 
+           label=f'True π = {np.pi:.6f}', zorder=10)
+
+ax1.set_xlabel('Sample Size (N)', fontsize=11)
+ax1.set_ylabel('π Estimate', fontsize=11)
+ax1.set_title('Convergence to π', fontsize=12, fontweight='bold')
+ax1.legend(loc='upper right', fontsize=10)
+ax1.grid(True, alpha=0.3)
+ax1.set_ylim([2.8, 3.6])
+
+# Bottom plot: CI width decay (log-log scale)
+ax2.loglog(sample_sizes, ci_widths, 'blue', linewidth=2,
+          marker='o', markersize=3, label=f'{int(CONFIDENCE_LEVEL*100)}% CI Width', alpha=0.7)
+
+# Add reference line showing 1/sqrt(N) slope
+reference_line = ci_widths[0] * (sample_sizes[0] / sample_sizes)**0.5
+ax2.loglog(sample_sizes, reference_line, 'k--', linewidth=1.5, 
+          label='Reference: O(1/√N)', alpha=0.6)
+
+ax2.set_xlabel('Sample Size (N)', fontsize=11)
+ax2.set_ylabel('CI Width', fontsize=11)
+ax2.set_title('Confidence Interval Decay', fontsize=12, fontweight='bold')
+ax2.legend(loc='upper right', fontsize=10)
+ax2.grid(True, alpha=0.3, which='both')
+
+plt.tight_layout()
+plt.show()
+```
+
+The figure demonstrates that as the sample size $N$ increases, the mean estimate approaches the true value of $\pi$ and the confidence interval narrows, confirming the $O(1/\sqrt{N})$ convergence rate.
 
 ::: {.callout-tip}
 ## Monte Carlo Principle
