@@ -4,6 +4,5 @@
 /_book/
 /_freeze/
 .jupyter_cache/
-*_files/
 __pycache__/
 *.pyc
