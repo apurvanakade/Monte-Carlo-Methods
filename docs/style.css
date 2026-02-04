@@ -5,9 +5,27 @@
   max-width: 100%;
 } */
 
+/* Responsive images - Python generated figures */
+.figure-img,
+.cell-output-display img,
 p img {
   display: block;
   margin-left: auto;
   margin-right: auto;
   max-width: 100%;
+  height: auto;
+}
+
+/* Ensure figure containers are responsive */
+.quarto-figure,
+.quarto-float-fig {
+  max-width: 100%;
+}
+
+/* Mobile adjustments for figures */
+@media (max-width: 768px) {
+  .figure-img,
+  .cell-output-display img {
+    max-width: 100%;
+  }
 }
