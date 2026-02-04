@@ -437,6 +437,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
@@ -454,6 +460,12 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
@@ -469,6 +481,24 @@ window.Quarto = {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Simulated Annealing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -647,7 +677,7 @@ State Diagrams
 \end{pmatrix}.\]</span></p>
 <p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n\)</span>-th distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>.</p>
 </div>
-<div id="c20d5729" class="cell" data-execution_count="3">
+<div id="b8471021" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -791,7 +821,7 @@ Practical Significance of Mixing Time
 <p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>B.1</span></a> again. If we start at vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is at most 4 for this initial distribution.</p>
 <p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times over all initial distributions.</p>
 <p>In practice, we either provide a theoretical bound on the mixing time or “visually” inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.</p>
-<div id="38383527" class="cell" data-execution_count="4">
+<div id="988ea9c6" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -852,24 +882,29 @@ Algorithm: Markov Chain Sampling
 </div>
 <p>One big issue with this algorithm is that the samples are highly correlated. If independence is important, selecting every <span class="math inline">\(k\)</span>-th sample may be beneficial. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
 <div id="exm-random-walk-on-graph" class="theorem example">
-<p><span class="theorem-title"><strong>Example B.2</strong></span> In the example below we generate a uniform distribution over <span class="math inline">\(\{0, 1, \ldots, 14\}\)</span> by generating a random walk over a cycle of length 15.</p>
-<p>The autocorrelation plot below shows the correlation between samples at different lags, i.e., <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
-<p>We can either discard the first 40 samples or select every 40th sample to reduce the correlation. If independence is important, then we should select every 40th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
+<p><span class="theorem-title"><strong>Example B.2</strong></span> In the example below we consider a random walk on a <strong>barbell graph</strong>—two complete subgraphs (cliques) connected by a single bridge edge. This graph demonstrates poor mixing properties: a random walk starting in one clique takes a very long time to reach and properly sample the other clique.</p>
+<p>The barbell graph has a small spectral gap, leading to slow convergence to the stationary distribution. The stationary distribution should be uniform over all nodes, but as we’ll see, even after thousands of steps, the distribution remains highly concentrated in the starting clique.</p>
+<p>This example illustrates why burn-in is critical. Without sufficient burn-in, samples will not represent the true stationary distribution, leading to biased estimates.</p>
 </div>
-<div id="b2761e4c" class="cell" data-fold="true" data-execution_count="5">
+<div id="a0b9322a" class="cell" data-fold="true" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-5-output-1.png" width="691" height="519" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-5-output-1.png" width="979" height="423" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-5-output-2.png" width="764" height="374" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-5-output-2.png" width="1142" height="375" class="figure-img"></p>
 </figure>
 </div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+First visit to second clique at step: 158
+This represents 3.2% of the total walk length</code></pre>
 </div>
 </div>
 </section>
@@ -967,12 +1002,12 @@ Algorithm: Trace Plot Analysis
 <section id="trace-plots" class="level3" data-number="B.9.1">
 <h3 data-number="B.9.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">B.9.1</span> Trace Plots</h3>
 <p>A trace plot is simply a scatter plot of the samples generated by the Markov chain. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the trace plot should look like a cloud of points. If the Markov chain has not converged, the trace plot will show a trend.</p>
-<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after 1000 samples but after 5000 samples it is starting to look uniform.</p>
-<div id="a784925c" class="cell" data-fold="true" data-execution_count="6">
+<p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after 1000 samples. After 5000 samples it is starting to mix better, but still shows concentration in the starting clique. Even with 20000 steps, the chain may still not be fully mixed, demonstrating the severe mixing issues with the barbell graph.</p>
+<div id="54b8aa3e" class="cell" data-fold="true" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-6-output-1.png" width="756" height="374" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-6-output-1.png" width="1331" height="374" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1020,18 +1055,18 @@ Important Limitations of Running Averages
 <p>Use running averages as <strong>supporting evidence</strong> for your autocorrelation-based burn-in determination, not as the primary diagnostic.</p>
 <div id="exm">
 <p>Below is the running average analysis for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>.</p>
-<div id="95b904bf" class="cell" data-fold="true" data-execution_count="7">
+<div id="afa9ca18" class="cell" data-fold="true" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-7-output-1.png" width="799" height="523" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-7-output-1.png" width="808" height="523" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Final running average (full chain): 6.838
-Average of last 80% of chain: 6.922
-Difference: 0.084</code></pre>
+<pre><code>Final running average (full chain): 11.807
+Average of last 80% of chain: 10.935
+Difference: 0.872</code></pre>
 </div>
 </div>
 </div>
@@ -1088,19 +1123,19 @@ Interpreting Autocorrelation Results
 <p>From this analysis, we can see whether the autocorrelation patterns are similar across different starting points. If they are, the chain has likely converged by the earliest point where this stability is observed. This approach is more principled than simply thresholding autocorrelation values, as it’s based on the fundamental property that converged Markov chains have time-invariant statistical properties.</p>
 <div id="exm-autocorrelation" class="theorem example">
 <p><span class="theorem-title"><strong>Example B.4</strong></span> Below is the autocorrelation analysis for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. Rather than simply looking for where autocorrelation drops below a threshold, we examine whether the autocorrelation pattern has stabilized across different portions of the chain.</p>
-<div id="f66db0e4" class="cell" data-fold="true" data-execution_count="8">
+<div id="d8f04e9d" class="cell" data-fold="true" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-8-output-1.png" width="961" height="449" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-8-output-1.png" width="969" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Similarity analysis:
-Burn-in 0 vs 500: similarity = 0.003
-Burn-in 500 vs 1000: similarity = 0.005
-Burn-in 1000 vs 1250: similarity = 0.009
+Burn-in 0 vs 500: similarity = 0.001
+Burn-in 500 vs 1000: similarity = 0.001
+Burn-in 1000 vs 1250: similarity = 0.005
 
 Based on visual inspection and similarity analysis, no burn-in is required.</code></pre>
 </div>

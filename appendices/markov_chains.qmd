@@ -344,11 +344,11 @@ One big issue with this algorithm is that the samples are highly correlated. If 
 
 ::: {#exm-random-walk-on-graph}
 
-In the example below we generate a uniform distribution over $\{0, 1, \ldots, 14\}$ by generating a random walk over a cycle of length 15. 
+In the example below we consider a random walk on a **barbell graph**—two complete subgraphs (cliques) connected by a single bridge edge. This graph demonstrates poor mixing properties: a random walk starting in one clique takes a very long time to reach and properly sample the other clique.
 
-The autocorrelation plot below shows the correlation between samples at different lags, i.e., $X_i$ and $X_{i+k}$ for different values of $k$. We can see that the correlation decreases as $k$ increases and stabilizes around $k = 40$. 
+The barbell graph has a small spectral gap, leading to slow convergence to the stationary distribution. The stationary distribution should be uniform over all nodes, but as we'll see, even after thousands of steps, the distribution remains highly concentrated in the starting clique.
 
-We can either discard the first 40 samples or select every 40th sample to reduce the correlation. If independence is important, then we should select every 40th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to "thin" the samples.
+This example illustrates why burn-in is critical. Without sufficient burn-in, samples will not represent the true stationary distribution, leading to biased estimates.
 
 :::
 
@@ -373,51 +373,68 @@ class GraphMC(nx.Graph):
         return walk
 
 
-# Create an n-cycle graph
-n = 15
-G = nx.cycle_graph(n)
+# Create a barbell graph: two complete graphs connected by a bridge
+n1 = 8  # size of first clique
+n2 = 8  # size of second clique
+G = nx.barbell_graph(n1, n2)
 mc = GraphMC(G)
 N = 5000
-T = 100
+T_short = 100  # insufficient burn-in
+T_long = 2000  # still might not be enough!
 
-nx.draw(G, with_labels=True)
-plt.title("Generating {} samples on {}-cycle".format(N, n))
+# Visualize the graph
+plt.figure(figsize=(10, 4))
+pos = nx.spring_layout(G, seed=42)
+nx.draw(G, pos, with_labels=True, node_color='lightblue', 
+        node_size=300, font_size=8, edgecolors='black')
+plt.title("Barbell Graph: Two cliques connected by a bridge")
 plt.show()
 
+# Start random walk in the first clique (node 0)
 walk = mc.random_walk(0, N)
 
-# Remove transient phase (first 40)
-walk1 = walk[T:]
-
-# Count visits per node
+# Short burn-in (clearly insufficient)
+walk1 = walk[T_short:]
 node_counts1 = {node: walk1.count(node)/len(walk1) for node in mc.nodes}
 
-k = 20
-
-# discard first 40 samples and keep only every k-th sample
-walk2 = walk[T::k]
-
-# Count visits per node
+# Longer burn-in (still might not be enough)
+walk2 = walk[T_long:]
 node_counts2 = {node: walk2.count(node)/len(walk2) for node in mc.nodes}
 
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+# Plot distributions
+fig, axs = plt.subplots(1, 2, figsize=(12, 4))
 
-axs[0].bar(range(len(node_counts1)), list(node_counts1.values()))
-axs[0].set_xlabel('Nodes')
+expected_freq = 1/len(mc.nodes)
+
+axs[0].bar(range(len(node_counts1)), list(node_counts1.values()), color='steelblue', alpha=0.7)
+axs[0].set_xlabel('Node')
 axs[0].set_ylabel('Frequency')
-axs[0].axhline(1/len(mc.nodes), color='r', linestyle='--', label='Expected')
-axs[0].set_title('Discarding First {} Samples'.format(T))
+axs[0].axhline(expected_freq, color='r', linestyle='--', linewidth=2, label='Expected (uniform)')
+axs[0].set_title(f'After Discarding First {T_short} Samples\n(Insufficient Burn-in)')
 axs[0].legend()
+axs[0].set_ylim([0, max(list(node_counts1.values())) * 1.1])
 
-axs[1].bar(range(len(node_counts2)), list(node_counts2.values()))
-axs[1].set_xlabel('Nodes')
+axs[1].bar(range(len(node_counts2)), list(node_counts2.values()), color='steelblue', alpha=0.7)
+axs[1].set_xlabel('Node')
 axs[1].set_ylabel('Frequency')
-axs[1].set_title('Keeping only every {}-th Sample'.format(k))
-axs[1].axhline(1/len(mc.nodes), color='r', linestyle='--', label='Expected')
+axs[1].axhline(expected_freq, color='r', linestyle='--', linewidth=2, label='Expected (uniform)')
+axs[1].set_title(f'After Discarding First {T_long} Samples\n(Still Not Fully Mixed)')
 axs[1].legend()
+axs[1].set_ylim([0, max(list(node_counts1.values())) * 1.1])
+
+# Add vertical line to separate the two cliques
+for ax in axs:
+    ax.axvline(n1 - 0.5, color='gray', linestyle=':', linewidth=2, alpha=0.5)
+    ax.text(n1/2 - 0.5, ax.get_ylim()[1] * 0.9, 'Clique 1', ha='center', fontsize=10, color='gray')
+    ax.text(n1 + n2/2 - 0.5, ax.get_ylim()[1] * 0.9, 'Clique 2', ha='center', fontsize=10, color='gray')
 
 plt.tight_layout()
 plt.show()
+
+# Show how long it takes to first reach the second clique
+first_visit_clique2 = next((i for i, node in enumerate(walk) if node >= n1), None)
+print(f"\nFirst visit to second clique at step: {first_visit_clique2}")
+print(f"This represents {first_visit_clique2/N * 100:.1f}% of the total walk length")
 ```
 
 ## Reversible Markov Chains
@@ -540,25 +557,37 @@ To assess convergence of a Markov chain:
 
 A trace plot is simply a scatter plot of the samples generated by the Markov chain. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the trace plot should look like a cloud of points. If the Markov chain has not converged, the trace plot will show a trend.
 
-Below are the trace plots for @exm-random-walk-on-graph. We can see that the chain does not look uniform even after 1000 samples but after 5000 samples it is starting to look uniform.
+Below are the trace plots for @exm-random-walk-on-graph. We can see that the chain does not look uniform even after 1000 samples. After 5000 samples it is starting to mix better, but still shows concentration in the starting clique. Even with 20000 steps, the chain may still not be fully mixed, demonstrating the severe mixing issues with the barbell graph.
 
 
 ```{python}
 #| fold: true
+# Generate a much longer walk for the third subplot
+walk_extended = mc.random_walk(0, 20000)
+
 # trace plot of walk
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+fig, axs = plt.subplots(1, 3, figsize=(14, 4))
 
 temp = 1000
-axs[0].scatter(range(temp), walk[:temp], s=1)
+axs[0].scatter(range(temp), walk[:temp], s=1, alpha=0.5)
 axs[0].set_xlabel('Step')
 axs[0].set_ylabel('Node')
 axs[0].set_title('Trace Plot of Walk ({} steps)'.format(temp))
+axs[0].axhline(n1 - 0.5, color='red', linestyle='--', alpha=0.3, linewidth=1)
 
 temp = len(walk)
-axs[1].scatter(range(temp), walk[:temp], s=1)
+axs[1].scatter(range(temp), walk[:temp], s=1, alpha=0.5)
 axs[1].set_xlabel('Step')
 axs[1].set_ylabel('Node')
 axs[1].set_title('Trace Plot of Walk ({} steps)'.format(temp))
+axs[1].axhline(n1 - 0.5, color='red', linestyle='--', alpha=0.3, linewidth=1)
+
+temp = len(walk_extended)
+axs[2].scatter(range(temp), walk_extended[:temp], s=1, alpha=0.5)
+axs[2].set_xlabel('Step')
+axs[2].set_ylabel('Node')
+axs[2].set_title('Trace Plot of Walk ({} steps)'.format(temp))
+axs[2].axhline(n1 - 0.5, color='red', linestyle='--', alpha=0.3, linewidth=1)
 
 plt.tight_layout()
 plt.show()
