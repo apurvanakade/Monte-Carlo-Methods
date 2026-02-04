@@ -100,7 +100,7 @@ plt.show()
 ```
 
 
-The images below show scatter plots for the samples generated using the Metropolis--Hastings algorithm with four different choices of the Gaussian proposal distribution with standard deviations $1$, $0.5$, $0.2$, and $0.01$. The plots to the right are the running averages of the $x$ and $y$ coordinates. The scatter plot and the running averages provide a visual representation of the convergence of the samples to the target distribution.
+The images below show scatter plots for the samples generated using the Metropolis--Hastings algorithm with four different choices of the Gaussian proposal distribution with standard deviations $1$, $0.5$, $0.2$, and $0.01$. 
 
 :::
 
@@ -136,101 +136,45 @@ def find_running_avgs(X, fun):
 
   return running_avgs
 
-def plot_samples(region, X, sigma, n):
+def plot_samples(region, X, sigma, n, ax):
   import matplotlib.pyplot as plt
-
-  plt.figure(figsize=(10, 5))
-  
-  plt.subplot(1, 2, 1)
 
   plt = plot_polygon(region)
   for i in range(len(X)):
-    plt.plot(X[i][0], X[i][1], 'r.', markersize=1, alpha=0.5)
+    ax.plot(X[i][0], X[i][1], 'r.', markersize=1, alpha=0.5)
 
   # draw a filled circle at the last point of radius sigma
   circle = plt.Circle((X[-1][0], X[-1][1]), sigma, color='y', fill=True, alpha=0.25)
-  plt.gca().add_artist(circle)
+  ax.add_artist(circle)
 
-  plt.plot(X[0][0], X[0][1], 'o', markersize=5, label="start", color="black")
-  plt.plot(X[-1][0], X[-1][1], 'gx', markersize=10, label="end")
+  ax.plot(X[0][0], X[0][1], 'o', markersize=5, label="start", color="black")
+  ax.plot(X[-1][0], X[-1][1], 'gx', markersize=10, label="end")
 
   # show the value of k, sigma, and acceptance rate on the plot as a text block
   textstr = f'sigma = {sigma}\nacceptance rate = {len(X)/n:.4f}'
   props = dict(facecolor='white')
-  plt.gca().text(0.95, 0.95, textstr, transform=plt.gca().transAxes, fontsize=10,
+  ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=10,
                  verticalalignment='top', horizontalalignment='right', bbox=props)
-  
-  plt.subplot(1, 2, 2)
-  # plot running average of x and y side by side
-  running_avgs_x = find_running_avgs(X, lambda x: x[0])
-  running_avgs_y = find_running_avgs(X, lambda x: x[1])
-
-  plt.plot(running_avgs_x, label="x", color='b')
-  plt.axhline(running_avgs_x[-1], color='b', linestyle='--')
-  plt.plot(running_avgs_y, label="y", color='orange')
-  plt.axhline(running_avgs_y[-1], color='orange', linestyle='--')
-  plt.legend()
-
-  plt.show()
 
 ```
 
 ```{python}
-n = 10000
-sigma = 1
-np.random.seed(0)
+fig, axs = plt.subplots(2, 2, figsize=(12, 12))
 
+n = 10000
 start = [[0.05, 0.05]]
 search_distribution = "normal"
+sigmas = [1, 0.5, 0.1, 0.01]
 
-# np.random.seed(1)
-X = Metropolis_Hastings(n, start, sigma, search_distribution)
+for idx, sigma in enumerate(sigmas):
+    np.random.seed(0)
+    X = Metropolis_Hastings(n, start.copy(), sigma, search_distribution)
+    ax = axs[idx // 2, idx % 2]
+    plot_samples(region, X, sigma, n, ax)
+    ax.set_aspect('equal')
 
-plot_samples(region, X, sigma, n)
-
-```
-
-```{python}
-n = 10000
-sigma = 0.5
-np.random.seed(0)
-
-start = [[0.05, 0.05]]
-search_distribution = "normal"
-
-# np.random.seed(1)
-X = Metropolis_Hastings(n, start, sigma, search_distribution)
-
-plot_samples(region, X, sigma, n)
-
-```
-
-```{python}
-n = 10000
-sigma = 0.1
-np.random.seed(0)
-
-start = [[0.05, 0.05]]
-search_distribution = "normal"
-
-# np.random.seed(1)
-X = Metropolis_Hastings(n, start, sigma, search_distribution)
-
-plot_samples(region, X, sigma, n)
-```
-
-```{python}
-n = 10000
-sigma = 0.01
-np.random.seed(0)
-
-start = [[0.05, 0.05]]
-search_distribution = "normal"
-
-# np.random.seed(1)
-X = Metropolis_Hastings(n, start, sigma, search_distribution)
-
-plot_samples(region, X, sigma, n)
+plt.tight_layout()
+plt.show()
 ```
 
 ### Choosing the Proposal Distribution
