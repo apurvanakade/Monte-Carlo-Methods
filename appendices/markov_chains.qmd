@@ -8,6 +8,12 @@ execute:
   echo: false
 ---
 
+::: {.callout-warning}
+## Chapter Under Revision
+This chapter is currently being rewritten and may contain incomplete or outdated content. 
+Please see lecture notes.
+:::
+
 ```{python}
 import networkx as nx
 import matplotlib.pyplot as plt
