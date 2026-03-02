@@ -8,12 +8,6 @@ execute:
   echo: false
 ---
 
-::: {.callout-warning}
-## Chapter Under Revision
-This chapter is currently being rewritten and may contain incomplete or outdated content. 
-Please see lecture notes.
-:::
-
 ```{python}
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -178,19 +172,14 @@ We are particularly interested in the case when there is exactly one eigenvector
 
 ::: {#def-irreducibility}
 
-We say that a Markov chain is **irreducible** if for every pair of states $i, j \in \Omega$, there exists an integer $n$ such that $P^n(i, j) > 0$, i.e., it is possible to go from any state to any other state in a finite number of steps.
+We say that a Markov chain is **irreducible** if for every pair of states $i, j \in \Omega$, there exists an integer $n$ such that $P^n(i, j) > 0$, i.e., it is possible to go from any state to any other state in a finite number of steps. This ensures that the dimension of the 1-eigenspace is 1.
 
 :::
 
 ::: {#def-aperiodicity}
 
-We say that a state $i$ is **aperiodic** if the greatest common divisor of the set $\{n \geq 1 : P^n(i, i) > 0\}$ is 1. A Markov chain is called **aperiodic** if all its states are aperiodic.
+We say that a state $i$ is **aperiodic** if the greatest common divisor of the set $\{n \geq 1 : P^n(i, i) > 0\}$ is 1. A Markov chain is called **aperiodic** if all its states are aperiodic. This ensures that there are no other eigenvalues of norm 1.
 
-:::
-
-::: {.callout-important}
-## Note on Positive Recurrence
-Sometimes we add a preliminary requirement that the set $\{n \geq 1 : P^n(i, i) > 0\}$ is non-empty. This condition is called **positive recurrence**. We'll assume this as part of the definition of aperiodicity.
 :::
 
 ::: {#def-ergodicity}
@@ -201,10 +190,19 @@ A Markov chain is called **ergodic** if it is irreducible and aperiodic.
 
 ::: {#thm-fundamental-theorem}
 
-**Fundamental Theorem of Markov Chains**: If a Markov chain is ergodic, then it has a unique stationary distribution $\Pi$. Moreover, in this case, for any initial distribution $\pi_0$, the distribution of the chain converges to $\Pi$ as $n \to \infty$, i.e., 
+**Fundamental Theorem of Markov Chains**: If a Markov chain on a **finite state space** is ergodic, then it has a unique stationary distribution $\Pi$. Moreover, in this case, for any initial distribution $\pi_0$, the distribution of the chain converges to $\Pi$ as $n \to \infty$, i.e., 
 $$\lim_{n \to \infty} \pi_0 P^n = \Pi$$
 for any initial distribution $\pi_0$.
 
+:::
+
+::: {.callout-warning}
+## Infinite State Spaces
+For infinite state spaces, ergodicity (irreducibility + aperiodicity) alone is not sufficient. Additional conditions are required:
+
+- **Positive recurrence**: Every state must be positive recurrent, meaning the expected return time to any state $i$ is finite: $\mathbb{E}_i[T_i] < \infty$, where $T_i = \inf\{n \geq 1 : X_n = i\}$.
+- In infinite state spaces, a chain can be irreducible and aperiodic but **null recurrent** (expected return time is infinite), in which case no stationary distribution exists.
+- Alternatively, the chain could be **transient**, meaning states are visited only finitely many times with positive probability.
 :::
 
 ## Random Walk on Graphs
@@ -506,25 +504,38 @@ Multiplying the above vector $\mathbf{v}$ by $\text{diag}(\sqrt{\pi})$ gives us 
 
 ## Transition Kernels
 
-The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a **transition kernel** $K(x, y)$ that gives the "probability of transitioning from state $x$ to state $y$". However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the **density** of the distribution at that point. The transition kernel satisfies the equation:
+The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a **transition kernel** $K(x, y)$ that gives the "probability density for transitioning from state $x$ to state $y$". The transition kernel satisfies the equation:
 $$\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.$$
 
-All the properties of Markov chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov chains becomes 
+All the properties of Markov chains that we discussed earlier can be extended to transition kernels, but the definitions become more technical. The fundamental theorem of Markov chains becomes:
 
 ::: {#thm-fundamental-theorem-kernels}
 
 **(Fundamental Theorem of Markov Chains for Kernels).** If a Markov chain with transition kernel $K$ is 
 
-1. **Irreducible**: For all $x, y$, there exists $n$ such that $K^n(x, y) > 0$.
-2. **Positive recurrent**: The expected return time to a state is finite.
-3. **Aperiodic**: For all $x$, $\gcd\{n : K^n(x, x) > 0\} = 1$.
+1. **$\phi$-Irreducible**: There exists a measure $\phi$ such that for all sets $A$ with $\phi(A) > 0$ and all $x$, there exists $n$ such that $\mathbb{P}(X_n \in A \mid X_0 = x) > 0$.
+2. **Positive Harris recurrent**: The chain returns to every set of positive $\phi$-measure with probability 1 and the expected return time is finite.
+3. **Aperiodic**: The chain is not confined to a periodic structure (often verified by showing that for some set with positive measure, return times have GCD equal to 1, or by establishing a minorization condition).
 
 Then, the Markov chain has a unique stationary distribution $\Pi$ and for all initial distributions $\pi_0$, 
-$$\int \pi_0(x) K^n(x, y) \, dx \xrightarrow[TV]{} \Pi(y) \quad \text{as } n \to \infty.$$
+$$\|\pi_0 K^n - \Pi\|_{TV} \to 0 \quad \text{as } n \to \infty,$$
+where $\|\cdot\|_{TV}$ denotes the total variation distance.
 
 :::
 
+::: {.callout-note}
+## Practical Verification
+In practice, these conditions can be difficult to verify directly. For MCMC algorithms, aperiodicity is often ensured by design (e.g., having positive probability of staying in place), and irreducibility/positive recurrence are verified through properties of the target distribution and the proposal mechanism.
+:::
+
 ## Analyzing Convergence of Markov Chains
+
+::: {.callout-warning}
+## Chapter Under Revision
+**This chapter is currently being rewritten and may contain incomplete or outdated content. 
+Please see lecture notes.**
+:::
+
 
 In practice we need to decide how many samples to burn and how many samples to generate. We use various heuristics to decide this.
 

@@ -595,19 +595,6 @@ document.addEventListener("DOMContentLoaded", function() {
 </header>
 
 
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Chapter Under Revision
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This chapter is currently being rewritten and may contain incomplete or outdated content. Please see lecture notes.</p>
-</div>
-</div>
 <p>This appendix provides the theoretical foundation for MCMC methods covered in the main course. We will learn about Markov chains and focus on discrete chains for simplicity, but all results extend to the continuous case used in practice.</p>
 <section id="definitions" class="level2" data-number="B.1">
 <h2 data-number="B.1" class="anchored" data-anchor-id="definitions"><span class="header-section-number">B.1</span> Definitions</h2>
@@ -712,29 +699,34 @@ Evolution of the Markov chain starting from state A:
 <section id="fundamental-theorem" class="level2" data-number="B.3">
 <h2 data-number="B.3" class="anchored" data-anchor-id="fundamental-theorem"><span class="header-section-number">B.3</span> Fundamental Theorem</h2>
 <div id="def-irreducibility" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition B.4</strong></span> We say that a Markov chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span>, i.e., it is possible to go from any state to any other state in a finite number of steps.</p>
+<p><span class="theorem-title"><strong>Definition B.4</strong></span> We say that a Markov chain is <strong>irreducible</strong> if for every pair of states <span class="math inline">\(i, j \in \Omega\)</span>, there exists an integer <span class="math inline">\(n\)</span> such that <span class="math inline">\(P^n(i, j) &gt; 0\)</span>, i.e., it is possible to go from any state to any other state in a finite number of steps. This ensures that the dimension of the 1-eigenspace is 1.</p>
 </div>
 <div id="def-aperiodicity" class="theorem definition">
-<p><span class="theorem-title"><strong>Definition B.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic.</p>
-</div>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note on Positive Recurrence
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Sometimes we add a preliminary requirement that the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is non-empty. This condition is called <strong>positive recurrence</strong>. We’ll assume this as part of the definition of aperiodicity.</p>
-</div>
+<p><span class="theorem-title"><strong>Definition B.5</strong></span> We say that a state <span class="math inline">\(i\)</span> is <strong>aperiodic</strong> if the greatest common divisor of the set <span class="math inline">\(\{n \geq 1 : P^n(i, i) &gt; 0\}\)</span> is 1. A Markov chain is called <strong>aperiodic</strong> if all its states are aperiodic. This ensures that there are no other eigenvalues of norm 1.</p>
 </div>
 <div id="def-ergodicity" class="theorem definition">
 <p><span class="theorem-title"><strong>Definition B.6</strong></span> A Markov chain is called <strong>ergodic</strong> if it is irreducible and aperiodic.</p>
 </div>
 <div id="thm-fundamental-theorem" class="theorem">
-<p><span class="theorem-title"><strong>Theorem B.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>, i.e., <span class="math display">\[\lim_{n \to \infty} \pi_0 P^n = \Pi\]</span> for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
+<p><span class="theorem-title"><strong>Theorem B.2</strong></span> <strong>Fundamental Theorem of Markov Chains</strong>: If a Markov chain on a <strong>finite state space</strong> is ergodic, then it has a unique stationary distribution <span class="math inline">\(\Pi\)</span>. Moreover, in this case, for any initial distribution <span class="math inline">\(\pi_0\)</span>, the distribution of the chain converges to <span class="math inline">\(\Pi\)</span> as <span class="math inline">\(n \to \infty\)</span>, i.e., <span class="math display">\[\lim_{n \to \infty} \pi_0 P^n = \Pi\]</span> for any initial distribution <span class="math inline">\(\pi_0\)</span>.</p>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Infinite State Spaces
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For infinite state spaces, ergodicity (irreducibility + aperiodicity) alone is not sufficient. Additional conditions are required:</p>
+<ul>
+<li><strong>Positive recurrence</strong>: Every state must be positive recurrent, meaning the expected return time to any state <span class="math inline">\(i\)</span> is finite: <span class="math inline">\(\mathbb{E}_i[T_i] &lt; \infty\)</span>, where <span class="math inline">\(T_i = \inf\{n \geq 1 : X_n = i\}\)</span>.</li>
+<li>In infinite state spaces, a chain can be irreducible and aperiodic but <strong>null recurrent</strong> (expected return time is infinite), in which case no stationary distribution exists.</li>
+<li>Alternatively, the chain could be <strong>transient</strong>, meaning states are visited only finitely many times with positive probability.</li>
+</ul>
+</div>
 </div>
 </section>
 <section id="random-walk-on-graphs" class="level2" data-number="B.4">
@@ -938,20 +930,46 @@ Q(i, j)
 </section>
 <section id="transition-kernels" class="level2" data-number="B.8">
 <h2 data-number="B.8" class="anchored" data-anchor-id="transition-kernels"><span class="header-section-number">B.8</span> Transition Kernels</h2>
-<p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability of transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. However, because the sample space is continuous, the probability of being in a particular state is zero. Instead, we use the <strong>density</strong> of the distribution at that point. The transition kernel satisfies the equation: <span class="math display">\[\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.\]</span></p>
-<p>All the properties of Markov chains that we discussed earlier can be extended to transition kernels. The fundamental theorem of Markov chains becomes</p>
+<p>The sample spaces we encounter in MCMC methods are not discrete but continuous. Instead of a transition matrix, we use a <strong>transition kernel</strong> <span class="math inline">\(K(x, y)\)</span> that gives the “probability density for transitioning from state <span class="math inline">\(x\)</span> to state <span class="math inline">\(y\)</span>”. The transition kernel satisfies the equation: <span class="math display">\[\mathbb{P}(X_{n+1} \in A \mid X_n = x) = \int_{A} K(x, y) \, dy.\]</span></p>
+<p>All the properties of Markov chains that we discussed earlier can be extended to transition kernels, but the definitions become more technical. The fundamental theorem of Markov chains becomes:</p>
 <div id="thm-fundamental-theorem-kernels" class="theorem">
 <p><span class="theorem-title"><strong>Theorem B.6</strong></span> <strong>(Fundamental Theorem of Markov Chains for Kernels).</strong> If a Markov chain with transition kernel <span class="math inline">\(K\)</span> is</p>
 <ol type="1">
-<li><strong>Irreducible</strong>: For all <span class="math inline">\(x, y\)</span>, there exists <span class="math inline">\(n\)</span> such that <span class="math inline">\(K^n(x, y) &gt; 0\)</span>.</li>
-<li><strong>Positive recurrent</strong>: The expected return time to a state is finite.</li>
-<li><strong>Aperiodic</strong>: For all <span class="math inline">\(x\)</span>, <span class="math inline">\(\gcd\{n : K^n(x, x) &gt; 0\} = 1\)</span>.</li>
+<li><strong><span class="math inline">\(\phi\)</span>-Irreducible</strong>: There exists a measure <span class="math inline">\(\phi\)</span> such that for all sets <span class="math inline">\(A\)</span> with <span class="math inline">\(\phi(A) &gt; 0\)</span> and all <span class="math inline">\(x\)</span>, there exists <span class="math inline">\(n\)</span> such that <span class="math inline">\(\mathbb{P}(X_n \in A \mid X_0 = x) &gt; 0\)</span>.</li>
+<li><strong>Positive Harris recurrent</strong>: The chain returns to every set of positive <span class="math inline">\(\phi\)</span>-measure with probability 1 and the expected return time is finite.</li>
+<li><strong>Aperiodic</strong>: The chain is not confined to a periodic structure (often verified by showing that for some set with positive measure, return times have GCD equal to 1, or by establishing a minorization condition).</li>
 </ol>
-<p>Then, the Markov chain has a unique stationary distribution <span class="math inline">\(\Pi\)</span> and for all initial distributions <span class="math inline">\(\pi_0\)</span>, <span class="math display">\[\int \pi_0(x) K^n(x, y) \, dx \xrightarrow[TV]{} \Pi(y) \quad \text{as } n \to \infty.\]</span></p>
+<p>Then, the Markov chain has a unique stationary distribution <span class="math inline">\(\Pi\)</span> and for all initial distributions <span class="math inline">\(\pi_0\)</span>, <span class="math display">\[\|\pi_0 K^n - \Pi\|_{TV} \to 0 \quad \text{as } n \to \infty,\]</span> where <span class="math inline">\(\|\cdot\|_{TV}\)</span> denotes the total variation distance.</p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Practical Verification
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In practice, these conditions can be difficult to verify directly. For MCMC algorithms, aperiodicity is often ensured by design (e.g., having positive probability of staying in place), and irreducibility/positive recurrence are verified through properties of the target distribution and the proposal mechanism.</p>
+</div>
 </div>
 </section>
 <section id="analyzing-convergence-of-markov-chains" class="level2" data-number="B.9">
 <h2 data-number="B.9" class="anchored" data-anchor-id="analyzing-convergence-of-markov-chains"><span class="header-section-number">B.9</span> Analyzing Convergence of Markov Chains</h2>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Chapter Under Revision
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>This chapter is currently being rewritten and may contain incomplete or outdated content. Please see lecture notes.</strong></p>
+</div>
+</div>
 <p>In practice we need to decide how many samples to burn and how many samples to generate. We use various heuristics to decide this.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
