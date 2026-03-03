@@ -528,6 +528,78 @@ where $\|\cdot\|_{TV}$ denotes the total variation distance.
 In practice, these conditions can be difficult to verify directly. For MCMC algorithms, aperiodicity is often ensured by design (e.g., having positive probability of staying in place), and irreducibility/positive recurrence are verified through properties of the target distribution and the proposal mechanism.
 :::
 
+## Central Limit Theorem for Markov Chains
+
+A primary motivation for MCMC methods is to estimate expectations of the form $\mathbb{E}_\Pi[g(X)]$ for some function $g: \Omega \to \mathbb{R}$, where $\Pi$ is the stationary distribution. For example, we might want to compute the mean, variance, or higher moments of the stationary distribution.
+
+### Sample Mean Estimator
+
+Given a Markov chain $X_0, X_1, \ldots, X_n$ with stationary distribution $\Pi$, the **sample mean estimator** for $\mathbb{E}_\Pi[g(X)]$ is
+$$\bar{g}_n = \frac{1}{n} \sum_{i=1}^{n} g(X_i).$$
+
+By the ergodic theorem for Markov chains, if the chain is ergodic, then $\bar{g}_n \to \mathbb{E}_\Pi[g(X)]$ almost surely as $n \to \infty$. However, for practical purposes, we need to understand the *rate* of convergence and quantify the uncertainty in our estimate.
+
+### Variance of the Sample Mean
+
+To analyze the quality of our estimator, we compute its variance. Assuming the chain has reached stationarity (i.e., $X_i \sim \Pi$ for all $i$), we have:
+$$\text{Var}(\bar{g}_n) = \text{Var}\left(\frac{1}{n} \sum_{i=1}^{n} g(X_i)\right) = \frac{1}{n^2} \sum_{i=1}^{n} \sum_{j=1}^{n} \text{Cov}(g(X_i), g(X_j)).$$
+
+Unlike independent samples, Markov chain samples are correlated. Splitting the sum into diagonal and off-diagonal terms:
+$$\text{Var}(\bar{g}_n) = \frac{1}{n^2} \left[ \sum_{i=1}^{n} \text{Var}(g(X_i)) + 2\sum_{i=1}^{n} \sum_{j > i} \text{Cov}(g(X_i), g(X_j)) \right].$$
+
+By stationarity, $\text{Var}(g(X_i)) = \sigma_g^2$ for all $i$, and $\text{Cov}(g(X_i), g(X_j))$ depends only on $|j - i|$. Let $\gamma_k = \text{Cov}(g(X_0), g(X_k))$ denote the **lag-$k$ autocovariance**. Then:
+$$\text{Var}(\bar{g}_n) = \frac{\sigma_g^2}{n} + \frac{2}{n^2} \sum_{k=1}^{n-1} (n-k) \gamma_k.$$
+
+For large $n$, this simplifies to:
+$$\text{Var}(\bar{g}_n) \approx \frac{1}{n} \left( \sigma_g^2 + 2\sum_{k=1}^{\infty} \gamma_k \right) = \frac{\sigma_{\text{asy}}^2}{n},$$
+
+where $\sigma_{\text{asy}}^2 = \sigma_g^2 + 2\sum_{k=1}^{\infty} \gamma_k$ is called the **asymptotic variance**.
+
+### Geometric Ergodicity
+
+For the variance of the sample mean to decrease as $O(1/n)$, we need the sum $\sum_{k=1}^{\infty} \gamma_k$ to converge. This requires the autocovariances to decay sufficiently fast.
+
+::: {#def-geometric-ergodicity}
+
+A Markov chain with stationary distribution $\Pi$ is called **geometrically ergodic** if there exist constants $C > 0$ and $\rho \in (0, 1)$ such that for all initial states $x$:
+$$\| \mathbb{P}(X_n \in \cdot \mid X_0 = x) - \Pi(\cdot) \|_{\text{TV}} \leq C(x) \rho^n,$$
+
+where $C(x)$ may depend on the initial state $x$.
+
+:::
+
+Geometric ergodicity implies that the chain converges to its stationary distribution at an exponential rate. This condition is stronger than ordinary ergodicity and has important consequences for estimation.
+
+::: {.callout-tip}
+## Geometric Ergodicity and Covariance Decay
+If a Markov chain is geometrically ergodic, then the autocovariances $\gamma_k$ decay exponentially fast: $|\gamma_k| \leq C' \rho^k$ for some constants $C'$ and $\rho \in (0, 1)$. This ensures that $\sum_{k=1}^{\infty} |\gamma_k| < \infty$, so the asymptotic variance $\sigma_{\text{asy}}^2$ is finite.
+:::
+
+### Central Limit Theorem
+
+Under geometric ergodicity, we have a central limit theorem analogous to the CLT for independent samples:
+
+::: {#thm-clt-markov}
+
+**(CLT for Geometrically Ergodic Chains).** Let $X_0, X_1, \ldots$ be a geometrically ergodic Markov chain with stationary distribution $\Pi$. Let $g: \Omega \to \mathbb{R}$ be a function with $\mathbb{E}_\Pi[g(X)^2] < \infty$. Then:
+$$\sqrt{n}\left(\bar{g}_n - \mathbb{E}_\Pi[g(X)]\right) \xrightarrow{d} \mathcal{N}(0, \sigma_{\text{asy}}^2),$$
+
+where $\sigma_{\text{asy}}^2 = \sigma_g^2 + 2\sum_{k=1}^{\infty} \gamma_k$ is the asymptotic variance.
+
+:::
+
+This theorem tells us that even though MCMC samples are correlated, the sample mean is still asymptotically normal. The key difference from independent sampling is that the variance is inflated by the factor 
+$$\tau = \frac{\sigma_{\text{asy}}^2}{\sigma_g^2} = 1 + 2\sum_{k=1}^{\infty} \frac{\gamma_k}{\sigma_g^2},$$
+
+which is called the **integrated autocorrelation time**. To achieve the same precision as $n$ independent samples, we need approximately $n \cdot \tau$ MCMC samples.
+
+::: {.callout-important}
+## Practical Implications
+1. **Effective Sample Size (ESS)**: The effective sample size is $n_{\text{eff}} = n / \tau$, representing the equivalent number of independent samples.
+2. **Confidence Intervals**: Standard errors for MCMC estimates should use $\sigma_{\text{asy}}/\sqrt{n}$ rather than $\sigma_g/\sqrt{n}$.
+3. **Chain Design**: Algorithms that mix faster (smaller $\tau$) produce more efficient estimates.
+:::
+
 ## Analyzing Convergence of Markov Chains
 
 ::: {.callout-warning}
