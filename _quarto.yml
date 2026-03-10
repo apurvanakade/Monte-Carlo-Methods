@@ -1,6 +1,9 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - apps/**/*.js
+    - apps/**/*.py
 
 book:
   title: "Monte Carlo Methods Lecture Notes"
@@ -9,6 +12,19 @@ book:
     style: docked
   navbar:
     search: true
+    left:
+      - text: Apps
+        menu:
+          - text: Apps Home
+            href: apps/index.qmd
+          - text: Estimating Pi
+            href: apps/estimating-pi.qmd
+          - text: "Buffon's Needle"
+            href: apps/buffons-needle.qmd
+          - text: Metropolis-Hastings
+            href: apps/metropolis-hastings.qmd
+          - text: Metropolis Random Walk
+            href: apps/metropolis-random-walk.qmd
     right:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
@@ -38,6 +54,13 @@ book:
         - chapters/applications/ising.qmd
         - chapters/applications/mmn.qmd
         - chapters/applications/bootstrap.qmd
+    - part: "Interactive Apps"
+      chapters:
+        - apps/index.qmd
+        - apps/estimating-pi.qmd
+        - apps/buffons-needle.qmd
+        - apps/metropolis-hastings.qmd
+        - apps/metropolis-random-walk.qmd
     - part: "Advanced Topics"
       chapters:
         - chapters/dynamical/kalman_filters.qmd

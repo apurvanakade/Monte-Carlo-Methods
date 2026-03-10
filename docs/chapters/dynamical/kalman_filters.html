@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-08-02">
 
-<title>17&nbsp; Kalman Filters – Monte Carlo Methods Lecture Notes</title>
+<title>22&nbsp; Kalman Filters – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
 <link href="../../chapters/dynamical/particle_filters.html" rel="next">
-<link href="../../chapters/applications/bootstrap.html" rel="prev">
+<link href="../../apps/metropolis-random-walk.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -108,7 +108,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../style.css">
-<meta property="og:title" content="17&nbsp; Kalman Filters – Monte Carlo Methods Lecture Notes">
+<meta property="og:title" content="22&nbsp; Kalman Filters – Monte Carlo Methods Lecture Notes">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -290,6 +290,35 @@ window.Quarto = {
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-apps" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Apps</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-apps">    
+        <li>
+    <a class="dropdown-item" href="../../apps/index.html">
+ <span class="dropdown-text">Apps Home</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../apps/estimating-pi.html">
+ <span class="dropdown-text">Estimating Pi</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../apps/buffons-needle.html">
+ <span class="dropdown-text">Buffon’s Needle</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../apps/metropolis-hastings.html">
+ <span class="dropdown-text">Metropolis-Hastings</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../apps/metropolis-random-walk.html">
+ <span class="dropdown-text">Metropolis Random Walk</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
@@ -308,7 +337,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Kalman Filters</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -446,7 +475,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Advanced Topics</span></a>
+ <span class="menu-text">Interactive Apps</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -454,8 +483,32 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+  <a href="../../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/estimating-pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Estimating π</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/buffons-needle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Buffon’s Needle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Metropolis-Hastings Algorithm</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/metropolis-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
   </div>
 </li>
       </ul>
@@ -463,29 +516,46 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
- <span class="menu-text">Optimization</span></a>
+ <span class="menu-text">Advanced Topics</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
-      </ul>
-  </li>
-        <li class="sidebar-item">
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
 </li>
+      </ul>
+  </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
+ <span class="menu-text">Optimization</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
@@ -538,9 +608,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script>
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Kalman Filters</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></h1>
+<h1 class="title"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Kalman Filters</span></h1>
 </div>
 
 
@@ -987,13 +1057,13 @@ document.addEventListener("DOMContentLoaded", function() {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../chapters/applications/bootstrap.html" class="pagination-link" aria-label="Bootstrap">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span>
+      <a href="../../apps/metropolis-random-walk.html" class="pagination-link" aria-label="Metropolis Random Walk">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/dynamical/particle_filters.html" class="pagination-link" aria-label="Particle Filters">
-        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Particle Filters</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
