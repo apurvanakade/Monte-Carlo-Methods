@@ -4,6 +4,7 @@ project:
   resources:
     - apps/**/*.js
     - apps/**/*.py
+    - apps/**/*.json
 
 book:
   title: "Monte Carlo Methods Lecture Notes"

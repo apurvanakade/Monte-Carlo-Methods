@@ -15,8 +15,3 @@ page-layout: full
 title-block-banner: true
 toc: false
 ---
-
-::: {.callout-note}
-## Python-Powered Visualizations
-These interactive apps use [Pyodide](https://pyodide.org/) to run Python code directly in your browser. No server-side computation is needed - everything runs in your web browser!
-:::

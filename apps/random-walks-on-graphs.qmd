@@ -11,6 +11,19 @@ toc: false
 
 [← Return to Apps](index.qmd){.btn .btn-outline-primary .btn-sm}
 
+```{python}
+#| echo: false
+#| output: false
+import importlib.util
+from pathlib import Path
+
+script_path = Path("random walks on graphs/random_walks_on_graphs_precompute.py")
+spec = importlib.util.spec_from_file_location("rw_precompute", script_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+module.write_data("random walks on graphs/random_walks_on_graphs_data.json", max_time=200)
+```
+
 ```{=html}
 <style>
     #quarto-content .content,
@@ -22,270 +35,172 @@ toc: false
     #TOC-container {
         display: none !important;
     }
-    .controls {
+    .rw-controls {
         background: white;
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 20px;
     }
-    .control-group {
+    .rw-row {
         margin: 12px 0;
         display: flex;
         align-items: center;
         gap: 15px;
     }
-    .control-group label {
+    .rw-row label {
         min-width: 220px;
         font-weight: 500;
     }
-    .control-group select,
-    .control-group input[type="range"] {
+    .rw-row select,
+    .rw-row input[type="range"] {
         flex: 1;
         max-width: 420px;
     }
-    .control-group .value {
+    .rw-row .value {
         min-width: 90px;
         font-weight: bold;
         color: #1f77b4;
     }
-    #canvas {
-        transition: opacity 0.2s ease-in-out;
-        max-width: 100%;
+    .rw-grid {
+        display: grid;
+        grid-template-columns: minmax(420px, 1fr) minmax(320px, 0.9fr);
+        gap: 18px;
+        align-items: start;
+    }
+    #rw-graph-svg,
+    #rw-tv-svg,
+    #rw-spectrum-svg {
+        width: 100%;
+        background: white;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    #canvas.updating {
-        opacity: 0.6;
+    #rw-graph-svg,
+    #rw-tv-svg {
+        height: 500px;
     }
-    #loading {
+    #rw-spectrum-svg {
+        height: 230px;
+    }
+    .rw-stats {
+        background: white;
+        padding: 18px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 16px;
+    }
+    .rw-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+    }
+    .rw-stat {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .rw-stat-label {
+        font-size: 0.82em;
+        color: #666;
+    }
+    .rw-stat-value {
+        font-size: 1.07em;
+        font-weight: 700;
+    }
+    #rw-loading {
         background: white;
         padding: 40px;
         border-radius: 8px;
         text-align: center;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .stats-container {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-top: 20px;
-    }
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-    .stat-item {
-        padding: 10px;
-        background: #f8f9fa;
-        border-radius: 4px;
-    }
-    .stat-label {
-        font-size: 0.85em;
-        color: #666;
-    }
-    .stat-value {
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #333;
-    }
-    #main-content {
+    #rw-main {
         display: none;
     }
-    button {
-        background: #1f77b4;
-        color: white;
-        border: none;
-        padding: 10px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    button:hover {
-        background: #185f90;
+    @media (max-width: 1000px) {
+        .rw-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
-
-<div id="loading">
-    <p>Loading Python environment...</p>
-    <p style="color:#666;font-size:0.9em;">First load may take a few seconds while dependencies are fetched.</p>
+<div id="rw-loading">
+    <p>Loading precomputed data...</p>
+    <p style="color:#666;font-size:0.9em;">Rendering is client-side with d3. No Python runs during slider movement.</p>
 </div>
 
-<div id="main-content">
-    <div class="controls">
-        <div class="control-group">
+<div id="rw-main">
+    <div class="rw-controls">
+        <div class="rw-row">
             <label for="graph-select">Graph:</label>
             <select id="graph-select"></select>
         </div>
 
-        <div class="control-group">
+        <div class="rw-row">
             <label for="start-slider">Start Node:</label>
             <input type="range" id="start-slider" min="0" max="10" step="1" value="0">
             <span class="value" id="start-value">0</span>
         </div>
 
-        <div class="control-group">
+        <div class="rw-row">
             <label for="time-slider">Time Step:</label>
             <input type="range" id="time-slider" min="0" max="200" step="1" value="0">
             <span class="value" id="time-value">0</span>
         </div>
 
-        <div class="control-group">
+        <div class="rw-row">
             <label>Animation:</label>
-            <button id="play-btn">Play</button>
-            <button id="pause-btn">Pause</button>
+            <button id="play-btn" class="btn btn-primary btn-sm">Play</button>
+            <button id="pause-btn" class="btn btn-outline-secondary btn-sm">Pause</button>
         </div>
     </div>
 
-    <canvas id="canvas"></canvas>
+    <div class="rw-grid">
+        <svg id="rw-graph-svg"></svg>
+        <svg id="rw-tv-svg"></svg>
+    </div>
 
-    <div class="stats-container">
+    <svg id="rw-spectrum-svg" style="margin-top: 16px;"></svg>
+
+    <div class="rw-stats">
         <h3>Statistics</h3>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-label">Current TV Distance</div>
-                <div class="stat-value" id="stat-tv">-</div>
+        <div class="rw-stats-grid">
+            <div class="rw-stat">
+                <div class="rw-stat-label">Current TV Distance</div>
+                <div class="rw-stat-value" id="stat-tv">-</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">L2 Distance</div>
-                <div class="stat-value" id="stat-l2">-</div>
+            <div class="rw-stat">
+                <div class="rw-stat-label">L2 Distance</div>
+                <div class="rw-stat-value" id="stat-l2">-</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Spectral Gap</div>
-                <div class="stat-value" id="stat-gap">-</div>
+            <div class="rw-stat">
+                <div class="rw-stat-label">Spectral Gap</div>
+                <div class="rw-stat-value" id="stat-gap">-</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Mixing Time (epsilon=0.1)</div>
-                <div class="stat-value" id="stat-mixing">-</div>
+            <div class="rw-stat">
+                <div class="rw-stat-label">Mixing Time (epsilon=0.1)</div>
+                <div class="rw-stat-value" id="stat-mixing">-</div>
+            </div>
+            <div class="rw-stat">
+                <div class="rw-stat-label">Max Node Probability</div>
+                <div class="rw-stat-value" id="stat-max">-</div>
             </div>
         </div>
     </div>
 </div>
 
 <script type="module">
-    import {
-        initPyodide,
-        getGraphInfo,
-        precomputeData,
-        debouncedUpdate,
-        renderImageToCanvas,
-        updateStats,
-        updatePlot
-    } from './random walks on graphs/random_walks_on_graphs_app.js';
-
-    const canvas = document.getElementById('canvas');
-    const graphSelect = document.getElementById('graph-select');
-    const startSlider = document.getElementById('start-slider');
-    const timeSlider = document.getElementById('time-slider');
-    const startValue = document.getElementById('start-value');
-    const timeValue = document.getElementById('time-value');
-    const playBtn = document.getElementById('play-btn');
-    const pauseBtn = document.getElementById('pause-btn');
-
-    let timerId = null;
-    const maxTime = 200;
-
-    function applyData(data) {
-        renderImageToCanvas(canvas, data.image);
-        updateStats(data);
-        canvas.classList.remove('updating');
-    }
-
-    function updateNodeSliderLimit(graphInfo, graphName) {
-        const maxNode = Math.max(0, graphInfo.node_counts[graphName] - 1);
-        startSlider.max = maxNode;
-        if (parseInt(startSlider.value) > maxNode) {
-            startSlider.value = 0;
-            startValue.textContent = '0';
-        }
-    }
-
-    function requestUpdate() {
-        canvas.classList.add('updating');
-        const graphName = graphSelect.value;
-        const startNode = parseInt(startSlider.value);
-        const t = parseInt(timeSlider.value);
-        debouncedUpdate(graphName, startNode, t, maxTime, applyData);
-    }
-
-    function startAnimation() {
-        if (timerId !== null) return;
-        timerId = setInterval(() => {
-            let t = parseInt(timeSlider.value);
-            if (t >= maxTime) {
-                t = 0;
-            } else {
-                t += 1;
-            }
-            timeSlider.value = t;
-            timeValue.textContent = String(t);
-            requestUpdate();
-        }, 220);
-    }
-
-    function stopAnimation() {
-        if (timerId !== null) {
-            clearInterval(timerId);
-            timerId = null;
-        }
-    }
+    import { initRandomWalksApp } from './random walks on graphs/random_walks_on_graphs_d3_app.js';
 
     async function init() {
         try {
-            await initPyodide();
-            const info = getGraphInfo();
-
-            info.options.forEach((name) => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                graphSelect.appendChild(opt);
-            });
-
-            graphSelect.value = info.default_graph;
-            startSlider.value = info.default_start;
-            timeSlider.value = info.default_time;
-            startValue.textContent = String(info.default_start);
-            timeValue.textContent = String(info.default_time);
-
-            updateNodeSliderLimit(info, graphSelect.value);
-
-            graphSelect.addEventListener('change', () => {
-                stopAnimation();
-                updateNodeSliderLimit(info, graphSelect.value);
-                precomputeData(graphSelect.value, parseInt(startSlider.value), maxTime).catch(console.error);
-                requestUpdate();
-            });
-
-            startSlider.addEventListener('input', (e) => {
-                stopAnimation();
-                startValue.textContent = e.target.value;
-                precomputeData(graphSelect.value, parseInt(e.target.value), maxTime).catch(console.error);
-                requestUpdate();
-            });
-
-            timeSlider.addEventListener('input', (e) => {
-                timeValue.textContent = e.target.value;
-                requestUpdate();
-            });
-
-            playBtn.addEventListener('click', startAnimation);
-            pauseBtn.addEventListener('click', stopAnimation);
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-
-            await precomputeData(graphSelect.value, parseInt(startSlider.value), maxTime);
-            const data = await updatePlot(graphSelect.value, parseInt(startSlider.value), parseInt(timeSlider.value), maxTime);
-            if (data) {
-                applyData(data);
-            }
+            await initRandomWalksApp();
+            document.getElementById('rw-loading').style.display = 'none';
+            document.getElementById('rw-main').style.display = 'block';
         } catch (err) {
             console.error('Failed to initialize app:', err);
-            document.getElementById('loading').innerHTML = '<p style="color:red;">Error loading Python environment. Check console for details.</p>';
+            document.getElementById('rw-loading').innerHTML = '<p style="color:red;">Failed to load precomputed data.</p>';
         }
     }
 
@@ -295,10 +210,4 @@ toc: false
 
 ## About This App
 
-This app visualizes random walks on different graph families and compares how quickly they mix. It tracks:
-
-1. Node-wise probability mass over time
-2. Total variation distance to stationarity
-3. Spectrum of the transition matrix and spectral gap
-
-You can switch graph structure, starting node, and time to see how bottlenecks and connectivity affect convergence speed.
+This version precomputes random-walk trajectories in Python at build time and stores the results as JSON. The browser only renders precomputed values with d3, so slider interactions stay smooth.

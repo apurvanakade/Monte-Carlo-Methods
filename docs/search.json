@@ -815,7 +815,7 @@
     "href": "apps/index.html",
     "title": "17  Interactive Apps",
     "section": "",
-    "text": "Python-Powered Visualizations\n\n\n\nThese interactive apps use Pyodide to run Python code directly in your browser. No server-side computation is needed - everything runs in your web browser!\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nRandom Walks on Graphs\n\n\n\nrandom-walk\n\ngraph-theory\n\nmcmc\n\nvisualization\n\n\n\nInteractively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.\n\n\n\nMar 10, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis Random Walk\n\n\n\nrandom-walk\n\nmcmc\n\nvisualization\n\n\n\nExplore random walks using the Metropolis algorithm and observe how particles move through space.\n\n\n\nJan 4, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis-Hastings Algorithm\n\n\n\nmcmc\n\nstatistics\n\nalgorithms\n\n\n\nVisualize the Metropolis-Hastings algorithm, a Markov Chain Monte Carlo method for sampling from probability distributions.\n\n\n\nJan 3, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nEstimating π\n\n\n\nmonte-carlo\n\nprobability\n\nvisualization\n\n\n\nUse Monte Carlo methods to estimate the value of π by randomly sampling points in a square.\n\n\n\nJan 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nBuffon’s Needle\n\n\n\nprobability\n\nmonte-carlo\n\nvisualization\n\n\n\nEstimate the value of π using Buffon’s needle problem - a classic probability experiment that connects geometry with randomness.\n\n\n\nJan 1, 2025\n\n\n\n\n\n\nNo matching items",
+    "text": "Random Walks on Graphs\n\n\n\nrandom-walk\n\ngraph-theory\n\nmcmc\n\nvisualization\n\n\n\nInteractively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.\n\n\n\nMar 10, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis Random Walk\n\n\n\nrandom-walk\n\nmcmc\n\nvisualization\n\n\n\nExplore random walks using the Metropolis algorithm and observe how particles move through space.\n\n\n\nJan 4, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis-Hastings Algorithm\n\n\n\nmcmc\n\nstatistics\n\nalgorithms\n\n\n\nVisualize the Metropolis-Hastings algorithm, a Markov Chain Monte Carlo method for sampling from probability distributions.\n\n\n\nJan 3, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nEstimating π\n\n\n\nmonte-carlo\n\nprobability\n\nvisualization\n\n\n\nUse Monte Carlo methods to estimate the value of π by randomly sampling points in a square.\n\n\n\nJan 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nBuffon’s Needle\n\n\n\nprobability\n\nmonte-carlo\n\nvisualization\n\n\n\nEstimate the value of π using Buffon’s needle problem - a classic probability experiment that connects geometry with randomness.\n\n\n\nJan 1, 2025\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>17</span>  <span class='chapter-title'>Interactive Apps</span>"
@@ -826,18 +826,7 @@
     "href": "apps/estimating-pi.html",
     "title": "18  Estimating π",
     "section": "",
-    "text": "18.1 About This App\n← Return to Apps\nThis app demonstrates a simple application of Monte Carlo simulation: estimating π by random sampling. The method works by comparing areas:\nBy randomly generating points uniformly in the square and counting how many fall inside the circle, we can estimate this ratio:\n\\[\\frac{\\text{points inside circle}}{\\text{total points}} \\approx \\frac{\\pi}{4}\\]\nTherefore:\n\\[\\pi \\approx 4 \\cdot \\frac{\\text{points inside circle}}{\\text{total points}}\\]\nAs we increase the number of random samples, the Law of Large Numbers guarantees that our estimate converges to the true value of π.",
-    "crumbs": [
-      "Interactive Apps",
-      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Estimating π</span>"
-    ]
-  },
-  {
-    "objectID": "apps/estimating-pi.html#about-this-app",
-    "href": "apps/estimating-pi.html#about-this-app",
-    "title": "18  Estimating π",
-    "section": "",
-    "text": "Consider a unit circle (radius = 1) inscribed in a square (side = 2)\nThe circle has area \\(\\pi r^2 = \\pi\\)\nThe square has area \\((2r)^2 = 4\\)\nThe ratio of areas is \\(\\frac{\\pi}{4}\\)",
+    "text": "← Return to Apps\n\n\n\n  Sample Size (N):\n  \n  1,000\n\n\n\n  \n  \n    Results\n    \n\n\n\nSample Size:\n-\n\n\nPoints Inside:\n-\n\n\nπ Estimate:\n-\n\n\nTrue π:\n-\n\n\nAbsolute Error:\n-\n\n\nStandard Error:\n-",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>18</span>  <span class='chapter-title'>Estimating π</span>"
@@ -848,7 +837,7 @@
     "href": "apps/buffons-needle.html",
     "title": "19  Buffon’s Needle",
     "section": "",
-    "text": "19.1 About This App\n← Return to Apps\nBuffon’s Needle is a classic problem in geometric probability, first posed by Georges-Louis Leclerc, Comte de Buffon, in the 18th century. The problem involves dropping needles on a floor made of parallel strips and counting how many needles cross the lines between the strips.\nThis simple physical experiment can be used to estimate π! The probability that a needle of length \\(\\ell\\) will cross a line when dropped on a floor with parallel lines spaced \\(d\\) apart (where \\(\\ell \\leq d\\)) is:\n\\[P = \\frac{2\\ell}{\\pi d}\\]\nBy rearranging this formula and using the Law of Large Numbers, we can estimate π by performing many trials:\n\\[\\pi \\approx \\frac{2\\ell \\cdot n}{d \\cdot c}\\]\nwhere \\(n\\) is the total number of needles dropped and \\(c\\) is the number that cross a line.",
+    "text": "← Return to Apps\n\n\n\n  Number of Needles:\n  \n  10\n\n\n\n  \n  \n    Results\n    \n\n\n\nTotal Needles:\n-\n\n\nLine Crossings:\n-\n\n\nπ Estimate:\n-\n\n\nTrue π:\n-\n\n\nAbsolute Error:\n-\n\n\nStandard Error:\n-",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>19</span>  <span class='chapter-title'>Buffon's Needle</span>"
@@ -859,18 +848,7 @@
     "href": "apps/metropolis-hastings.html",
     "title": "20  Metropolis-Hastings Algorithm",
     "section": "",
-    "text": "20.1 About This App\n← Return to Apps\nThe Metropolis-Hastings algorithm is a Markov Chain Monte Carlo (MCMC) method for obtaining a sequence of random samples from a probability distribution for which direct sampling is difficult.",
-    "crumbs": [
-      "Interactive Apps",
-      "<span class='chapter-number'>20</span>  <span class='chapter-title'>Metropolis-Hastings Algorithm</span>"
-    ]
-  },
-  {
-    "objectID": "apps/metropolis-hastings.html#about-this-app",
-    "href": "apps/metropolis-hastings.html#about-this-app",
-    "title": "20  Metropolis-Hastings Algorithm",
-    "section": "",
-    "text": "20.1.1 How It Works\nThe algorithm generates samples by constructing a Markov chain that has the desired distribution as its equilibrium distribution. At each step:\n\nPropose a new state \\(x'\\) from the current state \\(x\\) using a proposal distribution \\(q(x' | x)\\)\nCalculate the acceptance ratio: \\[\\alpha = \\min\\left(1, \\frac{p(x') q(x|x')}{p(x) q(x'|x)}\\right)\\]\nAccept the new state with probability \\(\\alpha\\), otherwise stay at the current state\n\nWhere \\(p(x)\\) is the target probability distribution we want to sample from.\nThis simple procedure allows us to sample from complex, high-dimensional distributions that would be intractable to sample from directly - making it a cornerstone of modern Bayesian statistics and computational physics.",
+    "text": "← Return to Apps\n\n\n\n  \n    Proposal Width (d):\n    \n    2.0\n  \n  \n    Number of Samples:\n    \n    20\n  \n  \n    Resample\n  \n\n\n\n\n\n\n  Statistics\n  \n    Acceptance Rate-\n    Accepted / Total-\n    Effective Sample Size-\n    Sample Mean-\n    Sample Std Dev-",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>20</span>  <span class='chapter-title'>Metropolis-Hastings Algorithm</span>"
@@ -881,7 +859,7 @@
     "href": "apps/metropolis-random-walk.html",
     "title": "21  Metropolis Random Walk",
     "section": "",
-    "text": "21.1 About This App\n← Return to Apps\nThis app visualizes a random walk governed by the Metropolis algorithm, demonstrating how a stochastic process can explore a state space while respecting certain probability constraints.",
+    "text": "← Return to Apps\n\n\n\n  \n    Proposal Side Length d:\n    \n    0.5\n  \n  \n    Number of Samples:\n    \n    50\n  \n  \n    Starting Point:\n    \n  \n  \n    Resample\n  \n\n\n\n\n\n  \n    Running Averages of Coordinates\n    \n  \n  \n    Autocorrelation Functions (ACF)\n    \n  \n\n\n\n  Statistics\n  \n    Acceptance Rate-\n    Accepted / Total-\n    ESS (X)-\n    ESS (Y)-",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>21</span>  <span class='chapter-title'>Metropolis Random Walk</span>"
@@ -892,18 +870,7 @@
     "href": "apps/random-walks-on-graphs.html",
     "title": "22  Random Walks on Graphs",
     "section": "",
-    "text": "22.1 About This App\n← Return to Apps\nThis app visualizes random walks on different graph families and compares how quickly they mix. It tracks:\nYou can switch graph structure, starting node, and time to see how bottlenecks and connectivity affect convergence speed.",
-    "crumbs": [
-      "Interactive Apps",
-      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Random Walks on Graphs</span>"
-    ]
-  },
-  {
-    "objectID": "apps/random-walks-on-graphs.html#about-this-app",
-    "href": "apps/random-walks-on-graphs.html#about-this-app",
-    "title": "22  Random Walks on Graphs",
-    "section": "",
-    "text": "Node-wise probability mass over time\nTotal variation distance to stationarity\nSpectrum of the transition matrix and spectral gap",
+    "text": "22.1 About This App\n← Return to Apps\nThis version precomputes random-walk trajectories in Python at build time and stores the results as JSON. The browser only renders precomputed values with d3, so slider interactions stay smooth.",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>22</span>  <span class='chapter-title'>Random Walks on Graphs</span>"

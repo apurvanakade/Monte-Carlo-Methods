@@ -405,248 +405,52 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <p><a href="../apps/index.html" class="btn btn-outline-primary btn-sm">← Return to Apps</a></p>
 <style>
-    #quarto-content .content,
-    main.content {
-        max-width: min(1800px, 96vw) !important;
-    }
-    #quarto-margin-sidebar,
-    nav#TOC,
-    #TOC-container {
-        display: none !important;
-    }
-    .controls {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    .control-group {
-        margin: 15px 0;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    .control-group label {
-        min-width: 200px;
-        font-weight: 500;
-    }
-    .control-group input[type="range"] {
-        flex: 1;
-        max-width: 400px;
-    }
-    .control-group .value {
-        min-width: 80px;
-        font-weight: bold;
-        color: #4a90d9;
-    }
-    #canvas {
-        transition: opacity 0.2s ease-in-out;
-        max-width: 100%;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    #canvas.updating {
-        opacity: 0.6;
-    }
-    #loading {
-        background: white;
-        padding: 40px;
-        border-radius: 8px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    #loading .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #4a90d9;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    #main-content {
-        display: none;
-    }
-    .stats-container {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-top: 20px;
-    }
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-    .stat-item {
-        padding: 10px;
-        background: #f8f9fa;
-        border-radius: 4px;
-    }
-    .stat-label {
-        font-size: 0.85em;
-        color: #666;
-    }
-    .stat-value {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #333;
-    }
-    button {
-        background: #4a90d9;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background 0.2s;
-    }
-    button:hover {
-        background: #357abd;
-    }
-    button:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-    }
+  #quarto-content .content, main.content { max-width: min(1800px, 96vw) !important; }
+  #quarto-margin-sidebar, nav#TOC, #TOC-container { display: none !important; }
+  .controls { background:white; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-bottom:16px; }
+  .control-group { margin:10px 0; display:flex; align-items:center; gap:15px; }
+  .control-group label { min-width:200px; font-weight:500; }
+  .control-group .value { min-width:80px; font-weight:bold; color:#2563eb; }
+  svg { width:100%; background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-top:14px; }
+  #mh-trace-svg, #mh-hist-svg { height: 320px; }
 </style>
 
-<div id="loading">
-    <div class="spinner"></div>
-    <p>Loading Python environment...</p>
-    <p style="color: #666; font-size: 0.9em;">This may take a few seconds on first load.</p>
+<div class="controls">
+  <div class="control-group">
+    <label for="d-slider">Proposal Width (d):</label>
+    <input type="range" id="d-slider" min="0.5" max="6" step="0.5" value="2">
+    <span class="value" id="d-value">2.0</span>
+  </div>
+  <div class="control-group">
+    <label for="n-slider">Number of Samples:</label>
+    <input type="range" id="n-slider" min="5" max="500" step="1" value="20">
+    <span class="value" id="n-value">20</span>
+  </div>
+  <div class="control-group">
+    <button id="resample-btn" class="btn btn-primary btn-sm">Resample</button>
+  </div>
 </div>
 
-<div id="main-content">
-    <div class="controls">
-        <div class="control-group">
-            <label for="d-slider">Proposal Width (d):</label>
-            <input type="range" id="d-slider" min="0.5" max="6" step="0.5" value="2">
-            <span class="value" id="d-value">2.0</span>
-        </div>
-        
-        <div class="control-group">
-            <label for="n-slider">Number of Samples:</label>
-            <input type="range" id="n-slider" min="5" max="500" step="1" value="20">
-            <span class="value" id="n-value">20</span>
-        </div>
-        
-        <div class="control-group">
-            <button id="resample-btn">Resample</button>
-        </div>
-    </div>
-    
-    <canvas id="canvas"></canvas>
-    
-    <div class="stats-container">
-        <h3 class="anchored">Statistics</h3>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-label">Acceptance Rate</div>
-                <div class="stat-value" id="stat-acceptance">-</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Accepted / Total</div>
-                <div class="stat-value" id="stat-accepted">-</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Effective Sample Size</div>
-                <div class="stat-value" id="stat-ess">-</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Sample Mean</div>
-                <div class="stat-value" id="stat-mean">-</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Sample Std Dev</div>
-                <div class="stat-value" id="stat-std">-</div>
-            </div>
-        </div>
-    </div>
+<svg id="mh-trace-svg"></svg>
+<svg id="mh-hist-svg"></svg>
+
+<div style="background:white; padding:18px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-top:16px;">
+  <h3 class="anchored">Statistics</h3>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
+    <div><div>Acceptance Rate</div><div id="stat-acceptance" style="font-weight:bold;">-</div></div>
+    <div><div>Accepted / Total</div><div id="stat-accepted" style="font-weight:bold;">-</div></div>
+    <div><div>Effective Sample Size</div><div id="stat-ess" style="font-weight:bold;">-</div></div>
+    <div><div>Sample Mean</div><div id="stat-mean" style="font-weight:bold;">-</div></div>
+    <div><div>Sample Std Dev</div><div id="stat-std" style="font-weight:bold;">-</div></div>
+  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
 <script type="module">
-    import { initPyodide, debouncedUpdate, renderImageToCanvas, updateStats, updatePlot } from './metropolis hastings/metropolis_hastings_app.js';
-
-    const canvas = document.getElementById('canvas');
-
-    async function handleUpdate() {
-        const n = parseInt(document.getElementById('n-slider').value);
-        const d = parseFloat(document.getElementById('d-slider').value);
-        
-        canvas.classList.add('updating');
-        
-        debouncedUpdate(n, d, (data) => {
-            renderImageToCanvas(canvas, data.image);
-            updateStats(data, n);
-            canvas.classList.remove('updating');
-        });
-    }
-
-    async function init() {
-        try {
-            await initPyodide();
-            
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            
-            // Set up event listeners
-            document.getElementById('d-slider').addEventListener('input', (e) => {
-                document.getElementById('d-value').textContent = parseFloat(e.target.value).toFixed(1);
-                handleUpdate();
-            });
-            
-            document.getElementById('n-slider').addEventListener('input', (e) => {
-                document.getElementById('n-value').textContent = parseInt(e.target.value).toLocaleString();
-                handleUpdate();
-            });
-            
-            document.getElementById('resample-btn').addEventListener('click', () => {
-                handleUpdate();
-            });
-            
-            // Initial render
-            const n = parseInt(document.getElementById('n-slider').value);
-            const d = parseFloat(document.getElementById('d-slider').value);
-            document.getElementById('n-value').textContent = n.toLocaleString();
-            document.getElementById('d-value').textContent = d.toFixed(1);
-            const data = await updatePlot(n, d);
-            if (data) {
-                renderImageToCanvas(canvas, data.image);
-                updateStats(data, n);
-            }
-        } catch (err) {
-            console.error('Failed to initialize app:', err);
-            document.getElementById('loading').innerHTML = '<p style="color: red;">Error loading Python environment. Please refresh the page.</p>';
-        }
-    }
-
-    window.addEventListener('load', init);
+  import { initMetropolisHastingsApp } from './metropolis hastings/metropolis_hastings_d3_app.js';
+  initMetropolisHastingsApp().catch((err) => console.error('Failed to initialize app:', err));
 </script>
-<section id="about-this-app" class="level2" data-number="20.1">
-<h2 data-number="20.1" class="anchored" data-anchor-id="about-this-app"><span class="header-section-number">20.1</span> About This App</h2>
-<p>The Metropolis-Hastings algorithm is a Markov Chain Monte Carlo (MCMC) method for obtaining a sequence of random samples from a probability distribution for which direct sampling is difficult.</p>
-<section id="how-it-works" class="level3" data-number="20.1.1">
-<h3 data-number="20.1.1" class="anchored" data-anchor-id="how-it-works"><span class="header-section-number">20.1.1</span> How It Works</h3>
-<p>The algorithm generates samples by constructing a Markov chain that has the desired distribution as its equilibrium distribution. At each step:</p>
-<ol type="1">
-<li><strong>Propose</strong> a new state <span class="math inline">\(x'\)</span> from the current state <span class="math inline">\(x\)</span> using a proposal distribution <span class="math inline">\(q(x' | x)\)</span></li>
-<li><strong>Calculate</strong> the acceptance ratio: <span class="math display">\[\alpha = \min\left(1, \frac{p(x') q(x|x')}{p(x) q(x'|x)}\right)\]</span></li>
-<li><strong>Accept</strong> the new state with probability <span class="math inline">\(\alpha\)</span>, otherwise stay at the current state</li>
-</ol>
-<p>Where <span class="math inline">\(p(x)\)</span> is the target probability distribution we want to sample from.</p>
-<p>This simple procedure allows us to sample from complex, high-dimensional distributions that would be intractable to sample from directly - making it a cornerstone of modern Bayesian statistics and computational physics.</p>
 
 
-</section>
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
