@@ -870,7 +870,7 @@
     "href": "apps/random-walks-on-graphs.html",
     "title": "22  Random Walks on Graphs",
     "section": "",
-    "text": "22.1 About This App\n← Return to Apps\nThis version precomputes random-walk trajectories in Python at build time and stores the results as JSON. The browser only renders precomputed values with d3, so slider interactions stay smooth.",
+    "text": "← Return to Apps\n\n\n\n    Loading precomputed data...\n    Rendering is client-side with d3. No Python runs during slider movement.\n\n\n\n    \n        \n            Graph:\n            \n        \n\n        \n            Start Node:\n            \n            0\n        \n\n        \n            Time Step:\n            \n            0\n        \n\n        \n            Animation:\n            Play\n            Pause\n        \n    \n\n    \n        \n        \n    \n\n    \n\n    \n        Statistics\n        \n            \n                Current TV Distance\n                -\n            \n            \n                L2 Distance\n                -\n            \n            \n                Spectral Gap\n                -\n            \n            \n                Mixing Time (epsilon=0.1)\n                -\n            \n            \n                Max Node Probability\n                -",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>22</span>  <span class='chapter-title'>Random Walks on Graphs</span>"

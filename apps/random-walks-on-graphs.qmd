@@ -208,6 +208,3 @@ module.write_data("random walks on graphs/random_walks_on_graphs_data.json", max
 </script>
 ```
 
-## About This App
-
-This version precomputes random-walk trajectories in Python at build time and stores the results as JSON. The browser only renders precomputed values with d3, so slider interactions stay smooth.
