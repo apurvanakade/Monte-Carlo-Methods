@@ -9,7 +9,7 @@
 <meta name="author" content="Apurva Nakade">
 <meta name="dcterms.date" content="2025-08-02">
 
-<title>26&nbsp; Cross Entropy Method – Monte Carlo Methods Lecture Notes</title>
+<title>27&nbsp; Cross Entropy Method – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -108,7 +108,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../../style.css">
-<meta property="og:title" content="26&nbsp; Cross Entropy Method – Monte Carlo Methods Lecture Notes">
+<meta property="og:title" content="27&nbsp; Cross Entropy Method – Monte Carlo Methods Lecture Notes">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -316,6 +316,10 @@ window.Quarto = {
     <a class="dropdown-item" href="../../apps/metropolis-random-walk.html">
  <span class="dropdown-text">Metropolis Random Walk</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../apps/random-walks-on-graphs.html">
+ <span class="dropdown-text">Random Walks on Graphs</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -337,7 +341,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/optimization/index.html">Optimization</a></li><li class="breadcrumb-item"><a href="../../chapters/optimization/cross_entropy.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/optimization/index.html">Optimization</a></li><li class="breadcrumb-item"><a href="../../chapters/optimization/cross_entropy.html"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -511,6 +515,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -525,7 +535,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
 </li>
       </ul>
@@ -544,7 +554,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -608,9 +618,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script>
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/optimization/index.html">Optimization</a></li><li class="breadcrumb-item"><a href="../../chapters/optimization/cross_entropy.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/optimization/index.html">Optimization</a></li><li class="breadcrumb-item"><a href="../../chapters/optimization/cross_entropy.html"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></h1>
+<h1 class="title"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></h1>
 </div>
 
 
@@ -1058,12 +1068,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../../chapters/optimization/simulated_annealing.html" class="pagination-link" aria-label="Simulated Annealing">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Simulated Annealing</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Simulated Annealing</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../../chapters/references.html" class="pagination-link" aria-label="References">
-        <span class="nav-page-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">References</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">References</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

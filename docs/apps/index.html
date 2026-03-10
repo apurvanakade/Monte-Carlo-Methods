@@ -138,7 +138,7 @@ window.Quarto = {
 <link rel="stylesheet" href="../style.css">
 <meta property="og:title" content="17&nbsp; Interactive Apps – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="Explore mathematical concepts through interactive visualizations">
-<meta property="og:image" content="../apps/images/metropolis-random-walk.svg">
+<meta property="og:image" content="../apps/images/random-walks-on-graphs.svg">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -345,6 +345,10 @@ window.Quarto = {
         <li>
     <a class="dropdown-item" href="../apps/metropolis-random-walk.html">
  <span class="dropdown-text">Metropolis Random Walk</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../apps/random-walks-on-graphs.html">
+ <span class="dropdown-text">Random Walks on Graphs</span></a>
   </li>  
     </ul>
   </li>
@@ -558,6 +562,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -572,7 +582,7 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
 </li>
       </ul>
@@ -591,7 +601,7 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">References</span></span></a>
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -623,8 +633,7 @@ window.Quarto = {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(4)</span></div><div class="category" data-category="YWxnb3JpdGhtcw==">algorithms <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bWNtYw==">mcmc <span class="quarto-category-count">(2)</span></div><div class="category" data-category="bW9udGUtY2FybG8=">monte-carlo <span class="quarto-category-count">(2)</span></div><div class="category" data-category="cHJvYmFiaWxpdHk=">probability <span class="quarto-category-count">(2)</span></div><div class="category" data-category="cmFuZG9tLXdhbGs=">random-walk <span class="quarto-category-count">(1)</span></div><div class="category" data-category="c3RhdGlzdGljcw==">statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dmlzdWFsaXphdGlvbg==">visualization <span class="quarto-category-count">(3)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="YWxnb3JpdGhtcw==">algorithms <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Z3JhcGgtdGhlb3J5">graph-theory <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bWNtYw==">mcmc <span class="quarto-category-count">(3)</span></div><div class="category" data-category="bW9udGUtY2FybG8=">monte-carlo <span class="quarto-category-count">(2)</span></div><div class="category" data-category="cHJvYmFiaWxpdHk=">probability <span class="quarto-category-count">(2)</span></div><div class="category" data-category="cmFuZG9tLXdhbGs=">random-walk <span class="quarto-category-count">(2)</span></div><div class="category" data-category="c3RhdGlzdGljcw==">statistics <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dmlzdWFsaXphdGlvbg==">visualization <span class="quarto-category-count">(4)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-body" id="quarto-document-content">
 
@@ -672,14 +681,45 @@ Python-Powered Visualizations
 <p>These interactive apps use <a href="https://pyodide.org/">Pyodide</a> to run Python code directly in your browser. No server-side computation is needed - everything runs in your web browser!</p>
 </div>
 </div>
-<p><a href="../index.html">Back to blog home</a></p>
 
 
 
 
 <div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
 <div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="cmFuZG9tLXdhbGslMkNtY21jJTJDdmlzdWFsaXphdGlvbg==" data-listing-date-sort="1735966800000" data-listing-file-modified-sort="1773163891542" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2323">
+<div class="g-col-1" data-index="0" data-categories="cmFuZG9tLXdhbGslMkNncmFwaC10aGVvcnklMkNtY21jJTJDdmlzdWFsaXphdGlvbg==" data-listing-date-sort="1773115200000" data-listing-file-modified-sort="1773166118241" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2495">
+<a href="../apps/random-walks-on-graphs.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/random-walks-on-graphs.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Random Walks on Graphs
+</h5>
+<div class="listing-categories">
+
+<div class="listing-category" onclick="window.quartoListingCategory('cmFuZG9tLXdhbGs='); return false;">random-walk</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('Z3JhcGgtdGhlb3J5'); return false;">graph-theory</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('bWNtYw=='); return false;">mcmc</div>
+
+<div class="listing-category" onclick="window.quartoListingCategory('dmlzdWFsaXphdGlvbg=='); return false;">visualization</div>
+
+</div>
+<div class="card-text listing-description delink">
+<p>Interactively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.</p>
+</div>
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Mar 10, 2026
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="1" data-categories="cmFuZG9tLXdhbGslMkNtY21jJTJDdmlzdWFsaXphdGlvbg==" data-listing-date-sort="1735966800000" data-listing-file-modified-sort="1773165485337" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2375">
 <a href="../apps/metropolis-random-walk.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -709,7 +749,7 @@ Jan 4, 2025
 </div>
 </div></a>
 </div>
-<div class="g-col-1" data-index="1" data-categories="bWNtYyUyQ3N0YXRpc3RpY3MlMkNhbGdvcml0aG1z" data-listing-date-sort="1735880400000" data-listing-file-modified-sort="1773163891542" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2135">
+<div class="g-col-1" data-index="2" data-categories="bWNtYyUyQ3N0YXRpc3RpY3MlMkNhbGdvcml0aG1z" data-listing-date-sort="1735880400000" data-listing-file-modified-sort="1773165485333" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2187">
 <a href="../apps/metropolis-hastings.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -739,7 +779,7 @@ Jan 3, 2025
 </div>
 </div></a>
 </div>
-<div class="g-col-1" data-index="2" data-categories="bW9udGUtY2FybG8lMkNwcm9iYWJpbGl0eSUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735794000000" data-listing-file-modified-sort="1773163891533" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1222">
+<div class="g-col-1" data-index="3" data-categories="bW9udGUtY2FybG8lMkNwcm9iYWJpbGl0eSUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735794000000" data-listing-file-modified-sort="1773165485333" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1274">
 <a href="../apps/estimating-pi.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -769,7 +809,7 @@ Jan 2, 2025
 </div>
 </div></a>
 </div>
-<div class="g-col-1" data-index="3" data-categories="cHJvYmFiaWxpdHklMkNtb250ZS1jYXJsbyUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735707600000" data-listing-file-modified-sort="1773163891531" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1236">
+<div class="g-col-1" data-index="4" data-categories="cHJvYmFiaWxpdHklMkNtb250ZS1jYXJsbyUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735707600000" data-listing-file-modified-sort="1773165485333" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1288">
 <a href="../apps/buffons-needle.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">

@@ -25,6 +25,8 @@ book:
             href: apps/metropolis-hastings.qmd
           - text: Metropolis Random Walk
             href: apps/metropolis-random-walk.qmd
+          - text: Random Walks on Graphs
+            href: apps/random-walks-on-graphs.qmd
     right:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
@@ -61,6 +63,7 @@ book:
         - apps/buffons-needle.qmd
         - apps/metropolis-hastings.qmd
         - apps/metropolis-random-walk.qmd
+        - apps/random-walks-on-graphs.qmd
     - part: "Advanced Topics"
       chapters:
         - chapters/dynamical/kalman_filters.qmd
