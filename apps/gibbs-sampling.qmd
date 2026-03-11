@@ -1,0 +1,99 @@
+---
+title: "Gibbs Sampling for Bivariate Normals"
+description: "Compare Gibbs trajectories for independent and correlated bivariate normal targets."
+date: "2026-03-11"
+categories: [mcmc, gibbs, statistics]
+image: "images/gibbs-sampling.svg"
+page-layout: full
+sidebar: false
+toc: false
+---
+
+[← Return to Apps](index.qmd){.btn .btn-outline-primary .btn-sm}
+
+```{=html}
+<style>
+  #quarto-content .content, main.content { max-width: min(1800px, 96vw) !important; }
+  #quarto-margin-sidebar, nav#TOC, #TOC-container { display: none !important; }
+
+  .controls { background:white; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); margin-bottom:16px; }
+  .control-group { margin:10px 0; display:flex; align-items:center; gap:15px; flex-wrap: wrap; }
+  .control-group label { min-width:220px; font-weight:500; }
+  .control-group input[type="range"] { width:min(640px, 90vw); }
+  .control-group .value { min-width:80px; font-weight:bold; color:#1d4ed8; }
+
+  .panel-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap:14px;
+  }
+  .panel-card {
+    background:white;
+    border-radius:8px;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+    padding:10px;
+  }
+  .panel-card h4 {
+    margin:4px 6px 8px;
+    font-size: 1rem;
+  }
+  .traj-svg { width:100%; height:460px; }
+  .acf-svg { width:100%; height:280px; }
+
+  .legend {
+    background:white;
+    border-radius:8px;
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+    margin-top:14px;
+    padding:12px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    font-size:0.95rem;
+  }
+  .legend-item { display:flex; align-items:center; gap:8px; }
+  .swatch { width:14px; height:14px; border-radius:3px; display:inline-block; }
+  .swatch-line { width:18px; height:0; border-top:2px solid #9ca3af; display:inline-block; }
+  .panel-stats { font-size:0.82rem; color:#475569; margin:0 6px 6px; display:flex; gap:16px; flex-wrap:wrap; }
+  .panel-stats span { white-space:nowrap; }
+  .panel-stats strong { color:#1d4ed8; }
+</style>
+
+<div class="controls">
+  <div id="gibbs-status" style="display:none; margin-bottom:10px; color:#b91c1c; font-weight:600;"></div>
+  <div class="control-group">
+    <label for="steps-slider">Gibbs iterations:</label>
+    <input type="range" id="steps-slider" min="5" max="500" step="1" value="80">
+    <span class="value" id="steps-value">80</span>
+  </div>
+  <div class="control-group">
+    <button id="resample-btn" class="btn btn-primary btn-sm">Resample both chains</button>
+  </div>
+</div>
+
+<div class="panel-grid">
+  <div class="panel-card">
+    <h4>Independent Target: ρ = 0</h4>
+    <div id="stats-rho0" class="panel-stats"></div>
+    <svg id="gibbs-rho0-traj" class="traj-svg"></svg>
+    <svg id="gibbs-rho0-acf" class="acf-svg"></svg>
+  </div>
+  <div class="panel-card">
+    <h4>Correlated Target: ρ = 0.9</h4>
+    <div id="stats-rho7" class="panel-stats"></div>
+    <svg id="gibbs-rho7-traj" class="traj-svg"></svg>
+    <svg id="gibbs-rho7-acf" class="acf-svg"></svg>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><span class="swatch" style="background:#f97316;"></span><span>Intermediate updates (xₜ, yₜ₋₁)</span></div>
+  <div class="legend-item"><span class="swatch" style="background:#2563eb;"></span><span>Final Gibbs samples (xₜ, yₜ)</span></div>
+  <div class="legend-item"><span class="swatch" style="background:#dc2626;"></span><span>Current state</span></div>
+</div>
+
+<script type="module">
+  import { initGibbsSamplingApp } from './gibbs sampling/gibbs_sampling_d3_app.js';
+  initGibbsSamplingApp().catch((err) => console.error('Failed to initialize Gibbs app:', err));
+</script>
+```

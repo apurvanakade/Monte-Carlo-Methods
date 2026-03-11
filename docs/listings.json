@@ -2,6 +2,7 @@
   {
     "listing": "/apps/index.html",
     "items": [
+      "/apps/gibbs-sampling.html",
       "/apps/random-walks-on-graphs.html",
       "/apps/metropolis-random-walk.html",
       "/apps/metropolis-hastings.html",

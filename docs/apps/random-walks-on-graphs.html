@@ -9,7 +9,7 @@
 <meta name="dcterms.date" content="2026-03-10">
 <meta name="description" content="Interactively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.">
 
-<title>22&nbsp; Random Walks on Graphs – Monte Carlo Methods Lecture Notes</title>
+<title>23&nbsp; Random Walks on Graphs – Monte Carlo Methods Lecture Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -33,7 +33,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../chapters/dynamical/kalman_filters.html" rel="next">
-<link href="../apps/metropolis-random-walk.html" rel="prev">
+<link href="../apps/gibbs-sampling.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -107,7 +107,7 @@ window.Quarto = {
 </script>
 
 <link rel="stylesheet" href="../style.css">
-<meta property="og:title" content="22&nbsp; Random Walks on Graphs – Monte Carlo Methods Lecture Notes">
+<meta property="og:title" content="23&nbsp; Random Walks on Graphs – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="Interactively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.">
 <meta property="og:image" content="images/random-walks-on-graphs.svg">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
@@ -292,37 +292,10 @@ window.Quarto = {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-apps" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Apps</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-apps">    
-        <li>
-    <a class="dropdown-item" href="../apps/index.html">
- <span class="dropdown-text">Apps Home</span></a>
+  <li class="nav-item">
+    <a class="nav-link" href="../apps/index.html"> 
+<span class="menu-text">Interactive Apps</span></a>
   </li>  
-        <li>
-    <a class="dropdown-item" href="../apps/estimating-pi.html">
- <span class="dropdown-text">Estimating Pi</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../apps/buffons-needle.html">
- <span class="dropdown-text">Buffon’s Needle</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../apps/metropolis-hastings.html">
- <span class="dropdown-text">Metropolis-Hastings</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../apps/metropolis-random-walk.html">
- <span class="dropdown-text">Metropolis Random Walk</span></a>
-  </li>  
-        <li>
-    <a class="dropdown-item" href="../apps/random-walks-on-graphs.html">
- <span class="dropdown-text">Random Walks on Graphs</span></a>
-  </li>  
-    </ul>
-  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -373,9 +346,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script>
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../apps/index.html">Interactive Apps</a></li><li class="breadcrumb-item"><a href="../apps/random-walks-on-graphs.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../apps/index.html">Interactive Apps</a></li><li class="breadcrumb-item"><a href="../apps/random-walks-on-graphs.html"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></h1>
+<h1 class="title"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></h1>
   <div class="quarto-categories">
     <div class="quarto-category">random-walk</div>
     <div class="quarto-category">graph-theory</div>
@@ -1004,13 +977,13 @@ document.addEventListener("DOMContentLoaded", function() {
   </script>
 <nav class="page-navigation column-page">
   <div class="nav-page nav-page-previous">
-      <a href="../apps/metropolis-random-walk.html" class="pagination-link" aria-label="Metropolis Random Walk">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span>
+      <a href="../apps/gibbs-sampling.html" class="pagination-link" aria-label="Gibbs Sampling for Bivariate Normals">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Gibbs Sampling for Bivariate Normals</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/dynamical/kalman_filters.html" class="pagination-link" aria-label="Kalman Filters">
-        <span class="nav-page-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

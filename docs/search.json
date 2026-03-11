@@ -6,6 +6,7 @@
     "section": "",
     "text": "Preface\n⚠️ Note: These notes are very much under construction and subject to significant changes.\nThese are the lecture notes for Monte Carlo Methods (EN.553.433). The notes are loosely based on course materials by Dr. Jim Spall and the textbook by Rubinstein & Kroese (Rubinstein and Kroese 2017).\nThese notes represent only half of the course content. The remaining material consists of Jupyter notebooks assigned as homework, which are not published online.\n\n\n\n\nRubinstein, R. Y., and D. P. Kroese. 2017. Simulation and the Monte Carlo Method. 3rd ed. USA: Wiley.",
     "crumbs": [
+      "Interactive Apps",
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]
   },
@@ -815,7 +816,7 @@
     "href": "apps/index.html",
     "title": "17  Interactive Apps",
     "section": "",
-    "text": "Random Walks on Graphs\n\n\n\nrandom-walk\n\ngraph-theory\n\nmcmc\n\nvisualization\n\n\n\nInteractively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.\n\n\n\nMar 10, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis Random Walk\n\n\n\nrandom-walk\n\nmcmc\n\nvisualization\n\n\n\nExplore random walks using the Metropolis algorithm and observe how particles move through space.\n\n\n\nJan 4, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis-Hastings Algorithm\n\n\n\nmcmc\n\nstatistics\n\nalgorithms\n\n\n\nVisualize the Metropolis-Hastings algorithm, a Markov Chain Monte Carlo method for sampling from probability distributions.\n\n\n\nJan 3, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nEstimating π\n\n\n\nmonte-carlo\n\nprobability\n\nvisualization\n\n\n\nUse Monte Carlo methods to estimate the value of π by randomly sampling points in a square.\n\n\n\nJan 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nBuffon’s Needle\n\n\n\nprobability\n\nmonte-carlo\n\nvisualization\n\n\n\nEstimate the value of π using Buffon’s needle problem - a classic probability experiment that connects geometry with randomness.\n\n\n\nJan 1, 2025\n\n\n\n\n\n\nNo matching items",
+    "text": "Gibbs Sampling for Bivariate Normals\n\n\nCompare Gibbs trajectories for independent and correlated bivariate normal targets.\n\n\n\nMar 11, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\nRandom Walks on Graphs\n\n\nInteractively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.\n\n\n\nMar 10, 2026\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis Random Walk\n\n\nExplore random walks using the Metropolis algorithm and observe how particles move through space.\n\n\n\nJan 4, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nMetropolis-Hastings Algorithm\n\n\nVisualize the Metropolis-Hastings algorithm, a Markov Chain Monte Carlo method for sampling from probability distributions.\n\n\n\nJan 3, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nEstimating π\n\n\nUse Monte Carlo methods to estimate the value of π by randomly sampling points in a square.\n\n\n\nJan 2, 2025\n\n\n\n\n\n\n\n\n\n\n\n\n\nBuffon’s Needle\n\n\nEstimate the value of π using Buffon’s needle problem - a classic probability experiment that connects geometry with randomness.\n\n\n\nJan 1, 2025\n\n\n\n\n\n\nNo matching items",
     "crumbs": [
       "Interactive Apps",
       "<span class='chapter-number'>17</span>  <span class='chapter-title'>Interactive Apps</span>"
@@ -868,12 +869,12 @@
   {
     "objectID": "apps/random-walks-on-graphs.html",
     "href": "apps/random-walks-on-graphs.html",
-    "title": "22  Random Walks on Graphs",
+    "title": "23  Random Walks on Graphs",
     "section": "",
     "text": "← Return to Apps\n\n\n\n    Loading precomputed data...\n    Rendering is client-side with d3. No Python runs during slider movement.\n\n\n\n    \n        \n            Graph:\n            \n        \n\n        \n            Start Node:\n            \n            0\n        \n\n        \n            Time Step:\n            \n            0\n        \n\n        \n            Animation:\n            Play\n            Pause\n        \n    \n\n    \n        \n        \n    \n\n    \n\n    \n        Statistics\n        \n            \n                Current TV Distance\n                -\n            \n            \n                L2 Distance\n                -\n            \n            \n                Spectral Gap\n                -\n            \n            \n                Mixing Time (epsilon=0.1)\n                -\n            \n            \n                Max Node Probability\n                -",
     "crumbs": [
       "Interactive Apps",
-      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Random Walks on Graphs</span>"
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>Random Walks on Graphs</span>"
     ]
   },
   {
@@ -1137,6 +1138,17 @@
     "crumbs": [
       "Appendices",
       "<span class='chapter-number'>B</span>  <span class='chapter-title'>Markov Chains</span>"
+    ]
+  },
+  {
+    "objectID": "apps/gibbs-sampling.html",
+    "href": "apps/gibbs-sampling.html",
+    "title": "22  Gibbs Sampling for Bivariate Normals",
+    "section": "",
+    "text": "← Return to Apps\n\n\n\n  \n  \n    Gibbs iterations:\n    \n    80\n  \n  \n    Resample both chains\n  \n\n\n\n  \n    Independent Target: ρ = 0\n    \n    \n    \n  \n  \n    Correlated Target: ρ = 0.9\n    \n    \n    \n  \n\n\n\n  Intermediate updates (xₜ, yₜ₋₁)\n  Final Gibbs samples (xₜ, yₜ)\n  Current state",
+    "crumbs": [
+      "Interactive Apps",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>Gibbs Sampling for Bivariate Normals</span>"
     ]
   }
 ]

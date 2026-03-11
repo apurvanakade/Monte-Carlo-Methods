@@ -2,12 +2,18 @@
 title: "Interactive Apps"
 subtitle: "Explore mathematical concepts through interactive visualizations"
 listing:
-  contents: "*.qmd"
+  contents:
+    - buffons-needle.qmd
+    - estimating-pi.qmd
+    - gibbs-sampling.qmd
+    - metropolis-hastings.qmd
+    - metropolis-random-walk.qmd
+    - random-walks-on-graphs.qmd
   sort: "date desc"
   type: grid
   grid-columns: 3
-  fields: [image, date, title, description, categories]
-  categories: true
+  fields: [image, date, title, description]
+  # categories: true
   sort-ui: false
   filter-ui: false
   image-height: 250px

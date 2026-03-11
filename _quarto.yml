@@ -14,20 +14,8 @@ book:
   navbar:
     search: true
     left:
-      - text: Apps
-        menu:
-          - text: Apps Home
-            href: apps/index.qmd
-          - text: Estimating Pi
-            href: apps/estimating-pi.qmd
-          - text: "Buffon's Needle"
-            href: apps/buffons-needle.qmd
-          - text: Metropolis-Hastings
-            href: apps/metropolis-hastings.qmd
-          - text: Metropolis Random Walk
-            href: apps/metropolis-random-walk.qmd
-          - text: Random Walks on Graphs
-            href: apps/random-walks-on-graphs.qmd
+      - text: Interactive Apps
+        href: apps/index.qmd
     right:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
@@ -64,6 +52,7 @@ book:
         - apps/buffons-needle.qmd
         - apps/metropolis-hastings.qmd
         - apps/metropolis-random-walk.qmd
+        - apps/gibbs-sampling.qmd
         - apps/random-walks-on-graphs.qmd
     - part: "Advanced Topics"
       chapters:
