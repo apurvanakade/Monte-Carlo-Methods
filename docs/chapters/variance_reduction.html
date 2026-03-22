@@ -522,13 +522,12 @@ window.Quarto = {
   <li><a href="#optimal-proposal-distribution" id="toc-optimal-proposal-distribution" class="nav-link" data-scroll-target="#optimal-proposal-distribution"><span class="header-section-number">12.1.2</span> Optimal Proposal Distribution</a></li>
   <li><a href="#key-considerations-for-importance-sampling" id="toc-key-considerations-for-importance-sampling" class="nav-link" data-scroll-target="#key-considerations-for-importance-sampling"><span class="header-section-number">12.1.3</span> Key Considerations for Importance Sampling</a></li>
   </ul></li>
-  <li><a href="#antithetic-and-control-random-variates" id="toc-antithetic-and-control-random-variates" class="nav-link" data-scroll-target="#antithetic-and-control-random-variates"><span class="header-section-number">12.2</span> Antithetic and Control Random Variates</a>
+  <li><a href="#control-variates" id="toc-control-variates" class="nav-link" data-scroll-target="#control-variates"><span class="header-section-number">12.2</span> Control Variates</a></li>
+  <li><a href="#antithetic-variates" id="toc-antithetic-variates" class="nav-link" data-scroll-target="#antithetic-variates"><span class="header-section-number">12.3</span> Antithetic Variates</a></li>
+  <li><a href="#common-random-numbers" id="toc-common-random-numbers" class="nav-link" data-scroll-target="#common-random-numbers"><span class="header-section-number">12.4</span> Common Random Numbers</a>
   <ul class="collapse">
-  <li><a href="#antithetic-variates" id="toc-antithetic-variates" class="nav-link" data-scroll-target="#antithetic-variates"><span class="header-section-number">12.2.1</span> Antithetic Variates</a></li>
-  <li><a href="#control-variates" id="toc-control-variates" class="nav-link" data-scroll-target="#control-variates"><span class="header-section-number">12.2.2</span> Control Variates</a></li>
-  <li><a href="#common-random-numbers" id="toc-common-random-numbers" class="nav-link" data-scroll-target="#common-random-numbers"><span class="header-section-number">12.2.3</span> Common Random Numbers</a></li>
-  <li><a href="#when-to-use-common-random-numbers" id="toc-when-to-use-common-random-numbers" class="nav-link" data-scroll-target="#when-to-use-common-random-numbers"><span class="header-section-number">12.2.4</span> When to Use Common Random Numbers</a></li>
-  <li><a href="#summary-of-variance-reduction-methods" id="toc-summary-of-variance-reduction-methods" class="nav-link" data-scroll-target="#summary-of-variance-reduction-methods"><span class="header-section-number">12.2.5</span> Summary of Variance Reduction Methods</a></li>
+  <li><a href="#when-to-use-common-random-numbers" id="toc-when-to-use-common-random-numbers" class="nav-link" data-scroll-target="#when-to-use-common-random-numbers"><span class="header-section-number">12.4.1</span> When to Use Common Random Numbers</a></li>
+  <li><a href="#summary-of-variance-reduction-methods" id="toc-summary-of-variance-reduction-methods" class="nav-link" data-scroll-target="#summary-of-variance-reduction-methods"><span class="header-section-number">12.4.2</span> Summary of Variance Reduction Methods</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -663,7 +662,7 @@ q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
 \]</span></p>
 <p>This proposal concentrates samples in the tail region where the indicator function is non-zero.</p>
 </div>
-<div id="c0a85814" class="cell" data-execution_count="3">
+<div id="a15caa20" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -697,56 +696,8 @@ Variance Reduction Factor: 72.2x</code></pre>
 </ol>
 </section>
 </section>
-<section id="antithetic-and-control-random-variates" class="level2" data-number="12.2">
-<h2 data-number="12.2" class="anchored" data-anchor-id="antithetic-and-control-random-variates"><span class="header-section-number">12.2</span> Antithetic and Control Random Variates</h2>
-<p>These methods exploit correlation between random variables to reduce variance. Recall that for two random variables:</p>
-<p><span class="math display">\[
-\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X, Y).
-\]</span></p>
-<p>While positive correlation increases variance, we can cleverly use negative correlation (antithetic variates) or known positive correlation (control variates) to our advantage.</p>
-<section id="antithetic-variates" class="level3" data-number="12.2.1">
-<h3 data-number="12.2.1" class="anchored" data-anchor-id="antithetic-variates"><span class="header-section-number">12.2.1</span> Antithetic Variates</h3>
-<p>The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.</p>
-<p><strong>Key Result</strong>: For a monotonic function <span class="math inline">\(f\)</span> on <span class="math inline">\([a, b]\)</span> and <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>:</p>
-<p><span class="math display">\[
-\text{Cov}(f(X), f(a + b - X)) \leq 0.
-\]</span></p>
-<p>This leads to the antithetic variates estimator:</p>
-<p><span class="math display">\[
-\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
-\]</span></p>
-<p>where <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>.</p>
-<div id="thm-antithetic-variate" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 12.1</strong></span> <strong>Theorem</strong>: For monotonic functions, <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})\)</span>.</p>
-</div>
-<div id="exm-antithetic-variables" class="theorem example">
-<p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
-</div>
-<div id="a6093397" class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="variance_reduction_files/figure-html/cell-5-output-1.png" width="1142" height="565" class="figure-img"></p>
-</figure>
-</div>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Standard Monte Carlo:
-  Estimate: 0.793935
-  Variance: 1.340866e-04
-
-Antithetic Variates:
-  Estimate: 0.784943
-  Variance: 2.182878e-06
-
-True Value: 0.785398
-Variance Reduction Factor: 61.43x</code></pre>
-</div>
-</div>
-</section>
-<section id="control-variates" class="level3" data-number="12.2.2">
-<h3 data-number="12.2.2" class="anchored" data-anchor-id="control-variates"><span class="header-section-number">12.2.2</span> Control Variates</h3>
+<section id="control-variates" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="control-variates"><span class="header-section-number">12.2</span> Control Variates</h2>
 <p>Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to “correct” our estimates.</p>
 <p>Given a function <span class="math inline">\(h(x)\)</span> with known expectation <span class="math inline">\(\mathbb{E}[h(X)] = h_0\)</span>, the control variate estimator is:</p>
 <p><span class="math display">\[
@@ -757,19 +708,24 @@ Variance Reduction Factor: 61.43x</code></pre>
 <p><span class="math display">\[
 \text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
 \]</span></p>
-<p>The optimal choice of <span class="math inline">\(\beta\)</span> that minimizes this variance is:</p>
+<p>Define</p>
 <p><span class="math display">\[
 \beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
 \]</span></p>
+<p>Then the control variate estimator improves on crude Monte Carlo, i.e., <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{CV}}) &lt; \text{Var}(\hat{\ell}_{\text{crude}}) = \frac{1}{N}\text{Var}(f(X))\)</span>, if and only if:</p>
+<p><span class="math display">\[
+\beta^2 \text{Var}(h(X)) &lt; 2\beta \,\text{Cov}(f(X), h(X)),
+\]</span></p>
+<p>or equivalently, <span class="math inline">\(\beta(\beta - 2\beta^*) &lt; 0\)</span>, meaning <span class="math inline">\(\beta \in (0,\, 2\beta^*)\)</span> when <span class="math inline">\(\text{Cov}(f(X), h(X)) &gt; 0\)</span>, and <span class="math inline">\(\beta \in (2\beta^*,\, 0)\)</span> when <span class="math inline">\(\text{Cov}(f(X), h(X)) &lt; 0\)</span>. In particular, any control variate <span class="math inline">\(h\)</span> with nonzero correlation to <span class="math inline">\(f\)</span> admits a <span class="math inline">\(\beta\)</span> that yields variance reduction. In both cases, the optimal <span class="math inline">\(\beta\)</span> is the midpoint <span class="math inline">\(\beta^*\)</span>.</p>
 <p>In practice, we often estimate <span class="math inline">\(\beta^*\)</span> from pilot samples or use a reasonable approximation.</p>
 <div id="exm-control-variates" class="theorem example">
-<p><span class="theorem-title"><strong>Example 12.2</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
+<p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
 </div>
-<div id="36a05bc8" class="cell" data-execution_count="7">
+<div id="c18f44a4" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="variance_reduction_files/figure-html/cell-7-output-1.png" width="1142" height="565" class="figure-img"></p>
+<p><img src="variance_reduction_files/figure-html/cell-5-output-1.png" width="1142" height="565" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -789,7 +745,35 @@ Control Variates Results:
   β = 0.700: Estimate = 0.266761, Variance = 1.197605e-05, Reduction = 0.96x</code></pre>
 </div>
 </div>
-<div id="de6a075f" class="cell" data-execution_count="8">
+<div id="b59e304d" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="variance_reduction_files/figure-html/cell-6-output-1.png" width="1142" height="565" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="antithetic-variates" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="antithetic-variates"><span class="header-section-number">12.3</span> Antithetic Variates</h2>
+<p>The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.</p>
+<p><strong>Key Result</strong>: For a monotonic function <span class="math inline">\(f\)</span> on <span class="math inline">\([a, b]\)</span> and <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>:</p>
+<p><span class="math display">\[
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
+\]</span></p>
+<p>This leads to the antithetic variates estimator:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
+\]</span></p>
+<p>where <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>.</p>
+<div id="thm-antithetic-variate" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 12.1</strong></span> <strong>Theorem</strong>: For monotonic functions, <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})\)</span>.</p>
+</div>
+<div id="exm-antithetic-variables" class="theorem example">
+<p><span class="theorem-title"><strong>Example 12.2</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
+</div>
+<div id="1386e4ac" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -797,10 +781,23 @@ Control Variates Results:
 </figure>
 </div>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Standard Monte Carlo:
+  Estimate: 0.793935
+  Variance: 1.340866e-04
+
+Antithetic Variates:
+  Estimate: 0.784943
+  Variance: 2.182878e-06
+
+True Value: 0.785398
+Variance Reduction Factor: 61.43x</code></pre>
+</div>
 </div>
 </section>
-<section id="common-random-numbers" class="level3" data-number="12.2.3">
-<h3 data-number="12.2.3" class="anchored" data-anchor-id="common-random-numbers"><span class="header-section-number">12.2.3</span> Common Random Numbers</h3>
+<section id="common-random-numbers" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="common-random-numbers"><span class="header-section-number">12.4</span> Common Random Numbers</h2>
 <p>When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.</p>
 <p><strong>The Problem</strong>: Suppose we want to estimate the difference <span class="math inline">\(\delta = \mathbb{E}[f(X)] - \mathbb{E}[g(X)]\)</span> where <span class="math inline">\(X\)</span> represents random inputs to two different systems. The naive approach uses independent samples:</p>
 <p><span class="math display">\[
@@ -822,7 +819,7 @@ Control Variates Results:
 <div id="exm-common-random-numbers" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.3</strong></span> <strong>Comparing Queue Systems.</strong> Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.</p>
 </div>
-<div id="63174ffb" class="cell" data-execution_count="9">
+<div id="45838bf7" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-stdout">
 <pre><code>Theoretical waiting times:
   System 1 (μ=1.5): 2.0000
@@ -844,7 +841,7 @@ Independent Sampling:
 Variance Reduction Factor: 1.86x</code></pre>
 </div>
 </div>
-<div id="c79342a6" class="cell" data-execution_count="10">
+<div id="ef5de02f" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -860,9 +857,8 @@ Example differences for highlighted customers:
   Customer 40: System 1 = 1.168, System 2 = 0.511, Difference = 0.657</code></pre>
 </div>
 </div>
-</section>
-<section id="when-to-use-common-random-numbers" class="level3" data-number="12.2.4">
-<h3 data-number="12.2.4" class="anchored" data-anchor-id="when-to-use-common-random-numbers"><span class="header-section-number">12.2.4</span> When to Use Common Random Numbers</h3>
+<section id="when-to-use-common-random-numbers" class="level3" data-number="12.4.1">
+<h3 data-number="12.4.1" class="anchored" data-anchor-id="when-to-use-common-random-numbers"><span class="header-section-number">12.4.1</span> When to Use Common Random Numbers</h3>
 <p>CRN is most effective when:</p>
 <ol type="1">
 <li><p><strong>Comparing Similar Systems</strong>: The systems should respond similarly to the same random inputs, creating positive correlation.</p></li>
@@ -882,8 +878,8 @@ Example differences for highlighted customers:
 <li>May be complex to implement in large-scale simulations</li>
 </ul>
 </section>
-<section id="summary-of-variance-reduction-methods" class="level3" data-number="12.2.5">
-<h3 data-number="12.2.5" class="anchored" data-anchor-id="summary-of-variance-reduction-methods"><span class="header-section-number">12.2.5</span> Summary of Variance Reduction Methods</h3>
+<section id="summary-of-variance-reduction-methods" class="level3" data-number="12.4.2">
+<h3 data-number="12.4.2" class="anchored" data-anchor-id="summary-of-variance-reduction-methods"><span class="header-section-number">12.4.2</span> Summary of Variance Reduction Methods</h3>
 <ol type="1">
 <li><strong>Importance Sampling</strong>:
 <ul>

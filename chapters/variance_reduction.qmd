@@ -218,117 +218,7 @@ print(f"\nVariance Reduction Factor: {variance_crude/variance_is:.1f}x")
 
 4. **Weight Degeneracy**: Poor choice of $q(x)$ can lead to a few samples having very large weights, effectively reducing the sample size and increasing variance.
 
-## Antithetic and Control Random Variates
-
-These methods exploit correlation between random variables to reduce variance. Recall that for two random variables:
-
-$$
-\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X, Y).
-$$
-
-While positive correlation increases variance, we can cleverly use negative correlation (antithetic variates) or known positive correlation (control variates) to our advantage.
-
-### Antithetic Variates
-
-The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.
-
-**Key Result**: For a monotonic function $f$ on $[a, b]$ and $X \sim \text{Uniform}(a, b)$:
-
-$$
-\text{Cov}(f(X), f(a + b - X)) \leq 0.
-$$
-
-This leads to the antithetic variates estimator:
-
-$$
-\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
-$$
-
-where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
-
-::: {#thm-antithetic-variate}
-**Theorem**: For monotonic functions, $\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})$.
-:::
-
-::: {#exm-antithetic-variables}
-**Antithetic Variates.** We estimate $\ell = \int_0^1 \frac{1}{1 + x^2} dx$ using antithetic variates. Since $f(x) = \frac{1}{1 + x^2}$ is decreasing on $[0, 1]$, the pairs $(f(X), f(1-X))$ are negatively correlated.
-:::
-
-```{python}
-#| code-summary: "Show code for antithetic variates example"
-
-# Function to integrate
-def f(x):
-    return 1 / (1 + x**2)
-
-# Set random seed
-np.random.seed(42)
-
-# Number of samples
-N = 200
-
-# Standard Monte Carlo
-X_standard = np.random.uniform(0, 1, N)
-estimates_standard = f(X_standard)
-estimate_standard = np.mean(estimates_standard)
-
-# Antithetic Variates Monte Carlo
-X = np.random.uniform(0, 1, N//2)
-X_antithetic = 1 - X  # Antithetic pairs
-estimates_anti = (f(X) + f(X_antithetic)) / 2
-estimate_antithetic = np.mean(estimates_anti)
-
-# True value (arctan(1) - arctan(0) = π/4)
-true_value = np.pi / 4
-
-# Compute variances
-var_standard = np.var(estimates_standard) / N
-var_antithetic = np.var(estimates_anti) / (N//2)
-
-# Running averages
-running_avg_standard = np.cumsum(f(X_standard[:N//2])) / np.arange(1, N//2 + 1)
-running_avg_anti = np.cumsum(estimates_anti) / np.arange(1, N//2 + 1)
-```
-
-```{python}
-#| code-summary: "Show plotting code"
-
-# Create figure
-plt.figure(figsize=(12, 6))
-plt.style.use('seaborn-v0_8-darkgrid')
-
-# Plot running averages
-plt.plot(running_avg_standard, label='Standard Monte Carlo', 
-         alpha=0.8, linewidth=2)
-plt.plot(running_avg_anti, label='Antithetic Variates', 
-         alpha=0.8, linewidth=2)
-plt.axhline(y=true_value, color='red', linestyle='--', 
-            label=f'True Value: {true_value:.6f}', linewidth=2)
-
-# Formatting
-plt.xlabel('Number of Sample Pairs', fontsize=12)
-plt.ylabel('Running Average', fontsize=12)
-plt.title('Convergence Comparison: Standard MC vs. Antithetic Variates', 
-          fontsize=14, pad=20)
-plt.legend(fontsize=11, loc='best')
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-# Display results
-print(f"\nStandard Monte Carlo:")
-print(f"  Estimate: {estimate_standard:.6f}")
-print(f"  Variance: {var_standard:.6e}")
-
-print(f"\nAntithetic Variates:")
-print(f"  Estimate: {estimate_antithetic:.6f}")
-print(f"  Variance: {var_antithetic:.6e}")
-
-print(f"\nTrue Value: {true_value:.6f}")
-print(f"Variance Reduction Factor: {var_standard / var_antithetic:.2f}x")
-```
-
-### Control Variates
+## Control Variates
 
 Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to "correct" our estimates.
 
@@ -346,11 +236,20 @@ $$
 \text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
 $$
 
-The optimal choice of $\beta$ that minimizes this variance is:
+
+Define
 
 $$
 \beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
 $$
+
+Then the control variate estimator improves on crude Monte Carlo, i.e., $\text{Var}(\hat{\ell}_{\text{CV}}) < \text{Var}(\hat{\ell}_{\text{crude}}) = \frac{1}{N}\text{Var}(f(X))$, if and only if:
+
+$$
+\beta^2 \text{Var}(h(X)) < 2\beta \,\text{Cov}(f(X), h(X)),
+$$
+
+or equivalently, $\beta(\beta - 2\beta^*) < 0$, meaning $\beta \in (0,\, 2\beta^*)$ when $\text{Cov}(f(X), h(X)) > 0$, and $\beta \in (2\beta^*,\, 0)$ when $\text{Cov}(f(X), h(X)) < 0$. In particular, any control variate $h$ with nonzero correlation to $f$ admits a $\beta$ that yields variance reduction. In both cases, the optimal $\beta$ is the midpoint $\beta^*$.
 
 In practice, we often estimate $\beta^*$ from pilot samples or use a reasonable approximation.
 
@@ -482,7 +381,107 @@ plt.show()
 ```
 
 
-### Common Random Numbers
+## Antithetic Variates
+
+The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.
+
+**Key Result**: For a monotonic function $f$ on $[a, b]$ and $X \sim \text{Uniform}(a, b)$:
+
+$$
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
+$$
+
+This leads to the antithetic variates estimator:
+
+$$
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
+$$
+
+where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
+
+::: {#thm-antithetic-variate}
+**Theorem**: For monotonic functions, $\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})$.
+:::
+
+::: {#exm-antithetic-variables}
+**Antithetic Variates.** We estimate $\ell = \int_0^1 \frac{1}{1 + x^2} dx$ using antithetic variates. Since $f(x) = \frac{1}{1 + x^2}$ is decreasing on $[0, 1]$, the pairs $(f(X), f(1-X))$ are negatively correlated.
+:::
+
+```{python}
+#| code-summary: "Show code for antithetic variates example"
+
+# Function to integrate
+def f(x):
+    return 1 / (1 + x**2)
+
+# Set random seed
+np.random.seed(42)
+
+# Number of samples
+N = 200
+
+# Standard Monte Carlo
+X_standard = np.random.uniform(0, 1, N)
+estimates_standard = f(X_standard)
+estimate_standard = np.mean(estimates_standard)
+
+# Antithetic Variates Monte Carlo
+X = np.random.uniform(0, 1, N//2)
+X_antithetic = 1 - X  # Antithetic pairs
+estimates_anti = (f(X) + f(X_antithetic)) / 2
+estimate_antithetic = np.mean(estimates_anti)
+
+# True value (arctan(1) - arctan(0) = π/4)
+true_value = np.pi / 4
+
+# Compute variances
+var_standard = np.var(estimates_standard) / N
+var_antithetic = np.var(estimates_anti) / (N//2)
+
+# Running averages
+running_avg_standard = np.cumsum(f(X_standard[:N//2])) / np.arange(1, N//2 + 1)
+running_avg_anti = np.cumsum(estimates_anti) / np.arange(1, N//2 + 1)
+```
+
+```{python}
+#| code-summary: "Show plotting code"
+
+# Create figure
+plt.figure(figsize=(12, 6))
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Plot running averages
+plt.plot(running_avg_standard, label='Standard Monte Carlo', 
+         alpha=0.8, linewidth=2)
+plt.plot(running_avg_anti, label='Antithetic Variates', 
+         alpha=0.8, linewidth=2)
+plt.axhline(y=true_value, color='red', linestyle='--', 
+            label=f'True Value: {true_value:.6f}', linewidth=2)
+
+# Formatting
+plt.xlabel('Number of Sample Pairs', fontsize=12)
+plt.ylabel('Running Average', fontsize=12)
+plt.title('Convergence Comparison: Standard MC vs. Antithetic Variates', 
+          fontsize=14, pad=20)
+plt.legend(fontsize=11, loc='best')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Display results
+print(f"\nStandard Monte Carlo:")
+print(f"  Estimate: {estimate_standard:.6f}")
+print(f"  Variance: {var_standard:.6e}")
+
+print(f"\nAntithetic Variates:")
+print(f"  Estimate: {estimate_antithetic:.6f}")
+print(f"  Variance: {var_antithetic:.6e}")
+
+print(f"\nTrue Value: {true_value:.6f}")
+print(f"Variance Reduction Factor: {var_standard / var_antithetic:.2f}x")
+```
+
+## Common Random Numbers
 
 When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.
 
