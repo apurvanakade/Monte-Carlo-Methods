@@ -45,15 +45,6 @@ book:
         - chapters/applications/ising.qmd
         - chapters/applications/mmn.qmd
         - chapters/applications/bootstrap.qmd
-    - part: "Interactive Apps"
-      chapters:
-        - apps/index.qmd
-        - apps/estimating-pi.qmd
-        - apps/buffons-needle.qmd
-        - apps/metropolis-hastings.qmd
-        - apps/metropolis-random-walk.qmd
-        - apps/gibbs-sampling.qmd
-        - apps/random-walks-on-graphs.qmd
     - part: "Advanced Topics"
       chapters:
         - chapters/dynamical/kalman_filters.qmd
