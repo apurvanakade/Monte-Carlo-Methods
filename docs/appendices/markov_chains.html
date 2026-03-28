@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,6 +11,9 @@
 
 <title>Appendix B — Markov Chains – Monte Carlo Methods Lecture Notes</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -39,14 +42,14 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-8ef56b68f8fa1e9d2ba328e99e439f80.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-f418161beb48e0141c760e455f12af2c.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-ee81c25b5e6cf3f6942c6f9c45799924.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-db446d54fd5a772fc03f6e5780a6993c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-82111db1632b674d39086de9492f00d5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -76,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -89,7 +92,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -292,7 +295,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../apps/index.qmd"> 
+    <a class="nav-link active" href="../apps/index.html" aria-current="page"> 
 <span class="menu-text">Interactive Apps</span></a>
   </li>  
 </ul>
@@ -486,12 +489,65 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
+ <span class="menu-text">Interactive Apps</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/estimating-pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating π</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/buffons-needle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Buffon’s Needle</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Metropolis-Hastings Algorithm</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/metropolis-random-walk.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/gibbs-sampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">Gibbs Sampling for Bivariate Normals</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../appendices/probability.html" class="sidebar-item-text sidebar-link">
@@ -631,7 +687,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-State Diagrams
+<span class="screen-reader-only">Tip</span>State Diagrams
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -660,7 +716,7 @@ State Diagrams
 \end{pmatrix}.\]</span></p>
 <p>Suppose we start at vertex <span class="math inline">\(A\)</span>. This means that the initial distribution is <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. The <span class="math inline">\(n\)</span>-th distribution <span class="math inline">\(\pi_n\)</span> can be obtained by multiplying <span class="math inline">\(\pi_0\)</span> with the transition matrix <span class="math inline">\(P^n\)</span>.</p>
 </div>
-<div id="c20d5729" class="cell" data-execution_count="3">
+<div id="3819d2ec" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -729,7 +785,7 @@ Evolution of the Markov chain starting from state A:
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Infinite State Spaces
+<span class="screen-reader-only">Warning</span>Infinite State Spaces
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -756,7 +812,7 @@ Infinite State Spaces
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Algorithm: Random Walk on a Graph
+<span class="screen-reader-only">Note</span>Algorithm: Random Walk on a Graph
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -799,7 +855,7 @@ Algorithm: Random Walk on a Graph
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Practical Significance of Mixing Time
+<span class="screen-reader-only">Important</span>Practical Significance of Mixing Time
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -809,7 +865,7 @@ Practical Significance of Mixing Time
 <p><strong>Example.</strong> Consider <a href="#exm-random-walk" class="quarto-xref">Example&nbsp;<span>B.1</span></a> again. If we start at vertex <span class="math inline">\(A\)</span>, by step 4 we have already reached the distribution <span class="math inline">\(\pi_4 = [0.222, 0.167, 0.306, 0.306]\)</span>. The stationary distribution is <span class="math inline">\(\Pi = [1/8, 4/8, 2/8, 2/8]\)</span>. The total variation distance between <span class="math inline">\(\pi_4\)</span> and <span class="math inline">\(\Pi\)</span> is <span class="math inline">\(\| \pi_4 - \Pi \|_{\text{TV}} = 0.21\)</span>. This is less than <span class="math inline">\(1/4\)</span>, and hence the mixing time is at most 4 for this initial distribution.</p>
 <p>This only computes the mixing time for the initial distribution <span class="math inline">\(\pi_0 = [1, 0, 0, 0]\)</span>. In general, we need to compute the mixing time for all possible initial distributions. The mixing time is the maximum of these mixing times over all initial distributions.</p>
 <p>In practice, we either provide a theoretical bound on the mixing time or “visually” inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.</p>
-<div id="38383527" class="cell" data-execution_count="4">
+<div id="0ca92ee9" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -834,7 +890,7 @@ Practical Significance of Mixing Time
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Spectral Gap and Mixing Time
+<span class="screen-reader-only">Tip</span>Spectral Gap and Mixing Time
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -852,7 +908,7 @@ Spectral Gap and Mixing Time
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Algorithm: Markov Chain Sampling
+<span class="screen-reader-only">Note</span>Algorithm: Markov Chain Sampling
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -874,7 +930,7 @@ Algorithm: Markov Chain Sampling
 <p>The autocorrelation plot below shows the correlation between samples at different lags, i.e., <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_{i+k}\)</span> for different values of <span class="math inline">\(k\)</span>. We can see that the correlation decreases as <span class="math inline">\(k\)</span> increases and stabilizes around <span class="math inline">\(k = 40\)</span>.</p>
 <p>We can either discard the first 40 samples or select every 40th sample to reduce the correlation. If independence is important, then we should select every 40th sample. However, this leads to a lot of wasted samples and it might not get rid of all the correlation. This method is not preferred in practice. In practice, it is better to generate a large number of samples than to “thin” the samples.</p>
 </div>
-<div id="b2761e4c" class="cell" data-fold="true" data-execution_count="5">
+<div id="089f485d" class="cell" data-fold="true" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -960,7 +1016,7 @@ Q(i, j)
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Practical Verification
+<span class="screen-reader-only">Note</span>Practical Verification
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -998,7 +1054,7 @@ Practical Verification
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Geometric Ergodicity and Covariance Decay
+<span class="screen-reader-only">Tip</span>Geometric Ergodicity and Covariance Decay
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1021,7 +1077,7 @@ Geometric Ergodicity and Covariance Decay
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Practical Implications
+<span class="screen-reader-only">Important</span>Practical Implications
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1042,7 +1098,7 @@ Practical Implications
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Chapter Under Revision
+<span class="screen-reader-only">Warning</span>Chapter Under Revision
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1056,7 +1112,7 @@ Chapter Under Revision
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Algorithm: Trace Plot Analysis
+<span class="screen-reader-only">Note</span>Algorithm: Trace Plot Analysis
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1078,7 +1134,7 @@ Algorithm: Trace Plot Analysis
 <h3 data-number="B.10.1" class="anchored" data-anchor-id="trace-plots"><span class="header-section-number">B.10.1</span> Trace Plots</h3>
 <p>A trace plot is simply a scatter plot of the samples generated by the Markov chain. It is useful to see if the Markov chain has converged. If the Markov chain has converged, the trace plot should look like a cloud of points. If the Markov chain has not converged, the trace plot will show a trend.</p>
 <p>Below are the trace plots for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. We can see that the chain does not look uniform even after 1000 samples but after 5000 samples it is starting to look uniform.</p>
-<div id="a784925c" class="cell" data-fold="true" data-execution_count="6">
+<div id="1ab92b0d" class="cell" data-fold="true" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1098,7 +1154,7 @@ Algorithm: Trace Plot Analysis
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Important Limitations of Running Averages
+<span class="screen-reader-only">Warning</span>Important Limitations of Running Averages
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1130,18 +1186,18 @@ Important Limitations of Running Averages
 <p>Use running averages as <strong>supporting evidence</strong> for your autocorrelation-based burn-in determination, not as the primary diagnostic.</p>
 <div id="exm">
 <p>Below is the running average analysis for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>.</p>
-<div id="95b904bf" class="cell" data-fold="true" data-execution_count="7">
+<div id="d214f9c7" class="cell" data-fold="true" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="markov_chains_files/figure-html/cell-7-output-1.png" width="799" height="523" class="figure-img"></p>
+<p><img src="markov_chains_files/figure-html/cell-7-output-1.png" width="808" height="523" class="figure-img"></p>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Final running average (full chain): 6.838
-Average of last 80% of chain: 6.922
-Difference: 0.084</code></pre>
+<pre><code>Final running average (full chain): 6.730
+Average of last 80% of chain: 6.642
+Difference: 0.088</code></pre>
 </div>
 </div>
 </div>
@@ -1164,7 +1220,7 @@ Difference: 0.084</code></pre>
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Algorithm: Choosing Burn-in Period Using ACF Stability
+<span class="screen-reader-only">Note</span>Algorithm: Choosing Burn-in Period Using ACF Stability
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1184,7 +1240,7 @@ Algorithm: Choosing Burn-in Period Using ACF Stability
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Interpreting Autocorrelation Results
+<span class="screen-reader-only">Tip</span>Interpreting Autocorrelation Results
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1198,7 +1254,7 @@ Interpreting Autocorrelation Results
 <p>From this analysis, we can see whether the autocorrelation patterns are similar across different starting points. If they are, the chain has likely converged by the earliest point where this stability is observed. This approach is more principled than simply thresholding autocorrelation values, as it’s based on the fundamental property that converged Markov chains have time-invariant statistical properties.</p>
 <div id="exm-autocorrelation" class="theorem example">
 <p><span class="theorem-title"><strong>Example B.4</strong></span> Below is the autocorrelation analysis for <a href="#exm-random-walk-on-graph" class="quarto-xref">Example&nbsp;<span>B.2</span></a>. Rather than simply looking for where autocorrelation drops below a threshold, we examine whether the autocorrelation pattern has stabilized across different portions of the chain.</p>
-<div id="f66db0e4" class="cell" data-fold="true" data-execution_count="8">
+<div id="9775cdd8" class="cell" data-fold="true" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1208,9 +1264,9 @@ Interpreting Autocorrelation Results
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Similarity analysis:
-Burn-in 0 vs 500: similarity = 0.003
-Burn-in 500 vs 1000: similarity = 0.005
-Burn-in 1000 vs 1250: similarity = 0.009
+Burn-in 0 vs 500: similarity = 0.008
+Burn-in 500 vs 1000: similarity = 0.009
+Burn-in 1000 vs 1250: similarity = 0.005
 
 Based on visual inspection and similarity analysis, no burn-in is required.</code></pre>
 </div>
@@ -1231,7 +1287,7 @@ Based on visual inspection and similarity analysis, no burn-in is required.</cod
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Looking Ahead
+<span class="screen-reader-only">Important</span>Looking Ahead
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -1307,13 +1363,14 @@ Looking Ahead
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

@@ -6,3 +6,4 @@
 .jupyter_cache/
 __pycache__/
 *.pyc
+**/*.quarto_ipynb

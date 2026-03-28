@@ -55,6 +55,15 @@ book:
         - chapters/optimization/simulated_annealing.qmd
         - chapters/optimization/cross_entropy.qmd
     - chapters/references.qmd
+    - part: "Interactive Apps"
+      chapters:
+        - apps/index.qmd
+        - apps/estimating-pi.qmd
+        - apps/buffons-needle.qmd
+        - apps/metropolis-hastings.qmd
+        - apps/metropolis-random-walk.qmd
+        - apps/gibbs-sampling.qmd
+        - apps/random-walks-on-graphs.qmd
   appendices:
     - appendices/probability.qmd
     - appendices/markov_chains.qmd

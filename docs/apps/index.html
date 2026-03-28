@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-03-24">
 
-<title>11&nbsp; Metropolis–Hastings Algorithm – Monte Carlo Methods Lecture Notes</title>
+<title>23&nbsp; Interactive Apps – Monte Carlo Methods Lecture Notes</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -27,29 +26,31 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<link href="../../chapters/variance_reduction.html" rel="next">
-<link href="../../chapters/sampling/gibbs_2d.html" rel="prev">
-<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-f418161beb48e0141c760e455f12af2c.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-82111db1632b674d39086de9492f00d5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../apps/estimating-pi.html" rel="next">
+<link href="../chapters/references.html" rel="prev">
+<script src="../site_libs/quarto-listing/list.min.js"></script>
+<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-f418161beb48e0141c760e455f12af2c.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-82111db1632b674d39086de9492f00d5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -77,6 +78,35 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-image','listing-date','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -108,10 +138,10 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../../style.css">
-<meta property="og:title" content="11&nbsp; Metropolis–Hastings Algorithm – Monte Carlo Methods Lecture Notes">
-<meta property="og:description" content="">
-<meta property="og:image" content="mh_files/figure-html/cell-3-output-1.png">
+<link rel="stylesheet" href="../style.css">
+<meta property="og:title" content="23&nbsp; Interactive Apps – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="Explore mathematical concepts through interactive visualizations">
+<meta property="og:image" content="../apps/images/gibbs-sampling.svg">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -280,11 +310,11 @@ window.Quarto = {
   </script>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
     </a>
   </div>
@@ -295,7 +325,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../../apps/index.html" aria-current="page"> 
+    <a class="nav-link active" href="../apps/index.html" aria-current="page"> 
 <span class="menu-text">Interactive Apps</span></a>
   </li>  
 </ul>
@@ -317,33 +347,50 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/mh.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../apps/index.html">Interactive Apps</a></li><li class="breadcrumb-item"><a href="../apps/index.html"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-right"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../apps/index.html">Interactive Apps</a></li><li class="breadcrumb-item"><a href="../apps/index.html"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></a></li></ol></nav>
+      <h1 class="title"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></h1>
+            <p class="subtitle lead">Explore mathematical concepts through interactive visualizations</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-page-right">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Monte Carlo Estimation</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -352,13 +399,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
   </div>
 </li>
@@ -366,7 +413,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Sampling Techniques</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -375,43 +422,43 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link active">
+  <a href="../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
   </div>
 </li>
@@ -419,7 +466,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
   </div>
 </li>
@@ -434,19 +481,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
 </li>
@@ -463,7 +510,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
 </li>
@@ -482,7 +529,7 @@ window.Quarto = {
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+  <a href="../chapters/references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
   </div>
 </li>
@@ -497,43 +544,43 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/index.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/estimating-pi.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/estimating-pi.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating π</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/buffons-needle.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/buffons-needle.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Buffon’s Needle</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/metropolis-hastings.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/metropolis-hastings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Metropolis-Hastings Algorithm</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/metropolis-random-walk.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/metropolis-random-walk.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/gibbs-sampling.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/gibbs-sampling.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">Gibbs Sampling for Bivariate Normals</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
+  <a href="../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></span></a>
   </div>
 </li>
@@ -550,13 +597,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/probability.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+  <a href="../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
   </div>
 </li>
@@ -567,32 +614,9 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
-   
-  <ul>
-  <li><a href="#sec-random-walks" id="toc-sec-random-walks" class="nav-link active" data-scroll-target="#sec-random-walks"><span class="header-section-number">11.1</span> Random Walks Metropolis–Hastings Algorithm</a>
-  <ul class="collapse">
-  <li><a href="#proposal-distribution" id="toc-proposal-distribution" class="nav-link" data-scroll-target="#proposal-distribution"><span class="header-section-number">11.1.1</span> Proposal Distribution</a></li>
-  <li><a href="#choosing-the-proposal-distribution" id="toc-choosing-the-proposal-distribution" class="nav-link" data-scroll-target="#choosing-the-proposal-distribution"><span class="header-section-number">11.1.2</span> Choosing the Proposal Distribution</a></li>
-  </ul></li>
-  <li><a href="#metropolishastings-algorithm" id="toc-metropolishastings-algorithm" class="nav-link" data-scroll-target="#metropolishastings-algorithm"><span class="header-section-number">11.2</span> Metropolis–Hastings Algorithm</a>
-  <ul class="collapse">
-  <li><a href="#structure-of-metropolishastings-algorithm" id="toc-structure-of-metropolishastings-algorithm" class="nav-link" data-scroll-target="#structure-of-metropolishastings-algorithm"><span class="header-section-number">11.2.1</span> Structure of Metropolis–Hastings Algorithm</a></li>
-  <li><a href="#proposal-distribution-1" id="toc-proposal-distribution-1" class="nav-link" data-scroll-target="#proposal-distribution-1"><span class="header-section-number">11.2.2</span> Proposal Distribution</a></li>
-  <li><a href="#acceptance-criterion" id="toc-acceptance-criterion" class="nav-link" data-scroll-target="#acceptance-criterion"><span class="header-section-number">11.2.3</span> Acceptance Criterion</a></li>
-  </ul></li>
-  <li><a href="#symmetric-proposal-distribution" id="toc-symmetric-proposal-distribution" class="nav-link" data-scroll-target="#symmetric-proposal-distribution"><span class="header-section-number">11.3</span> Symmetric Proposal Distribution</a></li>
-  <li><a href="#metropolis-algorithm-for-symmetric-proposals" id="toc-metropolis-algorithm-for-symmetric-proposals" class="nav-link" data-scroll-target="#metropolis-algorithm-for-symmetric-proposals"><span class="header-section-number">11.4</span> Metropolis Algorithm for Symmetric Proposals</a>
-  <ul class="collapse">
-  <li><a href="#detailed-balance-and-reversibility" id="toc-detailed-balance-and-reversibility" class="nav-link" data-scroll-target="#detailed-balance-and-reversibility"><span class="header-section-number">11.4.1</span> Detailed Balance and Reversibility</a></li>
-  </ul></li>
-  </ul>
-</nav>
-    </div>
+    
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content quarto-banner-title-block column-page-right" id="quarto-document-content">
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -621,381 +645,145 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </script>
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/mh.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></h1>
+
+
+
+
+
+
+
+
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-categories="bWNtYyUyQ2dpYmJzJTJDc3RhdGlzdGljcw==" data-listing-date-sort="1773201600000" data-listing-file-modified-sort="1773234762741" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="391">
+<a href="../apps/gibbs-sampling.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/gibbs-sampling.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Gibbs Sampling for Bivariate Normals
+</h5>
+<div class="card-text listing-description delink">
+<p>Compare Gibbs trajectories for independent and correlated bivariate normal targets.</p>
 </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">March 24, 2025</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<!-- - random walks and uniform sampling
-- general algorithm
-- proof of detailed balance equations?
-- acceptance ratio vs convergence
-
-
-- programming assignment:
-  - generate from non-convex region
-  - plot acceptance ratio vs ESS? What is this u-shaped graph?
-  - generate from bivariate exponential -->
-<p>Metropolis–Hastings algorithm is a Markov Chain Monte Carlo (MCMC) method used to sample from a probability distribution. It is a type of a rejection sampling algorithm where we generate a sequence of samples from a target distribution by proposing a new sample and accepting or rejecting it based on a certain criterion. The algorithm is widely used in Bayesian statistics, statistical physics, and machine learning.</p>
-<p>We’ll start a few examples to understand the algorithm and then discuss the general algorithm.</p>
-<section id="sec-random-walks" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="sec-random-walks"><span class="header-section-number">11.1</span> Random Walks Metropolis–Hastings Algorithm</h2>
-<p>Consider a region <span class="math inline">\(\Omega\)</span> in <span class="math inline">\(\mathbb{R}^n\)</span>. Suppose we want to sample uniformly from this region. One way to do this is through rejection sampling. We envelope the region in simple shape like a cube and sample uniformly from the cube. If the sample lies in the region <span class="math inline">\(\Omega\)</span>, we accept it, otherwise we reject it. The efficiency of this method depends on the ratio of the volume of the cube to the volume of the region <span class="math inline">\(\Omega\)</span>. If the region is highly non-convex, this ratio can be very small and the rejection sampling can be very inefficient.</p>
-<p>An alternative method is to use random walks. We start at a point <span class="math inline">\(x_0\)</span> in the region <span class="math inline">\(\Omega\)</span> and take a random step in a random direction. If the new point <span class="math inline">\(x_1\)</span> is in the region <span class="math inline">\(\Omega\)</span>, we accept it, otherwise we stay at the point <span class="math inline">\(x_0\)</span>. We repeat this process to generate a sequence of points. This method is more efficient than rejection sampling for highly non-convex regions.</p>
-<p>The rationale behind this is that if a point is in the region <span class="math inline">\(\Omega\)</span>, then a point near it is also likely to be in the region. We can use this idea to sample from a probability distribution. The random walk Metropolis–Hastings algorithm for generating <span class="math inline">\(N\)</span> samples from a region <span class="math inline">\(\Omega\)</span> is as follows:</p>
-<ol type="1">
-<li>Start at a point <span class="math inline">\(x_0\)</span> in the region <span class="math inline">\(\Omega\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
-<ol type="1">
-<li>Generate a random step <span class="math inline">\(\sigma x\)</span>.</li>
-<li>Compute the new point <span class="math inline">\(y\)</span> <strong>near</strong> <span class="math inline">\(x_i\)</span>.</li>
-<li>If <span class="math inline">\(y\)</span> is in the region <span class="math inline">\(\Omega\)</span>,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-</ol></li>
-<li>Else,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = x_i\)</span>.</li>
-</ol></li>
-</ol></li>
-<li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
-</ol>
-<p>This is an example of a Metropolis–Hastings algorithm. The acceptance criterion is that the <em>new point <span class="math inline">\(y\)</span> should be in the region <span class="math inline">\(\Omega\)</span></em>.</p>
-<section id="proposal-distribution" class="level3" data-number="11.1.1">
-<h3 data-number="11.1.1" class="anchored" data-anchor-id="proposal-distribution"><span class="header-section-number">11.1.1</span> Proposal Distribution</h3>
-<p>The missing piece in the above algorithm is the method to generate a new point <span class="math inline">\(y\)</span> near the current point <span class="math inline">\(x_i\)</span>. This is done using a <strong>proposal distribution</strong>. The proposal distribution can be almost of any form, but it should be easy to sample from. The choice of the proposal distribution is crucial for the efficiency of the algorithm. A good proposal distribution should be able to explore the region <span class="math inline">\(\Omega\)</span> efficiently.</p>
-<p>In the case of random walks, there are two common choices for the proposal distribution:</p>
-<ol type="1">
-<li><strong>Gaussian proposal</strong>: We sample a new point from a Gaussian distribution centered at the current point <span class="math inline">\(x_i\)</span> with a certain variance.</li>
-<li><strong>Uniform proposal</strong>: We sample a new point from a uniform distribution in a neighborhood of the current point <span class="math inline">\(x_i\)</span>.</li>
-</ol>
-<div id="exm-L-shape" class="theorem example">
-<p><span class="theorem-title"><strong>Example 11.1</strong></span> Consider the L-shaped region in <span class="math inline">\(\mathbb{R}^2\)</span> as shown below. This is a non-convex region and rejection sampling would only provide an efficiency of <span class="math inline">\(0.1 + 0.1 - 0.01 = 0.18\)</span>. We’ll use the Metropolis–Hastings algorithm to sample from this region with higher efficiency.</p>
-<div id="3f9b0105" class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="mh_files/figure-html/cell-3-output-1.png" width="571" height="411" class="figure-img"></p>
-</figure>
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Mar 11, 2026
 </div>
 </div>
 </div>
-<p>The images below show scatter plots for the samples generated using the Metropolis–Hastings algorithm with four different choices of the Gaussian proposal distribution with standard deviations <span class="math inline">\(1\)</span>, <span class="math inline">\(0.5\)</span>, <span class="math inline">\(0.2\)</span>, and <span class="math inline">\(0.01\)</span>.</p>
+</div></a>
 </div>
-<div id="1279780a" class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="mh_files/figure-html/cell-5-output-1.png" width="1143" height="1140" class="figure-img"></p>
-</figure>
+<div class="g-col-1" data-index="1" data-categories="cmFuZG9tLXdhbGslMkNncmFwaC10aGVvcnklMkNtY21jJTJDdmlzdWFsaXphdGlvbg==" data-listing-date-sort="1773115200000" data-listing-file-modified-sort="1773175647101" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1497">
+<a href="../apps/random-walks-on-graphs.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/random-walks-on-graphs.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Random Walks on Graphs
+</h5>
+<div class="card-text listing-description delink">
+<p>Interactively explore mixing, spectral gaps, and probability flow for random walks on different graph structures.</p>
 </div>
-</div>
-</div>
-</section>
-<section id="choosing-the-proposal-distribution" class="level3" data-number="11.1.2">
-<h3 data-number="11.1.2" class="anchored" data-anchor-id="choosing-the-proposal-distribution"><span class="header-section-number">11.1.2</span> Choosing the Proposal Distribution</h3>
-<p>Notice that there is a tradeoff between the acceptance rate and the rate of convergence. In the above example,</p>
-<ul>
-<li>The proposal distribution with <span class="math inline">\(\sigma = 1\)</span> has the lowest acceptance rate but the samples are well spread out and the underlying markov chain converges quickly.</li>
-<li>The proposal distribution with <span class="math inline">\(\sigma = 0.01\)</span> has the highest acceptance rate but the samples are clustered and the underlying markov chain converges slowly. In the above simulation, even after <span class="math inline">\(10^5\)</span> samples (most of which are accepted), the samples are still clustered.</li>
-</ul>
-<p>Both of these are undesirable. We need to choose a proposal distribution that has a good balance between the acceptance rate and the rate of convergence.</p>
-<p>We see that for <span class="math inline">\(\sigma = 0.5\)</span>, the samples are well spread out and the underlying markov chain converges quickly to the target distribution. This is a good choice for the proposal distribution. However, the acceptance rate is <span class="math inline">\(0.07\)</span> which is lower than the acceptance rate for naive rejection sampling AND the generated samples are correlated. It is better to use rejection sampling than to use this proposal distribution.</p>
-<p>For <span class="math inline">\(\sigma = 0.2\)</span>, the acceptance rate is <span class="math inline">\(0.3\)</span> which is better than the acceptance rate for naive rejection sampling. The samples are well spread out and the underlying markov chain converges quickly, although not as quickly as for <span class="math inline">\(\sigma = 0.5.\)</span> For this example, <span class="math inline">\(\sigma = 0.2\)</span> is a good choice for the proposal distribution. We can fine tune this parameter to get a better acceptance rate, if needed.</p>
-</section>
-</section>
-<section id="metropolishastings-algorithm" class="level2" data-number="11.2">
-<h2 data-number="11.2" class="anchored" data-anchor-id="metropolishastings-algorithm"><span class="header-section-number">11.2</span> Metropolis–Hastings Algorithm</h2>
-<p>The general algorithm for the Metropolis–Hastings algorithm is an algorithm for generating a sequence of samples from a probability distribution <span class="math inline">\(p(x)\)</span>.</p>
-<section id="structure-of-metropolishastings-algorithm" class="level3" data-number="11.2.1">
-<h3 data-number="11.2.1" class="anchored" data-anchor-id="structure-of-metropolishastings-algorithm"><span class="header-section-number">11.2.1</span> Structure of Metropolis–Hastings Algorithm</h3>
-<p>The above example illustrates the general structure of the Metropolis–Hastings algorithm for sampling from a probability distribution <span class="math inline">\(p(x)\)</span>. The algorithm is as follows:</p>
-<ol type="1">
-<li><strong>Initialization</strong>: Start at a point <span class="math inline">\(x_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
-<ol type="1">
-<li>Generate a proposal <span class="math inline">\(y\)</span> close to <span class="math inline">\(x_i\)</span>.</li>
-<li>Evaluate the acceptance ratio <span class="math inline">\(\alpha (y | x_i)\)</span>.</li>
-<li>Accept <span class="math inline">\(y\)</span> with probability <span class="math inline">\(\alpha (y | x_i)\)</span>.
-<ol type="1">
-<li>If accepted, set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-<li>Else, set <span class="math inline">\(x_{i+1} = x_i\)</span>.</li>
-</ol></li>
-</ol></li>
-<li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
-</ol>
-</section>
-<section id="proposal-distribution-1" class="level3" data-number="11.2.2">
-<h3 data-number="11.2.2" class="anchored" data-anchor-id="proposal-distribution-1"><span class="header-section-number">11.2.2</span> Proposal Distribution</h3>
-<p>For the MH algorithm, we need to specify a <strong>proposal distribution</strong> for generating “nearby points”. This is a joint distribution <span class="math inline">\(q(x, y)\)</span> for two random variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>. However, for running the algorithm we only need the conditional distribution <span class="math inline">\(q(y | x)\)</span>. As such, it’s more common to say that the proposal distribution is the conditional distribution <span class="math inline">\(q(y | x)\)</span>. We think of <span class="math inline">\(x\)</span> as the current point and <span class="math inline">\(y\)</span> as the proposed point so that the proposal distribution <span class="math inline">\(q(y | x)\)</span> is <em>the distribution of the proposed point <span class="math inline">\(y\)</span> given the current point <span class="math inline">\(x\)</span></em>.</p>
-<p>In the <a href="#exm-L-shape" class="quarto-xref">Example&nbsp;<span>11.1</span></a>, the proposal distribution <span class="math inline">\(q(y|x)\)</span> was a Gaussian distribution centered at <span class="math inline">\(x\)</span> with a chosen variance,</p>
-<p><span class="math display">\[\begin{align*}
-q(y | x) = \mathcal{N}(y ; x, \sigma^2 I).
-\end{align*}\]</span></p>
-<p>The proposal distribution can be any distribution that is easy to sample from. The choice of the proposal distribution is crucial for the efficiency of the algorithm.</p>
-</section>
-<section id="acceptance-criterion" class="level3" data-number="11.2.3">
-<h3 data-number="11.2.3" class="anchored" data-anchor-id="acceptance-criterion"><span class="header-section-number">11.2.3</span> Acceptance Criterion</h3>
-<p>Once we generate a proposal <span class="math inline">\(y\)</span>, we need to evaluate an acceptance criterion for <span class="math inline">\(w\)</span>. The acceptance criterion is based on the ratio of the target distribution <span class="math inline">\(p(x)\)</span> and the proposal distribution <span class="math inline">\(q(y | x)\)</span>. We calculate the acceptance ratio as</p>
-<p><span class="math display">\[
-\alpha (y | x) = \min \left\{ \frac{p(y)}{p(x)} \cdot \frac{q(x | y)}{q(y | x)}, 1 \right\}.
-\]</span></p>
-<p>The complete Metropolis–Hastings algorithm is as follows:</p>
-<ol type="1">
-<li><strong>Initialization</strong>: Start at a point <span class="math inline">\(x_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
-<ol type="1">
-<li><p>Generate a proposal <span class="math inline">\(y\)</span> from the proposal distribution <span class="math inline">\(q(y | x_i)\)</span>.</p></li>
-<li><p>Compute the acceptance ratio <span class="math display">\[
-\alpha(y | x) = \min\left\{ \frac{p(y)}{p(x)} \cdot \frac{q(x | y)}{q(y | x)}, 1 \right\}.
-\]</span></p></li>
-<li><p>Accept <span class="math inline">\(y\)</span> with probability <span class="math inline">\(\alpha(y | x)\)</span>:</p>
-<ul>
-<li>If <span class="math inline">\(y\)</span> is accepted, set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-<li>Otherwise, set <span class="math inline">\(x_{i+1} = x_i\)</span>.</li>
-</ul></li>
-</ol></li>
-<li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
-</ol>
-<p>We can expand the algorithm further as follows:</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Metropolis–Hastings Algorithm
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Mar 10, 2026
 </div>
 </div>
-<div class="callout-body-container callout-body">
-<ol type="1">
-<li>Start at a point <span class="math inline">\(x_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
-<ol type="1">
-<li>Generate a proposal <span class="math inline">\(y \sim q(y | x_i)\)</span>.</li>
-<li>Compute <span class="math display">\[ \alpha_1 = p(y) \cdot q(x_i | y), \quad \alpha_2 = p(x_i) \cdot q(y | x_i). \]</span></li>
-<li>If <span class="math inline">\(\alpha_1 \geq \alpha_2\)</span>,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-</ol></li>
-<li>Else,
-<ol type="1">
-<li>Generate a random number <span class="math inline">\(u \sim \text{Uniform}(0, 1)\)</span>.</li>
-<li>If <span class="math inline">\(u &lt; \alpha_1 / \alpha_2\)</span>,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-</ol></li>
-<li>Else,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = x_i\)</span>.</li>
-</ol></li>
-</ol></li>
-</ol></li>
-<li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
-</ol>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="2" data-categories="cmFuZG9tLXdhbGslMkNtY21jJTJDdmlzdWFsaXphdGlvbg==" data-listing-date-sort="1735966800000" data-listing-file-modified-sort="1773175542090" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="324">
+<a href="../apps/metropolis-random-walk.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/metropolis-random-walk.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Metropolis Random Walk
+</h5>
+<div class="card-text listing-description delink">
+<p>Explore random walks using the Metropolis algorithm and observe how particles move through space.</p>
+</div>
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Jan 4, 2025
 </div>
 </div>
-</section>
-</section>
-<section id="symmetric-proposal-distribution" class="level2" data-number="11.3">
-<h2 data-number="11.3" class="anchored" data-anchor-id="symmetric-proposal-distribution"><span class="header-section-number">11.3</span> Symmetric Proposal Distribution</h2>
-<p>Often we use a symmetric proposal distribution <span class="math inline">\(q(y | x) = q(x | y)\)</span>. In this case, the acceptance ratio simplifies to</p>
-<p><span class="math display">\[
-\alpha(y | x) = \min \left\{ \frac{p(y)}{p(x)}, 1 \right\}.
-\]</span></p>
-<p>The Metropolis algorithm is a special case of the Metropolis–Hastings algorithm where the proposal distribution is symmetric. The Metropolis algorithm is widely used in practice. The algorithm is as follows:</p>
-<ol type="1">
-<li><strong>Initialization</strong>: Start at a point <span class="math inline">\(x_0\)</span>.</li>
-<li>For <span class="math inline">\(i = 0, 1, \ldots, N-1\)</span>:
-<ol type="1">
-<li>Generate a proposal <span class="math inline">\(y \sim q(y | x_i)\)</span>.</li>
-<li>If <span class="math inline">\(p(y) \geq p(x_i)\)</span>,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-</ol></li>
-<li>Else,
-<ol type="1">
-<li>Generate a random number <span class="math inline">\(u \sim \text{Uniform}(0, 1)\)</span>.</li>
-<li>If <span class="math inline">\(u &lt; p(y) / p(x_i)\)</span>,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = y\)</span>.</li>
-</ol></li>
-<li>Else,
-<ol type="1">
-<li>Set <span class="math inline">\(x_{i+1} = x_i\)</span>.</li>
-</ol></li>
-</ol></li>
-</ol></li>
-<li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
-</ol>
-<div id="exm-Metropolis-to-random-walk" class="theorem example">
-<p><span class="theorem-title"><strong>Example 11.2</strong></span> If <span class="math inline">\(p(x)\)</span> is a uniform distribution over the region <span class="math inline">\(\Omega\)</span>, then the Metropolis algorithm reduces to the random walk Metropolis–Hastings algorithm. In this case, the acceptance ratio becomes</p>
-<p><span class="math display">\[
-\alpha(y | x) = \begin{cases}
-1, &amp; \text{if } y \in \Omega, \\
-0, &amp; \text{if } y \notin \Omega.
-\end{cases}
-\]</span></p>
-<p>This means that we always accept a proposal <span class="math inline">\(y\)</span> if it is in the region <span class="math inline">\(\Omega\)</span> and reject it otherwise. This is equivalent to the random walk Metropolis–Hastings algorithm in <a href="#sec-random-walks" class="quarto-xref"><span>Section 11.1</span></a>.</p>
-<p>Several other algorithms, such as rejection sampling, random walks on graphs, and Gibbs sampling, can be viewed as special cases of the Metropolis–Hastings algorithm.</p>
 </div>
-<!--
-## Metropolis Markov Chain
-
-If the target distribution $p(x)$ is defined over the sample space $\Omega$, then the Metropolis--Hastings algorithm generates a Markov chain with state space $\Omega$. 
-
-For simplicity, 
-
-1. we will analyze the Metropolis algorithm with a symmetric proposal distribution $q(y | x) = q(x | y)$, and
-2. we will assume that the target distribution $p(x)$ is defined over a finite sample space $\Omega$.
-
-The transition matrix for the Markov chain is given by
-
-$$
-\begin{aligned}
-\mathbb{P}(X = b | X = a) = \begin{cases}
-q(b | a) & \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
-\frac{p(b)}{p(a)} \cdot q(b | a) & \text{if } p(b) < p(a) \text{ and } a \neq b, \\
-q(a | a) + \sum \limits_{b \in \Omega, p(b) < p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) & \text{if } a = b.
-\end{cases}
-\end{aligned}
-$$
-
-One can check that this defines a valid transition matrix by showing that the sum of the transition probabilities for each state is $1$.
-
-$$
-\begin{aligned}
-&\sum \limits_{b \in \Omega} \mathbb{P}(X = b | X = a) \\
-&= \sum \limits_{p(b) \ge p(a), a \neq b} q(b | a) 
-+ \sum \limits_{p(b) < p(a)} \frac{p(b)}{p(a)} \cdot q(b | a) 
-+ q(a|a)
-+ \sum \limits_{p(b) < p(a)} q(b | a) \cdot \left(1 - \frac{p(b)}{p(a)}\right) \\
-&= \sum \limits_{b \in \Omega} q(b | a) \\
-&= 1.
-\end{aligned}
-$$ 
-
-### Detailed Balance Equations
-
-::: {#thm-detailed-balance}
-The Metropolis algorithm is reversible with respect to the target distribution $p(x)$. This means that the Markov chain defined by the Metropolis algorithm satisfies the detailed balance equations:
-
-$$
-p(a) \cdot \mathbb{P}(X = b | X = a) = p(b) \cdot \mathbb{P}(X = a | X = b).
-$$
-:::
-
-::: {.proof}
-We only need check the detailed balance equations for the case when $a \neq b$. The case when $a = b$ is trivial. We make two cases:
-
-1. **Case 1**: $p(a) \neq p(b)$.
-
-Without loss of generality, assume that $p(a) < p(b)$. Then we have
-
-$$
-\begin{aligned}
-p(a) \cdot \mathbb{P}(X = b | X = a)
-&= p(a) \cdot q(b | a) \\
-&= p(a) \cdot q(a | b) \\
-&= p(b) \cdot q(a | b) \dfrac{p(a)}{p(b)} \\
-&= p(b) \cdot \mathbb{P}(X = a | X = b).
-\end{aligned}
-$$
-
-2. **Case 2**: $p(a) = p(b)$.
-In this case, we have
-$$
-\begin{aligned}
-p(a) \cdot \mathbb{P}(X = b | X = a)
-&= p(a) \cdot q(b | a) \\
-&= p(b) \cdot q(a | b) \\
-&= p(b) \cdot \mathbb{P}(X = a | X = b).
-\end{aligned}
-$$
-Thus, in both cases, we have shown that the detailed balance equations hold. This completes the proof.
-
-:::
--->
-</section>
-<section id="metropolis-algorithm-for-symmetric-proposals" class="level2" data-number="11.4">
-<h2 data-number="11.4" class="anchored" data-anchor-id="metropolis-algorithm-for-symmetric-proposals"><span class="header-section-number">11.4</span> Metropolis Algorithm for Symmetric Proposals</h2>
-<p>When the proposal distribution is symmetric, i.e., <span class="math inline">\(q(y | x) = q(x | y)\)</span>, the Metropolis-Hastings algorithm simplifies to the Metropolis algorithm. We analyze this case for a target distribution <span class="math inline">\(p(x)\)</span> defined over a finite sample space <span class="math inline">\(\Omega\)</span>.</p>
-<p>The transition matrix for the Markov chain is given by</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mathbb{P}(X = b | X = a) = \begin{cases}
-q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) &amp; \text{if } a \neq b, \\
-1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right) &amp; \text{if } a = b.
-\end{cases}
-\end{aligned}
-\]</span></p>
-<p>This can be equivalently written as:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mathbb{P}(X = b | X = a) = \begin{cases}
-q(b | a) &amp; \text{if } p(b) \geq p(a) \text{ and } a \neq b, \\
-q(b | a) \cdot \frac{p(b)}{p(a)} &amp; \text{if } p(b) &lt; p(a) \text{ and } a \neq b, \\
-q(a | a) + \sum_{c: p(c) &lt; p(a)} q(c | a) \left(1 - \frac{p(c)}{p(a)}\right) &amp; \text{if } a = b.
-\end{cases}
-\end{aligned}
-\]</span></p>
-<p>To verify this defines a valid transition matrix, we check that transition probabilities sum to 1:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\sum_{b \in \Omega} \mathbb{P}(X = b | X = a)
-&amp;= \sum_{b \neq a} q(b | a) \min\left(1, \frac{p(b)}{p(a)}\right) + \left[1 - \sum_{c \neq a} q(c | a) \min\left(1, \frac{p(c)}{p(a)}\right)\right] \\
-&amp;= 1.
-\end{aligned}
-\]</span></p>
-<section id="detailed-balance-and-reversibility" class="level3" data-number="11.4.1">
-<h3 data-number="11.4.1" class="anchored" data-anchor-id="detailed-balance-and-reversibility"><span class="header-section-number">11.4.1</span> Detailed Balance and Reversibility</h3>
-<div id="thm-detailed-balance-symmetric" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 11.1</strong></span> The Metropolis algorithm with symmetric proposals satisfies the detailed balance equations with respect to the target distribution <span class="math inline">\(p(x)\)</span>:</p>
-<p><span class="math display">\[
-p(a) \cdot \mathbb{P}(X = b | X = a) = p(b) \cdot \mathbb{P}(X = a | X = b).
-\]</span></p>
+</div></a>
 </div>
-<div class="proof">
-<p><span class="proof-title"><em>Proof</em>. </span>For <span class="math inline">\(a = b\)</span>, the equation trivially holds. For <span class="math inline">\(a \neq b\)</span>, we verify:</p>
-<p>Since <span class="math inline">\(q(b | a) = q(a | b)\)</span> by symmetry, we have:</p>
-<p><span class="math display">\[
-\begin{aligned}
-p(a) \cdot \mathbb{P}(X = b | X = a)
-&amp;= p(a) \cdot q(b | a) \cdot \min\left(1, \frac{p(b)}{p(a)}\right) \\
-&amp;= q(b | a) \cdot \min(p(a), p(b)) \\
-&amp;= q(a | b) \cdot \min(p(b), p(a)) \\
-&amp;= p(b) \cdot q(a | b) \cdot \min\left(1, \frac{p(a)}{p(b)}\right) \\
-&amp;= p(b) \cdot \mathbb{P}(X = a | X = b).
-\end{aligned}
-\]</span></p>
-<p>This establishes that the Metropolis algorithm is reversible with respect to <span class="math inline">\(p(x)\)</span>.</p>
+<div class="g-col-1" data-index="3" data-categories="bWNtYyUyQ3N0YXRpc3RpY3MlMkNhbGdvcml0aG1z" data-listing-date-sort="1735880400000" data-listing-file-modified-sort="1773174325944" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="245">
+<a href="../apps/metropolis-hastings.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/metropolis-hastings.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Metropolis-Hastings Algorithm
+</h5>
+<div class="card-text listing-description delink">
+<p>Visualize the Metropolis-Hastings algorithm, a Markov Chain Monte Carlo method for sampling from probability distributions.</p>
 </div>
-
-
-</section>
-</section>
-
-</main> <!-- /main -->
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Jan 3, 2025
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="4" data-categories="bW9udGUtY2FybG8lMkNwcm9iYWJpbGl0eSUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735794000000" data-listing-file-modified-sort="1773173066881" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="198">
+<a href="../apps/estimating-pi.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/estimating-pi.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Estimating π
+</h5>
+<div class="card-text listing-description delink">
+<p>Use Monte Carlo methods to estimate the value of π by randomly sampling points in a square.</p>
+</div>
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Jan 2, 2025
+</div>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="5" data-categories="cHJvYmFiaWxpdHklMkNtb250ZS1jYXJsbyUyQ3Zpc3VhbGl6YXRpb24=" data-listing-date-sort="1735707600000" data-listing-file-modified-sort="1773173066883" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="196">
+<a href="../apps/buffons-needle.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="../apps/images/buffons-needle.svg" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Buffon’s Needle
+</h5>
+<div class="card-text listing-description delink">
+<p>Estimate the value of π using Buffon’s needle problem - a classic probability experiment that connects geometry with randomness.</p>
+</div>
+<div class="card-attribution card-text-small end">
+<div class="listing-date">
+Jan 1, 2025
+</div>
+</div>
+</div>
+</div></a>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -1409,15 +1197,15 @@ p(a) \cdot \mathbb{P}(X = b | X = a)
     }
   });
   </script>
-<nav class="page-navigation">
+<nav class="page-navigation column-page-right">
   <div class="nav-page nav-page-previous">
-      <a href="../../chapters/sampling/gibbs_2d.html" class="pagination-link" aria-label="Gibbs Sampling">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span>
+      <a href="../chapters/references.html" class="pagination-link" aria-label="References">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../chapters/variance_reduction.html" class="pagination-link" aria-label="Variance Reduction Techniques">
-        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../apps/estimating-pi.html" class="pagination-link" aria-label="Estimating π">
+        <span class="nav-page-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating π</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
