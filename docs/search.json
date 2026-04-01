@@ -1270,5 +1270,17 @@
       "Appendices",
       "<span class='chapter-number'>B</span>  <span class='chapter-title'>Markov Chains</span>"
     ]
+  },
+  {
+    "objectID": "chapters/dynamical/particle_filters.html#connection-between-kalman-filter-and-particle-filter",
+    "href": "chapters/dynamical/particle_filters.html#connection-between-kalman-filter-and-particle-filter",
+    "title": "18  Particle Filters",
+    "section": "18.6 Connection Between Kalman Filter and Particle Filter",
+    "text": "18.6 Connection Between Kalman Filter and Particle Filter\nThe variance-minimizing proposal is: \\[\nq^\\star(\\mathbf{x}_t \\mid \\mathbf{x}_{t-1}, \\mathbf{y}_t) = p(\\mathbf{x}_t \\mid \\mathbf{x}_{t-1}, \\mathbf{y}_t).\n\\]\nIn general, we do not know how to sample from this proposal as \\(p(\\mathbf{x}_t \\mid \\mathbf{x}_{t-1}, \\mathbf{y}_t)\\) is exactly the quantity we are trying to estimate. However, for linear-Gaussian models \\[\n\\mathbf{x}_t = \\mathbf{F}\\mathbf{x}_{t-1} + \\boldsymbol{\\eta}_t, \\quad \\boldsymbol{\\eta}_t \\sim \\mathcal{N}(\\mathbf{0}, \\mathbf{Q}),\n\\] \\[\n\\mathbf{y}_t = \\mathbf{H}\\mathbf{x}_t + \\boldsymbol{\\epsilon}_t, \\quad \\boldsymbol{\\epsilon}_t \\sim \\mathcal{N}(\\mathbf{0}, \\mathbf{R}),\n\\] this proposal is Gaussian for each parent particle \\(\\mathbf{x}_{t-1}^{(i)}\\): \\[\nq^\\star(\\mathbf{x}_t \\mid \\mathbf{x}_{t-1}^{(i)}, \\mathbf{y}_t)=\\mathcal{N}(\\mathbf{x}_t; \\boldsymbol{\\mu}_t^{(i)}, \\mathbf{\\Sigma}_t),\n\\] with \\[\n\\mathbf{\\Sigma}_t = \\left(\\mathbf{Q}^{-1} + \\mathbf{H}^\\top \\mathbf{R}^{-1} \\mathbf{H}\\right)^{-1},\n\\] \\[\n\\boldsymbol{\\mu}_t^{(i)} = \\mathbf{\\Sigma}_t\\left(\\mathbf{Q}^{-1}\\mathbf{F}\\mathbf{x}_{t-1}^{(i)} + \\mathbf{H}^\\top\\mathbf{R}^{-1}\\mathbf{y}_t\\right).\n\\]\nThese are exactly the same algebraic objects as a one-step Kalman conditioning update, but applied per particle parent state rather than to one global Gaussian. With this optimal proposal, the weight update collapses to: \\[\n    \\tilde{w}_t^{(i)} \\propto w_{t-1}^{(i)}\\, p(\\mathbf{y}_t \\mid \\mathbf{x}_{t-1}^{(i)}),\n\\] where \\[\np(\\mathbf{y}_t \\mid \\mathbf{x}_{t-1}^{(i)}) = \\mathcal{N}\\!\\left(\\mathbf{y}_t;\\, \\mathbf{H}\\mathbf{F}\\mathbf{x}_{t-1}^{(i)},\\, \\mathbf{S}_t\\right), \\quad\n\\mathbf{S}_t = \\mathbf{H}\\mathbf{Q}\\mathbf{H}^\\top + \\mathbf{R}.\n\\]\nThis makes the KF connection explicit:\n\nKalman filter: propagates one Gaussian \\(\\mathcal{N}(\\mathbf{m}_t, \\mathbf{P}_t)\\) exactly.\nPF + optimal proposal: propagates many particles with local Kalman-style conditional proposals and importance weights.\n\nAs \\(N \\to \\infty\\), the particle filter with optimal proposal converges to the Kalman filter in the linear-Gaussian case: \\[\n\\sum_{i=1}^N w_t^i \\, \\delta_{\\mathbf{x}_t^i} \\xrightarrow{N \\to \\infty} \\mathcal{N}(\\mathbf{m}_t^{KF}, \\mathbf{P}_t^{KF}).\n\\]\nIn this regime, the particle filter can be interpreted as a Monte Carlo approximation to the exact filtering solution computed analytically by the Kalman filter.\nIn purely linear-Gaussian systems, Kalman filtering remains the exact and computationally preferred method. PF with optimal proposals is most useful once you need particle flexibility: nonlinear dynamics/observations, non-Gaussian noise, etc.",
+    "crumbs": [
+      "Interactive Apps",
+      "Advanced Topics",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Particle Filters</span>"
+    ]
   }
 ]

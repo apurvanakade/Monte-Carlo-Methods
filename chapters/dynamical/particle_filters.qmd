@@ -714,3 +714,54 @@ Consider alternatives when:
 - The system is linear-Gaussian (use Kalman filter).
 - The state space is very high-dimensional (consider ensemble methods).
 - Computational resources are severely limited.
+
+## Connection Between Kalman Filter and Particle Filter
+
+
+The variance-minimizing proposal is:
+$$
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t) = p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t).
+$$
+
+In general, we do not know how to sample from this proposal as $p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t)$ is exactly the quantity we are trying to estimate. However, for linear-Gaussian models
+$$
+\mathbf{x}_t = \mathbf{F}\mathbf{x}_{t-1} + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}),
+$$
+$$
+\mathbf{y}_t = \mathbf{H}\mathbf{x}_t + \boldsymbol{\epsilon}_t, \quad \boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R}),
+$$
+this proposal is Gaussian for each parent particle $\mathbf{x}_{t-1}^{(i)}$:
+$$
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}^{(i)}, \mathbf{y}_t)=\mathcal{N}(\mathbf{x}_t; \boldsymbol{\mu}_t^{(i)}, \mathbf{\Sigma}_t),
+$$
+with
+$$
+\mathbf{\Sigma}_t = \left(\mathbf{Q}^{-1} + \mathbf{H}^\top \mathbf{R}^{-1} \mathbf{H}\right)^{-1},
+$$
+$$
+\boldsymbol{\mu}_t^{(i)} = \mathbf{\Sigma}_t\left(\mathbf{Q}^{-1}\mathbf{F}\mathbf{x}_{t-1}^{(i)} + \mathbf{H}^\top\mathbf{R}^{-1}\mathbf{y}_t\right).
+$$
+
+These are exactly the same algebraic objects as a one-step Kalman conditioning update, but applied **per particle parent state** rather than to one global Gaussian. With this optimal proposal, the weight update collapses to:
+$$
+    \tilde{w}_t^{(i)} \propto w_{t-1}^{(i)}\, p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}),
+$$
+where
+$$
+p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}) = \mathcal{N}\!\left(\mathbf{y}_t;\, \mathbf{H}\mathbf{F}\mathbf{x}_{t-1}^{(i)},\, \mathbf{S}_t\right), \quad
+\mathbf{S}_t = \mathbf{H}\mathbf{Q}\mathbf{H}^\top + \mathbf{R}.
+$$
+
+This makes the KF connection explicit:
+
+- **Kalman filter**: propagates one Gaussian $\mathcal{N}(\mathbf{m}_t, \mathbf{P}_t)$ exactly.
+- **PF + optimal proposal**: propagates many particles with local Kalman-style conditional proposals and importance weights.
+
+As $N \to \infty$, the particle filter with optimal proposal converges to the Kalman filter in the linear-Gaussian case:
+$$
+\sum_{i=1}^N w_t^i \, \delta_{\mathbf{x}_t^i} \xrightarrow{N \to \infty} \mathcal{N}(\mathbf{m}_t^{KF}, \mathbf{P}_t^{KF}).
+$$
+
+In this regime, the particle filter can be interpreted as a Monte Carlo approximation to the exact filtering solution computed analytically by the Kalman filter.
+
+In purely linear-Gaussian systems, Kalman filtering remains the exact and computationally preferred method. PF with optimal proposals is most useful once you need particle flexibility: nonlinear dynamics/observations, non-Gaussian noise, etc.

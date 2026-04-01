@@ -447,6 +447,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/mmn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">M/M/n Queue</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
   </div>
@@ -464,6 +470,12 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../chapters/dynamical/kalman_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
   </div>
@@ -479,6 +491,24 @@ window.Quarto = {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Optimization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/simulated_annealing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Simulated Annealing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/optimization/cross_entropy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Cross Entropy Method</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -601,6 +631,7 @@ window.Quarto = {
   <li><a href="#limitations-and-challenges" id="toc-limitations-and-challenges" class="nav-link" data-scroll-target="#limitations-and-challenges"><span class="header-section-number">18.5.2</span> Limitations and Challenges</a></li>
   <li><a href="#when-to-use-particle-filters" id="toc-when-to-use-particle-filters" class="nav-link" data-scroll-target="#when-to-use-particle-filters"><span class="header-section-number">18.5.3</span> When to Use Particle Filters</a></li>
   </ul></li>
+  <li><a href="#connection-between-kalman-filter-and-particle-filter" id="toc-connection-between-kalman-filter-and-particle-filter" class="nav-link" data-scroll-target="#connection-between-kalman-filter-and-particle-filter"><span class="header-section-number">18.6</span> Connection Between Kalman Filter and Particle Filter</a></li>
   </ul>
 </nav>
     </div>
@@ -1070,9 +1101,42 @@ Particle Filter Performance:
 <li>The state space is very high-dimensional (consider ensemble methods).</li>
 <li>Computational resources are severely limited.</li>
 </ul>
-
-
 </section>
+</section>
+<section id="connection-between-kalman-filter-and-particle-filter" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="connection-between-kalman-filter-and-particle-filter"><span class="header-section-number">18.6</span> Connection Between Kalman Filter and Particle Filter</h2>
+<p>The variance-minimizing proposal is: <span class="math display">\[
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t) = p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t).
+\]</span></p>
+<p>In general, we do not know how to sample from this proposal as <span class="math inline">\(p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t)\)</span> is exactly the quantity we are trying to estimate. However, for linear-Gaussian models <span class="math display">\[
+\mathbf{x}_t = \mathbf{F}\mathbf{x}_{t-1} + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}),
+\]</span> <span class="math display">\[
+\mathbf{y}_t = \mathbf{H}\mathbf{x}_t + \boldsymbol{\epsilon}_t, \quad \boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R}),
+\]</span> this proposal is Gaussian for each parent particle <span class="math inline">\(\mathbf{x}_{t-1}^{(i)}\)</span>: <span class="math display">\[
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}^{(i)}, \mathbf{y}_t)=\mathcal{N}(\mathbf{x}_t; \boldsymbol{\mu}_t^{(i)}, \mathbf{\Sigma}_t),
+\]</span> with <span class="math display">\[
+\mathbf{\Sigma}_t = \left(\mathbf{Q}^{-1} + \mathbf{H}^\top \mathbf{R}^{-1} \mathbf{H}\right)^{-1},
+\]</span> <span class="math display">\[
+\boldsymbol{\mu}_t^{(i)} = \mathbf{\Sigma}_t\left(\mathbf{Q}^{-1}\mathbf{F}\mathbf{x}_{t-1}^{(i)} + \mathbf{H}^\top\mathbf{R}^{-1}\mathbf{y}_t\right).
+\]</span></p>
+<p>These are exactly the same algebraic objects as a one-step Kalman conditioning update, but applied <strong>per particle parent state</strong> rather than to one global Gaussian. With this optimal proposal, the weight update collapses to: <span class="math display">\[
+    \tilde{w}_t^{(i)} \propto w_{t-1}^{(i)}\, p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}),
+\]</span> where <span class="math display">\[
+p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}) = \mathcal{N}\!\left(\mathbf{y}_t;\, \mathbf{H}\mathbf{F}\mathbf{x}_{t-1}^{(i)},\, \mathbf{S}_t\right), \quad
+\mathbf{S}_t = \mathbf{H}\mathbf{Q}\mathbf{H}^\top + \mathbf{R}.
+\]</span></p>
+<p>This makes the KF connection explicit:</p>
+<ul>
+<li><strong>Kalman filter</strong>: propagates one Gaussian <span class="math inline">\(\mathcal{N}(\mathbf{m}_t, \mathbf{P}_t)\)</span> exactly.</li>
+<li><strong>PF + optimal proposal</strong>: propagates many particles with local Kalman-style conditional proposals and importance weights.</li>
+</ul>
+<p>As <span class="math inline">\(N \to \infty\)</span>, the particle filter with optimal proposal converges to the Kalman filter in the linear-Gaussian case: <span class="math display">\[
+\sum_{i=1}^N w_t^i \, \delta_{\mathbf{x}_t^i} \xrightarrow{N \to \infty} \mathcal{N}(\mathbf{m}_t^{KF}, \mathbf{P}_t^{KF}).
+\]</span></p>
+<p>In this regime, the particle filter can be interpreted as a Monte Carlo approximation to the exact filtering solution computed analytically by the Kalman filter.</p>
+<p>In purely linear-Gaussian systems, Kalman filtering remains the exact and computationally preferred method. PF with optimal proposals is most useful once you need particle flexibility: nonlinear dynamics/observations, non-Gaussian noise, etc.</p>
+
+
 </section>
 
 </main> <!-- /main -->
