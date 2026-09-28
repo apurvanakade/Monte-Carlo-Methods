@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,10 +13,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -42,14 +45,24 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-f418161beb48e0141c760e455f12af2c.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b72d44010710761ef2be279569eaa82e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-82111db1632b674d39086de9492f00d5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-1f3d5cd3961055ad9ac6a76443b528c4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-deed35505a3318e2e9e46565d85ff454.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-6df77f21b98f5dae23a504842b92b66a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-deed35505a3318e2e9e46565d85ff454.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="referrer" content="same-origin">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-chrome-site-0.1.10/site.js"></script>
+<script src="../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.css" rel="stylesheet">
+<meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
+<link href="../site_libs/quarto-contrib/mathviz-fonts-0.1.10/fonts.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -79,7 +92,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -108,7 +121,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../assets/style.css">
 <meta property="og:title" content="12&nbsp; Variance Reduction Techniques – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="">
 <meta property="og:image" content="variance_reduction_files/figure-html/cell-3-output-1.png">
@@ -501,42 +514,6 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/estimating-pi.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating π</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/buffons-needle.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Buffon’s Needle</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/metropolis-hastings.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Metropolis-Hastings Algorithm</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/metropolis-random-walk.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Metropolis Random Walk</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/gibbs-sampling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">Gibbs Sampling for Bivariate Normals</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../apps/random-walks-on-graphs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Random Walks on Graphs</span></span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -591,32 +568,6 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // const issueLink = document.getElementById("report-issue-link");
-    const issueLink = document.querySelector('a[href="https://github.com/apurvanakade/Monte-Carlo-Methods"]');
-    if (issueLink) {
-        const repoUrl = "https://github.com/apurvanakade/Monte-Carlo-Methods";
-        const issueTitle = `Issue on page: ${document.title}`;
-        let issueBody = "";
-        document.addEventListener('selectionchange', function() {
-          const selectedText = window.getSelection().toString();
-          if (selectedText) {
-            issueBody = `Selected text:\n${selectedText}`;
-          } else {
-            issueBody = "";
-          }
-          const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
-          issueLink.href = fullIssueUrl;
-        });
-        const fullIssueUrl = `${repoUrl}/issues/new?title=${encodeURIComponent(issueTitle)}&body=${encodeURIComponent(issueBody)}`;
-        issueLink.href = fullIssueUrl;
-        issueLink.target = "_blank"; // Open in a new tab
-    }
-});
-
-
-</script>
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -718,7 +669,7 @@ q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
 \]</span></p>
 <p>This proposal concentrates samples in the tail region where the indicator function is non-zero.</p>
 </div>
-<div id="31d31783" class="cell" data-execution_count="3">
+<div id="f720930e" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -777,7 +728,7 @@ Variance Reduction Factor: 72.2x</code></pre>
 <div id="exm-control-variates" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.1</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
 </div>
-<div id="ff7765a6" class="cell" data-execution_count="5">
+<div id="e1c8c1c8" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -801,7 +752,7 @@ Control Variates Results:
   β = 0.700: Estimate = 0.266761, Variance = 1.197605e-05, Reduction = 0.96x</code></pre>
 </div>
 </div>
-<div id="b8915ba8" class="cell" data-execution_count="6">
+<div id="5bd20183" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -829,7 +780,7 @@ Control Variates Results:
 <div id="exm-antithetic-variables" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.2</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
 </div>
-<div id="ddfde426" class="cell" data-execution_count="8">
+<div id="4b074828" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -875,7 +826,7 @@ Variance Reduction Factor: 61.43x</code></pre>
 <div id="exm-common-random-numbers" class="theorem example">
 <p><span class="theorem-title"><strong>Example 12.3</strong></span> <strong>Comparing Queue Systems.</strong> Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.</p>
 </div>
-<div id="e8c57a5e" class="cell" data-execution_count="9">
+<div id="419d90db" class="cell" data-execution_count="9">
 <div class="cell-output cell-output-stdout">
 <pre><code>Theoretical waiting times:
   System 1 (μ=1.5): 2.0000
@@ -897,7 +848,7 @@ Independent Sampling:
 Variance Reduction Factor: 1.86x</code></pre>
 </div>
 </div>
-<div id="49afc5da" class="cell" data-execution_count="10">
+<div id="2b31145b" class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">

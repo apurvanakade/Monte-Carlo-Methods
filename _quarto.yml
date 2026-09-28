@@ -1,10 +1,8 @@
 project:
   type: book
   output-dir: docs
-  resources:
-    - apps/**/*.js
-    - apps/**/*.py
-    - apps/**/*.json
+  # Pulls the latest mathviz release into _extensions/ before every build.
+  pre-render: scripts/update-mathviz.sh
 
 book:
   title: "Monte Carlo Methods Lecture Notes"
@@ -20,7 +18,6 @@ book:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
         aria-label: GitHub
-        id: report-issue-link # Not working
   open-graph: true
   chapters:
     - index.qmd
@@ -55,39 +52,47 @@ book:
         - chapters/optimization/simulated_annealing.qmd
         - chapters/optimization/cross_entropy.qmd
     - chapters/references.qmd
+    # Add each app page here as it is built (apps/<name>.qmd).
     - part: "Interactive Apps"
       chapters:
         - apps/index.qmd
-        - apps/estimating-pi.qmd
-        - apps/buffons-needle.qmd
-        - apps/metropolis-hastings.qmd
-        - apps/metropolis-random-walk.qmd
-        - apps/gibbs-sampling.qmd
-        - apps/random-walks-on-graphs.qmd
   appendices:
     - appendices/probability.qmd
     - appendices/markov_chains.qmd
   page-footer: "© 2025 Apurva Nakade. All rights reserved."
 
+bibliography: references.bib
 
-bibliography:
-  references.bib
+# mathviz (https://github.com/apurvanakade/mathviz): puts math.js, Plotly,
+# window.VM and the mathviz stylesheet into every page's <head>.
+filters:
+  - mathviz
+mathviz:
+  referrer: same-origin
+  # Inter + JetBrains Mono from site_libs/ (the theme below names them).
+  fonts: true
+  # Select text -> "Report bug" opens an issue linking the page's .qmd source.
+  report-bug:
+    repo: apurvanakade/Monte-Carlo-Methods
 
 format:
   html:
     reader-mode: true
+    # mathviz's Quarto theme: Bootstrap chrome in the same palette as the
+    # mathviz panels. Site overrides go in a second file listed after each
+    # (set $vm-* variables under /*-- scss:defaults --*/).
     theme:
-      light: [cosmo, brand]
-      dark: [superhero, brand]
-    css: 
-      - style.css
-    include-before-body: header-scripts.html
-    documentclass: scrreprt
+      light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
+      dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
+    css:
+      - assets/style.css
     bread-crumbs: true
     back-to-top-navigation: true
-    
 
+# Kernel from the project's .venv (QUARTO_PYTHON is set in _environment).
+jupyter: python3
 
 execute:
   echo: false
+  warning: false
   cache: true

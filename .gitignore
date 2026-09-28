@@ -7,3 +7,8 @@
 __pycache__/
 *.pyc
 **/*.quarto_ipynb
+
+# render artifacts that land next to sources
+**/*_files/figure-pdf/
+**/*_files/libs/
+.venv/
