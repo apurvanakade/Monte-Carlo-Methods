@@ -15,12 +15,14 @@ Every build first runs `scripts/update-mathviz.sh` (a `pre-render` hook in
 A full render always checks; `quarto preview` checks at most once an hour.
 Offline, the build continues with the copy already installed.
 
-Python cells run in the project's `.venv` (Quarto finds it through
-`QUARTO_PYTHON` in `_environment`). To create it:
+Every code cell is OJS and runs in the reader's browser, so there is nothing
+to install beyond Quarto.
+
+Functions this site needs before a mathviz release carries them live in the
+`mathviz-local` overlay (`_mathviz/`, built into `_extensions/mathviz-local/`):
 
 ```sh
-python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+cd _mathviz && node --test && node scripts/build.mjs
 ```
 
 ## Layout
@@ -28,6 +30,8 @@ python3.12 -m venv .venv
 ```
 _quarto.yml           book config; enables the mathviz filter
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
+                      and mathviz-local (built from _mathviz/)
+_mathviz/             this site's additions to mathviz, until a release carries them
 index.qmd             preface
 chapters/             lecture notes, one folder per part
 appendices/           probability and Markov chain background

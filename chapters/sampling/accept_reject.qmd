@@ -126,59 +126,119 @@ On average, we expect to reject half of our proposals.
 In practice, you would implement this algorithm in a loop until you obtain the desired number of samples. The triangular distribution is actually simple enough that direct methods exist, but it serves as a good example for understanding the accept-reject principle.
 :::
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-# def p(x):
-#     if x < 0 or x > 1:
-#         return 0
-#     return 6*x*(1-x)
+arTargetPlot = VM.plotting.persistentPlot({height: "340px"})
+arBoxPlot = VM.plotting.persistentPlot({height: "420px"})
+arBoxHistPlot = VM.plotting.persistentPlot({height: "340px"})
+arProposalPlot = VM.plotting.persistentPlot({height: "340px"})
+arBetaPlot = VM.plotting.persistentPlot({height: "420px"})
+arBetaHistPlot = VM.plotting.persistentPlot({height: "340px"})
 
-def p(x):
-  if x < 0 or x > 1:
-    return 0
-  elif x < 0.5:
-    return 4*x
-  else:
-    return 4*(1-x)
+// The target: the triangular density on [0, 1] with its peak at 1/2.
+function arTarget(x) {
+  if (x < 0 || x > 1) return 0
+  if (x < 0.5) return 4 * x
+  return 4 * (1 - x)
+}
 
-M = 2
+// The Beta(2, 2) proposal density.
+function arBeta(x) {
+  if (x < 0 || x > 1) return 0
+  return 6 * x * (1 - x)
+}
 
-# plot p(x)
-x = np.linspace(0, 1, 100)
-y = [p(i) for i in x]
-plt.plot(x, y)
-plt.axhline(y=M, color='r', linestyle='--')
-plt.show()
+arGrid = {
+  const xs = []
+  for (let i = 0; i <= 200; i++) xs.push(i / 200)
+  return xs
+}
+
+function arCurve(fn, color, name, dash) {
+  const ys = []
+  for (const x of arGrid) ys.push(fn(x))
+  return {x: arGrid, y: ys, type: "scatter", mode: "lines", name, line: {color, width: 2, dash: dash ?? "solid"}}
+}
+
+// Scatter of every proposal (x, y): accepted points under the target
+// density, rejected ones above it.
+function arScatter(sample) {
+  const ax = [], ay = [], rx = [], ry = []
+  for (let i = 0; i < sample.xs.length; i++) {
+    if (sample.accepted[i]) {
+      ax.push(sample.xs[i])
+      ay.push(sample.ys[i])
+    } else {
+      rx.push(sample.xs[i])
+      ry.push(sample.ys[i])
+    }
+  }
+  return [
+    {x: rx, y: ry, type: "scattergl", mode: "markers", name: "Rejected", marker: {color: chartColors.warn, size: 2}, hoverinfo: "skip"},
+    {x: ax, y: ay, type: "scattergl", mode: "markers", name: "Accepted", marker: {color: chartColors.fn, size: 2}, hoverinfo: "skip"}
+  ]
+}
+
+// Density histogram of the accepted x's under the target density.
+function arHistogram(sample) {
+  const kept = []
+  for (let i = 0; i < sample.xs.length; i++) {
+    if (sample.accepted[i]) kept.push(sample.xs[i])
+  }
+  const bins = VM.distributions.histogramBins(kept, 100, {lo: 0, hi: 1})
+  return [
+    {x: bins.centers, y: bins.densities, type: "bar", name: "Accepted samples", marker: {color: VM.plotting.alpha(chartColors.fn, 0.6)}},
+    arCurve(arTarget, chartColors.alt, "Target density")
+  ]
+}
+
+function arEfficiency(sample) {
+  let count = 0
+  for (const a of sample.accepted) {
+    if (a) count++
+  }
+  return count / sample.xs.length
+}
+```
+
+```{ojs}
+arTargetPlot([arCurve(arTarget, chartColors.fn, "p(x)")], {
+  showlegend: false, xaxis: {title: "x"}, yaxis: {title: "p(x)", range: [0, 2.2]},
+  shapes: [{type: "line", xref: "paper", x0: 0, x1: 1, y0: 2, y1: 2, line: {color: chartColors.alt, dash: "dash", width: 2}}]
+})
 ```
     
 
 
+```{ojs}
+//| output: false
+// Uniform proposals on the box [0, 1] x [0, M] with M = 2.
+arBoxSample = {
+  const M = 2
+  const n = 10000
+  const rng = VM.sampling.seededRandom(1)
+  const xs = [], ys = [], accepted = []
+  for (let i = 0; i < n; i++) {
+    const x = rng()
+    const y = M * rng()
+    xs.push(x)
+    ys.push(y)
+    accepted.push(y < arTarget(x))
+  }
+  return {M, xs, ys, accepted}
+}
+```
 
-```{python}
-# idea behind the acceptance-rejection method for sampling from p(x)
-
-n=10000
-x = np.random.uniform(0, 1, n)
-y = np.random.uniform(0, M, n)
-
-accepted = []
-
-for i in range(n):
-    if y[i] < p(x[i]):
-        accepted.append((x[i], y[i]))
-
-# plot the points, color the accepted points in red and the rejected points in blue
-
-accepted = np.array(accepted)
-plt.scatter(x, y, color='orange', s=1)
-plt.scatter(accepted[:,0], accepted[:,1], color='blue', s=1)
-plt.axhline(y=M, color='red', linestyle='--', lw=2)
-# plt.title('Measured efficiency: {:.3f}, expected efficiency: {:.3f}'.format(len(accepted)/n, 1/1.5))
-
-plt.title('Efficiency = num accepted / num generated = {:.2f} = 1/{:.2f}'.format(len(accepted)/n, M))
-plt.show()        
+```{ojs}
+VM.plotting.plotWithLegend(arBoxPlot, arScatter(arBoxSample), {
+  title: {text: `Efficiency = accepted / generated = ${arEfficiency(arBoxSample).toFixed(2)} ≈ 1/${arBoxSample.M}`},
+  margin: {t: 40}, xaxis: {title: "x"}, yaxis: {title: "y"},
+  shapes: [{type: "line", xref: "paper", x0: 0, x1: 1, y0: 2, y1: 2, line: {color: chartColors.alt, dash: "dash", width: 2}}]
+})
 ```
 
 
@@ -186,17 +246,11 @@ plt.show()
     
 
 
-
-```{python}
-# histogram of the accepted points
-plt.hist(accepted[:,0], bins=100, density=True)
-plt.title('Histogram of the accepted points')
-
-# plot the true density
-x = np.linspace(0, 1, 100)
-y = [p(i) for i in x]
-plt.plot(x, y, color='red')
-plt.show()
+```{ojs}
+VM.plotting.plotWithLegend(arBoxHistPlot, arHistogram(arBoxSample), {
+  title: {text: "Histogram of the accepted points"}, margin: {t: 40}, bargap: 0,
+  xaxis: {title: "x"}, yaxis: {title: "density"}
+})
 ```
 
 
@@ -283,28 +337,12 @@ The $\text{Beta}(2, 2)$ distribution has density:
 $$g(x) = 6x(1-x), \quad x \in [0, 1]$$ {#eq-beta-22}
 
 
-```{python}
-def g(x):
-    if x < 0 or x > 1:
-        return 0
-    return 6*x*(1-x)
-
-M = 4/3
-
-# plot p(x) and g(x)
-x = np.linspace(0, 1, 100)
-y = [p(i) for i in x]
-plt.plot(x, y, label='Triangular distribution')
-
-y = [g(i) for i in x]
-plt.plot(x, y, label='Beta distribution')
-plt.legend()
-
-y = [M*g(i) for i in x]
-plt.plot(x, y, label='{:.2f}*Beta distribution'.format(M))
-plt.legend()
-
-plt.show()
+```{ojs}
+VM.plotting.plotWithLegend(arProposalPlot, [
+  arCurve(arTarget, chartColors.fn, "Triangular distribution"),
+  arCurve(arBeta, chartColors.alt, "Beta distribution"),
+  arCurve(x => 4 / 3 * arBeta(x), chartColors.ok, "1.33 · Beta distribution", "dash")
+], {xaxis: {title: "x"}, yaxis: {title: "density", rangemode: "tozero"}})
 ```
 
 **Efficiency comparison:**
@@ -426,43 +464,43 @@ The best proposal distributions:
 - Minimize the scaling constant $M$.
 :::
 
-```{python}
-n = 10000
+```{ojs}
+//| output: false
+// Proposals x ~ Beta(2, 2), then y uniform on [0, M g(x)] with M = 4/3.
+arBetaSample = {
+  const M = 4 / 3
+  const n = 10000
+  const rng = VM.sampling.seededRandom(2)
+  const xs = [], ys = [], accepted = []
+  for (let i = 0; i < n; i++) {
+    // The median of three uniforms is Beta(2, 2).
+    const u = [rng(), rng(), rng()].sort((a, b) => a - b)
+    const x = u[1]
+    const y = M * arBeta(x) * rng()
+    xs.push(x)
+    ys.push(y)
+    accepted.push(y < arTarget(x))
+  }
+  return {M, xs, ys, accepted}
+}
+```
 
-# first sample points from the beta distribution
-x = np.random.beta(2, 2, n)
-y = [np.random.uniform(0, M*g(i)) for i in x]
-
-accepted = []
-
-for i in range(n):
-    if y[i] < p(x[i]):
-        accepted.append((x[i], y[i]))
-
-# plot the points, color the accepted points in red and the rejected points in blue
-
-accepted = np.array(accepted)
-plt.scatter(x, y, color='orange', s=1)
-plt.scatter(accepted[:,0], accepted[:,1], color='blue', s=1)
-plt.title('Efficiency = num accepted / num generated = {:.2f} = 1/{:.2f}'.format(len(accepted)/n, M))
-plt.show()
+```{ojs}
+VM.plotting.plotWithLegend(arBetaPlot, arScatter(arBetaSample), {
+  title: {text: `Efficiency = accepted / generated = ${arEfficiency(arBetaSample).toFixed(2)} ≈ 1/${arBetaSample.M.toFixed(2)}`},
+  margin: {t: 40}, xaxis: {title: "x"}, yaxis: {title: "y"}
+})
 ```
 
 
     
 
 
-
-```{python}
-# histogram of the accepted points
-plt.hist(accepted[:,0], bins=100, density=True)
-plt.title('Histogram of the accepted points')
-
-# plot the true density
-x = np.linspace(0, 1, 100)
-y = [p(i) for i in x]
-plt.plot(x, y, color='red')
-plt.show()
+```{ojs}
+VM.plotting.plotWithLegend(arBetaHistPlot, arHistogram(arBetaSample), {
+  title: {text: "Histogram of the accepted points"}, margin: {t: 40}, bargap: 0,
+  xaxis: {title: "x"}, yaxis: {title: "density"}
+})
 ```
 
 

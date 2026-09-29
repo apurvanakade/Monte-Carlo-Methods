@@ -155,52 +155,62 @@ In our case of testing the randomness of a sequence of random numbers, we divide
 
 The chi-square test is used to test the null hypothesis that the observed data is consistent with the expected data. If the chi-square test statistic is large, then the null hypothesis is rejected. 
 
-The critical value of the chi-square test statistic depends on the number of degrees of freedom. The degrees of freedom is given by $k-1$. In Python, you can use the `scipy.stats.chi2.ppf` function to perform the chi-square test.
+The critical value of the chi-square test statistic depends on the number of degrees of freedom. The degrees of freedom is given by $k-1$. In Python, `scipy.stats.chi2.ppf` computes this critical value.
 
 ::: {.callout-warning}
 ## Choosing the Number of Bins
 The chi-square test is sensitive to the number of bins $k$. If $k$ is too small, then the test may not be sensitive enough to detect deviations from the expected distribution. If $k$ is too large, then the test may be too sensitive and may detect deviations that are not significant.
 :::
 
-```{python}
-#| echo: false
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import chi2
-from scipy.stats import norm
+chiPlot = VM.plotting.persistentPlot({height: "360px"})
+zPlot = VM.plotting.persistentPlot({height: "360px"})
+ksPlot = VM.plotting.persistentPlot({height: "360px"})
 
-# Generate x values and plot chi-square pdf
-x = np.linspace(0, 20, 1000)
-y = chi2.pdf(x, 3)
+// A density curve over [lo, hi], plus the shaded rejection region(s): each
+// entry of `tails` is an [from, to] interval.
+function rejectionFigure(pdf, lo, hi, tails, criticalValues) {
+  const xs = [], ys = []
+  for (let i = 0; i <= 500; i++) {
+    const x = lo + (hi - lo) * i / 500
+    xs.push(x)
+    ys.push(pdf(x))
+  }
+  const traces = []
+  for (const [from, to] of tails) {
+    const tx = [], ty = []
+    for (let i = 0; i <= 200; i++) {
+      const x = from + (to - from) * i / 200
+      tx.push(x)
+      ty.push(pdf(x))
+    }
+    traces.push({x: tx, y: ty, type: "scatter", mode: "lines", fill: "tozeroy", line: {width: 0},
+      fillcolor: VM.plotting.alpha(chartColors.fn, 0.45), hoverinfo: "skip", name: "Rejection region"})
+  }
+  traces.push({x: xs, y: ys, type: "scatter", mode: "lines", line: {color: chartColors.alt, width: 2}, name: "pdf"})
+  const shapes = []
+  for (const c of criticalValues) {
+    shapes.push({type: "line", x0: c, x1: c, yref: "paper", y0: 0, y1: 1, line: {color: chartColors.ok, dash: "dash", width: 2}})
+  }
+  return {traces, shapes}
+}
+```
 
-# Plot chi-square pdf
-plt.plot(x, y, 'r-', lw=2)
-plt.title('Chi-square pdf with 3 degrees of freedom')
-plt.xlabel('x')
-plt.ylabel('pdf')
-
-# Draw vertical and horizontal lines at 0
-plt.axvline(0, color='k', linestyle='-')
-plt.axhline(0, color='k', linestyle='-')
-
-# Calculate critical value for 95% confidence interval
-alpha = 0.05
-critical_value = chi2.ppf(1 - alpha, 3)
-
-# Add critical value annotation to the plot
-plt.text(critical_value, 0.05, f'Critical value for 5% significance: {critical_value:.2f}')
-
-# Shade the area to the right of the critical value
-x_fill = np.linspace(critical_value, 20, 1000)
-y_fill = chi2.pdf(x_fill, 3)
-plt.fill_between(x_fill, y_fill, color='blue', alpha=0.5)
-
-# Draw critical value on the plot
-plt.axvline(critical_value, color='g', linestyle='--')
-
-# Show the plot
-plt.show()
+```{ojs}
+{
+  const critical = VM.distributions.chiSquaredQuantile(0.95, 3)
+  const fig = rejectionFigure(x => VM.distributions.chiSquaredPdf(x, 3), 0, 20, [[critical, 20]], [critical])
+  return chiPlot(fig.traces, {
+    title: {text: "Chi-square pdf with 3 degrees of freedom"}, margin: {t: 40}, showlegend: false,
+    xaxis: {title: "x"}, yaxis: {title: "pdf", rangemode: "tozero"}, shapes: fig.shapes,
+    annotations: [{x: critical, y: 0.05, xanchor: "left", text: ` Critical value for 5% significance: ${critical.toFixed(2)}`, showarrow: false}]
+  })
+}
 ```
 
 ### Mono-bit test
@@ -226,48 +236,22 @@ Note that because this is a two-sided test, we reject the null hypothesis if $Z 
 In Python, you can use the `scipy.stats.norm.ppf` function to compute the critical values for the z-test.
 :::
 
-```{python}
-#| echo: false
+To find the critical value, we find $x$ such that $P(-x < X < x) = 0.95$ for a standard normal distribution. In the figure below, this is the area between the green dashed lines. If your z-score is outside of the critical values, you can reject the null hypothesis.
 
-# Generate x values and plot normal pdf
-x = np.linspace(-4, 4, 1000)
-y = norm.pdf(x, 0, 1)
-
-# Plot normal pdf
-plt.plot(x, y, 'r-', lw=2)
-plt.title('Standard normal pdf')
-plt.xlabel('x')
-plt.ylabel('pdf')
-
-# Draw vertical and horizontal lines at 0
-plt.axvline(0, color='k', linestyle='-')
-plt.axhline(0, color='k', linestyle='-')
-
-# Calculate critical value for 95% confidence interval
-alpha = 0.05
-critical_value_1 = norm.ppf(1 - alpha/2)
-critical_value_2 = norm.ppf(alpha/2)
-
-# Add critical value annotations to the plot
-plt.text(critical_value_1, 0.25, f'x = {critical_value_1:.2f}')
-plt.text(critical_value_2, 0.25, f'x = {critical_value_2:.2f}')
-
-# Shade the area to the right of the positive critical value
-x_fill = np.linspace(critical_value_1, 4, 1000)
-y_fill = norm.pdf(x_fill, 0, 1)
-plt.fill_between(x_fill, y_fill, color='blue', alpha=0.5)
-
-# Shade the area to the left of the negative critical value
-x_fill = np.linspace(-4, critical_value_2, 1000)
-y_fill = norm.pdf(x_fill, 0, 1)
-plt.fill_between(x_fill, y_fill, color='blue', alpha=0.5)
-
-# Draw critical value on the plot
-plt.axvline(critical_value_1, color='g', linestyle='--')
-plt.axvline(critical_value_2, color='g', linestyle='--')
-
-print("To find the critical value, we find $x$ such that $P(-x < X < x) = 0.95$ for a standard normal distribution. In the figure below, this is the area between the green dashed lines.")
-print("If your z-score is outside of the critical values, you can reject the null hypothesis.")
+```{ojs}
+{
+  const upper = VM.distributions.normalQuantile(0.975)
+  const lower = VM.distributions.normalQuantile(0.025)
+  const fig = rejectionFigure(x => VM.distributions.normalPdf(x, 0, 1), -4, 4, [[-4, lower], [upper, 4]], [lower, upper])
+  return zPlot(fig.traces, {
+    title: {text: "Standard normal pdf"}, margin: {t: 40}, showlegend: false,
+    xaxis: {title: "x"}, yaxis: {title: "pdf", rangemode: "tozero"}, shapes: fig.shapes,
+    annotations: [
+      {x: upper, y: 0.25, xanchor: "left", text: ` x = ${upper.toFixed(2)}`, showarrow: false},
+      {x: lower, y: 0.25, xanchor: "left", text: ` x = ${lower.toFixed(2)}`, showarrow: false}
+    ]
+  })
+}
 ```
 
 ### Runs test
@@ -363,40 +347,35 @@ Under $H_0$, as $n \to \infty$, the distribution of $\sqrt{n}D_n$ converges to t
 $$K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}$$
 :::
 
-```{python}
-
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import kstest
-
-# Kolmogorov distribution is not directly available as a PDF in scipy,
-# but we can use the cumulative distribution function (CDF) for visualization.
-from scipy.stats import kstwobign
-
-z = np.linspace(0.01, 2, 500)
-pdf_vals = kstwobign.pdf(z)
-
-plt.figure(figsize=(6,4))
-plt.plot(z, pdf_vals, lw=2, color='red')
-plt.title('PDF of Kolmogorov Distribution')
-plt.xlabel('z')
-plt.ylabel('pdf')
-
-# remove grid
-# Draw vertical and horizontal lines at 0
-plt.axvline(0, color='k', linestyle='-')
-plt.axhline(0, color='k', linestyle='-')
-
-# add a vertical line for 5% critical value
-plt.axvline(x=1.36, color='g', linestyle='--', label='5% Critical Value 1.36')
-plt.legend()
-
-# shade the area under the curve to the right of the critical value
-plt.fill_between(z, pdf_vals, where=(z > 1.36), color='blue', alpha=0.5)
-
-plt.grid(False)
-plt.show()
-
+```{ojs}
+{
+  // Density of the Kolmogorov distribution, the derivative of K(z). The
+  // alternating series above converges slowly for small z, so there we
+  // differentiate the equivalent form K(z) = (sqrt(2 pi) / z) sum_j
+  // exp(-(2j - 1)² pi² / (8 z²)) instead.
+  function kolmogorovPdf(z) {
+    let total = 0
+    if (z < 1) {
+      for (let j = 1; j <= 20; j++) {
+        const a = (2 * j - 1) * (2 * j - 1) * Math.PI * Math.PI / 8
+        total += Math.exp(-a / (z * z)) * (2 * a / Math.pow(z, 4) - 1 / (z * z))
+      }
+      return Math.sqrt(2 * Math.PI) * total
+    }
+    for (let j = 1; j <= 100; j++) {
+      let sign = 1
+      if (j % 2 === 0) sign = -1
+      total += sign * j * j * Math.exp(-2 * j * j * z * z)
+    }
+    return 8 * z * total
+  }
+  const fig = rejectionFigure(kolmogorovPdf, 0.01, 2, [[1.36, 2]], [1.36])
+  return ksPlot(fig.traces, {
+    title: {text: "PDF of Kolmogorov distribution"}, margin: {t: 40}, showlegend: false,
+    xaxis: {title: "z"}, yaxis: {title: "pdf", rangemode: "tozero"}, shapes: fig.shapes,
+    annotations: [{x: 1.36, yref: "paper", y: 0.95, xanchor: "left", text: " 5% critical value 1.36", showarrow: false}]
+  })
+}
 ```
 
 

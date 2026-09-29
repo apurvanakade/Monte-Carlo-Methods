@@ -2,45 +2,21 @@
 # Released under Apache 2.0 license as described in the file LICENSE.
 # Authors: Apurva Nakade
 
-# Renders the book into docs/, the same way `make build` does locally: the
-# Python cells run in .venv (found through QUARTO_PYTHON in _environment), and
-# the pre-render hook pulls the latest mathviz release. Shared by pr-check.yml
-# and publish.yml so the two renders can't drift apart.
-#
-# Quarto keeps its execution cache in a .jupyter_cache/ next to each chapter.
-# It is restored from the newest earlier run with the same requirements.txt,
-# so only chapters whose code cells changed re-execute; a new entry is saved
-# under this commit's sha.
+# Renders the book into docs/, the same way `make build` does locally; the
+# pre-render hook pulls the latest mathviz release. Shared by pr-check.yml and
+# publish.yml so the two renders can't drift apart. Every code cell is OJS and
+# runs in the reader's browser, so nothing needs installing but Quarto.
 
 name: Render the book
-description: Install Python and Quarto, restore the execution cache, quarto render
+description: Install Quarto, quarto render
 
 runs:
   using: composite
   steps:
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: "3.12"
-        cache: pip
-
-    - name: Install Python packages into .venv
-      shell: bash
-      run: |
-        python -m venv .venv
-        .venv/bin/pip install -r requirements.txt
-
     - name: Setup Quarto
       uses: quarto-dev/quarto-actions/setup@v2
       with:
         version: 1.10.18
-
-    - name: Restore the execution cache
-      uses: actions/cache@v4
-      with:
-        path: "**/.jupyter_cache"
-        key: jupyter-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-${{ github.sha }}
-        restore-keys: jupyter-${{ runner.os }}-${{ hashFiles('requirements.txt') }}-
 
     - name: Render
       shell: bash

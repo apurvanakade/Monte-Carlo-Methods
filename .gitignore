@@ -3,17 +3,14 @@
 .DS_Store
 /_book/
 /_freeze/
-.jupyter_cache/
-__pycache__/
-*.pyc
-**/*.quarto_ipynb
 
 # render artifacts that land next to sources
 **/*_files/figure-pdf/
 **/*_files/libs/
-.venv
 
 /.luarc.json
 
 # rendered site: built and published by .github/workflows/publish.yml
 /docs/
+
+**/*.quarto_ipynb
