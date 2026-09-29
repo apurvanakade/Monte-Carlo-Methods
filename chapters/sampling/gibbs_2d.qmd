@@ -376,6 +376,288 @@ plt.ylabel('Y')
 plt.show()
 ```
 
+The app below runs the sampler from $(2.5, -2.5)$. Drag $\rho$ toward $\pm 1$: the ellipses of the target narrow, each conditional step shrinks to a standard deviation of $\sqrt{1 - \rho^2}$, and the chain's axis-parallel staircase can only creep along the diagonal. At $\rho = 0$ the two coordinates are independent and every sweep is an exact, independent draw.
+
+```{ojs}
+//| output: false
+// VM is the mathviz library (loaded on every page by the mathviz extension,
+// plus this site's additions from _mathviz/ via mathviz-local). This page
+// uses VM.mcmc.gibbsBivariateNormal, VM.mcmc.autocorrelation,
+// VM.mcmc.effectiveSampleSize, VM.sampling.seededRandom,
+// VM.sampling.gaussianRandom, VM.plotting.persistentPlot, VM.ui.statRow,
+// VM.ui.urlParam and VM.ui.syncUrlParams.
+VM = window.VM
+
+// vmTheme re-runs every cell that bakes a palette color into a trace when
+// the reader toggles dark mode; chartColors is that palette.
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+```
+
+```{ojs}
+//| output: false
+gibbsMaxN = 1000
+gibbsStart = [2.5, -2.5]
+gibbsDefaults = ({seed: 1, n: 30, rho: 0.9})
+
+gibbsTraceOptions = ["Target contours", "Staircase path", "Samples", "Current state"]
+gibbsTraceColors = new Map([
+  ["Target contours", chartColors.muted],
+  ["Staircase path", chartColors.warn],
+  ["Samples", chartColors.fn],
+  ["Current state", chartColors.alt]
+])
+```
+
+<div class="vm-app" id="gibbs-app">
+
+<div class="ojs-panel">
+
+```{ojs}
+viewof gibbsRedraw = {
+  const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-auto")
+  return button
+}
+```
+
+</div>
+
+```{ojs}
+//| output: false
+gibbsSeed = {
+  if (gibbsRedraw === 0) return VM.ui.urlParam("gibbs_seed", gibbsDefaults.seed)
+  return Math.floor(Math.random() * 1e9)
+}
+```
+
+```{ojs}
+//| output: false
+// gibbsChain: gibbsMaxN sweeps, rerun when rho or the seed changes. The
+// same seed reuses the same normal draws, so dragging rho deforms one
+// chain rather than drawing a new one.
+gibbsChain = VM.mcmc.gibbsBivariateNormal({
+  rho: gibbsRho,
+  n: gibbsMaxN,
+  start: gibbsStart,
+  gaussian: VM.sampling.gaussianRandom(VM.sampling.seededRandom(gibbsSeed))
+})
+```
+
+```{ojs}
+//| output: false
+// The samples after sweeps 1..n (the start is not a sample).
+gibbsView = {
+  const n = gibbsN
+  const xs = gibbsChain.x.slice(1, n + 1)
+  const ys = gibbsChain.y.slice(1, n + 1)
+  let mx = 0, my = 0
+  for (let i = 0; i < n; i++) {
+    mx += xs[i]
+    my += ys[i]
+  }
+  mx /= n
+  my /= n
+  let sxy = 0, sxx = 0, syy = 0
+  for (let i = 0; i < n; i++) {
+    sxy += (xs[i] - mx) * (ys[i] - my)
+    sxx += (xs[i] - mx) * (xs[i] - mx)
+    syy += (ys[i] - my) * (ys[i] - my)
+  }
+  let corr = NaN
+  if (sxx > 0 && syy > 0) corr = sxy / Math.sqrt(sxx * syy)
+  return {n, xs, ys, mx, my, corr}
+}
+```
+
+```{ojs}
+{
+  let corrText = "—"
+  if (Number.isFinite(gibbsView.corr)) corrText = gibbsView.corr.toFixed(3)
+  return VM.ui.statRow([
+    {label: "Sweeps N", value: gibbsView.n.toLocaleString()},
+    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(gibbsView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(gibbsView.ys).toFixed(1)},
+    {label: "Sample correlation", value: corrText, title: `Target correlation ρ = ${gibbsRho}`},
+    {label: "Mean (target 0, 0)", value: `${gibbsView.mx.toFixed(2)}, ${gibbsView.my.toFixed(2)}`}
+  ])
+}
+```
+
+```{ojs}
+//| output: false
+gibbsPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+gibbsShow = new Set(gibbsTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const n = gibbsView.n
+  const rho = gibbsRho
+  const c = gibbsChain
+
+  // Contours of the target at Mahalanobis radius 1, 2, 3: the image of a
+  // circle of that radius under the Cholesky factor of [[1, rho], [rho, 1]].
+  const contourX = [], contourY = []
+  const s = Math.sqrt(1 - rho * rho)
+  for (const r of [1, 2, 3]) {
+    for (let k = 0; k <= 160; k++) {
+      const a = 2 * Math.PI * k / 160
+      contourX.push(r * Math.cos(a))
+      contourY.push(r * (rho * Math.cos(a) + s * Math.sin(a)))
+    }
+    contourX.push(null)
+    contourY.push(null)
+  }
+
+  // start -> half step -> end of each sweep, for sweeps 1..n.
+  const pathX = [c.x[0]], pathY = [c.y[0]]
+  for (let t = 1; t <= n; t++) {
+    pathX.push(c.halfX[t], c.x[t])
+    pathY.push(c.halfY[t], c.y[t])
+  }
+
+  const data = []
+  if (gibbsShow.has("Target contours")) {
+    data.push({x: contourX, y: contourY, type: "scatter", mode: "lines", name: "Target contours", showlegend: false,
+      line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"})
+  }
+  if (gibbsShow.has("Staircase path")) {
+    data.push({x: pathX, y: pathY, type: "scatter", mode: "lines", name: "Staircase path", showlegend: false,
+      line: {color: VM.plotting.alpha("warn", 0.8), width: 1.5}, hoverinfo: "skip"})
+  }
+  if (gibbsShow.has("Samples")) {
+    data.push({x: gibbsView.xs, y: gibbsView.ys, type: "scattergl", mode: "markers", name: "Samples", showlegend: false,
+      marker: {color: chartColors.fn, size: 5},
+      hovertemplate: "(%{x:.3f}, %{y:.3f})<extra></extra>"})
+  }
+  if (gibbsShow.has("Current state")) {
+    data.push({x: [c.x[n]], y: [c.y[n]], type: "scatter", mode: "markers", name: "Current state", showlegend: false,
+      marker: {color: chartColors.alt, size: 11, line: {color: chartColors.halo, width: 1.5}},
+      hovertemplate: `(X<sub>${n}</sub>, Y<sub>${n}</sub>) = (%{x:.3f}, %{y:.3f})<extra></extra>`})
+  }
+
+  return gibbsPlot(data, {
+    xaxis: {range: [-4, 4], title: "x", constrain: "domain"},
+    yaxis: {range: [-4, 4], title: "y", scaleanchor: "x", constrain: "domain"},
+    hovermode: "closest",
+    uirevision: "static",
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof gibbsTraces = {
+  const items = []
+  for (const label of gibbsTraceOptions) items.push({label, color: gibbsTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: gibbsTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls ojs-grid">
+
+```{ojs}
+viewof gibbsRho = {
+  const initial = Math.min(0.99, Math.max(-0.99, VM.ui.urlParam("gibbs_rho", gibbsDefaults.rho)))
+  const slider = Inputs.range([-0.99, 0.99], {step: 0.01, value: initial, label: "Correlation ρ"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+```{ojs}
+viewof gibbsN = {
+  const initial = Math.min(gibbsMaxN, Math.max(1, Math.round(VM.ui.urlParam("gibbs_n", gibbsDefaults.n))))
+  const slider = Inputs.range([1, gibbsMaxN], {step: 1, value: initial, label: "Sweeps N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+gibbsUrlSync = VM.ui.syncUrlParams({
+  gibbs_seed: [gibbsSeed, gibbsDefaults.seed],
+  gibbs_rho: [gibbsRho, gibbsDefaults.rho],
+  gibbs_n: [gibbsN, gibbsDefaults.n]
+})
+```
+
+:::: {.callout-note collapse="false" title="Diagnostics for the chain above"}
+
+Trace plots of the two coordinates and their autocorrelation functions. For $\rho$ near $\pm 1$ the traces wander slowly and the ACF decays like $\rho^{2k}$, so the effective sample size is a small fraction of the number of sweeps.
+
+```{ojs}
+//| output: false
+gibbsTracePlot = VM.plotting.persistentPlot({height: "320px"})
+gibbsAcfPlot = VM.plotting.persistentPlot({height: "320px"})
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+{
+  const steps = []
+  for (let t = 1; t <= gibbsView.n; t++) steps.push(t)
+  return gibbsTracePlot([
+    {x: steps, y: gibbsView.xs, type: "scatter", mode: "lines", name: "x", line: {color: chartColors.accent2, width: 1.5}},
+    {x: steps, y: gibbsView.ys, type: "scatter", mode: "lines", name: "y", line: {color: chartColors.accent3, width: 1.5}}
+  ], {
+    title: {text: "Trace plots", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "sweep"},
+    yaxis: {title: "value", range: [-4, 4]},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+```{ojs}
+{
+  const maxLag = Math.min(40, gibbsView.n - 1)
+  const acfX = VM.mcmc.autocorrelation(gibbsView.xs, maxLag)
+  const acfY = VM.mcmc.autocorrelation(gibbsView.ys, maxLag)
+  const lags = []
+  const theory = []
+  for (let k = 0; k < acfX.length; k++) {
+    lags.push(k)
+    theory.push(Math.pow(gibbsRho * gibbsRho, k))
+  }
+  return gibbsAcfPlot([
+    {x: lags, y: acfX, type: "scatter", mode: "lines+markers", name: "x", line: {color: chartColors.accent2, width: 2}, marker: {size: 4}},
+    {x: lags, y: acfY, type: "scatter", mode: "lines+markers", name: "y", line: {color: chartColors.accent3, width: 2}, marker: {size: 4}},
+    {x: lags, y: theory, type: "scatter", mode: "lines", name: "ρ²ᵏ", line: {color: chartColors.ink, width: 1, dash: "dash"}}
+  ], {
+    title: {text: "Autocorrelation", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "lag", range: [0, 40]},
+    yaxis: {title: "ACF", range: [-0.3, 1.05]},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+:::
+
+::::
+
 ## Markov Chain {#sec-gibbs-markov-chain}
 
 The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables $\Omega = \Omega_X \times \Omega_Y$. In the above examples, the state space is $[0, D_1] \times [0, D_2]$ for the exponential distribution and $\mathbb{R}^2$ for the bivariate normal distribution.

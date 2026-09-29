@@ -1,13 +1,45 @@
 ---
 title: "Interactive Apps"
 subtitle: "Explore Monte Carlo methods through interactive visualizations"
-# Once the first app exists, turn this page into a gallery:
-# listing:
-#   contents: ["*.qmd", "!index.qmd"]
-#   type: grid
-#   fields: [image, title, description]
+# Each app lives in the chapter that explains it, wrapped in
+# <div class="vm-app" id="...">; the chapter URL with ?embed=<id> shows that
+# app alone (mathviz embed mode). The cards below link to those views, so
+# there is one copy of every app. Add a card here when a chapter gains an app
+# (inline listing items take `path:`, and it must be the .html URL: Quarto
+# drops a .qmd path that carries a query string).
+listing:
+  type: grid
+  grid-columns: 3
+  image-height: 220px
+  sort: false
+  fields: [image, title, description]
+  contents:
+    - title: "Estimating π"
+      description: "Scatter points in a square and count how many land inside the circle."
+      path: ../chapters/estimation/estimating_pi.html?embed=pi-app
+      image: images/estimating-pi.svg
+    - title: "Buffon's Needle"
+      description: "Drop needles on a ruled floor; the fraction that cross a line estimates π."
+      path: ../chapters/estimation/estimating_pi.html?embed=buffon-app
+      image: images/buffons-needle.svg
+    - title: "Random Walk in a Region"
+      description: "Sample uniformly from a non-convex region with random-walk Metropolis, and tune the step size."
+      path: ../chapters/sampling/mh.html?embed=rw-metropolis-app
+      image: images/metropolis-random-walk.svg
+    - title: "Metropolis–Hastings"
+      description: "A Metropolis chain for the standard normal: trace, rejected proposals and histogram."
+      path: ../chapters/sampling/mh.html?embed=metropolis-app
+      image: images/metropolis-hastings.svg
+    - title: "Gibbs Sampling"
+      description: "Gibbs sampling a bivariate normal: watch correlation slow the staircase down."
+      path: ../chapters/sampling/gibbs_2d.html?embed=gibbs-app
+      image: images/gibbs-sampling.svg
+    - title: "Random Walks on Graphs"
+      description: "Watch a distribution spread over a graph and compare mixing times, bottlenecks and spectral gaps."
+      path: ../appendices/markov_chains.html?embed=graph-walk-app
+      image: images/random-walks-on-graphs.svg
 page-layout: full
 toc: false
 ---
 
-The apps are being rebuilt with [mathviz](https://apurvanakade.github.io/mathviz/). Check back soon.
+Each app opens on its own. You'll find every one of them, with the explanation around it, in the chapter it belongs to -- and the **Share** button on any app gives a link or an `<iframe>` snippet for embedding it elsewhere.

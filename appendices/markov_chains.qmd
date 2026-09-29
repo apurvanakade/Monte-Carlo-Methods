@@ -327,6 +327,388 @@ One can show that 0 is an eigenvalue of $\mathcal{L}$ and all eigenvalues are no
 Spectral graph theory, in particular Cheeger inequalities, prove that there is an inverse relationship between the spectral gap of the graph and the mixing time of the random walk on the graph. The smaller the spectral gap, the larger the mixing time. You'll explore this connection in the homework.
 :::
 
+The app below computes $\pi_t = \pi_0 P^t$ exactly, starting from all the mass on one vertex, and colors each vertex by $\pi_t(i)$. On the right is $\| \pi_t - \Pi \|_{\text{TV}}$ with the $\tfrac{1}{4}$ threshold. Compare the complete graph, which mixes almost immediately, with the barbell and the chains of cliques, whose single-edge bottlenecks make the spectral gap tiny and the mixing time long. The app runs the *lazy* walk by default, which stays put with probability $\tfrac{1}{2}$ at each step and otherwise moves like the simple walk. Uncheck it to see why: the path, the tree, the grid and the star are bipartite, so the simple walk is periodic and never mixes. Laziness fixes that at the cost of moving half as often.
+
+```{ojs}
+//| output: false
+// VM is the mathviz library (loaded on every page by the mathviz extension,
+// plus this site's additions from _mathviz/ via mathviz-local). This page
+// uses VM.discreteMath.randomWalkMatrix, VM.discreteMath.springLayout,
+// VM.mcmc.evolveDistribution, VM.mcmc.totalVariation,
+// VM.numerical.symmetricEigenvalues, VM.plotting.persistentPlot,
+// VM.ui.statRow, VM.ui.urlParam and VM.ui.syncUrlParams.
+VM = window.VM
+
+// vmTheme re-runs every cell that bakes a palette color into a trace when
+// the reader toggles dark mode; chartColors is that palette.
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+```
+
+```{ojs}
+//| output: false
+// Long enough for every lazy walk here to mix (TV <= 1/4) except the
+// 31-vertex path's, which takes up to 342 steps and shows "> 200".
+walkMaxTime = 200
+walkThreshold = 0.25
+walkDefaults = ({graph: "Barbell (bottleneck)", lazy: true, start: 0, t: 0})
+
+// The graphs, as {nodeCount, edges}. Built by hand rather than with a
+// graph library: each is a few lines of edges.
+walkGraphs = {
+  const complete = (offset, size, edges) => {
+    for (let i = 0; i < size; i++) {
+      for (let j = i + 1; j < size; j++) edges.push([offset + i, offset + j])
+    }
+  }
+  const path = (nodeCount) => {
+    const edges = []
+    for (let i = 0; i + 1 < nodeCount; i++) edges.push([i, i + 1])
+    return {nodeCount, edges}
+  }
+  const cycle = (nodeCount) => {
+    const g = path(nodeCount)
+    g.edges.push([nodeCount - 1, 0])
+    return g
+  }
+  const completeGraph = (nodeCount) => {
+    const edges = []
+    complete(0, nodeCount, edges)
+    return {nodeCount, edges}
+  }
+  const star = (leaves) => {
+    const edges = []
+    for (let i = 1; i <= leaves; i++) edges.push([0, i])
+    return {nodeCount: leaves + 1, edges}
+  }
+  const grid = (rows, cols) => {
+    const edges = []
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c
+        if (c + 1 < cols) edges.push([i, i + 1])
+        if (r + 1 < rows) edges.push([i, i + cols])
+      }
+    }
+    return {nodeCount: rows * cols, edges}
+  }
+  const binaryTree = (depth) => {
+    const nodeCount = Math.pow(2, depth + 1) - 1
+    const edges = []
+    for (let i = 1; i < nodeCount; i++) edges.push([Math.floor((i - 1) / 2), i])
+    return {nodeCount, edges}
+  }
+  // Two K_m joined through one middle vertex: m, m + 1, ..., 2m.
+  const barbell = (m) => {
+    const edges = []
+    complete(0, m, edges)
+    complete(m + 1, m, edges)
+    edges.push([m - 1, m], [m, m + 1])
+    return {nodeCount: 2 * m + 1, edges}
+  }
+  // K_m with a path of `tail` vertices hanging off it.
+  const lollipop = (m, tail) => {
+    const edges = []
+    complete(0, m, edges)
+    for (let i = m - 1; i < m + tail - 1; i++) edges.push([i, i + 1])
+    return {nodeCount: m + tail, edges}
+  }
+  // `count` copies of K_size, consecutive ones joined by a single edge
+  // (and the last to the first when cyclic).
+  const cliqueChain = (count, size, cyclic) => {
+    const edges = []
+    for (let k = 0; k < count; k++) complete(k * size, size, edges)
+    for (let k = 0; k + 1 < count; k++) edges.push([(k + 1) * size - 1, (k + 1) * size])
+    if (cyclic) edges.push([count * size - 1, 0])
+    return {nodeCount: count * size, edges}
+  }
+
+  return new Map([
+    ["Barbell (bottleneck)", barbell(8)],
+    ["Complete graph (n = 15)", completeGraph(15)],
+    ["Cycle (n = 21)", cycle(21)],
+    ["Lollipop", lollipop(8, 8)],
+    ["3 cliques (2 bottlenecks)", cliqueChain(3, 9, false)],
+    ["3 cliques (3 bottlenecks, cyclic)", cliqueChain(3, 9, true)],
+    ["4 cliques (3 bottlenecks)", cliqueChain(4, 9, false)],
+    ["Path (n = 31)", path(31)],
+    ["Binary tree (depth 4)", binaryTree(4)],
+    ["Grid 5 × 5", grid(5, 5)],
+    ["Star (n = 15)", star(14)]
+  ])
+}
+
+// One color per feature, none shared: the vertex scale runs purple ->
+// amber, and no other trace uses either hue.
+walkTraceOptions = ["Edges", "Vertices", "Start vertex", "TV distance", "Mixing time"]
+walkTraceColors = new Map([
+  ["Edges", chartColors.muted],
+  ["Vertices", chartColors.accent2],
+  ["Start vertex", chartColors.ink],
+  ["TV distance", chartColors.fn],
+  ["Mixing time", chartColors.ok]
+])
+```
+
+<div class="vm-app" id="graph-walk-app">
+
+<div class="ojs-panel ojs-grid">
+
+```{ojs}
+viewof walkGraphName = {
+  const select = Inputs.select([...walkGraphs.keys()], {label: "Graph", value: VM.ui.urlParam("walk_graph", walkDefaults.graph)})
+  select.classList.add("ojs-fill")
+  return select
+}
+```
+
+```{ojs}
+// A choice, not a slider: the vertices are labels, and neighbouring
+// numbers aren't neighbouring vertices. The start vertex has a thick
+// dark ring in the picture. Rebuilt when the graph changes (its vertex count
+// does), keeping the URL's vertex when the new graph has it.
+viewof walkStart = {
+  // Read from walkGraphs, not walkGraph, so toggling the lazy walk
+  // doesn't rebuild this and lose the reader's choice.
+  const nodeCount = walkGraphs.get(walkGraphName).nodeCount
+  const vertices = []
+  for (let i = 0; i < nodeCount; i++) vertices.push(i)
+  const wanted = Math.round(VM.ui.urlParam("walk_start", walkDefaults.start))
+  let initial = 0
+  if (wanted >= 0 && wanted < nodeCount) initial = wanted
+  return Inputs.select(vertices, {label: "Start vertex", value: initial})
+}
+```
+
+```{ojs}
+viewof walkLazy = Inputs.toggle({label: "Lazy walk", value: VM.ui.urlParam("walk_lazy", walkDefaults.lazy)})
+```
+
+</div>
+
+```{ojs}
+//| output: false
+// Everything that depends on the graph alone: layout, transition matrix,
+// stationary distribution and spectrum. Rerun only when the graph or the
+// lazy toggle changes, not on every time step.
+walkGraph = {
+  const g = walkGraphs.get(walkGraphName)
+  const {P, degrees, stationary} = VM.discreteMath.randomWalkMatrix(g.nodeCount, g.edges, {lazy: walkLazy})
+  const positions = VM.discreteMath.springLayout(g.nodeCount, g.edges, {seed: 42, iterations: 400})
+
+  // P = D^-1 A is not symmetric, but D^(1/2) P D^(-1/2) is, and has the
+  // same eigenvalues -- which is what lets a symmetric solver find them.
+  const S = []
+  for (let i = 0; i < g.nodeCount; i++) {
+    const row = []
+    for (let j = 0; j < g.nodeCount; j++) row.push(Math.sqrt(degrees[i] / degrees[j]) * P[i][j])
+    S.push(row)
+  }
+  const eigenvalues = VM.numerical.symmetricEigenvalues(S)
+  return {...g, P, stationary, positions, eigenvalues}
+}
+```
+
+```{ojs}
+//| output: false
+// pi_t for t = 0..walkMaxTime from the chosen start, with its distance to
+// stationarity at every step.
+walkRun = {
+  const p0 = new Array(walkGraph.nodeCount).fill(0)
+  p0[walkStart] = 1
+  const distributions = VM.mcmc.evolveDistribution(walkGraph.P, p0, walkMaxTime)
+  const tv = []
+  for (const p of distributions) tv.push(VM.mcmc.totalVariation(p, walkGraph.stationary))
+  // First time the distance drops to the threshold and stays there.
+  let mixingTime = null
+  for (let t = walkMaxTime; t >= 0; t--) {
+    if (tv[t] > walkThreshold) break
+    mixingTime = t
+  }
+  return {distributions, tv, mixingTime}
+}
+```
+
+```{ojs}
+{
+  const ev = walkGraph.eigenvalues
+  let mixingText = `> ${walkMaxTime}`
+  if (walkRun.mixingTime !== null) mixingText = String(walkRun.mixingTime)
+  return VM.ui.statRow([
+    {label: "Vertices", value: walkGraph.nodeCount},
+    {label: `TV at t = ${walkT}`, value: walkRun.tv[walkT].toFixed(4)},
+    {label: "Mixing time", value: mixingText, title: "First step after which the TV distance stays ≤ ¼, from this start vertex"},
+    {label: "Spectral gap 1 − λ₂", value: (1 - ev[1]).toFixed(4), title: "λ₂: second-largest eigenvalue of P"},
+    {label: "Smallest eigenvalue", value: ev[ev.length - 1].toFixed(4), title: "−1 exactly when the walk is periodic (bipartite graph, not lazy)"}
+  ])
+}
+```
+
+```{ojs}
+//| output: false
+walkPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+walkShow = new Set(walkTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const pos = walkGraph.positions
+  const probs = walkRun.distributions[walkT]
+  let maxStationary = 0
+  for (const p of walkGraph.stationary) maxStationary = Math.max(maxStationary, p)
+  // A fixed color scale per graph: saturates at 3x the largest stationary
+  // mass, so a start vertex glows early on and the colors settle to a
+  // steady pattern -- proportional to degree -- as the walk mixes.
+  const cmax = Math.min(1, 3 * maxStationary)
+
+  const edgeX = [], edgeY = []
+  for (const [u, v] of walkGraph.edges) {
+    edgeX.push(pos[u][0], pos[v][0], null)
+    edgeY.push(pos[u][1], pos[v][1], null)
+  }
+  const nodeX = [], nodeY = [], labels = [], lineColors = [], lineWidths = []
+  for (let i = 0; i < walkGraph.nodeCount; i++) {
+    nodeX.push(pos[i][0])
+    nodeY.push(pos[i][1])
+    labels.push(String(i))
+    // A thick dark ring marks the start; every other vertex gets a thin
+    // light one, so the ring stands out at any fill color on the scale.
+    if (i === walkStart && walkShow.has("Start vertex")) {
+      lineColors.push(chartColors.ink)
+      lineWidths.push(4)
+    } else {
+      lineColors.push(chartColors.halo)
+      lineWidths.push(1)
+    }
+  }
+  const steps = []
+  for (let t = 0; t <= walkMaxTime; t++) steps.push(t)
+
+  const data = []
+  if (walkShow.has("Edges")) {
+    data.push({x: edgeX, y: edgeY, type: "scatter", mode: "lines", name: "Edges", showlegend: false,
+      line: {color: VM.plotting.alpha("muted", 0.7), width: 1.2}, hoverinfo: "skip"})
+  }
+  if (walkShow.has("Vertices")) {
+    data.push({x: nodeX, y: nodeY, type: "scatter", mode: "markers", name: "Vertices", showlegend: false,
+      text: labels, customdata: probs,
+      marker: {
+        size: walkGraph.nodeCount <= 20 ? 20 : 14,
+        color: probs, cmin: 0, cmax,
+        // Two opposite hues, purple (no mass) to amber (the most), rather
+        // than white to blue, whose pale end was hard to tell apart.
+        colorscale: [[0, chartColors.accent2], [1, chartColors.warn]],
+        line: {color: lineColors, width: lineWidths},
+        colorbar: {title: {text: "π<sub>t</sub>(i)", side: "top"}, orientation: "h", x: 0.25, xanchor: "center", y: -0.02, yanchor: "top", len: 0.4, thickness: 10, outlinewidth: 0}
+      },
+      hovertemplate: "vertex %{text}<br>π<sub>t</sub> = %{customdata:.4f}<extra></extra>"})
+  }
+  if (walkShow.has("TV distance")) {
+    data.push({x: steps, y: walkRun.tv, type: "scatter", mode: "lines", name: "TV distance", showlegend: false,
+      xaxis: "x2", yaxis: "y2", line: {color: chartColors.fn, width: 2},
+      hovertemplate: "t = %{x}<br>TV = %{y:.4f}<extra></extra>"})
+    data.push({x: [walkT], y: [walkRun.tv[walkT]], type: "scatter", mode: "markers", name: "now", showlegend: false,
+      xaxis: "x2", yaxis: "y2", marker: {color: chartColors.fn, size: 11, line: {color: chartColors.halo, width: 2}}, hoverinfo: "skip"})
+  }
+  data.push({x: [0, walkMaxTime], y: [walkThreshold, walkThreshold], type: "scatter", mode: "lines", name: "threshold ¼", showlegend: false,
+    xaxis: "x2", yaxis: "y2", line: {color: chartColors.muted, width: 1.5, dash: "dash"}, hoverinfo: "skip"})
+  if (walkShow.has("Mixing time") && walkRun.mixingTime !== null) {
+    data.push({x: [walkRun.mixingTime, walkRun.mixingTime], y: [0, 1], type: "scatter", mode: "lines", name: "Mixing time", showlegend: false,
+      xaxis: "x2", yaxis: "y2", line: {color: chartColors.ok, width: 1.5, dash: "dot"},
+      hovertemplate: `mixing time ${walkRun.mixingTime}<extra></extra>`})
+  }
+
+  // The TV panel's axes copy mathviz's axis chrome (it themes only the
+  // first x/y pair); this cell re-runs on a theme toggle through chartColors.
+  const themed = VM.plotting.layout()
+  return walkPlot(data, {
+    xaxis: {domain: [0, 0.5], range: [-1.15, 1.15], visible: false},
+    yaxis: {domain: [0, 1], range: [-1.15, 1.15], visible: false, scaleanchor: "x"},
+    xaxis2: {...themed.xaxis, domain: [0.62, 1], range: [0, walkMaxTime], title: {...themed.xaxis.title, text: "step t"}, anchor: "y2"},
+    yaxis2: {...themed.yaxis, domain: [0.1, 0.9], range: [0, 1.02], title: {...themed.yaxis.title, text: "‖π<sub>t</sub> − Π‖<sub>TV</sub>"}, anchor: "x2"},
+    hovermode: "closest",
+    uirevision: walkGraphName,
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof walkTraces = {
+  const items = []
+  for (const label of walkTraceOptions) items.push({label, color: walkTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: walkTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls">
+
+```{ojs}
+viewof walkT = {
+  const initial = Math.min(walkMaxTime, Math.max(0, Math.round(VM.ui.urlParam("walk_t", walkDefaults.t))))
+  const slider = Inputs.range([0, walkMaxTime], {step: 1, value: initial, label: "Step t"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+walkUrlSync = VM.ui.syncUrlParams({
+  walk_graph: [walkGraphName, walkDefaults.graph],
+  walk_lazy: [walkLazy ? 1 : 0, walkDefaults.lazy ? 1 : 0],
+  walk_start: [walkStart, walkDefaults.start],
+  walk_t: [walkT, walkDefaults.t]
+})
+```
+
+:::: {.callout-note collapse="true" title="Spectrum of the walk"}
+
+The eigenvalues of $P$ for the graph above, largest first. $\lambda_1 = 1$ always; the gap between it and $\lambda_2$ controls how fast the walk mixes, and an eigenvalue at $-1$ means the walk is periodic.
+
+```{ojs}
+//| output: false
+walkSpectrumPlot = VM.plotting.persistentPlot({height: "300px"})
+```
+
+```{ojs}
+{
+  const ev = walkGraph.eigenvalues
+  const index = [], colors = []
+  for (let i = 0; i < ev.length; i++) {
+    index.push(i + 1)
+    if (i === 1) {
+      colors.push(chartColors.alt)
+    } else {
+      colors.push(chartColors.fn)
+    }
+  }
+  return walkSpectrumPlot([
+    {x: index, y: ev, type: "bar", name: "eigenvalue", marker: {color: colors},
+      hovertemplate: "λ<sub>%{x}</sub> = %{y:.4f}<extra></extra>"}
+  ], {
+    xaxis: {title: "index", dtick: 5},
+    yaxis: {title: "eigenvalue λ", range: [-1.05, 1.05]},
+    showlegend: false,
+    uirevision: walkGraphName
+  })
+}
+```
+
+::::
+
 ## Sampling from a Markov Chain
 
 The algorithm to generate sample paths of length $n$ of a Markov chain is simple. Suppose $P$ is the transition matrix of the Markov chain with mixing time $t$.

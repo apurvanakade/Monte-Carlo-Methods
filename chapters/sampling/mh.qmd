@@ -17,6 +17,23 @@ from shapely.geometry.polygon import Polygon
 np.random.seed(0)
 ```
 
+```{ojs}
+//| output: false
+// VM is the mathviz library (loaded on every page by the mathviz extension,
+// plus this site's additions from _mathviz/ via mathviz-local). This page
+// uses VM.mcmc.randomWalkMetropolis, VM.mcmc.autocorrelation,
+// VM.mcmc.effectiveSampleSize, VM.mcmc.runningMean,
+// VM.distributions.histogramBins, VM.distributions.normalPdf,
+// VM.sampling.seededRandom, VM.plotting.persistentPlot, VM.ui.statRow,
+// VM.ui.urlParam and VM.ui.syncUrlParams.
+VM = window.VM
+
+// vmTheme re-runs every cell that bakes a palette color into a trace when
+// the reader toggles dark mode; chartColors is that palette.
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+```
+
 <!-- - random walks and uniform sampling
 - general algorithm
 - proof of detailed balance equations?
@@ -177,6 +194,338 @@ plt.tight_layout()
 plt.show()
 ```
 
+Try it yourself below. Pick a region and a proposal, then try a few step sizes: small steps are almost always accepted but crawl, large steps explore quickly but are mostly rejected (the red crosses). The shaded patch around the current point is the proposal -- a disc of radius $\sigma$ for the Gaussian, the square $[-\sigma, \sigma]^2$ around the point for the uniform.
+
+```{ojs}
+//| output: false
+rwMaxN = 5000
+rwDefaults = ({seed: 1, n: 300, sigma: 0.2, region: "L-shape", proposal: "Gaussian"})
+
+// Each region: membership test, outline (null-separated polyline), a
+// starting point inside it, fixed axis ranges, and the uniform
+// distribution's mean -- the value the running averages below converge to.
+rwRegions = {
+  const circle = (cx, cy, r) => {
+    const xs = [], ys = []
+    for (let k = 0; k <= 120; k++) {
+      xs.push(cx + r * Math.cos(2 * Math.PI * k / 120))
+      ys.push(cy + r * Math.sin(2 * Math.PI * k / 120))
+    }
+    return {xs, ys}
+  }
+  const left = circle(-1, 0, 1)
+  const right = circle(1, 0, 1)
+  return new Map([
+    ["L-shape", {
+      inside: (x, y) => (x >= 0 && x <= 1 && y >= 0 && y <= 0.1) || (x >= 0 && x <= 0.1 && y >= 0 && y <= 1),
+      outlineX: [0, 1, 1, 0.1, 0.1, 0, 0],
+      outlineY: [0, 0, 0.1, 0.1, 1, 1, 0],
+      start: [0.05, 0.05],
+      // Extra room on the left: the legend floats over the chart's top-left
+      // corner, which is where the L's vertical arm would otherwise be.
+      xRange: [-0.6, 1.1],
+      yRange: [-0.1, 1.1],
+      // Area 0.19: the two arms' means weighted by area.
+      mean: [(0.1 * 0.5 + 0.09 * 0.05) / 0.19, (0.1 * 0.5 + 0.09 * 0.05) / 0.19]
+    }],
+    ["Two discs", {
+      inside: (x, y) => (x + 1) * (x + 1) + y * y <= 1 || (x - 1) * (x - 1) + y * y <= 1,
+      outlineX: [...left.xs, null, ...right.xs],
+      outlineY: [...left.ys, null, ...right.ys],
+      start: [-1, 0],
+      xRange: [-2.2, 2.2],
+      yRange: [-1.3, 1.3],
+      mean: [0, 0]
+    }]
+  ])
+}
+
+rwTraceOptions = ["Region", "Path", "Samples", "Rejected proposals", "Proposal", "Current point"]
+rwTraceColors = new Map([
+  ["Region", chartColors.ink],
+  ["Path", chartColors.muted],
+  ["Samples", chartColors.fn],
+  ["Rejected proposals", chartColors.alt],
+  ["Proposal", chartColors.warn],
+  ["Current point", chartColors.ok]
+])
+```
+
+<div class="vm-app" id="rw-metropolis-app">
+
+<div class="ojs-panel ojs-grid">
+
+```{ojs}
+viewof rwRegionName = Inputs.select([...rwRegions.keys()], {label: "Region Ω", value: VM.ui.urlParam("rw_region", rwDefaults.region)})
+```
+
+```{ojs}
+viewof rwProposal = Inputs.select(["Gaussian", "Uniform square"], {label: "Proposal", value: VM.ui.urlParam("rw_proposal", rwDefaults.proposal)})
+```
+
+```{ojs}
+// A typed value rather than a slider: the step size is a setting to
+// compare a few chosen values of (the chapter's 1, 0.5, 0.2, 0.01), not
+// something to scrub through.
+viewof rwSigmaInput = Inputs.text({label: "Step size σ", value: String(VM.ui.urlParam("rw_sigma", rwDefaults.sigma)), placeholder: "Example: 0.2, 1, 0.01"})
+```
+
+```{ojs}
+viewof rwRedraw = {
+  const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-auto")
+  return button
+}
+```
+
+</div>
+
+```{ojs}
+//| output: false
+// rwSigma parses the step-size field; anything unusable (empty, zero,
+// negative, mid-typing) falls back to the default.
+rwSigma = {
+  const parsed = VM.expressions.makeNumber(window.math, rwSigmaInput)
+  if (parsed === null || !Number.isFinite(parsed) || parsed <= 0) return rwDefaults.sigma
+  return Math.min(5, parsed)
+}
+```
+
+```{ojs}
+//| output: false
+rwSeed = {
+  if (rwRedraw === 0) return VM.ui.urlParam("rw_seed", rwDefaults.seed)
+  return Math.floor(Math.random() * 1e9)
+}
+```
+
+```{ojs}
+//| output: false
+rwRegion = rwRegions.get(rwRegionName)
+```
+
+```{ojs}
+//| output: false
+// rwChain: rwMaxN steps of the random walk, rerun whenever the region,
+// proposal, step size or seed changes. The same seed gives the same
+// underlying random numbers, so changing the step size shows the "same"
+// walk taking bigger or smaller steps. The N slider only picks how much of
+// it to show.
+rwChain = VM.mcmc.randomWalkMetropolis({
+  logDensity: p => (rwRegion.inside(p[0], p[1]) ? 0 : -Infinity),
+  start: rwRegion.start,
+  n: rwMaxN,
+  scale: rwSigma,
+  proposal: rwProposal === "Gaussian" ? "gaussian" : "uniform",
+  rng: VM.sampling.seededRandom(rwSeed)
+})
+```
+
+```{ojs}
+//| output: false
+rwView = {
+  const n = rwN
+  const xs = [], ys = []
+  let acceptedSteps = 0
+  for (let t = 0; t < n; t++) {
+    xs.push(rwChain.samples[t][0])
+    ys.push(rwChain.samples[t][1])
+    if (t > 0 && rwChain.accepted[t]) acceptedSteps++
+  }
+  return {n, xs, ys, acceptedSteps}
+}
+```
+
+```{ojs}
+{
+  const steps = rwView.n - 1
+  let rate = 0
+  if (steps > 0) rate = rwView.acceptedSteps / steps
+  return VM.ui.statRow([
+    {label: "Samples N", value: rwView.n.toLocaleString()},
+    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${rwView.acceptedSteps} of ${steps} proposals accepted`},
+    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(rwView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(rwView.ys).toFixed(1)}
+  ])
+}
+```
+
+```{ojs}
+//| output: false
+rwPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+rwShow = new Set(rwTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const n = rwView.n
+  const current = rwChain.samples[n - 1]
+  const rejectedX = [], rejectedY = []
+  for (let t = 1; t < n; t++) {
+    if (!rwChain.accepted[t]) {
+      rejectedX.push(rwChain.proposals[t][0])
+      rejectedY.push(rwChain.proposals[t][1])
+    }
+  }
+
+  // The proposal around the current point: a 1-sigma disc for the
+  // Gaussian, the whole support square for the uniform.
+  const patchX = [], patchY = []
+  if (rwProposal === "Gaussian") {
+    for (let k = 0; k <= 80; k++) {
+      patchX.push(current[0] + rwSigma * Math.cos(2 * Math.PI * k / 80))
+      patchY.push(current[1] + rwSigma * Math.sin(2 * Math.PI * k / 80))
+    }
+  } else {
+    const s = rwSigma
+    patchX.push(current[0] - s, current[0] + s, current[0] + s, current[0] - s, current[0] - s)
+    patchY.push(current[1] - s, current[1] - s, current[1] + s, current[1] + s, current[1] - s)
+  }
+
+  const data = []
+  if (rwShow.has("Proposal")) {
+    data.push({x: patchX, y: patchY, type: "scatter", mode: "lines", fill: "toself", name: "Proposal", showlegend: false,
+      fillcolor: VM.plotting.alpha("warn", 0.2), line: {color: chartColors.warn, width: 1.5}, hoverinfo: "skip"})
+  }
+  if (rwShow.has("Region")) {
+    data.push({x: rwRegion.outlineX, y: rwRegion.outlineY, type: "scatter", mode: "lines", name: "Region", showlegend: false,
+      line: {color: chartColors.ink, width: 2}, hoverinfo: "skip"})
+  }
+  // WebGL for the traces that grow to thousands of points as N plays.
+  if (rwShow.has("Path")) {
+    data.push({x: rwView.xs, y: rwView.ys, type: "scattergl", mode: "lines", name: "Path", showlegend: false,
+      line: {color: VM.plotting.alpha("muted", 0.6), width: 1}, hoverinfo: "skip"})
+  }
+  if (rwShow.has("Samples")) {
+    data.push({x: rwView.xs, y: rwView.ys, type: "scattergl", mode: "markers", name: "Samples", showlegend: false,
+      marker: {color: chartColors.fn, size: 4}, hoverinfo: "skip"})
+  }
+  if (rwShow.has("Rejected proposals")) {
+    data.push({x: rejectedX, y: rejectedY, type: "scattergl", mode: "markers", name: "Rejected proposals", showlegend: false,
+      marker: {color: chartColors.alt, size: 6, symbol: "x-thin", line: {color: chartColors.alt, width: 1.5}}, hoverinfo: "skip"})
+  }
+  if (rwShow.has("Current point")) {
+    data.push({x: [current[0]], y: [current[1]], type: "scatter", mode: "markers", name: "Current point", showlegend: false,
+      marker: {color: chartColors.ok, size: 11, line: {color: chartColors.halo, width: 1.5}},
+      hovertemplate: "Current point<br>(%{x:.3f}, %{y:.3f})<extra></extra>"})
+  }
+
+  return rwPlot(data, {
+    xaxis: {range: rwRegion.xRange, zeroline: false, title: "x", constrain: "domain"},
+    yaxis: {range: rwRegion.yRange, zeroline: false, title: "y", scaleanchor: "x", constrain: "domain"},
+    hovermode: "closest",
+    // Keyed on the region, so switching regions resets the view to the new
+    // region's ranges while zoom survives every other change.
+    uirevision: rwRegionName,
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof rwTraces = {
+  const items = []
+  for (const label of rwTraceOptions) items.push({label, color: rwTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: rwTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls">
+
+```{ojs}
+viewof rwN = {
+  const initial = Math.min(rwMaxN, Math.max(10, Math.round(VM.ui.urlParam("rw_n", rwDefaults.n))))
+  const slider = Inputs.range([10, rwMaxN], {step: 10, value: initial, label: "Samples N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+rwUrlSync = VM.ui.syncUrlParams({
+  rw_region: [rwRegionName, rwDefaults.region],
+  rw_proposal: [rwProposal, rwDefaults.proposal],
+  rw_seed: [rwSeed, rwDefaults.seed],
+  rw_sigma: [rwSigmaInput, String(rwDefaults.sigma)],
+  rw_n: [rwN, rwDefaults.n]
+})
+```
+
+:::: {.callout-note collapse="false" title="Diagnostics for the chain above"}
+
+The running averages of $x$ and $y$ should settle on the region's mean (dashed); the autocorrelation function shows how many steps the chain needs to forget where it was. A slowly decaying ACF means a small effective sample size.
+
+```{ojs}
+//| output: false
+rwRunningPlot = VM.plotting.persistentPlot({height: "320px"})
+rwAcfPlot = VM.plotting.persistentPlot({height: "320px"})
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+{
+  const steps = []
+  for (let t = 1; t <= rwView.n; t++) steps.push(t)
+  const meanX = VM.mcmc.runningMean(rwView.xs)
+  const meanY = VM.mcmc.runningMean(rwView.ys)
+  const ends = [1, rwView.n]
+  return rwRunningPlot([
+    {x: steps, y: meanX, type: "scatter", mode: "lines", name: "x", line: {color: chartColors.accent2, width: 2}},
+    {x: steps, y: meanY, type: "scatter", mode: "lines", name: "y", line: {color: chartColors.accent3, width: 2}},
+    {x: ends, y: [rwRegion.mean[0], rwRegion.mean[0]], type: "scatter", mode: "lines", name: "mean of x", line: {color: chartColors.accent2, width: 1, dash: "dash"}},
+    {x: ends, y: [rwRegion.mean[1], rwRegion.mean[1]], type: "scatter", mode: "lines", name: "mean of y", line: {color: chartColors.accent3, width: 1, dash: "dot"}}
+  ], {
+    title: {text: "Running averages", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "step"},
+    yaxis: {title: "average"},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+```{ojs}
+{
+  const maxLag = Math.min(100, rwView.n - 1)
+  const acfX = VM.mcmc.autocorrelation(rwView.xs, maxLag)
+  const acfY = VM.mcmc.autocorrelation(rwView.ys, maxLag)
+  const lags = []
+  for (let k = 0; k < acfX.length; k++) lags.push(k)
+  return rwAcfPlot([
+    {x: lags, y: acfX, type: "scatter", mode: "lines", name: "x", line: {color: chartColors.accent2, width: 2}},
+    {x: lags, y: acfY, type: "scatter", mode: "lines", name: "y", line: {color: chartColors.accent3, width: 2}}
+  ], {
+    title: {text: "Autocorrelation", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "lag", range: [0, 100]},
+    yaxis: {title: "ACF", range: [-0.3, 1.05]},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+:::
+
+::::
+
 ### Choosing the Proposal Distribution
 
 Notice that there is a tradeoff between the acceptance rate and the rate of convergence. In the above example, 
@@ -293,6 +642,284 @@ The Metropolis algorithm is a special case of the Metropolis--Hastings algorithm
            1. Set $x_{i+1} = x_i$.
 3. Return the sequence of points $x_0, x_1, \ldots, x_{N-1}$.
    
+
+::: {#exm-metropolis-normal}
+
+Take the standard normal target $p(x) \propto e^{-x^2/2}$ and the uniform proposal $y \sim \text{Uniform}(x_i - d, x_i + d)$, which is symmetric. A proposal toward the mode ($p(y) \ge p(x_i)$) is always accepted; one away from it is accepted with probability $p(y)/p(x_i) = e^{(x_i^2 - y^2)/2}$. Below, the left panel is the trace $x_0, x_1, \ldots$ with the rejected proposals marked, and the right panel the histogram of the samples against the target density.
+
+:::
+
+```{ojs}
+//| output: false
+mhDefaults = ({seed: 1, n: 100, d: 2, max: "500"})
+
+mhTraceOptions = ["Chain", "Rejected proposals", "Histogram", "Target N(0, 1)"]
+mhTraceColors = new Map([
+  ["Chain", chartColors.fn],
+  ["Rejected proposals", chartColors.alt],
+  ["Histogram", VM.plotting.alpha("accent3", 0.55)],
+  ["Target N(0, 1)", chartColors.ink]
+])
+
+// The y-axis (sample value) is fixed at +-4.5 for every chain, so neither
+// slider rescales it; the histogram shares it.
+mhYRange = [-4.5, 4.5]
+```
+
+<div class="vm-app" id="metropolis-app">
+
+<div class="ojs-panel ojs-grid">
+
+```{ojs}
+// Always-live, like the sliders: it sets the step slider's range and the
+// trace's x-axis, so a long run and a short one each fill the chart.
+viewof mhMaxInput = {
+  const input = Inputs.text({label: "Max N", value: String(VM.ui.urlParam("mh_max", mhDefaults.max)), placeholder: "Example: 500, 5000"})
+  return input
+}
+```
+
+```{ojs}
+viewof mhRedraw = {
+  const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-auto")
+  return button
+}
+```
+
+</div>
+
+```{ojs}
+//| output: false
+// mhMax parses the Max N field, falling back to 500 on anything unusable.
+mhMax = {
+  const parsed = VM.expressions.makeNumber(window.math, mhMaxInput)
+  if (parsed === null || !Number.isFinite(parsed)) return 500
+  return Math.min(20000, Math.max(20, Math.round(parsed)))
+}
+```
+
+```{ojs}
+//| output: false
+mhSeed = {
+  if (mhRedraw === 0) return VM.ui.urlParam("mh_seed", mhDefaults.seed)
+  return Math.floor(Math.random() * 1e9)
+}
+```
+
+```{ojs}
+//| output: false
+// mhChain: mhMax states of the chain from x0 = 0. The same seed reuses the
+// same random numbers, so dragging d shows the same chain with a wider or
+// narrower proposal.
+mhChain = {
+  const run = VM.mcmc.randomWalkMetropolis({
+    logDensity: p => -0.5 * p[0] * p[0],
+    start: [0],
+    n: mhMax,
+    scale: mhD,
+    proposal: "uniform",
+    rng: VM.sampling.seededRandom(mhSeed)
+  })
+  const samples = []
+  for (const s of run.samples) samples.push(s[0])
+  return {samples, proposals: run.proposals, accepted: run.accepted}
+}
+```
+
+```{ojs}
+//| output: false
+mhView = {
+  const n = Math.min(mhN, mhMax)
+  const samples = mhChain.samples.slice(0, n)
+  let acceptedSteps = 0
+  let sum = 0
+  for (let t = 0; t < n; t++) {
+    if (t > 0 && mhChain.accepted[t]) acceptedSteps++
+    sum += samples[t]
+  }
+  const mean = sum / n
+  let sumSq = 0
+  for (const x of samples) sumSq += (x - mean) * (x - mean)
+  return {n, samples, acceptedSteps, mean, sd: Math.sqrt(sumSq / n)}
+}
+```
+
+```{ojs}
+{
+  const steps = mhView.n - 1
+  let rate = 0
+  if (steps > 0) rate = mhView.acceptedSteps / steps
+  return VM.ui.statRow([
+    {label: "Samples N", value: mhView.n.toLocaleString()},
+    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${mhView.acceptedSteps} of ${steps} proposals accepted`},
+    {label: "ESS", value: VM.mcmc.effectiveSampleSize(mhView.samples).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "Mean (target 0)", value: mhView.mean.toFixed(3)},
+    {label: "SD (target 1)", value: mhView.sd.toFixed(3)}
+  ])
+}
+```
+
+```{ojs}
+//| output: false
+mhPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+mhShow = new Set(mhTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const n = mhView.n
+  const steps = [], rejectedT = [], rejectedY = []
+  for (let t = 0; t < n; t++) {
+    steps.push(t)
+    if (t > 0 && !mhChain.accepted[t]) {
+      rejectedT.push(t)
+      rejectedY.push(mhChain.proposals[t][0])
+    }
+  }
+
+  const bins = VM.distributions.histogramBins(mhView.samples, 36, {lo: mhYRange[0], hi: mhYRange[1]})
+  const binWidth = (mhYRange[1] - mhYRange[0]) / 36
+  const curve = VM.distributions.sampleCurve(y => VM.distributions.normalPdf(y, 0, 1), mhYRange[0], mhYRange[1], {n: 200})
+
+  const data = []
+  if (mhShow.has("Chain")) {
+    data.push({x: steps, y: mhView.samples, type: "scattergl", mode: "lines+markers", name: "Chain", showlegend: false,
+      line: {color: chartColors.fn, width: 1.5}, marker: {color: chartColors.fn, size: 4},
+      hovertemplate: "x<sub>%{x}</sub> = %{y:.3f}<extra></extra>"})
+  }
+  if (mhShow.has("Rejected proposals")) {
+    data.push({x: rejectedT, y: rejectedY, type: "scattergl", mode: "markers", name: "Rejected proposals", showlegend: false,
+      marker: {color: chartColors.alt, size: 7, symbol: "x-thin", line: {color: chartColors.alt, width: 1.5}},
+      hovertemplate: "rejected at step %{x}: y = %{y:.3f}<extra></extra>"})
+  }
+  if (mhShow.has("Histogram")) {
+    data.push({x: bins.densities, y: bins.centers, type: "bar", orientation: "h", width: binWidth * 0.95, name: "Histogram", showlegend: false,
+      xaxis: "x2", yaxis: "y", marker: {color: VM.plotting.alpha("accent3", 0.55)},
+      hovertemplate: "density %{x:.3f}<extra></extra>"})
+  }
+  if (mhShow.has("Target N(0, 1)")) {
+    data.push({x: curve.ys, y: curve.xs, type: "scatter", mode: "lines", name: "Target N(0, 1)", showlegend: false,
+      xaxis: "x2", yaxis: "y", line: {color: chartColors.ink, width: 2}, hoverinfo: "skip"})
+  }
+
+  // mathviz themes xaxis/yaxis; the histogram's own x-axis copies that
+  // chrome from VM.plotting.layout() (this cell re-runs on a theme toggle
+  // through chartColors, so the copy stays current).
+  const themedAxis = VM.plotting.layout().xaxis
+  return mhPlot(data, {
+    xaxis: {domain: [0, 0.74], range: [-0.02 * mhMax, mhMax * 1.02], title: "step t", zeroline: false},
+    xaxis2: {...themedAxis, domain: [0.78, 1], range: [0, 0.8], title: {...themedAxis.title, text: "density"}, anchor: "y"},
+    yaxis: {range: mhYRange, title: "x", zeroline: true},
+    bargap: 0,
+    hovermode: "closest",
+    uirevision: "static",
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof mhTraces = {
+  const items = []
+  for (const label of mhTraceOptions) items.push({label, color: mhTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: mhTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls ojs-grid">
+
+```{ojs}
+viewof mhD = {
+  const initial = Math.min(6, Math.max(0.1, VM.ui.urlParam("mh_d", mhDefaults.d)))
+  const slider = Inputs.range([0.1, 6], {step: 0.1, value: initial, label: "Proposal half-width d"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+```{ojs}
+viewof mhN = {
+  const initial = Math.min(mhMax, Math.max(10, Math.round(VM.ui.urlParam("mh_n", mhDefaults.n))))
+  const slider = Inputs.range([10, mhMax], {step: 1, value: initial, label: "Samples N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+mhUrlSync = VM.ui.syncUrlParams({
+  mh_seed: [mhSeed, mhDefaults.seed],
+  mh_d: [mhD, mhDefaults.d],
+  mh_n: [mhN, mhDefaults.n],
+  mh_max: [mhMaxInput, mhDefaults.max]
+})
+```
+
+:::: {.callout-note collapse="false" title="Diagnostics for the chain above"}
+
+A tiny $d$ gives an acceptance rate near 100% but a chain that barely moves: the ACF decays slowly and the effective sample size is a small fraction of $N$. A huge $d$ rejects almost everything, and the chain sits still for long stretches. The effective sample size is largest in between.
+
+```{ojs}
+//| output: false
+mhRunningPlot = VM.plotting.persistentPlot({height: "320px"})
+mhAcfPlot = VM.plotting.persistentPlot({height: "320px"})
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+{
+  const steps = []
+  for (let t = 0; t < mhView.n; t++) steps.push(t)
+  return mhRunningPlot([
+    {x: steps, y: VM.mcmc.runningMean(mhView.samples), type: "scatter", mode: "lines", name: "running mean", line: {color: chartColors.fn, width: 2}},
+    {x: [0, mhView.n - 1], y: [0, 0], type: "scatter", mode: "lines", name: "target mean", line: {color: chartColors.ink, width: 1, dash: "dash"}}
+  ], {
+    title: {text: "Running mean", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "step t"},
+    yaxis: {title: "mean of x₀, …, xₜ"},
+    showlegend: false,
+    uirevision: "static"
+  })
+}
+```
+
+```{ojs}
+{
+  const acf = VM.mcmc.autocorrelation(mhView.samples, Math.min(50, mhView.n - 1))
+  const lags = []
+  for (let k = 0; k < acf.length; k++) lags.push(k)
+  return mhAcfPlot([
+    {x: lags, y: acf, type: "bar", name: "ACF", marker: {color: chartColors.fn}}
+  ], {
+    title: {text: "Autocorrelation", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "lag", range: [-0.5, 50.5]},
+    yaxis: {title: "ACF", range: [-0.3, 1.05]},
+    showlegend: false,
+    uirevision: "static"
+  })
+}
+```
+
+:::
+
+::::
 
 ::: {#exm-Metropolis-to-random-walk}
 
