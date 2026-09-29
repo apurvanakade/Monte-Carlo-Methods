@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered by GitHub Actions and published to GitHub Pages from the `gh-pages` branch. Chapters are prose plus Observable JS (OJS) cells: every figure, and in a few chapters an interactive app, is drawn in the reader's browser. Nothing executes at render time, and there is no Python. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the pages call, including `VM.mcmc.*`, is in mathviz itself or, until a release carries it, in this site's `mathviz-local` overlay; see the mathviz section below for how this site gets it and how to contribute to it.
+Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered by GitHub Actions and published to GitHub Pages from the `gh-pages` branch. Chapters are prose plus Observable JS (OJS) cells: every figure, and in a few chapters an interactive app, is drawn in the reader's browser. Nothing executes at render time, and there is no Python. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the pages call, including `VM.mcmc.*`, is in mathviz itself; see the mathviz section below for how this site gets it and how to contribute to it.
 
 ## Commands
 
@@ -11,7 +11,7 @@ Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), r
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
 - `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). Only run it when asked.
 
-Nothing to install beyond Quarto (and Node, for the overlay's `cd _mathviz && node --test && node scripts/build.mjs`).
+Nothing to install beyond Quarto (and Node, if a local overlay is added: `cd _mathviz && node --test && node scripts/build.mjs`).
 
 ## Branches, PRs and releases
 
@@ -35,8 +35,7 @@ Same rules as VisualMathLab. `develop` is where work lands; `main` is a pointer 
 
 ```
 _quarto.yml      book config: chapter list, filters [mathviz], mathviz: options, theme
-_extensions/     apurvanakade/mathviz (installed, don't edit); mathviz-local (built from _mathviz/)
-_mathviz/        the mathviz-local overlay's source (see "Contributing to mathviz")
+_extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
 chapters/        lecture notes, one folder per part
 appendices/      probability and Markov-chain background
@@ -63,7 +62,7 @@ A utility used by exactly one app stays in that chapter's OJS cells. Beyond that
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. To try it here first, build mathviz and `quarto add ../mathviz --no-prompt` from this repo; restore the release with `make update-mathviz` before committing.
 - **This site needs it before a release carries it, or only this site ever will** → a local overlay. Copy it in from mathviz's [`kit/`](https://github.com/apurvanakade/mathviz/tree/main/kit) (`_mathviz/` + `_extensions/mathviz-local/`, with `mathviz-local` listed *after* `mathviz` under `filters:`); `kit/_mathviz/README.md` has the steps. It is laid out path for path like mathviz's `src/`, so a file at the same path as an upstream one replaces that member (a hot patch), and `node scripts/port.mjs <this repo>/_mathviz` in mathviz moves files upstream. Once a mathviz release carries them, delete them here, otherwise they silently shadow later upstream changes. When the overlay is empty, remove it again.
 
-The overlay today holds the CDFs and quantiles (`VM.distributions.normalCdf`, `normalQuantile`, `chiSquaredCdf`, `chiSquaredQuantile`, `regularizedGamma`), `VM.distributions.sampleStats`, `VM.sampling.exponentialRandom`, `VM.filters.systematicResample`, `VM.plotting.plotWithLegend` (with `legendItems` and `lockedAxes`), a hot patch of `VM.plotting.persistentPlot` (its `height` now beats the chart box's 500px `min-height`), and a CSS hot patch keeping `layout-ncol` charts inside a phone screen, all in [apurvanakade/mathviz#15](https://github.com/apurvanakade/mathviz/pull/15). When a release carries them, delete them from `_mathviz/src/js/` and `_mathviz/src/manifest.mjs`; with nothing left, remove `_mathviz/`, `_extensions/mathviz-local/` and the `mathviz-local` filter.
+There is no overlay today: mathviz v0.1.12 carries everything the last one held.
 
 ## Writing an app
 

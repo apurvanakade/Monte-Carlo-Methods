@@ -18,20 +18,11 @@ Offline, the build continues with the copy already installed.
 Every code cell is OJS and runs in the reader's browser, so there is nothing
 to install beyond Quarto.
 
-Functions this site needs before a mathviz release carries them live in the
-`mathviz-local` overlay (`_mathviz/`, built into `_extensions/mathviz-local/`):
-
-```sh
-cd _mathviz && node --test && node scripts/build.mjs
-```
-
 ## Layout
 
 ```
 _quarto.yml           book config; enables the mathviz filter
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
-                      and mathviz-local (built from _mathviz/)
-_mathviz/             this site's additions to mathviz, until a release carries them
 index.qmd             preface
 chapters/             lecture notes, one folder per part
 appendices/           probability and Markov chain background
