@@ -26,24 +26,40 @@ python3.12 -m venv .venv
 ## Layout
 
 ```
-_quarto.yml           book config; enables the mathviz filter
-_extensions/          mathviz (managed by scripts/update-mathviz.sh -- don't edit)
+_quarto.yml           book config; enables the mathviz and mathviz-local filters
+_extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
+                      and mathviz-local (dist/ built from _mathviz/ -- don't edit)
+_mathviz/             this site's additions to mathviz, laid out like mathviz's src/
 index.qmd             preface
 chapters/             lecture notes, one folder per part
 appendices/           probability and Markov chain background
-apps/                 interactive apps (mathviz); add each to _quarto.yml
+apps/                 the Interactive Apps gallery (links to each app's ?embed= view)
 assets/               site CSS
 scripts/              build hooks
-_legacy/apps/         the old D3 apps, kept as reference while porting (not rendered)
 references.bib
 docs/                 rendered site (build output, committed for GitHub Pages)
 ```
 
 ## Writing an app
 
-Each page already has `VM`, math.js, Plotly and the mathviz stylesheet. Start
-from the mathviz [starter pages](https://github.com/apurvanakade/mathviz/tree/main/starter)
-and the [docs](https://apurvanakade.github.io/mathviz/).
+Apps live in the chapter that explains them, as OJS cells. Each page already
+has `VM`, math.js, Plotly and the mathviz stylesheet, plus this site's own
+additions (`VM.mcmc.*`, `VM.ui.statRow`, ... -- see `_mathviz/README.md`).
+Start from the mathviz [starter pages](https://github.com/apurvanakade/mathviz/tree/main/starter)
+and the [docs](https://apurvanakade.github.io/mathviz/), or copy an existing
+app (`chapters/estimation/estimating_pi.qmd` is the simplest).
+
+- Wrap the app's controls, readouts and main chart in
+  `<div class="vm-app" id="<name>-app">`. That block is what
+  `<chapter>.html?embed=<name>-app` shows on its own, and what the Share
+  button offers as an `<iframe>`.
+- Several apps can share a chapter: prefix every OJS cell name and URL
+  parameter with the app's name (`pi`, `buffon`, ...), since both are
+  page-wide.
+- Add a card for it to `apps/index.qmd`, linking to the `?embed=` view.
+- A new reusable function goes in `_mathviz/src/js/<category>/`, with a test
+  next to it and an entry in `_mathviz/src/manifest.mjs`; then
+  `make mathviz-local`.
 
 ## Notes
 
