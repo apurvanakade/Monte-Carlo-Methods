@@ -142,35 +142,40 @@ The triangular distribution provides a good example of inverse transform samplin
 The inverse transform sampling method can be used to sample from the triangular distribution, though the derivation involves handling the piecewise nature of both the CDF and its inverse.
 
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-# graph of the triangular distribution for c=0.25
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-def triangular_distribution(x, a, b, c):
-    assert a <= c <= b, 'c must be between a and b'
+triPlot = VM.plotting.persistentPlot({height: "360px"})
 
-    if a <= x < c:
-        return 2 * (x - a) / ((b - a) * (c - a))
-    elif c <= x <= b:
-        return 2 * (b - x) / ((b - a) * (b - c))
-    else:
-        return 0
-    
-x = np.linspace(0, 1, 100)
-y = [triangular_distribution(xi, a = 0, b = 1, c = 0.25) for xi in x]
+// Triangular density on [a, b] with mode c.
+function triangularPdf(x, a, b, c) {
+  if (a <= x && x < c) return 2 * (x - a) / ((b - a) * (c - a))
+  if (c <= x && x <= b) return 2 * (b - x) / ((b - a) * (b - c))
+  return 0
+}
+```
 
-plt.plot(x, y)
-plt.xlabel('x')
-plt.ylabel('f(x)')
-plt.title('Triangular distribution for a=0, b=1, c=0.25')
-plt.axhline(0, color='black', lw=0.5)
-plt.axvline(0, color='black', lw=0.5)
-
-# make the plot smaller in size
-plt.gcf().set_size_inches(6, 4)
-
-plt.show()
+```{ojs}
+{
+  const xs = [], ys = []
+  for (let i = 0; i <= 200; i++) {
+    const x = i / 200
+    xs.push(x)
+    ys.push(triangularPdf(x, 0, 1, 0.25))
+  }
+  return triPlot([
+    {x: xs, y: ys, type: "scatter", mode: "lines", line: {color: chartColors.fn, width: 2}, name: "f(x)"}
+  ], {
+    title: {text: "Triangular distribution for a = 0, b = 1, c = 0.25"},
+    margin: {t: 40},
+    xaxis: {title: "x"},
+    yaxis: {title: "f(x)", rangemode: "tozero"},
+    showlegend: false
+  })
+}
 ```
 
 ## Normal Distribution

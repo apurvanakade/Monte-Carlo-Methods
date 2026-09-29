@@ -7,15 +7,6 @@ execute:
   echo: false
 ---
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
-
-
-np.random.seed(0)
-```
 
 ```{ojs}
 //| output: false
@@ -83,36 +74,27 @@ In the case of random walks, there are two common choices for the proposal distr
 Consider the L-shaped region in $\mathbb{R}^2$ as shown below. This is a non-convex region and rejection sampling would only provide an efficiency of $0.1 + 0.1 - 0.01 = 0.18$. We'll use the Metropolis--Hastings algorithm to sample from this region with higher efficiency.
 
 
-```{python}
-# Draw an L shaped region in R2 
-def L_shape():
-    width = 0.1
-    height = 0.1
-    X = np.array([[0, 0], [1, 0], [1, height], [width, height], [width, 1], [0, 1], [0, 0]])
-    return X
+```{ojs}
+//| output: false
+mhLRegion = rwRegions.get("L-shape")
+mhLShapePlot = VM.plotting.persistentPlot({height: "380px"})
+mhLSamplePlots = {
+  const plots = []
+  for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({height: "400px"}))
+  return plots
+}
+```
 
-# plot the polygon
-def plot_polygon(X):
-    # increase thickness of lines
-    plt.rcParams['lines.linewidth'] = 2
-
-    # plot the polygon
-    plt.plot(X[:, 0], X[:, 1], 'b')
-
-    plt.axhline(0, color='black', lw=1)
-    plt.axvline(0, color='black', lw=1)
-    plt.axis('equal')
-    
-    # label the point (width, height)
-    plt.text(X[3, 0] * 1.2, X[3, 1] * 1.2, f'({X[3, 0]}, {X[3, 1]})', fontsize=10)
-    # mark the point (width, height)
-    plt.plot(X[3, 0], X[3, 1], 'bo')
-
-    return plt
-
-region = L_shape()
-plt = plot_polygon(region)
-plt.show()
+```{ojs}
+mhLShapePlot([
+  {x: mhLRegion.outlineX, y: mhLRegion.outlineY, type: "scatter", mode: "lines", line: {color: chartColors.fn, width: 2}, hoverinfo: "skip"},
+  {x: [0.1], y: [0.1], type: "scatter", mode: "markers+text", marker: {color: chartColors.fn, size: 8},
+    text: ["(0.1, 0.1)"], textposition: "top right"}
+], {
+  showlegend: false,
+  xaxis: {range: [-0.1, 1.1], zeroline: true, zerolinecolor: chartColors.ink},
+  yaxis: {range: [-0.1, 1.1], zeroline: true, zerolinecolor: chartColors.ink, scaleanchor: "x"}
+})
 ```
 
 
@@ -120,78 +102,71 @@ The images below show scatter plots for the samples generated using the Metropol
 
 :::
 
-```{python}
-# nearby candidate points
-def generate_candidate(x, y, sigma, distribution):
-    if distribution == "uniform":
-        x_new = np.random.uniform(x - sigma, x + sigma)
-        y_new = np.random.uniform(y - sigma, y + sigma)
-    elif distribution == "normal":
-        x_new = np.random.normal(x, sigma)
-        y_new = np.random.normal(y, sigma)
-    return [x_new, y_new]
-  
-# check if a point is in the region
-def is_in_region(x, region):
-  return Polygon(region).contains(Point(x))
 
-def Metropolis_Hastings(n, X, sigma, search_distribution):
-  for i in range(n):
-    new_sample = generate_candidate(X[-1][0], X[-1][1], sigma, search_distribution)
-    if is_in_region(new_sample, region):
-      X.append(new_sample)  
-  return X
+```{ojs}
+//| output: false
+// 10,000 Gaussian random-walk steps from (0.05, 0.05) for each step size.
+mhLRuns = {
+  const runs = []
+  for (const sigma of [1, 0.5, 0.2, 0.01]) {
+    const chain = VM.mcmc.randomWalkMetropolis({
+      logDensity: p => (mhLRegion.inside(p[0], p[1]) ? 0 : -Infinity),
+      start: mhLRegion.start,
+      n: 10000,
+      scale: sigma,
+      proposal: "gaussian",
+      rng: VM.sampling.seededRandom(0)
+    })
+    runs.push({sigma, chain})
+  }
+  return runs
+}
 
-def find_running_avgs(X, fun):
-
-  running_avgs = np.zeros(len(X))
-
-  running_avgs[0] = fun(X[0])
-  for i in range(len(X) - 1):
-    running_avgs[i+1] = (i * running_avgs[i] + fun(X[i+1]))/(i+1)
-
-  return running_avgs
-
-def plot_samples(region, X, sigma, n, ax):
-  import matplotlib.pyplot as plt
-
-  plt = plot_polygon(region)
-  for i in range(len(X)):
-    ax.plot(X[i][0], X[i][1], 'r.', markersize=1, alpha=0.5)
-
-  # draw a filled circle at the last point of radius sigma
-  circle = plt.Circle((X[-1][0], X[-1][1]), sigma, color='y', fill=True, alpha=0.25)
-  ax.add_artist(circle)
-
-  ax.plot(X[0][0], X[0][1], 'o', markersize=5, label="start", color="black")
-  ax.plot(X[-1][0], X[-1][1], 'gx', markersize=10, label="end")
-
-  # show the value of k, sigma, and acceptance rate on the plot as a text block
-  textstr = f'sigma = {sigma}\nacceptance rate = {len(X)/n:.4f}'
-  props = dict(facecolor='white')
-  ax.text(0.95, 0.95, textstr, transform=ax.transAxes, fontsize=10,
-                 verticalalignment='top', horizontalalignment='right', bbox=props)
-
+function mhLSampleFigure(plot, run) {
+  const xs = [], ys = []
+  for (const p of run.chain.samples) {
+    xs.push(p[0])
+    ys.push(p[1])
+  }
+  const last = run.chain.samples[run.chain.samples.length - 1]
+  const rate = run.chain.acceptedCount / (run.chain.samples.length - 1)
+  return VM.plotting.plotWithLegend(plot, [
+    {x: mhLRegion.outlineX, y: mhLRegion.outlineY, type: "scatter", mode: "lines", line: {color: chartColors.ink, width: 1.5}, hoverinfo: "skip", showlegend: false},
+    {x: xs, y: ys, type: "scattergl", mode: "markers", marker: {color: VM.plotting.alpha(chartColors.alt, 0.5), size: 2}, hoverinfo: "skip", showlegend: false},
+    {x: [xs[0]], y: [ys[0]], type: "scatter", mode: "markers", marker: {color: chartColors.ink, size: 8}, name: "start"},
+    {x: [last[0]], y: [last[1]], type: "scatter", mode: "markers", marker: {color: chartColors.ok, size: 11, symbol: "x"}, name: "end"}
+  ], {
+    xaxis: {range: [-0.15, 1.15]},
+    yaxis: {range: [-0.15, 1.15], scaleanchor: "x"},
+    legend: {x: 0.98, xanchor: "right", y: 0.75},
+    // The proposal: a disc of radius sigma around the last point.
+    shapes: [{type: "circle", x0: last[0] - run.sigma, x1: last[0] + run.sigma, y0: last[1] - run.sigma, y1: last[1] + run.sigma,
+      fillcolor: VM.plotting.alpha(chartColors.warn, 0.25), line: {width: 0}}],
+    annotations: [{xref: "paper", yref: "paper", x: 0.98, y: 0.98, xanchor: "right", yanchor: "top", align: "right", showarrow: false,
+      text: `σ = ${run.sigma}<br>acceptance rate = ${rate.toFixed(4)}`, bordercolor: chartColors.muted, borderpad: 4}]
+  })
+}
 ```
 
-```{python}
-fig, axs = plt.subplots(2, 2, figsize=(12, 12))
+::: {layout-ncol=2}
 
-n = 10000
-start = [[0.05, 0.05]]
-search_distribution = "normal"
-sigmas = [1, 0.5, 0.1, 0.01]
-
-for idx, sigma in enumerate(sigmas):
-    np.random.seed(0)
-    X = Metropolis_Hastings(n, start.copy(), sigma, search_distribution)
-    ax = axs[idx // 2, idx % 2]
-    plot_samples(region, X, sigma, n, ax)
-    ax.set_aspect('equal')
-
-plt.tight_layout()
-plt.show()
+```{ojs}
+mhLSampleFigure(mhLSamplePlots[0], mhLRuns[0])
 ```
+
+```{ojs}
+mhLSampleFigure(mhLSamplePlots[1], mhLRuns[1])
+```
+
+```{ojs}
+mhLSampleFigure(mhLSamplePlots[2], mhLRuns[2])
+```
+
+```{ojs}
+mhLSampleFigure(mhLSamplePlots[3], mhLRuns[3])
+```
+
+:::
 
 Try it yourself below. Pick a region and a proposal, then try a few step sizes: small steps are almost always accepted but crawl, large steps explore quickly but are mostly rejected (the red crosses). The shaded patch around the current point is the proposal -- a disc of radius $\sigma$ for the Gaussian, the square $[-\sigma, \sigma]^2$ around the point for the uniform.
 
@@ -589,10 +564,6 @@ The complete Metropolis--Hastings algorithm is as follows:
         - If $y$ is accepted, set $x_{i+1} = y$.
         - Otherwise, set $x_{i+1} = x_i$.
 3. Return the sequence of points $x_0, x_1, \ldots, x_{N-1}$.
-
-
-
-
 
 
 We can expand the algorithm further as follows:

@@ -31,111 +31,97 @@ There are two approaches we can take to simulate an M/M/n queue
 1. Process driven
 1. Event driven
 
-```{python}
-import heapq
-import numpy as np
-import matplotlib.pyplot as plt
-from collections import deque
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-class MMnQueueSim:
-    def __init__(self, arrival_rate, service_rate, num_servers, max_customers=1000, seed=None):
-        self.lambda_ = arrival_rate
-        self.mu = service_rate
-        self.n = num_servers
-        self.max_customers = max_customers
-        self.rng = np.random.default_rng(seed)
+mmnQueuePlot = VM.plotting.persistentPlot({height: "340px"})
 
-        self.clock = 0.0
-        self.event_queue = []  # min-heap of (event_time, event_type, customer_id)
-        self.wait_queue = deque()
-        self.server_busy = 0
-
-        self.stats = {
-            'arrival_times': {},
-            'start_service_times': {},
-            'departure_times': {},
-            'queue_length_log': []  # (time, queue_length)
-        }
-
-    def schedule_event(self, time, event_type, customer_id):
-        heapq.heappush(self.event_queue, (time, event_type, customer_id))
-
-    def log_queue_length(self):
-        queue_len = len(self.wait_queue)
-        self.stats['queue_length_log'].append((self.clock, queue_len))
-
-    def run(self):
-        arrival_time = self.clock + self.rng.exponential(1 / self.lambda_)
-        self.schedule_event(arrival_time, 'arrival', 0)
-
-        customer_id = 1
-
-        while self.event_queue and len(self.stats['departure_times']) < self.max_customers:
-            self.clock, event_type, cust_id = heapq.heappop(self.event_queue)
-
-            self.log_queue_length()
-
-            if event_type == 'arrival':
-                self.stats['arrival_times'][cust_id] = self.clock
-
-                if self.server_busy < self.n:
-                    self.server_busy += 1
-                    service_time = self.rng.exponential(1 / self.mu)
-                    departure_time = self.clock + service_time
-                    self.stats['start_service_times'][cust_id] = self.clock
-                    self.schedule_event(departure_time, 'departure', cust_id)
-                else:
-                    self.wait_queue.append(cust_id)
-
-                next_arrival_time = self.clock + self.rng.exponential(1 / self.lambda_)
-                if customer_id < self.max_customers:
-                    self.schedule_event(next_arrival_time, 'arrival', customer_id)
-                    customer_id += 1
-
-            elif event_type == 'departure':
-                self.stats['departure_times'][cust_id] = self.clock
-                self.server_busy -= 1
-
-                if self.wait_queue:
-                    next_cust = self.wait_queue.popleft()
-                    self.server_busy += 1
-                    self.stats['start_service_times'][next_cust] = self.clock
-                    service_time = self.rng.exponential(1 / self.mu)
-                    departure_time = self.clock + service_time
-                    self.schedule_event(departure_time, 'departure', next_cust)
-
-    def report(self):
-        wait_times = []
-        sojourn_times = []
-
-        for cid in self.stats['departure_times']:
-            arrival = self.stats['arrival_times'][cid]
-            start = self.stats['start_service_times'][cid]
-            depart = self.stats['departure_times'][cid]
-            wait_times.append(start - arrival)
-            sojourn_times.append(depart - arrival)
-
-        print(f"Simulated {len(sojourn_times)} customers")
-        print(f"Average wait time     : {np.mean(wait_times):.4f}")
-        print(f"Average sojourn time  : {np.mean(sojourn_times):.4f}")
-        print(f"Server utilization    : {min(1.0, self.lambda_ / (self.n * self.mu)):.4f} (theoretical)")
-
-    def plot_queue_length(self):
-        times, lengths = zip(*self.stats['queue_length_log'])
-        plt.figure(figsize=(10, 4))
-        plt.step(times, lengths, where='post', color='blue')
-        plt.title("Queue Length Over Time")
-        plt.xlabel("Simulation Time")
-        plt.ylabel("Queue Length")
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+// Discrete-event simulation of an M/M/n queue until maxCustomers have
+// departed. Events are kept in a list sorted by time (a heap would be
+// faster; a thousand customers don't need one). Returns each customer's
+// arrival, service-start and departure times and the queue length after
+// every event.
+function mmnSimulate({arrivalRate, serviceRate, servers, maxCustomers, seed}) {
+  const rng = VM.sampling.seededRandom(seed)
+  const interArrival = VM.sampling.exponentialRandom(rng, arrivalRate)
+  const serviceTime = VM.sampling.exponentialRandom(rng, serviceRate)
+  const events = []
+  function schedule(time, type, id) {
+    let k = events.length
+    while (k > 0 && events[k - 1].time > time) k--
+    events.splice(k, 0, {time, type, id})
+  }
+  const arrival = [], start = [], departure = []
+  const waiting = []
+  const log = {times: [], lengths: []}
+  let busy = 0
+  let departed = 0
+  let nextId = 1
+  schedule(interArrival(), "arrival", 0)
+  while (events.length > 0 && departed < maxCustomers) {
+    const event = events.shift()
+    const clock = event.time
+    log.times.push(clock)
+    log.lengths.push(waiting.length)
+    if (event.type === "arrival") {
+      arrival[event.id] = clock
+      if (busy < servers) {
+        busy++
+        start[event.id] = clock
+        schedule(clock + serviceTime(), "departure", event.id)
+      } else {
+        waiting.push(event.id)
+      }
+      if (nextId < maxCustomers) {
+        schedule(clock + interArrival(), "arrival", nextId)
+        nextId++
+      }
+    } else {
+      departure[event.id] = clock
+      departed++
+      busy--
+      if (waiting.length > 0) {
+        const next = waiting.shift()
+        busy++
+        start[next] = clock
+        schedule(clock + serviceTime(), "departure", next)
+      }
+    }
+  }
+  return {arrivalRate, serviceRate, servers, arrival, start, departure, log}
+}
 ```
 
-```{python}
-sim = MMnQueueSim(arrival_rate=2.0, service_rate=1.5, num_servers=2, max_customers=1000, seed=42)
-sim.run()
-sim.report()
-sim.plot_queue_length()
+```{ojs}
+//| output: false
+mmnSim = mmnSimulate({arrivalRate: 2.0, serviceRate: 1.5, servers: 2, maxCustomers: 1000, seed: 42})
+```
 
+```{ojs}
+{
+  const sim = mmnSim
+  const waits = [], sojourns = []
+  for (let id = 0; id < sim.departure.length; id++) {
+    if (sim.departure[id] === undefined) continue
+    waits.push(sim.start[id] - sim.arrival[id])
+    sojourns.push(sim.departure[id] - sim.arrival[id])
+  }
+  const utilization = Math.min(1, sim.arrivalRate / (sim.servers * sim.serviceRate))
+  return VM.ui.statRow([
+    {label: "Customers simulated", value: String(waits.length)},
+    {label: "Average wait time", value: VM.distributions.sampleStats(waits).mean.toFixed(4)},
+    {label: "Average sojourn time", value: VM.distributions.sampleStats(sojourns).mean.toFixed(4)},
+    {label: "Server utilization (theoretical)", value: utilization.toFixed(4)}
+  ])
+}
+```
+
+```{ojs}
+mmnQueuePlot([{x: mmnSim.log.times, y: mmnSim.log.lengths, type: "scatter", mode: "lines", line: {shape: "hv", color: chartColors.fn, width: 1.5}}], {
+  title: {text: "Queue length over time"}, margin: {t: 40}, showlegend: false,
+  xaxis: {title: "Simulation time"}, yaxis: {title: "Queue length"}
+})
 ```

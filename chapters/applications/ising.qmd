@@ -7,9 +7,95 @@ execute:
   echo: false
 ---
 
-```{python}
-import numpy as np 
-import matplotlib.pyplot as plt
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+
+// An L x L lattice of independent ±1 spins, as an array of rows.
+function isingRandomLattice(L, rng) {
+  const lattice = []
+  for (let i = 0; i < L; i++) {
+    const row = []
+    for (let j = 0; j < L; j++) {
+      if (rng() < 0.5) {
+        row.push(1)
+      } else {
+        row.push(-1)
+      }
+    }
+    lattice.push(row)
+  }
+  return lattice
+}
+
+function isingMagnetization(lattice) {
+  let sum = 0
+  for (const row of lattice) {
+    for (const s of row) sum += s
+  }
+  return sum / (lattice.length * lattice.length)
+}
+
+// Sum of the four neighbours of (i, j), with periodic boundaries.
+function isingNeighbours(lattice, i, j) {
+  const L = lattice.length
+  return lattice[(i + 1) % L][j] + lattice[(i - 1 + L) % L][j] + lattice[i][(j + 1) % L] + lattice[i][(j - 1 + L) % L]
+}
+
+// One Gibbs sweep: visit every site in order and redraw its spin from its
+// conditional, P(up) = 1 / (1 + exp(-2 beta h)) with h the neighbour sum.
+function isingGibbsSweep(lattice, beta, rng) {
+  const L = lattice.length
+  for (let i = 0; i < L; i++) {
+    for (let j = 0; j < L; j++) {
+      const h = isingNeighbours(lattice, i, j)
+      const pUp = 1 / (1 + Math.exp(-2 * beta * h))
+      if (rng() < pUp) {
+        lattice[i][j] = 1
+      } else {
+        lattice[i][j] = -1
+      }
+    }
+  }
+}
+
+// One Metropolis sweep: L² single-spin-flip proposals at random sites.
+function isingMetropolisSweep(lattice, beta, rng) {
+  const L = lattice.length
+  for (let k = 0; k < L * L; k++) {
+    const i = Math.floor(rng() * L)
+    const j = Math.floor(rng() * L)
+    const dE = 2 * lattice[i][j] * isingNeighbours(lattice, i, j)
+    if (dE < 0 || rng() < Math.exp(-beta * dE)) lattice[i][j] = -lattice[i][j]
+  }
+}
+
+function isingCopy(lattice) {
+  const out = []
+  for (const row of lattice) out.push(row.slice())
+  return out
+}
+
+// Spins as a heatmap: -1 dark, +1 light (the ends swap with the theme).
+function isingHeatmap(lattice, axes) {
+  return {z: lattice, type: "heatmap", showscale: false, zmin: -1, zmax: 1, hoverinfo: "skip",
+    colorscale: [[0, chartColors.ink], [1, chartColors.halo]], ...axes}
+}
+
+isingTc = 2 / Math.log(1 + Math.SQRT2)
+```
+
+```{ojs}
+//| output: false
+isingArrowPlot = VM.plotting.persistentPlot({height: "480px"})
+isingAnnealPlot = VM.plotting.persistentPlot({height: "380px"})
+isingSnapshotPlot = VM.plotting.persistentPlot({height: "380px"})
+isingGibbsLatticePlot = VM.plotting.persistentPlot({height: "340px"})
+isingGibbsTracePlot = VM.plotting.persistentPlot({height: "340px"})
+isingMetropolisLatticePlot = VM.plotting.persistentPlot({height: "340px"})
+isingMetropolisTracePlot = VM.plotting.persistentPlot({height: "340px"})
 ```
 
 ## The Physical Ising Model
@@ -33,46 +119,49 @@ The Ising model is a simple model of ferromagnetism from statistical mechanics. 
 
 Next, we create a mathematical model to describe the system.
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-
-def plot_ising_model(spin_grid):
-    """
-    Plots a 2D Ising model with up (red) and down (blue) arrows, tilted to prevent overlap.
-    :param spin_grid: 2D numpy array of spins (+1 or -1)
-    """
-    Lx, Ly = spin_grid.shape
-    x, y = np.meshgrid(range(Lx), range(Ly), indexing='ij')
-    
-    plt.figure(figsize=(6,6))
-    
-    for i in range(Lx):
-        for j in range(Ly):
-            color = 'red' if spin_grid[i, j] == 1 else 'blue'
-            angle = 30 if spin_grid[i, j] == 1 else -150  # Tilt angle to prevent overlap
-            dx = 0.5 * np.sin(np.radians(angle))
-            dy = 0.5 * np.cos(np.radians(angle))
-            plt.arrow(j, -i, dx, dy,
-                      head_width=0.2, head_length=0.2, fc=color, ec=color)
-    
-    # Draw faint grid lines manually
-    for i in range(Lx + 1):
-        plt.hlines(-i, -0.5, Ly - 0.5, colors='gray', linestyles='--', linewidth=0.5, alpha=0.3)
-    for j in range(Ly + 1):
-        plt.vlines(j, -Lx + 0.5, 0.5, colors='gray', linestyles='--', linewidth=0.5, alpha=0.3)
-    
-    plt.xlim(-0.5, Ly - 0.5)
-    plt.ylim(-Lx + 0.5, 0.5)
-    plt.xticks([])
-    plt.yticks([])
-    plt.show()
-
-# Example: Generate a random Ising model grid
-np.random.seed(42)
-L = 10  # Grid size
-ising_grid = np.random.choice([-1, 1], size=(L, L))
-plot_ising_model(ising_grid)
+```{ojs}
+{
+  // A random 10 x 10 configuration: up spins as red arrows, down spins as
+  // blue ones, tilted so neighbouring arrows don't overlap.
+  const L = 10
+  const lattice = isingRandomLattice(L, VM.sampling.seededRandom(42))
+  const shaftX = {up: [], down: []}, shaftY = {up: [], down: []}
+  const headX = {up: [], down: []}, headY = {up: [], down: []}
+  for (let i = 0; i < L; i++) {
+    for (let j = 0; j < L; j++) {
+      let key = "down"
+      let angle = -150
+      if (lattice[i][j] === 1) {
+        key = "up"
+        angle = 30
+      }
+      // Arrow from (j, -i) to its head, `angle` degrees clockwise from up.
+      const hx = j + 0.4 * Math.sin(angle * Math.PI / 180)
+      const hy = -i + 0.4 * Math.cos(angle * Math.PI / 180)
+      shaftX[key].push(j, hx, null)
+      shaftY[key].push(-i, hy, null)
+      headX[key].push(hx)
+      headY[key].push(hy)
+    }
+  }
+  const traces = []
+  for (const [key, color, angle] of [["up", chartColors.alt, 30], ["down", chartColors.fn, -150]]) {
+    traces.push({x: shaftX[key], y: shaftY[key], type: "scatter", mode: "lines", line: {color, width: 2}, hoverinfo: "skip"})
+    traces.push({x: headX[key], y: headY[key], type: "scatter", mode: "markers", hoverinfo: "skip",
+      marker: {symbol: "triangle-up", angle, size: 11, color}})
+  }
+  const shapes = []
+  for (let k = 0; k <= L; k++) {
+    shapes.push({type: "line", x0: -0.5, x1: L - 0.5, y0: -k + 0.5, y1: -k + 0.5, line: {color: chartColors.muted, width: 0.5, dash: "dash"}})
+    shapes.push({type: "line", x0: k - 0.5, x1: k - 0.5, y0: -L + 0.5, y1: 0.5, line: {color: chartColors.muted, width: 0.5, dash: "dash"}})
+  }
+  const hidden = {showticklabels: false, showgrid: false, zeroline: false, showline: false, ticks: ""}
+  return isingArrowPlot(traces, {
+    shapes, showlegend: false,
+    xaxis: {...hidden, range: [-0.5, L - 0.5]},
+    yaxis: {...hidden, range: [-L + 0.5, 0.5], scaleanchor: "x"}
+  })
+}
 ```
 
 ## The Mathematical Ising Model
@@ -365,241 +454,134 @@ We can see that at $T=1.5$, the system is magnetized and the magnetization is mo
 If we gradually increase the temperature from $T=1$ to $T=3$, we can see that the magnetization decreases smoothly until $T=2$, after which it drops suddenly. This is the phase transition.
 Below the graph are snapshots of the grid at different temperatures. One can see that at low temperatures, the grid is mostly monochromatic, but at high temperatures, the grid is more chaotic.
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-
-def initialize_lattice(L):
-    """Initialize an LxL lattice with random spins (+1 or -1)."""
-    return np.random.choice([-1, 1], size=(L, L))
-
-def magnetization(lattice):
-    """Compute the magnetization of the lattice."""
-    return np.sum(lattice) / lattice.size
-
-def gibbs_step(lattice, beta, J=1):
-    """Perform a single Gibbs sampling step."""
-    L = lattice.shape[0]
-    for i in range(L):
-        for j in range(L):
-            neighbors = lattice[(i+1)%L, j] + lattice[(i-1)%L, j] + \
-                        lattice[i, (j+1)%L] + lattice[i, (j-1)%L]
-            h = J * neighbors
-            P_up = 1 / (1 + np.exp(-2 * beta * h))
-            lattice[i, j] = 1 if np.random.rand() < P_up else -1
-
-def simulate_ising_gibbs(L, T_start, T_end, steps, snapshots=16):
-    """Simulate the Ising model using Gibbs sampling with temperature annealing."""
-    lattice = initialize_lattice(L)
-    magnetizations = {}
-    saved_lattices = []
-    snapshot_interval = steps // snapshots  # Save states evenly over time
-    
-    # add some equilibrium time
-    for _ in range(steps // 10):
-        gibbs_step(lattice, 1 / T_start)
-    
-    for step in range(steps):
-        T = T_start + (T_end - T_start) * (step / steps)  # Linearly varying temperature
-        beta = 1 / T
-        gibbs_step(lattice, beta)
-        
-        # if step % (steps // 100) == 0:
-        magnetizations[T] = magnetization(lattice)
-        if step % snapshot_interval == 0 and len(saved_lattices) < snapshots:
-            saved_lattices.append(np.copy(lattice))
-    
-    return lattice, magnetizations, saved_lattices
-
-# Parameters
-L = 20  # Lattice size
-T_start = 1.4  # Initial temperature (highly disordered state)
-T_end = 3.0  # Final temperature (more ordered state)
-steps = 10000  # Number of Gibbs steps
-snapshots = 8  # Number of snapshots to capture
-
-# Critical Temperature for 2D Ising Model
-Tc = 2 / np.log(1 + np.sqrt(2))  # ~2.269
-
-# Run simulation with cooling schedule
-final_lattice, magnetizations, saved_lattices = simulate_ising_gibbs(L, T_start, T_end, steps, snapshots)
+```{ojs}
+//| output: false
+// Gibbs sampling on a 20 x 20 lattice while the temperature rises linearly
+// from 1.4 to 3.0 over 10,000 sweeps (after 1000 sweeps at 1.4 to settle).
+// Records the magnetization after every sweep and 8 evenly spaced snapshots.
+isingAnneal = {
+  const L = 20, tStart = 1.4, tEnd = 3.0, steps = 10000, snapshots = 8
+  const rng = VM.sampling.seededRandom(42)
+  const lattice = isingRandomLattice(L, rng)
+  for (let s = 0; s < steps / 10; s++) isingGibbsSweep(lattice, 1 / tStart, rng)
+  const temperatures = [], magnetizations = [], saved = []
+  for (let step = 0; step < steps; step++) {
+    const T = tStart + (tEnd - tStart) * step / steps
+    isingGibbsSweep(lattice, 1 / T, rng)
+    temperatures.push(T)
+    magnetizations.push(isingMagnetization(lattice))
+    if (step % (steps / snapshots) === 0) saved.push({T, M: magnetizations[step], lattice: isingCopy(lattice)})
+  }
+  return {temperatures, magnetizations, saved}
+}
 ```
 
-```{python}
-
-# Convert magnetizations dictionary to a list of values sorted by temperature
-plt.figure(figsize=(10, 5))
-sorted_temperatures = sorted(magnetizations.keys())
-sorted_magnetizations = [magnetizations[T] for T in sorted_temperatures]
-plt.plot(sorted_temperatures[::100], sorted_magnetizations[::100], label='Magnetization')
-plt.axvline(x=Tc, color='r', linestyle='--', label=f'Limiting Critical T={Tc:.3f}')
-plt.ylim(-1, 1)
-plt.axhline(0, color='gray', linewidth=0.5)
-plt.xlabel('Temperature')
-plt.ylabel('Magnetization')
-plt.title('Magnetization vs Temperature')
-plt.legend()
-plt.show()
-
-# Visualization of Spin Evolution
-fig, axes = plt.subplots(2, 4, figsize=(10, 5))
-for i, ax in enumerate(axes.flat):
-    T_current = T_start + (T_end - T_start) * (i / snapshots)
-    T_rounded = round(T_current, 4)  # Round to match the keys in the dictionary
-    
-    # find closest temperature in the dictionary
-    closest_T = min(magnetizations.keys(), key=lambda x: abs(x - T_current))
-    ax.imshow(saved_lattices[i], cmap='gray')
-    ax.set_title(f'T={T_current:.2f}, ' + f'M={magnetizations[closest_T]:.2f}')
-    ax.axis('off')
-plt.suptitle('Evolution of Spins Over Cooling')
-plt.tight_layout()
-plt.show()
+```{ojs}
+{
+  const a = isingAnneal
+  const ts = [], ms = []
+  for (let i = 0; i < a.temperatures.length; i += 100) {
+    ts.push(a.temperatures[i])
+    ms.push(a.magnetizations[i])
+  }
+  return VM.plotting.plotWithLegend(isingAnnealPlot, [
+    {x: ts, y: ms, type: "scatter", mode: "lines", name: "Magnetization", line: {color: chartColors.fn, width: 2}},
+    {x: [isingTc, isingTc], y: [-1, 1], type: "scatter", mode: "lines", name: `Limiting critical T = ${isingTc.toFixed(3)}`,
+      line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {title: {text: "Magnetization vs temperature"}, margin: {t: 40}, xaxis: {title: "Temperature"},
+    yaxis: {title: "Magnetization", range: [-1, 1]}})
+}
 ```
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-
-def initialize_lattice(L):
-    """Initialize an LxL lattice with random spins (+1 or -1)."""
-    return np.random.choice([-1, 1], size=(L, L))
-
-def magnetization(lattice):
-    """Compute the magnetization of the lattice."""
-    return np.sum(lattice) / lattice.size
-
-def gibbs_step(lattice, beta, J=1):
-    """Perform a single Gibbs sampling step."""
-    L = lattice.shape[0]
-    for i in range(L):
-        for j in range(L):
-            neighbors = lattice[(i+1)%L, j] + lattice[(i-1)%L, j] + \
-                        lattice[i, (j+1)%L] + lattice[i, (j-1)%L]
-            h = J * neighbors
-            P_up = 1 / (1 + np.exp(-2 * beta * h))
-            lattice[i, j] = 1 if np.random.rand() < P_up else -1
-
-def simulate_ising_gibbs(L, T, steps):
-    """Simulate the Ising model using Gibbs sampling with magnetization tracking."""
-    beta = 1 / T
-    lattice = initialize_lattice(L)
-    magnetizations = []
-    
-    for _ in range(steps):
-        gibbs_step(lattice, beta)
-        if _ % (steps // 100) == 0:  # Sample magnetization every 1% of the steps
-            magnetizations.append(magnetization(lattice))
-    
-    return lattice, magnetizations
-
-# Parameters
-L = 20  # Lattice size
-T = 2.0  # Temperature
-steps = 5000  # Number of Gibbs steps
-
-# Run simulation
-final_lattice, magnetizations = simulate_ising_gibbs(L, T, steps)
-
+```{ojs}
+{
+  // The 8 snapshots in a 2 x 4 grid of heatmaps, each titled with its
+  // temperature and magnetization.
+  const traces = [], annotations = []
+  const layout = {title: {text: "Evolution of spins as the temperature rises"}, margin: {t: 50},
+    grid: {rows: 2, columns: 4, pattern: "independent", ygap: 0.25, xgap: 0.08}, annotations}
+  for (let k = 0; k < isingAnneal.saved.length; k++) {
+    const snap = isingAnneal.saved[k]
+    let suffix = ""
+    if (k > 0) suffix = String(k + 1)
+    traces.push(isingHeatmap(snap.lattice, {xaxis: "x" + suffix, yaxis: "y" + suffix}))
+    const hidden = {showticklabels: false, showgrid: false, zeroline: false, ticks: ""}
+    layout["xaxis" + suffix] = {...hidden, constrain: "domain"}
+    layout["yaxis" + suffix] = {...hidden, scaleanchor: "x" + suffix, autorange: "reversed"}
+    annotations.push({text: `T = ${snap.T.toFixed(2)}, M = ${snap.M.toFixed(2)}`, showarrow: false,
+      xref: "x" + suffix + " domain", yref: "y" + suffix + " domain", x: 0.5, y: 1.02, yanchor: "bottom", font: {size: 12}})
+  }
+  return isingSnapshotPlot(traces, layout)
+}
 ```
 
-```{python}
-# Visualization
-plt.figure(figsize=(10,4))
-plt.subplot(1, 2, 1)
-plt.imshow(final_lattice, cmap='gray')
-plt.title(f'Ising Model at T={T}')
+```{ojs}
+//| output: false
+// A lattice run at a fixed temperature: `sweep` 5000 times from a random
+// start, recording the magnetization every 50 sweeps.
+function isingRun(sweep, T, seed) {
+  const L = 20, steps = 5000
+  const rng = VM.sampling.seededRandom(seed)
+  const lattice = isingRandomLattice(L, rng)
+  const magnetizations = []
+  for (let step = 0; step < steps; step++) {
+    sweep(lattice, 1 / T, rng)
+    if (step % (steps / 100) === 0) magnetizations.push(isingMagnetization(lattice))
+  }
+  return {T, lattice, magnetizations}
+}
 
-plt.subplot(1, 2, 2)
-plt.ylim(-1, 1)
-plt.axhline(0, color='black', lw=0.5, ls='--')
-plt.plot(magnetizations)
-plt.xlabel('Sample Step')
-plt.ylabel('Magnetization')
-plt.title('Magnetization Over Time with Mean {:.2f}'.format(np.mean(magnetizations)))
+// The final lattice, and its magnetization trace: the two halves of a run's figure.
+function isingLatticeFigure(plot, run) {
+  const hidden = {showticklabels: false, showgrid: false, zeroline: false, showline: false, ticks: ""}
+  return plot([isingHeatmap(run.lattice, {})], {
+    title: {text: `Ising model at T = ${run.T}`}, margin: {t: 40}, showlegend: false,
+    xaxis: {...hidden, constrain: "domain"}, yaxis: {...hidden, scaleanchor: "x", autorange: "reversed"}
+  })
+}
 
-plt.tight_layout()
-plt.show()
+function isingTraceFigure(plot, run) {
+  const samples = []
+  for (let i = 0; i < run.magnetizations.length; i++) samples.push(i)
+  const mean = VM.distributions.sampleStats(run.magnetizations).mean
+  return plot([{x: samples, y: run.magnetizations, type: "scatter", mode: "lines", line: {color: chartColors.fn, width: 2}}], {
+    title: {text: `Magnetization, mean ${mean.toFixed(2)}`}, margin: {t: 40}, showlegend: false,
+    xaxis: {title: "Sample step"}, yaxis: {title: "Magnetization", range: [-1, 1]},
+    shapes: [{type: "line", xref: "paper", x0: 0, x1: 1, y0: 0, y1: 0, line: {color: chartColors.ink, width: 0.5, dash: "dash"}}]
+  })
+}
 
+isingGibbsRun = isingRun(isingGibbsSweep, 2.0, 7)
 ```
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
+::: {layout-ncol=2}
 
-def initialize_lattice(L):
-    """Initialize a random LxL lattice with spins +/-1."""
-    return np.random.choice([-1, 1], size=(L, L))
-
-def energy(lattice, J=1):
-    """Compute the total energy of the lattice."""
-    L = lattice.shape[0]
-    E = 0
-    for i in range(L):
-        for j in range(L):
-            S = lattice[i, j]
-            neighbors = lattice[(i+1)%L, j] + lattice[i, (j+1)%L] + \
-                        lattice[(i-1)%L, j] + lattice[i, (j-1)%L]
-            E += -J * S * neighbors
-    return E / 2  # Each pair counted twice
-
-def monte_carlo_step(lattice, beta, J=1):
-    """Perform a single Monte Carlo step using the Metropolis algorithm."""
-    L = lattice.shape[0]
-    for _ in range(L*L):
-        i, j = np.random.randint(0, L, size=2)
-        S = lattice[i, j]
-        neighbors = lattice[(i+1)%L, j] + lattice[i, (j+1)%L] + \
-                    lattice[(i-1)%L, j] + lattice[i, (j-1)%L]
-        dE = 2 * J * S * neighbors
-        if dE < 0 or np.random.rand() < np.exp(-beta * dE):
-            lattice[i, j] *= -1
-
-def magnetization(lattice):
-    """Compute the magnetization of the lattice."""
-    return np.sum(lattice) / lattice.size
-
-def simulate_ising(L, T, steps):
-    """Simulate the 2D Ising model for a given temperature and steps."""
-    beta = 1 / T
-    lattice = initialize_lattice(L)
-    magnetizations = []
-    
-    for _ in range(steps):
-        monte_carlo_step(lattice, beta)
-        if _ % (steps // 100) == 0:  # Sample magnetization every 1% of the steps
-            magnetizations.append(magnetization(lattice))
-    return lattice, magnetizations
-
-# Parameters
-L = 20  # Lattice size
-T = 2.5  # Temperature
-steps = 5000  # Number of Monte Carlo steps
-
-# Run simulation
-final_lattice, magnetizations = simulate_ising(L, T, steps)
-
+```{ojs}
+isingLatticeFigure(isingGibbsLatticePlot, isingGibbsRun)
 ```
 
-```{python}
-
-# Visualization
-plt.figure(figsize=(10,4))
-plt.subplot(1, 2, 1)
-plt.imshow(final_lattice, cmap='gray')
-plt.title(f'Ising Model at T={T}')
-
-plt.subplot(1, 2, 2)
-plt.ylim(-1, 1)
-plt.axhline(0, color='black', lw=0.5, ls='--')
-plt.plot(magnetizations)
-plt.xlabel('Sample Step')
-plt.ylabel('Magnetization')
-plt.title('Magnetization Over Time with Mean {:.2f}'.format(np.mean(magnetizations)))
-
-plt.tight_layout()
-plt.show()
+```{ojs}
+isingTraceFigure(isingGibbsTracePlot, isingGibbsRun)
 ```
+
+:::
+
+```{ojs}
+//| output: false
+isingMetropolisRun = isingRun(isingMetropolisSweep, 2.5, 8)
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+isingLatticeFigure(isingMetropolisLatticePlot, isingMetropolisRun)
+```
+
+```{ojs}
+isingTraceFigure(isingMetropolisTracePlot, isingMetropolisRun)
+```
+
+:::
 
 ## Final Remarks
 

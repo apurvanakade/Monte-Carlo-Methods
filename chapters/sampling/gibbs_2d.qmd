@@ -7,25 +7,6 @@ toc: true
 execute:
   echo: false
 ---
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import multivariate_normal
-
-np.random.seed(0)
-```
-
-```{python}
-lags = 20
-threshold = 0.1
-
-# Correlation between X and Y
-def autocorr(x, t):
-  return np.corrcoef(x[:-t], x[t:])[0, 1]
-
-n = 10 # burn-in period
-N = 10000
-```
 
 
 # Gibbs Sampling
@@ -84,174 +65,127 @@ We can easily sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the
 3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
 :::
 
-```{python}
-class truncated_exponential:
-    def __init__(self, lambda_, D):
-        self.lambda_ = lambda_
-        self.D = D
+```{ojs}
+//| output: false
+// The figures in this chapter, before the app. VM and chartColors are
+// defined with the app below.
+g2ExpContourPlot = VM.plotting.persistentPlot({height: "420px"})
+g2ExpSurfacePlot = VM.plotting.persistentPlot({height: "460px"})
+g2ExpScatterPlot = VM.plotting.persistentPlot({height: "480px"})
+g2ExpPathPlot = VM.plotting.persistentPlot({height: "480px"})
+g2NormContourPlot = VM.plotting.persistentPlot({height: "420px"})
+g2NormSurfacePlot = VM.plotting.persistentPlot({height: "460px"})
+g2NormScatterPlot = VM.plotting.persistentPlot({height: "480px"})
+g2NormPathPlot = VM.plotting.persistentPlot({height: "480px"})
 
-    def rvs(self, size=1):
-        """Samples from a truncated exponential distribution over [0, D]"""
-        U = np.random.uniform(0, 1, size)
-        Z = -np.log(1 - U * (1 - np.exp(-self.lambda_ * self.D))) / self.lambda_
-        return Z
+// Joint exponential: f(x, y) = c exp(-lambda x y) on [0, D1] x [0, D2].
+g2Lambda = 2
+g2D1 = 5
+g2D2 = 3
+g2N = 10000
 
-    def pdf(self, x):
-        """Computes the probability density function of the truncated exponential distribution."""
-        return (self.lambda_ * np.exp(-self.lambda_ * x)) / (1 - np.exp(-self.lambda_ * self.D)) * (x >= 0) * (x <= self.D)
+// Unnormalized: the contour and surface plots only need the shape.
+function g2ExpDensity(x, y) {
+  if (x < 0 || x > g2D1 || y < 0 || y > g2D2) return 0
+  return Math.exp(-g2Lambda * x * y)
+}
 
+// One draw from Exp(rate) truncated to [0, D], by the inverse transform
+// X = -log(1 - U (1 - e^{-rate D})) / rate. At rate 0 it is uniform.
+function g2TruncatedExponential(rate, D, u) {
+  if (rate === 0) return D * u
+  return -Math.log(1 - u * (1 - Math.exp(-rate * D))) / rate
+}
 
-class truncated_2D_exponential:
-    def __init__(self, lambda_, D1, D2):
-        self.lambda_ = lambda_
-        self.D1 = D1
-        self.D2 = D2
+// A density on a grid, for Plotly's contour and surface traces.
+function g2Grid(density, lo, hi, count) {
+  const xs = [], z = []
+  for (let i = 0; i < count; i++) xs.push(lo + (hi - lo) * i / (count - 1))
+  for (const y of xs) {
+    const row = []
+    for (const x of xs) row.push(density(x, y))
+    z.push(row)
+  }
+  return {x: xs, y: xs, z}
+}
 
-    def X_given_Y(self, y):
-        """Returns the conditional truncated exponential distribution P(X | Y=y)"""
-        return truncated_exponential(self.lambda_ * y, self.D1)
+function g2Colorscale() {
+  return [[0, VM.plotting.alpha(chartColors.fn, 0.04)], [1, chartColors.fn]]
+}
 
-    def Y_given_X(self, x):
-        """Returns the conditional truncated exponential distribution P(Y | X=x)"""
-        return truncated_exponential(self.lambda_ * x, self.D2)
+function g2Contour(plot, grid, title) {
+  return plot([{...grid, type: "contour", colorscale: g2Colorscale(), ncontours: 20, showscale: false,
+    contours: {coloring: "lines"}, line: {width: 1.5}}], {
+    title: {text: title}, margin: {t: 40}, xaxis: {title: "X"}, yaxis: {title: "Y", scaleanchor: "x"}
+  })
+}
 
-    def rvs(self, size=1000):
-        """Gibbs sampler for the truncated 2D exponential distribution"""
-        X = np.zeros(size)
-        Y = np.zeros(size)
+function g2Surface(plot, grid, title) {
+  const axis = {color: chartColors.ink, gridcolor: VM.plotting.alpha(chartColors.muted, 0.4)}
+  return plot([{...grid, type: "surface", colorscale: g2Colorscale(), showscale: false}], {
+    title: {text: title}, margin: {t: 40},
+    scene: {xaxis: {...axis, title: "X"}, yaxis: {...axis, title: "Y"}, zaxis: {...axis, title: "Density"},
+      camera: {eye: {x: 1.6, y: 1.6, z: 0.8}}}
+  })
+}
 
-        # Initialize Y randomly
-        Y[0] = np.random.uniform(0, self.D2)  # Ensure it's within [0, D2]
+function g2Scatter(plot, chain, title) {
+  return plot([{x: chain.x, y: chain.y, type: "scattergl", mode: "markers",
+    marker: {color: VM.plotting.alpha(chartColors.alt, 0.4), size: 3}, hoverinfo: "skip"}], {
+    title: {text: title}, margin: {t: 40}, showlegend: false, xaxis: {title: "X"}, yaxis: {title: "Y"}
+  })
+}
 
-        for i in range(1, size):
-            # Sample X given the previous Y
-            X[i] = self.X_given_Y(Y[i - 1]).rvs(size=1)[0]
-            # Sample Y given the new X
-            Y[i] = self.Y_given_X(X[i]).rvs(size=1)[0]
-
-        return X, Y
-    
-    def pdf(self, x, y):
-        """Computes the probability density function of the truncated 2D exponential distribution."""
-        if x < 0 or x > self.D1 or y < 0 or y > self.D2:
-            return 0
-        return self.lambda_ ** 2 * np.exp(-self.lambda_ * (x + y)) / (1 - np.exp(-self.lambda_ * self.D1)) / (1 - np.exp(-self.lambda_ * self.D2))
-
-
-# Parameters
-lambda_ = 2
-D1 = 5
-D2 = 3
-num_samples = 5000
-
-# Generate samples
-model = truncated_2D_exponential(lambda_, D1, D2)
-X, Y = model.rvs(num_samples)
+// The first k sweeps as a staircase: a horizontal move to the new X, then a
+// vertical move to the new Y. Later sweeps are drawn more opaque.
+function g2Path(plot, chain, k, title) {
+  const traces = []
+  for (let i = 1; i <= k; i++) {
+    const opacity = Math.log(1 + i / k) / Math.log(2)
+    traces.push({x: [chain.x[i - 1], chain.x[i], chain.x[i]], y: [chain.y[i - 1], chain.y[i - 1], chain.y[i]],
+      type: "scatter", mode: "lines", line: {color: chartColors.fn, width: 1.5}, opacity, showlegend: false, hoverinfo: "skip"})
+  }
+  traces.push({x: chain.x.slice(0, k + 1), y: chain.y.slice(0, k + 1), type: "scatter", mode: "markers",
+    marker: {color: chartColors.alt, size: 5}, name: "Samples"})
+  traces.push({x: [chain.x[0]], y: [chain.y[0]], type: "scatter", mode: "markers",
+    marker: {color: chartColors.ok, size: 12}, name: "Start"})
+  traces.push({x: [chain.x[k]], y: [chain.y[k]], type: "scatter", mode: "markers",
+    marker: {color: chartColors.fn, size: 12}, name: `${k}-th sample`})
+  return VM.plotting.plotWithLegend(plot, traces, {title: {text: title}, margin: {t: 40}, xaxis: {title: "X"}, yaxis: {title: "Y"}})
+}
 ```
 
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # Needed for 3D plots
-
-# Assuming model.pdf is already defined
-x = np.linspace(-0.5, 3, 100)
-y = np.linspace(-0.5, 3, 100)
-X, Y = np.meshgrid(x, y)
-pos = np.empty(X.shape + (2,))
-pos[:, :, 0] = X
-pos[:, :, 1] = Y
-Z = np.array([[model.pdf(xi, yi) for xi, yi in zip(x_row, y_row)] for x_row, y_row in zip(X, Y)])
-
-# Set figure width to 7 inches (700 px at 100 DPI), and height to 14 for vertical stacking
-fig = plt.figure(figsize=(7, 14), tight_layout=True)
-
-# First subplot: Contour plot (top)
-ax1 = fig.add_subplot(211)
-cp = ax1.contour(x, y, Z, levels=20, alpha=0.6)
-ax1.set_xlim(0, 2)
-ax1.set_ylim(0, 2)
-ax1.set_title('Bivariate Exponential Contour Plot')
-ax1.set_xlabel('X')
-ax1.set_ylabel('Y')
-
-# Second subplot: 3D surface plot (bottom)
-ax2 = fig.add_subplot(212, projection='3d')
-ax2.plot_surface(X, Y, Z, cmap='viridis')
-ax2.set_xlabel('X')
-ax2.set_ylabel('Y')
-ax2.set_zlabel('Density')
-ax2.set_title('Bivariate Exponential Density')
-
-plt.show()
+```{ojs}
+g2Contour(g2ExpContourPlot, g2Grid(g2ExpDensity, 0, 3, 120), "Joint exponential: contour plot")
 ```
 
-```{python}
-def gibbs_sampler_exp(lambda_, D1, D2, x0=1.0, y0=1.0):
-    X = np.zeros(N + 1)
-    Y = np.zeros(N + 1)
-    X[0] = x0
-    Y[0] = y0
-    for i in range(N):
-        # Sample X given previous Y
-        rate_x = lambda_ * Y[i] * D1
-        # Prevent rate_x=0 division by zero
-        if rate_x > 0:
-            u = np.random.uniform()
-            X[i+1] = -np.log(1 - u * (1 - np.exp(-rate_x))) / rate_x
-        else:
-            X[i+1] = 0.0
-
-        # Sample Y given new X
-        rate_y = lambda_ * X[i+1] * D2
-        if rate_y > 0:
-            u = np.random.uniform()
-            Y[i+1] = -np.log(1 - u * (1 - np.exp(-rate_y))) / rate_y
-        else:
-            Y[i+1] = 0.0
-    return X, Y
-
-X, Y = gibbs_sampler_exp(lambda_, D1, D2)
+```{ojs}
+g2Surface(g2ExpSurfacePlot, g2Grid(g2ExpDensity, 0, 3, 60), "Joint exponential density")
 ```
 
-```{python}
-#| fig-width: 7
-
-plt.figure(figsize=(7, 7))
-plt.scatter(X, Y, alpha=0.5, color='r', s=5)
-plt.title('Gibbs Sampler for Bivariate Normal')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.show()
+```{ojs}
+//| output: false
+// Gibbs sampler for the joint exponential, from (X0, Y0) = (1, 1):
+// X_i ~ Exp(lambda Y_{i-1}) on [0, D1], then Y_i ~ Exp(lambda X_i) on [0, D2].
+g2ExpChain = {
+  const rng = VM.sampling.seededRandom(0)
+  const x = [1], y = [1]
+  for (let i = 0; i < g2N; i++) {
+    const nextX = g2TruncatedExponential(g2Lambda * y[i], g2D1, rng())
+    x.push(nextX)
+    y.push(g2TruncatedExponential(g2Lambda * nextX, g2D2, rng()))
+  }
+  return {x, y}
+}
 ```
 
-```{python}
-#| fig-width: 7
+```{ojs}
+g2Scatter(g2ExpScatterPlot, g2ExpChain, "Gibbs sampler for the joint exponential")
+```
 
-k = 20
-
-plt.figure(figsize=(7, 7))  # 7 inches wide = 672 px at default 96 DPI
-
-plt.xlim(min(X[:k])-0.5, max(Y[:k])+0.5)
-plt.ylim(min(Y[:k])-0.5, max(X[:k])+0.5)
-
-for i in range(k + 1):
-    if i > 0:
-        alpha = np.log(1 + (i / k)) * np.log(2)
-        plt.plot([X[i - 1], X[i]], [Y[i - 1], Y[i - 1]], 'b-', linewidth=1, alpha=alpha)
-        plt.plot([X[i], X[i]], [Y[i - 1], Y[i]], 'b-', linewidth=1, alpha=alpha)
-    plt.plot(X[i], Y[i], 'ro', markersize=2)
-
-# Start and end points
-plt.plot(X[0], Y[0], 'go', markersize=8, label='Start')
-plt.plot(X[k], Y[k], 'bo', markersize=8, label=f'{k}-th sample')
-plt.legend()
-
-plt.title('Gibbs Sampler Trajectories for Bivariate Exponential')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.show()
+```{ojs}
+g2Path(g2ExpPathPlot, g2ExpChain, 20, "Gibbs sampler trajectory for the joint exponential")
 ```
 
 ## Bivariate Normal Distribution
@@ -284,96 +218,43 @@ We can sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using standard n
 3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
 :::
 
-```{python}
-#| fig-width: 7
+```{ojs}
+//| output: false
+g2Rho = 0.5
 
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import multivariate_normal
-from mpl_toolkits.mplot3d import Axes3D  # Required for 3D plots
-
-rho = 0.5
-rv = multivariate_normal([0, 0], [[1, rho], [rho, 1]])
-
-# 3D plot of the bivariate normal distribution
-x = np.linspace(-3, 3, 100)
-y = np.linspace(-3, 3, 100)
-X, Y = np.meshgrid(x, y)
-pos = np.empty(X.shape + (2,))
-pos[:, :, 0] = X
-pos[:, :, 1] = Y
-Z = rv.pdf(pos)
-
-fig = plt.figure(figsize=(7, 14), tight_layout=True)
-
-# Top subplot: Contour plot
-ax1 = fig.add_subplot(211)
-ax1.contour(x, y, Z, alpha=0.6)
-ax1.set_title('Bivariate Normal Contour Plot')
-ax1.set_xlabel('X')
-ax1.set_ylabel('Y')
-
-# Bottom subplot: 3D surface plot
-ax2 = fig.add_subplot(212, projection='3d')
-ax2.plot_surface(X, Y, Z, cmap='viridis')
-ax2.set_xlabel('X')
-ax2.set_ylabel('Y')
-ax2.set_zlabel('Density')
-ax2.set_title('Bivariate Normal PDF')
-
-plt.show()
+// Standard bivariate normal density with correlation g2Rho.
+function g2NormalDensity(x, y) {
+  const r = g2Rho
+  const q = (x * x - 2 * r * x * y + y * y) / (1 - r * r)
+  return Math.exp(-q / 2) / (2 * Math.PI * Math.sqrt(1 - r * r))
+}
 ```
 
-```{python}
-def gibbs_sampler(rho, N):
-  # In Gibbs we have a 100% acceptance rate
-  X = np.zeros(N + 1) 
-  Y = np.zeros(N + 1)
-  for i in range(N): #np.arange(0,N,1):
-    X[i+1] = rho * Y[i] + np.sqrt(1-rho**2) * np.random.normal(0,1)
-    Y[i+1] = rho * X[i+1] + np.sqrt(1-rho**2) * np.random.normal(0,1)
-  return X, Y
-
-X, Y = gibbs_sampler(rho, N)
+```{ojs}
+g2Contour(g2NormContourPlot, g2Grid(g2NormalDensity, -3, 3, 120), "Bivariate normal: contour plot")
 ```
 
-```{python}
-#| fig-width: 7
-
-plt.figure(figsize=(7, 7))
-plt.scatter(X, Y, alpha=0.5, color='r', s=5)
-plt.title('Gibbs Sampler for Bivariate Normal')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.show()
+```{ojs}
+g2Surface(g2NormSurfacePlot, g2Grid(g2NormalDensity, -3, 3, 60), "Bivariate normal density")
 ```
 
-```{python}
-#| fig-width: 7
+```{ojs}
+//| output: false
+// X_i ~ N(rho Y_{i-1}, 1 - rho²), then Y_i ~ N(rho X_i, 1 - rho²), from (0, 0).
+g2NormChain = VM.mcmc.gibbsBivariateNormal({
+  rho: g2Rho,
+  n: g2N,
+  start: [0, 0],
+  gaussian: VM.sampling.gaussianRandom(VM.sampling.seededRandom(0))
+})
+```
 
-k = 20
+```{ojs}
+g2Scatter(g2NormScatterPlot, g2NormChain, "Gibbs sampler for the bivariate normal")
+```
 
-plt.figure(figsize=(7, 7))  # 7 inches wide = 700px at 100 DPI
-
-plt.xlim(min(X[:k]) - 0.5, max(X[:k]) + 0.5)
-plt.ylim(min(Y[:k]) - 0.5, max(Y[:k]) + 0.5)
-
-for i in range(k + 1):
-    if i > 0:
-        alpha = np.log(1 + (i / k)) * np.log(2)
-        plt.plot([X[i - 1], X[i]], [Y[i - 1], Y[i - 1]], 'b-', linewidth=1, alpha=alpha)
-        plt.plot([X[i], X[i]], [Y[i - 1], Y[i]], 'b-', linewidth=1, alpha=alpha)
-    plt.plot(X[i], Y[i], 'ro', markersize=2)
-
-# Mark start and end points
-plt.plot(X[0], Y[0], 'go', markersize=8, label='Start')
-plt.plot(X[k], Y[k], 'bo', markersize=8, label=f'{k}-th sample')
-plt.legend()
-
-plt.title('Gibbs Sampler Trajectories for Bivariate Normal')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.show()
+```{ojs}
+g2Path(g2NormPathPlot, g2NormChain, 20, "Gibbs sampler trajectory for the bivariate normal")
 ```
 
 The app below runs the sampler from $(2.5, -2.5)$. Drag $\rho$ toward $\pm 1$: the ellipses of the target narrow, each conditional step shrinks to a standard deviation of $\sqrt{1 - \rho^2}$, and the chain's axis-parallel staircase can only creep along the diagonal. At $\rho = 0$ the two coordinates are independent and every sweep is an exact, independent draw.

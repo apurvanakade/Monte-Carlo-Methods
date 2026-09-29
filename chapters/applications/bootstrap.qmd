@@ -171,111 +171,142 @@ While the non-parametric bootstrap is remarkably versatile, several limitations 
 Despite these limitations, the non-parametric bootstrap remains one of the most widely applicable and robust methods for statistical inference, particularly when distributional assumptions are questionable or when analytical results are unavailable.
 
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-np.random.seed(42)
+bsGridPlots = {
+  const plots = []
+  for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({height: "340px"}))
+  return plots
+}
+bsRidgePlot = VM.plotting.persistentPlot({height: "520px"})
+bsFitPlot = VM.plotting.persistentPlot({height: "380px"})
+bsComparePlot = VM.plotting.persistentPlot({height: "380px"})
 
-true_mean, true_std = 0, 1
-true_dist = stats.norm(true_mean, true_std)
+function bsNormalSample(n, mean, sd, gaussian) {
+  const out = []
+  for (let i = 0; i < n; i++) out.push(mean + sd * gaussian())
+  return out
+}
 
-def bootstrap_means(sample, n_bootstrap=1000):
-    """Bootstrap the sample mean"""
-    bootstrap_means = []
-    n = len(sample)
-    for _ in range(n_bootstrap):
-        bootstrap_sample = np.random.choice(sample, size=n, replace=True)
-        bootstrap_means.append(np.mean(bootstrap_sample))
-    return np.array(bootstrap_means)
+// B bootstrap replicates of statistic(resample), each resample drawn from
+// `data` with replacement.
+function bsBootstrap(data, statistic, B, rng) {
+  const out = []
+  const n = data.length
+  for (let b = 0; b < B; b++) {
+    const resample = []
+    for (let i = 0; i < n; i++) resample.push(data[Math.floor(rng() * n)])
+    out.push(statistic(resample))
+  }
+  return out
+}
 
-sample_sizes = [5, 10, 25, 50]
-n_bootstrap = 2000
+function bsMean(values) {
+  return VM.distributions.sampleStats(values).mean
+}
 
-# First figure: Original samples vs Bootstrap distributions (2x2 grid)
-fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-fig.suptitle('Bootstrap Convergence to Normal Distribution', fontsize=14)
+function bsLinspace(lo, hi, count) {
+  const out = []
+  for (let i = 0; i < count; i++) out.push(lo + (hi - lo) * i / (count - 1))
+  return out
+}
 
-x_range = np.linspace(-4, 4, 1000)
-true_pdf = true_dist.pdf(x_range)
+// Bootstrap distributions of the sample mean, for a N(0, 1) sample of each
+// size, with the normal approximation N(x̄, s² / n) they should approach.
+bsMeans = {
+  const rng = VM.sampling.seededRandom(42)
+  const gaussian = VM.sampling.gaussianRandom(rng)
+  const out = []
+  for (const n of [5, 10, 25, 50]) {
+    const sample = bsNormalSample(n, 0, 1, gaussian)
+    const stats = VM.distributions.sampleStats(sample)
+    out.push({n, boot: bsBootstrap(sample, bsMean, 2000, rng), center: stats.mean, se: stats.sd / Math.sqrt(n)})
+  }
+  return out
+}
 
-for i, n in enumerate(sample_sizes):
-    row = i // 2
-    col = i % 2
-    
-    sample = np.random.normal(true_mean, true_std, n)
-    boot_means = bootstrap_means(sample, n_bootstrap)
-    
-    # Bootstrap distributions
-    axes[row, col].hist(boot_means, bins=30, alpha=0.7, color='lightcoral', 
-                       density=True, label='Bootstrap Distribution')
-    
-    theoretical_mean = np.mean(sample)
-    theoretical_std = np.std(sample, ddof=1) / np.sqrt(n)
-    theoretical_x = np.linspace(boot_means.min(), boot_means.max(), 200)
-    theoretical_pdf = stats.norm.pdf(theoretical_x, theoretical_mean, theoretical_std)
-    axes[row, col].plot(theoretical_x, theoretical_pdf, 'b-', linewidth=2, 
-                       label='Theoretical Normal')
-    
-    axes[row, col].axvline(np.mean(boot_means), color='red', linestyle='--', 
-                          linewidth=2, label=f'Mean: {np.mean(boot_means):.2f}')
-    
-    axes[row, col].set_title(f'Sample Size n = {n}')
-    axes[row, col].legend()
-    axes[row, col].grid(True, alpha=0.3)
-    
-    boot_std = np.std(boot_means)
-    axes[row, col].text(0.05, 0.95, f'SE: {boot_std:.3f}', 
-                       transform=axes[row, col].transAxes, fontsize=10, 
-                       verticalalignment='top',
-                       bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+function bsMeansFigure(plot, run) {
+  const bins = VM.distributions.histogramBins(run.boot, 30)
+  const bootStats = VM.distributions.sampleStats(run.boot, {ddof: 0})
+  const xs = bsLinspace(Math.min(...run.boot), Math.max(...run.boot), 200)
+  const ys = []
+  for (const x of xs) ys.push(VM.distributions.normalPdf(x, run.center, run.se * run.se))
+  return VM.plotting.plotWithLegend(plot, [
+    {x: bins.centers, y: bins.densities, type: "bar", name: "Bootstrap distribution", marker: {color: VM.plotting.alpha(chartColors.alt, 0.45)}},
+    {x: xs, y: ys, type: "scatter", mode: "lines", name: "Theoretical normal", line: {color: chartColors.fn, width: 2}},
+    {x: [bootStats.mean, bootStats.mean], y: [0, Math.max(...bins.densities)], type: "scatter", mode: "lines",
+      name: `Mean: ${bootStats.mean.toFixed(2)}`, line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {
+    title: {text: `Sample size n = ${run.n}`}, margin: {t: 40}, bargap: 0.05,
+    legend: {orientation: "h", y: -0.15},
+    annotations: [{xref: "paper", yref: "paper", x: 0.02, y: 0.98, xanchor: "left", yanchor: "top", showarrow: false,
+      text: `SE: ${bootStats.sd.toFixed(3)}`, bordercolor: chartColors.muted, borderpad: 4}]
+  })
+}
+```
 
-plt.tight_layout()
-plt.show()
+::: {layout-ncol=2}
 
-# Second figure: Convergence comparison
-fig, ax = plt.subplots(1, 1, figsize=(10, 8))
+```{ojs}
+bsMeansFigure(bsGridPlots[0], bsMeans[0])
+```
 
-sample_sizes_detailed = [3, 5, 10, 20, 50]
-colors = ['red', 'orange', 'green', 'blue', 'purple']
+```{ojs}
+bsMeansFigure(bsGridPlots[1], bsMeans[1])
+```
 
-x_min, x_max = -2, 2
-y_positions = np.arange(len(sample_sizes_detailed))
+```{ojs}
+bsMeansFigure(bsGridPlots[2], bsMeans[2])
+```
 
-for i, (n, color) in enumerate(zip(sample_sizes_detailed, colors)):
-    np.random.seed(42 + i)
-    sample = np.random.normal(true_mean, true_std, n)
-    boot_means = bootstrap_means(sample, 1000)
-    
-    hist_counts, hist_bins = np.histogram(boot_means, bins=30, density=True)
-    hist_centers = (hist_bins[:-1] + hist_bins[1:]) / 2
-    hist_heights = hist_counts * 0.2
-    
-    y_base = i
-    ax.fill_between(hist_centers, y_base, y_base + hist_heights, 
-                    alpha=0.6, color=color, label=f'n={n}')
-    
-    sample_mean = np.mean(sample)
-    sample_se = np.std(sample, ddof=1) / np.sqrt(n)
-    x_theory = np.linspace(x_min, x_max, 200)
-    y_theory = stats.norm.pdf(x_theory, sample_mean, sample_se)
-    y_theory_scaled = y_theory * 0.2
-    
-    ax.plot(x_theory, y_base + y_theory_scaled, 'k-', linewidth=2, alpha=0.8)
+```{ojs}
+bsMeansFigure(bsGridPlots[3], bsMeans[3])
+```
 
-ax.set_xlim(x_min, x_max)
-ax.set_ylim(-0.5, len(sample_sizes_detailed))
-ax.set_xlabel('Bootstrap Sample Mean')
-ax.set_ylabel('Sample Size')
-ax.set_yticks(y_positions)
-ax.set_yticklabels([f'n={n}' for n in sample_sizes_detailed])
-ax.set_title('Bootstrap Distribution Convergence\n(Colored: Bootstrap, Black: Theoretical)')
-ax.grid(True, alpha=0.3)
-ax.legend(loc='upper right')
+:::
 
-plt.tight_layout()
-plt.show()
+```{ojs}
+{
+  // Bootstrap distributions of the mean (colored) against the normal
+  // approximation (black) for n = 3 ... 50, stacked one row per n.
+  const sizes = [3, 5, 10, 20, 50]
+  const palette = ["alt", "warn", "ok", "fn", "accent2"]
+  const traces = []
+  for (let i = 0; i < sizes.length; i++) {
+    const n = sizes[i]
+    const rng = VM.sampling.seededRandom(42 + i)
+    const sample = bsNormalSample(n, 0, 1, VM.sampling.gaussianRandom(rng))
+    const boot = bsBootstrap(sample, bsMean, 1000, rng)
+    const bins = VM.distributions.histogramBins(boot, 30)
+    const color = chartColors[palette[i]]
+    // A filled outline from the baseline y = i up to i + 0.2 · density.
+    const px = [bins.centers[0]], py = [i]
+    for (let k = 0; k < bins.centers.length; k++) {
+      px.push(bins.centers[k])
+      py.push(i + 0.2 * bins.densities[k])
+    }
+    px.push(bins.centers[bins.centers.length - 1])
+    py.push(i)
+    traces.push({x: px, y: py, type: "scatter", mode: "lines", fill: "toself", name: `n=${n}`,
+      fillcolor: VM.plotting.alpha(color, 0.6), line: {color, width: 1}})
+    const stats = VM.distributions.sampleStats(sample)
+    const se = stats.sd / Math.sqrt(n)
+    const xs = bsLinspace(-2, 2, 200), ys = []
+    for (const x of xs) ys.push(i + 0.2 * VM.distributions.normalPdf(x, stats.mean, se * se))
+    traces.push({x: xs, y: ys, type: "scatter", mode: "lines", showlegend: false, line: {color: chartColors.ink, width: 2}})
+  }
+  const labels = []
+  for (const n of sizes) labels.push(`n=${n}`)
+  return VM.plotting.plotWithLegend(bsRidgePlot, traces, {
+    title: {text: "Bootstrap (colored) vs. normal approximation (black)"}, margin: {t: 40},
+    xaxis: {title: "Bootstrap sample mean", range: [-2, 2]},
+    yaxis: {title: "Sample size", range: [-0.5, sizes.length], tickvals: [0, 1, 2, 3, 4], ticktext: labels}
+  })
+}
 ```
 
 
@@ -341,101 +372,100 @@ For exponentially distributed data, bootstrap the sample mean $\bar{X}$.
 
 When the exponential assumption is correct, this provides exact inference using the known $\chi^2$ distribution properties.
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import stats
+```{ojs}
+//| output: false
+// A sample of 25 from N(5, 1.5²), and the bootstrap distribution of the
+// estimate of P(X > 8): non-parametric (resample the data) and parametric
+// (draw from the normal fitted to the data).
+bsTail = {
+  const n = 25, mu = 5, sigma = 1.5, threshold = 8, B = 2000
+  const rng = VM.sampling.seededRandom(42)
+  const gaussian = VM.sampling.gaussianRandom(rng)
+  const data = bsNormalSample(n, mu, sigma, gaussian)
+  // The maximum-likelihood fit: the sample mean and the n-denominator sd.
+  const fit = VM.distributions.sampleStats(data, {ddof: 0})
+  function aboveThreshold(values) {
+    let count = 0
+    for (const v of values) {
+      if (v > threshold) count++
+    }
+    return count / values.length
+  }
+  const nonparametric = bsBootstrap(data, aboveThreshold, B, rng)
+  const parametric = []
+  for (let b = 0; b < B; b++) parametric.push(aboveThreshold(bsNormalSample(n, fit.mean, fit.sd, gaussian)))
+  // One resample of each kind, for the comparison plot.
+  const exampleRng = VM.sampling.seededRandom(123)
+  const nonparametricSample = bsBootstrap(data, x => x, 1, exampleRng)[0]
+  const parametricSample = bsNormalSample(n, fit.mean, fit.sd, VM.sampling.gaussianRandom(exampleRng))
+  return {
+    threshold, data, fit, nonparametricSample, parametricSample,
+    trueProb: 1 - VM.distributions.normalCdf(threshold, mu, sigma * sigma),
+    nonparametricMean: bsMean(nonparametric),
+    parametricMean: bsMean(parametric)
+  }
+}
 
-np.random.seed(42)
+function bsThresholdLine(height) {
+  return {x: [bsTail.threshold, bsTail.threshold], y: [0, height], type: "scatter", mode: "lines", name: "Threshold",
+    line: {color: chartColors.alt, dash: "dash", width: 2}}
+}
+```
 
-def bootstrap_statistic_nonparametric(data, statistic_func, n_bootstrap=1000):
-    """Non-parametric bootstrap"""
-    bootstrap_stats = []
-    n = len(data)
-    for _ in range(n_bootstrap):
-        bootstrap_sample = np.random.choice(data, size=n, replace=True)
-        bootstrap_stats.append(statistic_func(bootstrap_sample))
-    return np.array(bootstrap_stats)
+::: {layout-ncol=2}
 
-def bootstrap_statistic_parametric(data, distribution, statistic_func, n_bootstrap=1000):
-    """Parametric bootstrap"""
-    params = distribution.fit(data)
-    n = len(data)
-    
-    bootstrap_stats = []
-    for _ in range(n_bootstrap):
-        bootstrap_sample = distribution.rvs(*params, size=n)
-        bootstrap_stats.append(statistic_func(bootstrap_sample))
-    return np.array(bootstrap_stats)
+```{ojs}
+{
+  const t = bsTail
+  const bins = VM.distributions.histogramBins(t.data, 15)
+  const xs = bsLinspace(-1, 10, 300), ys = [], tailX = [], tailY = []
+  for (const x of xs) {
+    const y = VM.distributions.normalPdf(x, t.fit.mean, t.fit.variance)
+    ys.push(y)
+    if (x > t.threshold) {
+      tailX.push(x)
+      tailY.push(y)
+    }
+  }
+  return VM.plotting.plotWithLegend(bsFitPlot, [
+    {x: bins.centers, y: bins.densities, type: "bar", name: "Sample data", marker: {color: VM.plotting.alpha(chartColors.fn, 0.45), line: {color: chartColors.ink, width: 1}}},
+    {x: xs, y: ys, type: "scatter", mode: "lines", name: "Fitted normal", line: {color: chartColors.alt, width: 2}},
+    {x: tailX, y: tailY, type: "scatter", mode: "lines", fill: "tozeroy", showlegend: false, line: {width: 0},
+      fillcolor: VM.plotting.alpha(chartColors.alt, 0.3), hoverinfo: "skip"},
+    bsThresholdLine(Math.max(...bins.densities))
+  ], {title: {text: "Sample data and fitted distribution"}, margin: {t: 40}, bargap: 0.05,
+    xaxis: {range: [-1, 10]}, legend: {orientation: "h", y: -0.15}})
+}
+```
 
-def probability_above_threshold(x, threshold=8):
-    """Estimate P(X > threshold)"""
-    return np.mean(x > threshold)
+```{ojs}
+{
+  const t = bsTail
+  const nonparametric = VM.distributions.histogramBins(t.nonparametricSample, 12)
+  const parametric = VM.distributions.histogramBins(t.parametricSample, 12)
+  return VM.plotting.plotWithLegend(bsComparePlot, [
+    {x: nonparametric.centers, y: nonparametric.densities, type: "bar", name: "Non-parametric",
+      marker: {color: VM.plotting.alpha(chartColors.fn, 0.6), line: {color: chartColors.fn, width: 1}}},
+    {x: parametric.centers, y: parametric.densities, type: "bar", name: "Parametric",
+      marker: {color: VM.plotting.alpha(chartColors.alt, 0.6), line: {color: chartColors.alt, width: 1}}},
+    bsThresholdLine(Math.max(...nonparametric.densities, ...parametric.densities))
+  ], {title: {text: "Bootstrap sample comparison"}, margin: {t: 40}, barmode: "overlay",
+    xaxis: {range: [-1, 10]}, legend: {orientation: "h", y: -0.15}})
+}
+```
 
-# Generate sample from normal distribution
-n_samples = 25
-true_mu, true_sigma = 5, 1.5
-n_bootstrap = 2000
+:::
 
-normal_data = np.random.normal(loc=true_mu, scale=true_sigma, size=n_samples)
-true_prob = 1 - stats.norm.cdf(8, loc=true_mu, scale=true_sigma)
-
-# Bootstrap estimates
-nonparam_probs = bootstrap_statistic_nonparametric(normal_data, 
-                                                  lambda x: probability_above_threshold(x, 8), 
-                                                  n_bootstrap)
-param_probs = bootstrap_statistic_parametric(normal_data, stats.norm, 
-                                            lambda x: probability_above_threshold(x, 8), 
-                                            n_bootstrap)
-
-# Create visualization
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-
-# Left: Sample data and fitted distribution
-axes[0].hist(normal_data, bins=15, alpha=0.7, color='lightblue', 
-             density=True, edgecolor='black', label='Sample data')
-
-mu_hat, sigma_hat = stats.norm.fit(normal_data)
-x_range = np.linspace(-1, 10, 300)
-fitted_curve = stats.norm.pdf(x_range, mu_hat, sigma_hat)
-
-axes[0].plot(x_range, fitted_curve, 'r-', linewidth=2, label='Fitted normal')
-axes[0].axvline(8, color='red', linestyle='--', linewidth=2, label='Threshold')
-axes[0].fill_between(x_range[x_range > 8], fitted_curve[x_range > 8], 
-                    alpha=0.3, color='red')
-axes[0].set_title('Sample Data and Fitted Distribution')
-axes[0].legend()
-axes[0].grid(True, alpha=0.3)
-axes[0].set_xlim(-1, 10)
-
-# Right: Bootstrap sample comparison
-np.random.seed(123)
-nonparam_sample = np.random.choice(normal_data, size=n_samples, replace=True)
-param_sample = stats.norm.rvs(mu_hat, sigma_hat, size=n_samples)
-
-axes[1].hist(nonparam_sample, bins=12, alpha=0.7, color='blue', 
-             density=True, label='Non-parametric', edgecolor='darkblue')
-axes[1].hist(param_sample, bins=12, alpha=0.7, color='red', 
-             density=True, label='Parametric', edgecolor='darkred')
-axes[1].axvline(8, color='red', linestyle='--', linewidth=2, label='Threshold')
-axes[1].set_title('Bootstrap Sample Comparison')
-axes[1].legend()
-axes[1].grid(True, alpha=0.3)
-axes[1].set_xlim(-1, 10)
-
-plt.tight_layout()
-plt.show()
-
-# Results
-nonparam_mean = np.mean(nonparam_probs)
-param_mean = np.mean(param_probs)
-nonparam_bias = abs(nonparam_mean - true_prob)
-param_bias = abs(param_mean - true_prob)
-
-print(f"True P(X > 8): {true_prob:.4f}")
-print(f"Non-parametric estimate: {nonparam_mean:.4f} (bias: {nonparam_bias:.4f})")
-print(f"Parametric estimate: {param_mean:.4f} (bias: {param_bias:.4f})")
-
+```{ojs}
+VM.ui.statRow([
+  {label: "True P(X > 8)", value: bsTail.trueProb.toFixed(4)},
+  {label: "Non-parametric estimate", value: bsTail.nonparametricMean.toFixed(4),
+    title: `bias ${Math.abs(bsTail.nonparametricMean - bsTail.trueProb).toFixed(4)}`},
+  {label: "Parametric estimate", value: bsTail.parametricMean.toFixed(4),
+    title: `bias ${Math.abs(bsTail.parametricMean - bsTail.trueProb).toFixed(4)}`},
+  {label: "Non-parametric bias", value: Math.abs(bsTail.nonparametricMean - bsTail.trueProb).toFixed(4)},
+  {label: "Parametric bias", value: Math.abs(bsTail.parametricMean - bsTail.trueProb).toFixed(4)}
+])
 ```
 
 ### Comparison: Parametric vs Non-parametric

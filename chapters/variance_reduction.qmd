@@ -122,90 +122,95 @@ $$
 This proposal concentrates samples in the tail region where the indicator function is non-zero.
 :::
 
-```{python}
-#| code-summary: "Show code for importance sampling example"
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-import numpy as np
-from scipy.stats import norm, expon
-import matplotlib.pyplot as plt
+// Running average of an array: out[i] = mean of values[0..i].
+function vrRunningAverage(values) {
+  const out = []
+  let sum = 0
+  for (let i = 0; i < values.length; i++) {
+    sum += values[i]
+    out.push(sum / (i + 1))
+  }
+  return out
+}
 
-# Set random seed for reproducibility
-np.random.seed(42)
+// Indices 1..n, for x-axes counting samples.
+function vrCounts(n) {
+  const out = []
+  for (let i = 1; i <= n; i++) out.push(i)
+  return out
+}
 
-# Parameters
-N = 4000
-shift = 2
-scale = 1
-mu, sigma = 0, 1  # Standard normal parameters
+// A running-average chart: one line per estimator plus the true value.
+function vrConvergenceFigure(plot, series, trueValue, xTitle, title, yRange) {
+  const n = series[0].values.length
+  const traces = []
+  for (const s of series) {
+    traces.push({x: vrCounts(n), y: s.values, type: "scatter", mode: "lines", name: s.name, line: {color: chartColors[s.color], width: 2}})
+  }
+  traces.push({x: [1, n], y: [trueValue, trueValue], type: "scatter", mode: "lines",
+    name: `True value: ${trueValue.toFixed(6)}`, line: {color: chartColors.ink, dash: "dash", width: 2}})
+  const yaxis = {title: "Running average"}
+  if (yRange) yaxis.range = yRange
+  return VM.plotting.plotWithLegend(plot, traces, {title: {text: title}, margin: {t: 40}, xaxis: {title: xTitle}, yaxis})
+}
 
-# Define distributions
-target_pdf = lambda x: norm.pdf(x, loc=mu, scale=sigma)
-proposal_pdf = lambda x: expon.pdf(x - shift, scale=scale) * (x > shift)
-proposal_rvs = lambda size: expon.rvs(scale=scale, size=size) + shift
+vrIsPlot = VM.plotting.persistentPlot({height: "420px"})
 
-# Importance Sampling
-samples_is = proposal_rvs(N)
-weights = target_pdf(samples_is) / proposal_pdf(samples_is)
-
-# Estimate probability P(X > 2)
-indicator = samples_is > 2  # Always true for our proposal
-estimate_is = np.mean(indicator * weights)
-
-# Crude Monte Carlo (direct sampling from normal)
-samples_crude = np.random.normal(loc=mu, scale=sigma, size=N)
-estimate_crude = np.mean(samples_crude > 2)
-
-# Compute running averages
-running_avg_is = np.cumsum(indicator * weights) / np.arange(1, N + 1)
-running_avg_crude = np.cumsum(samples_crude > 2) / np.arange(1, N + 1)
-
-# True value
-true_value = 1 - norm.cdf(2)
+// Estimate P(X > 2) for X ~ N(0, 1), with N = 4000 samples each way.
+vrImportance = {
+  const N = 4000
+  const rng = VM.sampling.seededRandom(42)
+  const proposal = VM.sampling.exponentialRandom(rng, 1)
+  const gaussian = VM.sampling.gaussianRandom(rng)
+  // Importance sampling: Y = 2 + Exp(1), weight phi(Y) / q(Y) with
+  // q(y) = exp(-(y - 2)). Every Y is above 2, so the indicator is always 1.
+  const weighted = [], crude = []
+  for (let i = 0; i < N; i++) {
+    const y = 2 + proposal()
+    weighted.push(VM.distributions.normalPdf(y, 0, 1) / Math.exp(-(y - 2)))
+    let hit = 0
+    if (gaussian() > 2) hit = 1
+    crude.push(hit)
+  }
+  return {
+    N,
+    trueValue: 1 - VM.distributions.normalCdf(2),
+    weighted, crude,
+    isStats: VM.distributions.sampleStats(weighted, {ddof: 0}),
+    crudeStats: VM.distributions.sampleStats(crude, {ddof: 0})
+  }
+}
 ```
 
-```{python}
-#| code-summary: "Show plotting code"
+```{ojs}
+{
+  const r = vrImportance
+  return vrConvergenceFigure(vrIsPlot, [
+    {name: "Crude MC", values: vrRunningAverage(r.crude), color: "fn"},
+    {name: "Importance sampling", values: vrRunningAverage(r.weighted), color: "warn"}
+  ], r.trueValue, "Number of samples", "Importance sampling vs. crude Monte Carlo", [0, 0.04])
+}
+```
 
-# Create figure with improved styling
-plt.figure(figsize=(12, 6))
-plt.style.use('seaborn-v0_8-darkgrid')
-
-# Plot running averages
-plt.plot(running_avg_crude, label=f'Crude MC (Final: {estimate_crude:.5f})', 
-         alpha=0.8, linewidth=2)
-plt.plot(running_avg_is, label=f'Importance Sampling (Final: {estimate_is:.5f})', 
-         alpha=0.8, linewidth=2)
-plt.axhline(y=true_value, color='red', linestyle='--', 
-            label=f'True Value: {true_value:.5f}', linewidth=2)
-
-# Formatting
-plt.xlabel('Number of Samples', fontsize=12)
-plt.ylabel('Running Average', fontsize=12)
-plt.title('Comparison of Estimators: Importance Sampling vs. Crude Monte Carlo', 
-          fontsize=14, pad=20)
-plt.legend(fontsize=11, loc='best')
-plt.ylim(-0.00, 0.04)
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-# Calculate and display variance metrics
-variance_is = np.var(indicator * weights) / N
-variance_crude = np.var(samples_crude > 2) / N
-relative_error_is = np.sqrt(variance_is) / estimate_is if estimate_is > 0 else np.inf
-relative_error_crude = np.sqrt(variance_crude) / estimate_crude if estimate_crude > 0 else np.inf
-
-print(f"\nImportance Sampling:")
-print(f"  Estimate: {estimate_is:.5f}")
-print(f"  Variance: {variance_is:.2e}")
-print(f"  Relative Error: {relative_error_is:.3f}")
-
-print(f"\nCrude Monte Carlo:")
-print(f"  Estimate: {estimate_crude:.5f}")
-print(f"  Variance: {variance_crude:.2e}")
-print(f"  Relative Error: {relative_error_crude:.3f}")
-
-print(f"\nVariance Reduction Factor: {variance_crude/variance_is:.1f}x")
+```{ojs}
+{
+  const r = vrImportance
+  const rows = []
+  for (const [name, stats] of [["Importance sampling", r.isStats], ["Crude Monte Carlo", r.crudeStats]]) {
+    // Variance of the estimator (the sample mean), and its relative error.
+    const variance = stats.variance / r.N
+    rows.push([name, stats.mean.toFixed(5), variance.toExponential(2), (Math.sqrt(variance) / stats.mean).toFixed(3)])
+  }
+  const factor = r.crudeStats.variance / r.isStats.variance
+  return html`${VM.ui.renderTable({html, rows, headers: ["Method", "Estimate", "Variance", "Relative error"], filename: "importance-sampling.csv"})}
+    ${VM.ui.statRow([{label: "True value", value: r.trueValue.toFixed(5)}, {label: "Variance reduction factor", value: `${factor.toFixed(1)}×`}])}`
+}
 ```
 
 ### Key Considerations for Importance Sampling
@@ -257,127 +262,98 @@ In practice, we often estimate $\beta^*$ from pilot samples or use a reasonable 
 **Control Variates.** We estimate $\ell = \int_0^1 x e^{-x} dx$ using the control function $h(x) = x$. Since $X \sim \text{Uniform}(0,1)$, we know $\mathbb{E}[h(X)] = \frac{1}{2}$.
 :::
 
-```{python}
-#| code-summary: "Show code for control variates example"
+```{ojs}
+//| output: false
+vrCvPlot = VM.plotting.persistentPlot({height: "420px"})
+vrCvConvergencePlot = VM.plotting.persistentPlot({height: "420px"})
 
-# Function to integrate
-def f(x):
-    return x * np.exp(-x)
+// Estimate the integral of f(x) = x e^{-x} over [0, 1] (exactly 1 - 2/e)
+// with the control h(x) = x, E[h(X)] = 1/2.
+vrControl = {
+  const N = 1000
+  const h0 = 0.5
+  const rng = VM.sampling.seededRandom(42)
+  const xs = [], fs = []
+  for (let i = 0; i < N; i++) {
+    const x = rng()
+    xs.push(x)
+    fs.push(x * Math.exp(-x))
+  }
+  // beta* = Cov(f, h) / Var(h), estimated from the first 100 samples.
+  const pilot = 100
+  const fPilot = VM.distributions.sampleStats(fs.slice(0, pilot))
+  const hPilot = VM.distributions.sampleStats(xs.slice(0, pilot))
+  let cov = 0
+  for (let i = 0; i < pilot; i++) cov += (fs[i] - fPilot.mean) * (xs[i] - hPilot.mean)
+  cov /= pilot - 1
+  const betaEst = cov / hPilot.variance
 
-def h(x):
-    return x
+  // The control-variate samples f(X) - beta (h(X) - h0) for one beta.
+  function samplesFor(beta) {
+    const out = []
+    for (let i = 0; i < N; i++) out.push(fs[i] - beta * (xs[i] - h0))
+    return out
+  }
+  function estimatorFor(beta) {
+    const stats = VM.distributions.sampleStats(samplesFor(beta), {ddof: 0})
+    return {beta, estimate: stats.mean, variance: stats.variance / N}
+  }
 
-# Set random seed
-np.random.seed(42)
-
-# Number of samples
-N = 1000
-
-# Generate samples
-X = np.random.uniform(0, 1, N)
-
-# Known expectation of control variate
-h_0 = 0.5  # E[X] for X ~ Uniform(0,1)
-
-# Estimate optimal beta using pilot samples
-pilot_size = 100
-X_pilot = X[:pilot_size]
-f_pilot = f(X_pilot)
-h_pilot = h(X_pilot)
-beta_est = np.cov(f_pilot, h_pilot)[0,1] / np.var(h_pilot)
-
-# Try different beta values including the estimated one
-beta_values = [0, 0.2, beta_est, 0.5, 0.7]
-results = {}
-
-for beta in beta_values:
-    # Control variate estimator
-    cv_samples = f(X) - beta * (h(X) - h_0)
-    estimate = np.mean(cv_samples)
-    variance = np.var(cv_samples) / N
-    results[beta] = {'estimate': estimate, 'variance': variance}
-
-# Standard Monte Carlo
-standard_samples = f(X)
-estimate_standard = np.mean(standard_samples)
-var_standard = np.var(standard_samples) / N
-
-# True value: integral of x*e^(-x) from 0 to 1 = 1 - 2/e
-true_value = 1 - 2/np.e
+  const tested = []
+  for (const beta of [0, 0.2, betaEst, 0.5, 0.7]) tested.push(estimatorFor(beta))
+  tested.sort((a, b) => a.beta - b.beta)
+  const curve = []
+  for (let i = 0; i < 100; i++) curve.push(estimatorFor(-0.5 + 1.5 * i / 99))
+  return {N, h0, betaEst, tested, curve, standard: estimatorFor(0), trueValue: 1 - 2 / Math.E,
+    runningStandard: vrRunningAverage(fs), runningControl: vrRunningAverage(samplesFor(betaEst))}
+}
 ```
 
-```{python}
-#| code-summary: "Show plotting code"
-
-# Create figure for variance comparison
-plt.figure(figsize=(12, 6))
-plt.style.use('seaborn-v0_8-darkgrid')
-
-# Plot variance as function of beta
-beta_range = np.linspace(-0.5, 1.0, 100)
-variances = []
-
-for b in beta_range:
-    cv_samples = f(X) - b * (h(X) - h_0)
-    variances.append(np.var(cv_samples) / N)
-
-plt.plot(beta_range, variances, 'b-', linewidth=2, label='Variance')
-plt.axhline(y=var_standard, color='red', linestyle='--', 
-            label='Standard MC Variance', linewidth=2)
-plt.axvline(x=beta_est, color='green', linestyle=':', 
-            label=f'Estimated Optimal β = {beta_est:.3f}', linewidth=2)
-
-# Mark tested beta values
-for beta, res in results.items():
-    plt.plot(beta, res['variance'], 'ro', markersize=8)
-
-plt.xlabel('β', fontsize=12)
-plt.ylabel('Variance', fontsize=12)
-plt.title('Control Variate Variance as Function of β', fontsize=14, pad=20)
-plt.legend(fontsize=11)
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-# Display results
-print(f"\nTrue Value: {true_value:.6f}")
-print(f"\nStandard Monte Carlo:")
-print(f"  Estimate: {estimate_standard:.6f}")
-print(f"  Variance: {var_standard:.6e}")
-
-print(f"\nControl Variates Results:")
-for beta, res in sorted(results.items()):
-    print(f"  β = {beta:.3f}: Estimate = {res['estimate']:.6f}, "
-          f"Variance = {res['variance']:.6e}, "
-          f"Reduction = {var_standard/res['variance']:.2f}x")
+```{ojs}
+{
+  const r = vrControl
+  const betas = [], variances = [], testedBetas = [], testedVariances = []
+  for (const point of r.curve) {
+    betas.push(point.beta)
+    variances.push(point.variance)
+  }
+  for (const point of r.tested) {
+    testedBetas.push(point.beta)
+    testedVariances.push(point.variance)
+  }
+  return VM.plotting.plotWithLegend(vrCvPlot, [
+    {x: betas, y: variances, type: "scatter", mode: "lines", name: "Variance", line: {color: chartColors.fn, width: 2}},
+    {x: testedBetas, y: testedVariances, type: "scatter", mode: "markers", name: "Tested β", marker: {color: chartColors.alt, size: 9}},
+    {x: [-0.5, 1], y: [r.standard.variance, r.standard.variance], type: "scatter", mode: "lines", name: "Standard MC variance",
+      line: {color: chartColors.warn, dash: "dash", width: 2}},
+    {x: [r.betaEst, r.betaEst], y: [0, Math.max(...variances)], type: "scatter", mode: "lines",
+      name: `Estimated optimal β = ${r.betaEst.toFixed(3)}`, line: {color: chartColors.ok, dash: "dot", width: 2}}
+  ], {title: {text: "Control variate variance as a function of β"}, margin: {t: 40}, xaxis: {title: "β"}, yaxis: {title: "Variance", rangemode: "tozero"}})
+}
 ```
 
-```{python}
-#| code-summary: "Show convergence comparison"
+```{ojs}
+{
+  const r = vrControl
+  const rows = []
+  for (const point of r.tested) {
+    rows.push([point.beta.toFixed(3), point.estimate.toFixed(6), point.variance.toExponential(6),
+      `${(r.standard.variance / point.variance).toFixed(2)}×`])
+  }
+  return html`${VM.ui.statRow([
+      {label: "True value", value: r.trueValue.toFixed(6)},
+      {label: "Standard MC estimate", value: r.standard.estimate.toFixed(6)},
+      {label: "Standard MC variance", value: r.standard.variance.toExponential(6)}
+    ])}
+    ${VM.ui.renderTable({html, rows, headers: ["β", "Estimate", "Variance", "Reduction"], filename: "control-variates.csv"})}`
+}
+```
 
-# Plot convergence comparison
-plt.figure(figsize=(12, 6))
-plt.style.use('seaborn-v0_8-darkgrid')
-
-# Running averages
-running_avg_standard = np.cumsum(f(X)) / np.arange(1, N + 1)
-running_avg_cv = np.cumsum(f(X) - beta_est * (h(X) - h_0)) / np.arange(1, N + 1)
-
-plt.plot(running_avg_standard, label='Standard Monte Carlo', 
-         alpha=0.8, linewidth=2)
-plt.plot(running_avg_cv, label=f'Control Variate (β = {beta_est:.3f})', 
-         alpha=0.8, linewidth=2)
-plt.axhline(y=true_value, color='red', linestyle='--', 
-            label=f'True Value: {true_value:.6f}', linewidth=2)
-
-plt.xlabel('Number of Samples', fontsize=12)
-plt.ylabel('Running Average', fontsize=12)
-plt.title('Convergence: Standard MC vs. Control Variates', fontsize=14, pad=20)
-plt.legend(fontsize=11)
-plt.grid(True, alpha=0.3)
-plt.xlim(0, N)
-plt.tight_layout()
-plt.show()
+```{ojs}
+vrConvergenceFigure(vrCvConvergencePlot, [
+  {name: "Standard Monte Carlo", values: vrControl.runningStandard, color: "fn"},
+  {name: `Control variate (β = ${vrControl.betaEst.toFixed(3)})`, values: vrControl.runningControl, color: "warn"}
+], vrControl.trueValue, "Number of samples", "Convergence: standard MC vs. control variates")
 ```
 
 
@@ -407,78 +383,54 @@ where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
 **Antithetic Variates.** We estimate $\ell = \int_0^1 \frac{1}{1 + x^2} dx$ using antithetic variates. Since $f(x) = \frac{1}{1 + x^2}$ is decreasing on $[0, 1]$, the pairs $(f(X), f(1-X))$ are negatively correlated.
 :::
 
-```{python}
-#| code-summary: "Show code for antithetic variates example"
+```{ojs}
+//| output: false
+vrAntitheticPlot = VM.plotting.persistentPlot({height: "420px"})
 
-# Function to integrate
-def f(x):
-    return 1 / (1 + x**2)
-
-# Set random seed
-np.random.seed(42)
-
-# Number of samples
-N = 200
-
-# Standard Monte Carlo
-X_standard = np.random.uniform(0, 1, N)
-estimates_standard = f(X_standard)
-estimate_standard = np.mean(estimates_standard)
-
-# Antithetic Variates Monte Carlo
-X = np.random.uniform(0, 1, N//2)
-X_antithetic = 1 - X  # Antithetic pairs
-estimates_anti = (f(X) + f(X_antithetic)) / 2
-estimate_antithetic = np.mean(estimates_anti)
-
-# True value (arctan(1) - arctan(0) = π/4)
-true_value = np.pi / 4
-
-# Compute variances
-var_standard = np.var(estimates_standard) / N
-var_antithetic = np.var(estimates_anti) / (N//2)
-
-# Running averages
-running_avg_standard = np.cumsum(f(X_standard[:N//2])) / np.arange(1, N//2 + 1)
-running_avg_anti = np.cumsum(estimates_anti) / np.arange(1, N//2 + 1)
+// Estimate the integral of f(x) = 1 / (1 + x²) over [0, 1] (exactly pi/4):
+// N = 200 independent uniforms, against N/2 antithetic pairs (U, 1 - U).
+vrAntithetic = {
+  const N = 200
+  const f = x => 1 / (1 + x * x)
+  const rng = VM.sampling.seededRandom(42)
+  const standard = []
+  for (let i = 0; i < N; i++) standard.push(f(rng()))
+  const pairs = []
+  for (let i = 0; i < N / 2; i++) {
+    const u = rng()
+    pairs.push((f(u) + f(1 - u)) / 2)
+  }
+  const standardStats = VM.distributions.sampleStats(standard, {ddof: 0})
+  const pairStats = VM.distributions.sampleStats(pairs, {ddof: 0})
+  return {
+    N, trueValue: Math.PI / 4,
+    standard: {estimate: standardStats.mean, variance: standardStats.variance / N},
+    antithetic: {estimate: pairStats.mean, variance: pairStats.variance / (N / 2)},
+    // Running averages over N/2 steps: the first N/2 standard samples, and the pairs.
+    runningStandard: vrRunningAverage(standard.slice(0, N / 2)),
+    runningAntithetic: vrRunningAverage(pairs)
+  }
+}
 ```
 
-```{python}
-#| code-summary: "Show plotting code"
+```{ojs}
+vrConvergenceFigure(vrAntitheticPlot, [
+  {name: "Standard Monte Carlo", values: vrAntithetic.runningStandard, color: "fn"},
+  {name: "Antithetic variates", values: vrAntithetic.runningAntithetic, color: "warn"}
+], vrAntithetic.trueValue, "Number of sample pairs", "Convergence: standard MC vs. antithetic variates")
+```
 
-# Create figure
-plt.figure(figsize=(12, 6))
-plt.style.use('seaborn-v0_8-darkgrid')
-
-# Plot running averages
-plt.plot(running_avg_standard, label='Standard Monte Carlo', 
-         alpha=0.8, linewidth=2)
-plt.plot(running_avg_anti, label='Antithetic Variates', 
-         alpha=0.8, linewidth=2)
-plt.axhline(y=true_value, color='red', linestyle='--', 
-            label=f'True Value: {true_value:.6f}', linewidth=2)
-
-# Formatting
-plt.xlabel('Number of Sample Pairs', fontsize=12)
-plt.ylabel('Running Average', fontsize=12)
-plt.title('Convergence Comparison: Standard MC vs. Antithetic Variates', 
-          fontsize=14, pad=20)
-plt.legend(fontsize=11, loc='best')
-plt.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
-
-# Display results
-print(f"\nStandard Monte Carlo:")
-print(f"  Estimate: {estimate_standard:.6f}")
-print(f"  Variance: {var_standard:.6e}")
-
-print(f"\nAntithetic Variates:")
-print(f"  Estimate: {estimate_antithetic:.6f}")
-print(f"  Variance: {var_antithetic:.6e}")
-
-print(f"\nTrue Value: {true_value:.6f}")
-print(f"Variance Reduction Factor: {var_standard / var_antithetic:.2f}x")
+```{ojs}
+{
+  const r = vrAntithetic
+  const rows = [
+    ["Standard Monte Carlo", r.standard.estimate.toFixed(6), r.standard.variance.toExponential(6)],
+    ["Antithetic variates", r.antithetic.estimate.toFixed(6), r.antithetic.variance.toExponential(6)]
+  ]
+  return html`${VM.ui.renderTable({html, rows, headers: ["Method", "Estimate", "Variance"], filename: "antithetic-variates.csv"})}
+    ${VM.ui.statRow([{label: "True value", value: r.trueValue.toFixed(6)},
+      {label: "Variance reduction factor", value: `${(r.standard.variance / r.antithetic.variance).toFixed(2)}×`}])}`
+}
 ```
 
 ## Common Random Numbers
@@ -515,184 +467,158 @@ When $f(X)$ and $g(X)$ are positively correlated (which often happens when they 
 **Comparing Queue Systems.** Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.
 :::
 
-```{python}
-#| code-summary: "Show code for common random numbers example"
+```{ojs}
+//| output: false
+// Waiting times in queue of an M/M/1 queue that starts empty, by the
+// Lindley recursion W_i = max(0, D_{i-1} - A_i). Inter-arrival times and
+// service requirements are given; service time = requirement / rate.
+function vrMm1WaitingTimes(interArrivals, requirements, serviceRate) {
+  const waits = []
+  let arrival = 0
+  let previousDeparture = 0
+  for (let i = 0; i < interArrivals.length; i++) {
+    arrival += interArrivals[i]
+    let wait = 0
+    if (i > 0) wait = Math.max(0, previousDeparture - arrival)
+    waits.push(wait)
+    previousDeparture = arrival + wait + requirements[i] / serviceRate
+  }
+  return waits
+}
 
-import numpy as np
-import matplotlib.pyplot as plt
+function vrExponentials(draw, n) {
+  const out = []
+  for (let i = 0; i < n; i++) out.push(draw())
+  return out
+}
 
-# Set random seed
-np.random.seed(42)
+function vrMean(values) {
+  return VM.distributions.sampleStats(values).mean
+}
 
-# Simulate M/M/1 queue waiting times
-def simulate_mm1_queue(arrival_times, service_requirements, service_rate):
-    """
-    Simulate M/M/1 queue and return waiting times.
-    arrival_times: inter-arrival times
-    service_requirements: service time requirements (before scaling by rate)
-    service_rate: the service rate of the system
-    """
-    n = len(arrival_times)
-    arrival_epochs = np.cumsum(arrival_times)
-    service_times = service_requirements / service_rate
-    
-    waiting_times = np.zeros(n)
-    departure_times = np.zeros(n)
-    
-    # First customer
-    waiting_times[0] = 0
-    departure_times[0] = arrival_epochs[0] + service_times[0]
-    
-    # Subsequent customers
-    for i in range(1, n):
-        # Waiting time = max(0, previous departure - current arrival)
-        waiting_times[i] = max(0, departure_times[i-1] - arrival_epochs[i])
-        departure_times[i] = arrival_epochs[i] + waiting_times[i] + service_times[i]
-    
-    return waiting_times
+vrArrivalRate = 1
+vrServiceRates = [1.5, 2]
 
-# Parameters
-n_customers = 1000
-n_replications = 100
-arrival_rate = 1.0  # λ
-service_rate_1 = 1.5  # μ₁
-service_rate_2 = 2.0  # μ₂
-
-# True mean waiting times (M/M/1 formula: W = 1/(μ-λ))
-true_wait_1 = 1 / (service_rate_1 - arrival_rate)
-true_wait_2 = 1 / (service_rate_2 - arrival_rate)
-true_difference = true_wait_1 - true_wait_2
-
-print(f"Theoretical waiting times:")
-print(f"  System 1 (μ={service_rate_1}): {true_wait_1:.4f}")
-print(f"  System 2 (μ={service_rate_2}): {true_wait_2:.4f}")
-print(f"  Difference: {true_difference:.4f}")
-
-# Run simulations with both methods
-differences_crn = []
-differences_indep = []
-
-for rep in range(n_replications):
-    # Generate common random numbers
-    inter_arrivals = np.random.exponential(1/arrival_rate, n_customers)
-    service_requirements = np.random.exponential(1.0, n_customers)
-    
-    # CRN: Use same random numbers for both systems
-    wait_1_crn = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_1)
-    wait_2_crn = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_2)
-    differences_crn.append(np.mean(wait_1_crn) - np.mean(wait_2_crn))
-    
-    # Independent: Generate new random numbers for second system
-    inter_arrivals_2 = np.random.exponential(1/arrival_rate, n_customers)
-    service_requirements_2 = np.random.exponential(1.0, n_customers)
-    
-    wait_1_indep = simulate_mm1_queue(inter_arrivals, service_requirements, service_rate_1)
-    wait_2_indep = simulate_mm1_queue(inter_arrivals_2, service_requirements_2, service_rate_2)
-    differences_indep.append(np.mean(wait_1_indep) - np.mean(wait_2_indep))
-
-# Convert to arrays
-differences_crn = np.array(differences_crn)
-differences_indep = np.array(differences_indep)
-
-# Calculate statistics
-mean_crn = np.mean(differences_crn)
-var_crn = np.var(differences_crn)
-mean_indep = np.mean(differences_indep)
-var_indep = np.var(differences_indep)
-
-print(f"\nSimulation results ({n_replications} replications):")
-print(f"\nCommon Random Numbers:")
-print(f"  Mean difference: {mean_crn:.4f}")
-print(f"  Variance: {var_crn:.6f}")
-print(f"  Std deviation: {np.sqrt(var_crn):.4f}")
-
-print(f"\nIndependent Sampling:")
-print(f"  Mean difference: {mean_indep:.4f}")
-print(f"  Variance: {var_indep:.6f}")
-print(f"  Std deviation: {np.sqrt(var_indep):.4f}")
-
-print(f"\nVariance Reduction Factor: {var_indep/var_crn:.2f}x")
+// 100 replications of 1000 customers: the difference in mean waiting time
+// between the two systems, with common random numbers (both systems see the
+// same arrivals and requirements) and with independent ones.
+vrCrn = {
+  const nCustomers = 1000
+  const replications = 100
+  const [mu1, mu2] = vrServiceRates
+  const draw = VM.sampling.exponentialRandom(VM.sampling.seededRandom(42), 1)
+  const crn = [], independent = []
+  for (let rep = 0; rep < replications; rep++) {
+    const arrivals = vrExponentials(draw, nCustomers)
+    const requirements = vrExponentials(draw, nCustomers)
+    const wait1 = vrMean(vrMm1WaitingTimes(arrivals, requirements, mu1))
+    crn.push(wait1 - vrMean(vrMm1WaitingTimes(arrivals, requirements, mu2)))
+    const arrivals2 = vrExponentials(draw, nCustomers)
+    const requirements2 = vrExponentials(draw, nCustomers)
+    independent.push(wait1 - vrMean(vrMm1WaitingTimes(arrivals2, requirements2, mu2)))
+  }
+  // Steady-state mean wait in queue of an M/M/1 queue: lambda / (mu (mu - lambda)).
+  const lambda = vrArrivalRate
+  const theory = [lambda / (mu1 * (mu1 - lambda)), lambda / (mu2 * (mu2 - lambda))]
+  return {replications, theory, crn: VM.distributions.sampleStats(crn, {ddof: 0}), independent: VM.distributions.sampleStats(independent, {ddof: 0})}
+}
 ```
 
-```{python}
-#| code-summary: "Show visualization code"
+```{ojs}
+{
+  const r = vrCrn
+  const rows = []
+  for (const [name, stats] of [["Common random numbers", r.crn], ["Independent sampling", r.independent]]) {
+    rows.push([name, stats.mean.toFixed(4), stats.variance.toFixed(6), stats.sd.toFixed(4)])
+  }
+  return html`${VM.ui.statRow([
+      {label: `System 1 (μ = ${vrServiceRates[0]})`, value: r.theory[0].toFixed(4), title: "λ / (μ(μ − λ)), the steady-state mean wait in queue"},
+      {label: `System 2 (μ = ${vrServiceRates[1]})`, value: r.theory[1].toFixed(4), title: "λ / (μ(μ − λ)), the steady-state mean wait in queue"},
+      {label: "Theoretical difference", value: (r.theory[0] - r.theory[1]).toFixed(4)},
+      {label: "Variance reduction factor", value: `${(r.independent.variance / r.crn.variance).toFixed(2)}×`}
+    ])}
+    ${VM.ui.renderTable({html, rows, headers: [`Method (${r.replications} replications)`, "Mean difference", "Variance", "Std deviation"], filename: "common-random-numbers.csv"})}`
+}
+```
 
-# Generate a single simulation run for visualization
-np.random.seed(42)
-n_customers_viz = 50
+```{ojs}
+//| output: false
+vrCorrelationPlot = VM.plotting.persistentPlot({height: "440px"})
+vrPairedPlot = VM.plotting.persistentPlot({height: "440px"})
 
-# Generate common random numbers
-inter_arrivals_viz = np.random.exponential(1/arrival_rate, n_customers_viz)
-service_requirements_viz = np.random.exponential(1.0, n_customers_viz)
+// One run of 50 customers through both systems with common random
+// numbers, and a second run of 100 for the correlation between the two
+// systems' waiting times.
+vrCrnDemo = {
+  const draw = VM.sampling.exponentialRandom(VM.sampling.seededRandom(7), 1)
+  const [mu1, mu2] = vrServiceRates
+  const arrivals = vrExponentials(draw, 50)
+  const requirements = vrExponentials(draw, 50)
+  const arrivalsDemo = vrExponentials(draw, 100)
+  const requirementsDemo = vrExponentials(draw, 100)
+  const demo1 = vrMm1WaitingTimes(arrivalsDemo, requirementsDemo, mu1)
+  const demo2 = vrMm1WaitingTimes(arrivalsDemo, requirementsDemo, mu2)
+  const s1 = VM.distributions.sampleStats(demo1)
+  const s2 = VM.distributions.sampleStats(demo2)
+  let cov = 0
+  for (let i = 0; i < demo1.length; i++) cov += (demo1[i] - s1.mean) * (demo2[i] - s2.mean)
+  cov /= demo1.length - 1
+  const points = []
+  for (let i = 0; i < demo1.length; i++) points.push([demo1[i], demo2[i]])
+  return {
+    wait1: vrMm1WaitingTimes(arrivals, requirements, mu1),
+    wait2: vrMm1WaitingTimes(arrivals, requirements, mu2),
+    demo1, demo2,
+    correlation: cov / (s1.sd * s2.sd),
+    fit: VM.numerical.linearRegression(points),
+    highlighted: [10, 25, 40]
+  }
+}
+```
 
-# Simulate both systems with CRN
-wait_1_viz = simulate_mm1_queue(inter_arrivals_viz, service_requirements_viz, service_rate_1)
-wait_2_viz = simulate_mm1_queue(inter_arrivals_viz, service_requirements_viz, service_rate_2)
+```{ojs}
+{
+  const d = vrCrnDemo
+  const lo = Math.min(...d.demo1), hi = Math.max(...d.demo1)
+  return VM.plotting.plotWithLegend(vrCorrelationPlot, [
+    {x: d.demo1, y: d.demo2, type: "scatter", mode: "markers", name: "Customers", marker: {color: VM.plotting.alpha(chartColors.fn, 0.6), size: 7}},
+    {x: [lo, hi], y: [d.fit.slope * lo + d.fit.intercept, d.fit.slope * hi + d.fit.intercept], type: "scatter", mode: "lines",
+      name: `Linear fit (y = ${d.fit.slope.toFixed(2)}x + ${d.fit.intercept.toFixed(2)})`, line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {title: {text: `Correlation between systems (ρ = ${d.correlation.toFixed(3)})`}, margin: {t: 40},
+    xaxis: {title: "Waiting time, system 1"}, yaxis: {title: "Waiting time, system 2"}})
+}
+```
 
-# Create visualization
-fig, (ax2, ax1) = plt.subplots(2, 1, figsize=(14, 12))
-plt.style.use('seaborn-v0_8-darkgrid')
+```{ojs}
+{
+  const d = vrCrnDemo
+  const customers = vrCounts(d.wait1.length)
+  const shapes = [], annotations = []
+  for (const c of d.highlighted) {
+    shapes.push({type: "line", x0: c, x1: c, yref: "paper", y0: 0, y1: 1, line: {color: chartColors.muted, dash: "dot", width: 1}})
+    // An arrow spanning the paired difference for this customer.
+    annotations.push({x: c, y: d.wait2[c - 1], ax: c, ay: d.wait1[c - 1], axref: "x", ayref: "y", showarrow: true,
+      arrowhead: 2, arrowside: "end+start", arrowcolor: chartColors.alt, text: ""})
+  }
+  return VM.plotting.plotWithLegend(vrPairedPlot, [
+    {x: customers, y: d.wait1, type: "scatter", mode: "lines+markers", name: `System 1 (μ = ${vrServiceRates[0]})`,
+      line: {color: chartColors.fn, width: 1}, marker: {size: 5}},
+    {x: customers, y: d.wait2, type: "scatter", mode: "lines+markers", name: `System 2 (μ = ${vrServiceRates[1]})`,
+      line: {color: chartColors.warn, width: 1}, marker: {size: 5, symbol: "square"}}
+  ], {title: {text: "Paired wait times with common random numbers"}, margin: {t: 40},
+    xaxis: {title: "Customer number"}, yaxis: {title: "Waiting time"}, shapes, annotations})
+}
+```
 
-# Plot wait times for each customer
-customer_numbers = np.arange(1, n_customers_viz + 1)
-
-ax1.plot(customer_numbers, wait_1_viz, 'o-', alpha=0.7, label=f'System 1 (μ={service_rate_1})', 
-         markersize=4, linewidth=1)
-ax1.plot(customer_numbers, wait_2_viz, 's-', alpha=0.7, label=f'System 2 (μ={service_rate_2})', 
-         markersize=4, linewidth=1)
-
-# Add vertical lines to highlight specific customers
-highlight_customers = [10, 25, 40]
-for cust in highlight_customers:
-    ax1.axvline(x=cust, color='gray', linestyle=':', alpha=0.5)
-    # Add arrows showing the difference
-    y1 = wait_1_viz[cust-1]
-    y2 = wait_2_viz[cust-1]
-    ax1.annotate('', xy=(cust, y2), xytext=(cust, y1),
-                arrowprops=dict(arrowstyle='<->', color='red', alpha=0.7))
-
-ax1.set_xlabel('Customer Number', fontsize=12)
-ax1.set_ylabel('Waiting Time', fontsize=12)
-ax1.set_title('Paired Wait Times with Common Random Numbers', fontsize=14)
-ax1.legend()
-ax1.grid(True, alpha=0.3)
-
-# Demonstrate correlation with more samples
-sample_size = 100
-inter_arrivals_demo = np.random.exponential(1/arrival_rate, sample_size)
-service_requirements_demo = np.random.exponential(1.0, sample_size)
-
-wait_1_demo = simulate_mm1_queue(inter_arrivals_demo, service_requirements_demo, service_rate_1)
-wait_2_demo = simulate_mm1_queue(inter_arrivals_demo, service_requirements_demo, service_rate_2)
-
-correlation = np.corrcoef(wait_1_demo, wait_2_demo)[0, 1]
-
-ax2.scatter(wait_1_demo, wait_2_demo, alpha=0.6)
-ax2.set_xlabel('Waiting Time - System 1', fontsize=12)
-ax2.set_ylabel('Waiting Time - System 2', fontsize=12)
-ax2.set_title(f'Correlation between Systems (ρ = {correlation:.3f})', fontsize=14)
-ax2.grid(True, alpha=0.3)
-
-# Add regression line
-z = np.polyfit(wait_1_demo, wait_2_demo, 1)
-p = np.poly1d(z)
-x_line = np.linspace(wait_1_demo.min(), wait_1_demo.max(), 100)
-ax2.plot(x_line, p(x_line), "r--", alpha=0.8, linewidth=2, 
-     label=f'Linear fit (y = {z[0]:.2f}x + {z[1]:.2f})')
-
-# Add diagonal reference line
-max_val = max(wait_1_demo.max(), wait_2_demo.max())
-ax2.legend()
-
-plt.tight_layout()
-plt.show()
-
-# Show the effectiveness of pairing
-print(f"\nExample differences for highlighted customers:")
-for cust in highlight_customers:
-    diff = wait_1_viz[cust-1] - wait_2_viz[cust-1]
-    print(f"  Customer {cust}: System 1 = {wait_1_viz[cust-1]:.3f}, "
-          f"System 2 = {wait_2_viz[cust-1]:.3f}, Difference = {diff:.3f}")
+```{ojs}
+{
+  const d = vrCrnDemo
+  const rows = []
+  for (const c of d.highlighted) {
+    rows.push([c, d.wait1[c - 1].toFixed(3), d.wait2[c - 1].toFixed(3), (d.wait1[c - 1] - d.wait2[c - 1]).toFixed(3)])
+  }
+  return VM.ui.renderTable({html, rows, headers: ["Customer", "System 1", "System 2", "Difference"], filename: "paired-waits.csv"})
+}
 ```
 
 ### When to Use Common Random Numbers

@@ -30,7 +30,6 @@ $$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$
 where $\sigma^2_f = \text{Var}(f(X))$ is the variance of $f(X)$ under the uniform distribution.
 
 
-
 ::: {.callout-important}
 ## Key Properties
 
@@ -55,133 +54,131 @@ The following example integrates two functions over the interval $[0, \pi]$:
 
 - **Oscillatory**: $f_2(x) = 25\sin(25x)$ — a rapidly oscillating function with many periods
 
-```{python}
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
 
-np.random.seed(0)
+intSmoothPlot = VM.plotting.persistentPlot({height: "300px"})
+intOscPlot = VM.plotting.persistentPlot({height: "300px"})
+intEstimatePlot = VM.plotting.persistentPlot({height: "380px"})
+intErrorPlot = VM.plotting.persistentPlot({height: "380px"})
 
-def monte_carlo_integrate(func, a, b, n_samples):
-    x_samples = np.random.uniform(a, b, n_samples)
-    return (b - a) * np.mean(func(x_samples))
+// The two integrands on [0, pi]; both integrate to exactly 2.
+intFunctions = [
+  {name: "Smooth", title: "Smooth: sin(x)", f: x => Math.sin(x), trueValue: 2, color: "fn", marker: "circle"},
+  {name: "Oscillatory", title: "Oscillatory: 25 sin(25x)", f: x => 25 * Math.sin(25 * x), trueValue: 2, color: "alt", marker: "square"}
+]
 
-# Function definitions and configuration
-FUNCTIONS = {
-    'smooth': {
-        'func': lambda x: np.sin(x),
-        'label': r'Smooth: $\sin(x)$',
-        'color': 'blue',
-        'marker': 'o',
-        'true_value': 2.0
-    },
-    'oscillatory': {
-        'func': lambda x: 25 * np.sin(25 * x),
-        'label': r'Oscillatory: $25\sin(25x)$',
-        'color': 'red', 
-        'marker': 's',
-        'true_value': 2.0
-    }
+// (b - a) times the average of f at n uniform points in [a, b].
+function monteCarloIntegrate(f, a, b, n, rng) {
+  let sum = 0
+  for (let i = 0; i < n; i++) sum += f(a + (b - a) * rng())
+  return (b - a) * sum / n
 }
 
-# Integration bounds
-a, b = 0, np.pi
-x = np.linspace(a, b, 10000)
-sample_sizes = np.logspace(2, 5, 20).astype(int)
+// n = 10^2 ... 10^5, 20 sizes evenly spaced on a log scale.
+intSampleSizes = {
+  const sizes = []
+  for (let i = 0; i < 20; i++) sizes.push(Math.floor(Math.pow(10, 2 + 3 * i / 19)))
+  return sizes
+}
 
-# Create subplots
-fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-ax1, ax2, ax3, ax4 = axes.flatten()
+intResults = {
+  const rng = VM.sampling.seededRandom(0)
+  const results = []
+  for (const fn of intFunctions) {
+    const estimates = [], errors = []
+    for (const n of intSampleSizes) {
+      const estimate = monteCarloIntegrate(fn.f, 0, Math.PI, n, rng)
+      estimates.push(estimate)
+      errors.push(Math.abs(estimate - fn.trueValue))
+    }
+    // 25 independent estimates at n = 10,000, for the spread of the estimator.
+    const repeats = []
+    for (let run = 0; run < 25; run++) repeats.push(monteCarloIntegrate(fn.f, 0, Math.PI, 10000, rng))
+    results.push({...fn, estimates, errors, repeat: VM.distributions.sampleStats(repeats, {ddof: 0})})
+  }
+  return results
+}
 
-# Plot functions and calculate estimates/errors
-estimates = {}
-errors = {}
+function intFunctionFigure(fn, plot) {
+  const xs = [], ys = []
+  for (let i = 0; i <= 2000; i++) {
+    const x = Math.PI * i / 2000
+    xs.push(x)
+    ys.push(fn.f(x))
+  }
+  const color = chartColors[fn.color]
+  return plot([{x: xs, y: ys, type: "scatter", mode: "lines", fill: "tozeroy", line: {color, width: 2},
+    fillcolor: VM.plotting.alpha(color, 0.3)}], {title: {text: fn.title}, margin: {t: 40}, showlegend: false, xaxis: {title: "x"}})
+}
+```
 
-for i, (name, config) in enumerate(FUNCTIONS.items()):
-    func = config['func']
-    color = config['color']
-    
-    # Plot function (top row)
-    ax = ax1 if i == 0 else ax2
-    y_vals = func(x)
-    sns.lineplot(x=x, y=y_vals, ax=ax, color=color, linewidth=2)
-    ax.fill_between(x, 0, y_vals, alpha=0.3, color=color)
-    ax.set_title(config['label'])
-    ax.grid(True, alpha=0.3)
-    
-    # Calculate estimates and errors for all sample sizes
-    estimates[name] = [monte_carlo_integrate(func, a, b, n) for n in sample_sizes]
-    errors[name] = [abs(est - config['true_value']) for est in estimates[name]]
+::: {layout-ncol=2}
 
-# Plot estimates vs sample size
-ax3.set_title('Estimate vs Sample Size')
-for name, config in FUNCTIONS.items():
-    ax3.plot(sample_sizes, estimates[name], 
-             color=config['color'], marker=config['marker'], 
-             label=name.capitalize(), linestyle='-')
-    ax3.axhline(config['true_value'], color=config['color'], 
-                linestyle='--', label=f'True {name.capitalize()} Value')
+```{ojs}
+intFunctionFigure(intFunctions[0], intSmoothPlot)
+```
 
-ax3.set_xscale('log')
-ax3.set_xlabel('Sample Size')
-ax3.set_ylabel('Integral Estimate')
-ax3.legend()
-ax3.grid(True, alpha=0.3)
+```{ojs}
+intFunctionFigure(intFunctions[1], intOscPlot)
+```
 
-# Plot convergence errors
-ax4.set_title('Error vs Sample Size')
-for name, config in FUNCTIONS.items():
-    ax4.loglog(sample_sizes, errors[name], 
-               color=config['color'], marker=config['marker'],
-               label=name.capitalize(), linewidth=2)
+:::
 
-ax4.set_xlabel('Sample Size')
-ax4.set_ylabel('Absolute Error')
-ax4.legend()
-ax4.grid(True, alpha=0.3)
+```{ojs}
+//| output: false
+intEstimateTraces = {
+  const traces = []
+  for (const r of intResults) {
+    const color = chartColors[r.color]
+    traces.push({x: intSampleSizes, y: r.estimates, type: "scatter", mode: "lines+markers", name: r.name,
+      line: {color}, marker: {color, symbol: r.marker}})
+  }
+  traces.push({x: [intSampleSizes[0], intSampleSizes[19]], y: [2, 2], type: "scatter", mode: "lines",
+    name: "True value", line: {color: chartColors.ink, dash: "dash"}})
+  return traces
+}
+```
 
-plt.tight_layout()
-plt.show()
+```{ojs}
+VM.plotting.plotWithLegend(intEstimatePlot, intEstimateTraces, {title: {text: "Estimate vs sample size"}, margin: {t: 40},
+  xaxis: {title: "Sample size", type: "log"}, yaxis: {title: "Integral estimate"}})
+```
 
-# Multiple estimates at fixed sample size for statistical analysis
-n_test = 10000
-n_runs = 25
+```{ojs}
+//| output: false
+intErrorTraces = {
+  const traces = []
+  for (const r of intResults) {
+    const color = chartColors[r.color]
+    traces.push({x: intSampleSizes, y: r.errors, type: "scatter", mode: "lines+markers", name: r.name,
+      line: {color, width: 2}, marker: {color, symbol: r.marker}})
+  }
+  return traces
+}
+```
 
-multiple_estimates = {}
-for name, config in FUNCTIONS.items():
-    multiple_estimates[name] = [
-        monte_carlo_integrate(config['func'], a, b, n_test) 
-        for _ in range(n_runs)
-    ]
+```{ojs}
+VM.plotting.plotWithLegend(intErrorPlot, intErrorTraces, {title: {text: "Error vs sample size"}, margin: {t: 40},
+  xaxis: {title: "Sample size", type: "log"}, yaxis: {title: "Absolute error", type: "log"}})
+```
 
-# Create comparison DataFrame
-comparison_data = []
-std_devs = {}
-
-for name, config in FUNCTIONS.items():
-    estimates_list = multiple_estimates[name]
-    mean_est = np.mean(estimates_list)
-    std_dev = np.std(estimates_list)
-    std_devs[name] = std_dev
-    
-    comparison_data.append({
-        "Function": name.capitalize(),
-        "True Value": config['true_value'],
-        "Mean Est": mean_est,
-        "Error": abs(mean_est - config['true_value']),
-        "Std Dev": std_dev
-    })
-
-df_compare = pd.DataFrame(comparison_data)
-
-# Add std ratio (avoiding division by zero)
-smooth_std = std_devs['smooth']
-osc_std = std_devs['oscillatory']
-df_compare['Std Ratio'] = ['-', osc_std / smooth_std if smooth_std > 0 else np.nan]
-
-# Display formatted results
-print(df_compare.round(4))
+```{ojs}
+{
+  const rows = []
+  const smoothSd = intResults[0].repeat.sd
+  for (const r of intResults) {
+    let ratio = "–"
+    if (r.name === "Oscillatory") ratio = (r.repeat.sd / smoothSd).toFixed(4)
+    rows.push([r.name, r.trueValue.toFixed(4), r.repeat.mean.toFixed(4),
+      Math.abs(r.repeat.mean - r.trueValue).toFixed(4), r.repeat.sd.toFixed(4), ratio])
+  }
+  return VM.ui.renderTable({html, rows, filename: "smooth-vs-oscillatory.csv",
+    headers: ["Function", "True value", "Mean est. (25 runs, n = 10,000)", "Error", "Std dev", "Std ratio"]})
+}
 ```
 
 The contrast between the smooth $\sin(x)$ and rapidly oscillating $25\sin(25x)$ demonstrates why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
@@ -244,114 +241,101 @@ In $d$ dimensions, a grid-based method with $m$ points per dimension requires $m
 
 The following example demonstrates Monte Carlo integration of the function $f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}$ over the unit hypercube $[0,1]^d$ for dimensions $d = 1, 2, 3, 4, 5$.
 
-```{python}
-#| label: fig-multidimensional
-#| fig-cap: "Monte Carlo advantage in higher dimensions"
+```{ojs}
+//| output: false
+intErrorDimPlot = VM.plotting.persistentPlot({height: "380px"})
+intSdDimPlot = VM.plotting.persistentPlot({height: "380px"})
 
-def multidimensional_example():
-    """Demonstrate MC integration in higher dimensions"""
-    
-    # Function: exp(-||x||²) over unit hypercube
-    def f_nd(points):
-        # Ensure points is always 2D: (n_samples, n_dimensions)
-        if points.ndim == 1:
-            points = points.reshape(-1, 1)
-        return np.exp(-np.sum(points**2, axis=1))
-    
-    dimensions = [1, 2, 3, 4, 5]
-    sample_sizes = np.logspace(2, 3.5, 15).astype(int)  # From 100 to ~3000 samples
-    n_runs = 30  # Number of runs for each sample size
-    
-    colors = ['blue', 'red', 'green', 'orange', 'purple']
-    
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-    
-    for dim_idx, dim in enumerate(dimensions):
-        estimates_std = []
-        rel_errors = []
-              
-        # Get a reference value using the largest sample size
-        ref_estimates = []
-        ref_n_samples = sample_sizes[-1] * 2  # Use even larger sample for reference
-        for _ in range(10):
-            if dim == 1:
-                points = np.random.uniform(0, 1, (ref_n_samples, 1))
-            else:
-                points = np.random.uniform(0, 1, (ref_n_samples, dim))
-            f_values = f_nd(points)
-            ref_estimates.append(np.mean(f_values))
-        reference_value = np.mean(ref_estimates)
-        
-        for n_samples in sample_sizes:
-            estimates = []
-            for run in range(n_runs):
-                # Ensure consistent sampling for all dimensions
-                if dim == 1:
-                    points = np.random.uniform(0, 1, (n_samples, 1))
-                else:
-                    points = np.random.uniform(0, 1, (n_samples, dim))
-                
-                f_values = f_nd(points)
-                estimate = np.mean(f_values)
-                estimates.append(estimate)
-            
-            mean_est = np.mean(estimates)
-            std_est = np.std(estimates)
-            rel_error = abs(mean_est - reference_value) / abs(reference_value)
-            
-            estimates_std.append(std_est)
-            rel_errors.append(rel_error)
-        
-        # Plot 1: Relative error vs sample size
-        ax1.loglog(sample_sizes, rel_errors, 'o-', 
-                  color=colors[dim_idx], label=f'Dim {dim}', 
-                  linewidth=2, markersize=4)
-        
-        # Plot 2: Standard deviation vs sample size
-        ax2.loglog(sample_sizes, estimates_std, 'o-', 
-                  color=colors[dim_idx], label=f'Dim {dim}', 
-                  linewidth=2, markersize=4)
-    
-    # Formatting
-    ax1.set_xlabel('Number of Samples')
-    ax1.set_ylabel('')
-    ax1.set_title('Relative Error vs Sample Size')
-    ax1.grid(True, alpha=0.3)
-    ax1.legend()
-    
-    ax2.set_xlabel('Number of Samples')
-    ax2.set_ylabel('Standard Deviation')
-    ax2.set_title('Standard Deviation vs Sample Size')
-    ax2.grid(True, alpha=0.3)
-    ax2.legend()
-    
-    # Add theoretical 1/sqrt(n) reference line to std plot
-    # Use average std from first point to scale the reference line
-    first_stds = []
-    for dim_idx, dim in enumerate(dimensions):
-        estimates = []
-        for run in range(n_runs):
-            if dim == 1:
-                points = np.random.uniform(0, 1, (sample_sizes[0], 1))
-            else:
-                points = np.random.uniform(0, 1, (sample_sizes[0], dim))
-            f_values = f_nd(points)
-            estimate = np.mean(f_values)
-            estimates.append(estimate)
-        first_stds.append(np.std(estimates))
-    
-    avg_first_std = np.mean(first_stds)
-    scaling_factor = avg_first_std * np.sqrt(sample_sizes[0])
-    theoretical_std = scaling_factor / np.sqrt(sample_sizes)
-    ax2.loglog(sample_sizes, theoretical_std, 'k--', alpha=0.5, 
-              linewidth=2, label='∝ 1/√n')
-    ax2.legend()
-    
-    plt.tight_layout()
-    plt.show()
+// Integrate f(x) = exp(-|x|²) over [0, 1]^d, d = 1..5. The exact value is
+// (∫_0^1 e^{-t²} dt)^d = (sqrt(pi)/2 · erf(1))^d, and erf(1) = 2 Φ(√2) - 1.
+intDimensions = {
+  const oneDim = Math.sqrt(Math.PI) / 2 * (2 * VM.distributions.normalCdf(Math.SQRT2) - 1)
+  const sizes = []
+  for (let i = 0; i < 15; i++) sizes.push(Math.floor(Math.pow(10, 2 + 1.5 * i / 14)))
+  const runs = 30
+  const rng = VM.sampling.seededRandom(0)
+  const results = []
+  for (let d = 1; d <= 5; d++) {
+    const exact = Math.pow(oneDim, d)
+    const relErrors = [], sds = []
+    for (const n of sizes) {
+      const estimates = []
+      for (let run = 0; run < runs; run++) {
+        let sum = 0
+        for (let i = 0; i < n; i++) {
+          let normSq = 0
+          for (let k = 0; k < d; k++) {
+            const x = rng()
+            normSq += x * x
+          }
+          sum += Math.exp(-normSq)
+        }
+        estimates.push(sum / n)
+      }
+      const stats = VM.distributions.sampleStats(estimates, {ddof: 0})
+      relErrors.push(Math.abs(stats.mean - exact) / exact)
+      sds.push(stats.sd)
+    }
+    results.push({d, relErrors, sds})
+  }
+  return {sizes, results}
+}
 
-multidimensional_example()
+intDimColors = ["fn", "alt", "ok", "warn", "accent2"]
 ```
+
+```{ojs}
+//| output: false
+intErrorDimTraces = {
+  const traces = []
+  for (let i = 0; i < intDimensions.results.length; i++) {
+    const r = intDimensions.results[i]
+    const color = chartColors[intDimColors[i]]
+    traces.push({x: intDimensions.sizes, y: r.relErrors, type: "scatter", mode: "lines+markers", name: `Dim ${r.d}`,
+      line: {color, width: 2}, marker: {color, size: 5}})
+  }
+  return traces
+}
+```
+
+```{ojs}
+//| output: false
+intSdDimTraces = {
+  const sizes = intDimensions.sizes
+  const traces = []
+  let firstSdTotal = 0
+  for (let i = 0; i < intDimensions.results.length; i++) {
+    const r = intDimensions.results[i]
+    const color = chartColors[intDimColors[i]]
+    firstSdTotal += r.sds[0]
+    traces.push({x: sizes, y: r.sds, type: "scatter", mode: "lines+markers", name: `Dim ${r.d}`,
+      line: {color, width: 2}, marker: {color, size: 5}})
+  }
+  // A 1/sqrt(n) line through the average first standard deviation.
+  const scale = firstSdTotal / intDimensions.results.length * Math.sqrt(sizes[0])
+  const reference = []
+  for (const n of sizes) reference.push(scale / Math.sqrt(n))
+  traces.push({x: sizes, y: reference, type: "scatter", mode: "lines", name: "∝ 1/√n",
+    line: {color: chartColors.ink, dash: "dash", width: 2}})
+  return traces
+}
+```
+
+::: {#fig-multidimensional}
+
+```{ojs}
+VM.plotting.plotWithLegend(intErrorDimPlot, intErrorDimTraces, {title: {text: "Relative error vs sample size"}, margin: {t: 40},
+  xaxis: {title: "Number of samples", type: "log"}, yaxis: {type: "log"}})
+```
+
+```{ojs}
+VM.plotting.plotWithLegend(intSdDimPlot, intSdDimTraces, {title: {text: "Standard deviation vs sample size"}, margin: {t: 40},
+  xaxis: {title: "Number of samples", type: "log"}, yaxis: {title: "Standard deviation", type: "log"}})
+```
+
+Monte Carlo advantage in higher dimensions
+
+:::
 
 
 The example reveals several important properties of multidimensional integration:

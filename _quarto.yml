@@ -68,6 +68,9 @@ bibliography: references.bib
 # window.VM and the mathviz stylesheet into every page's <head>.
 filters:
   - mathviz
+  # This site's additions to mathviz (_mathviz/, built into
+  # _extensions/mathviz-local/); must come after mathviz.
+  - mathviz-local
 mathviz:
   referrer: same-origin
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
@@ -95,10 +98,8 @@ format:
     bread-crumbs: true
     back-to-top-navigation: true
 
-# Kernel from the project's .venv (QUARTO_PYTHON is set in _environment).
-jupyter: python3
-
+# Every code cell is OJS, run in the reader's browser; nothing executes at
+# render time.
 execute:
   echo: false
   warning: false
-  cache: true

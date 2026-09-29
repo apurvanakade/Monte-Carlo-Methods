@@ -8,11 +8,6 @@ execute:
   echo: false
 ---
 
-```{python}
-import networkx as nx
-import matplotlib.pyplot as plt
-import numpy as np
-```
 
 This appendix provides the theoretical foundation for MCMC methods covered in the main course. We will learn about Markov chains and focus on discrete chains for simplicity, but all results extend to the continuous case used in practice.
 
@@ -84,61 +79,90 @@ Suppose we start at vertex $A$. This means that the initial distribution is $\pi
 
 :::
 
-```{python}
-# Create a directed graph
-G = nx.DiGraph()
+```{ojs}
+//| output: false
+// The figures and tables for the examples in this appendix. VM and
+// chartColors are defined with the random-walk app further down.
+mcGraphPlot = VM.plotting.persistentPlot({height: "340px"})
+mcTvPlot = VM.plotting.persistentPlot({height: "340px"})
 
-# Add edges with transition probabilities
-edges = [
-    ('A', 'B', 1),
-    ('B', 'C', 1/3),
-    ('B', 'A', 1/3),
-    ('B', 'D', 1/3),
-    ('C', 'B', 1/2),
-    ('C', 'D', 1/2),
-    ('D', 'B', 1/2),
-    ('D', 'C', 1/2)
-]
+mcStates = ["A", "B", "C", "D"]
+mcEdges = [["A", "B", 1], ["B", "C", 1 / 3], ["B", "A", 1 / 3], ["B", "D", 1 / 3],
+  ["C", "B", 1 / 2], ["C", "D", 1 / 2], ["D", "B", 1 / 2], ["D", "C", 1 / 2]]
 
-G.add_weighted_edges_from(edges)
+// The transition matrix: P[i][j] is the probability of moving from state i to j.
+mcP = {
+  const P = []
+  for (let i = 0; i < mcStates.length; i++) P.push(new Array(mcStates.length).fill(0))
+  for (const [from, to, p] of mcEdges) P[mcStates.indexOf(from)][mcStates.indexOf(to)] = p
+  return P
+}
 
-plt.figure(figsize=(4,3))
-pos = nx.spectral_layout(G)
-nx.draw(G, pos, with_labels=True, node_size=1000, node_color='lightblue', edgecolors='black',
-  labels={n: f"$\\bf{{{n}}}$" for n in G.nodes})
+mcEvolution = VM.mcmc.evolveDistribution(mcP, [1, 0, 0, 0], 15)
 
-# Draw edge labels (weights)
-edge_labels = {(u, v): f"{d['weight']:.2f}" for u, v, d in G.edges(data=True)}
-nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=10)
+function mcRound(value, digits) {
+  return String(Number(value.toFixed(digits)))
+}
+```
 
-plt.show()
+```{ojs}
+{
+  // Each directed edge is drawn slightly to its own right, so the two
+  // directions of a pair are parallel arrows, labelled near their tails.
+  const pos = {A: [0, 0], B: [1, 0], C: [2, 0.7], D: [2, -0.7]}
+  const annotations = []
+  for (const [from, to, p] of mcEdges) {
+    const [x0, y0] = pos[from], [x1, y1] = pos[to]
+    const length = Math.hypot(x1 - x0, y1 - y0)
+    const ux = (x1 - x0) / length, uy = (y1 - y0) / length
+    const ox = 0.06 * uy, oy = -0.06 * ux
+    const trim = 0.17
+    annotations.push({x: x1 - trim * ux + ox, y: y1 - trim * uy + oy, ax: x0 + trim * ux + ox, ay: y0 + trim * uy + oy,
+      xref: "x", yref: "y", axref: "x", ayref: "y", text: "", showarrow: true, arrowhead: 2, arrowwidth: 1.5, arrowcolor: chartColors.muted})
+    annotations.push({x: x0 + 0.35 * (x1 - x0) + 2.2 * ox, y: y0 + 0.35 * (y1 - y0) + 2.2 * oy, text: p.toFixed(2),
+      showarrow: false, font: {size: 11}})
+  }
+  const xs = [], ys = []
+  for (const s of mcStates) {
+    xs.push(pos[s][0])
+    ys.push(pos[s][1])
+  }
+  const hidden = {showticklabels: false, showgrid: false, zeroline: false, showline: false, ticks: ""}
+  return mcGraphPlot([{x: xs, y: ys, text: mcStates, type: "scatter", mode: "markers+text", textposition: "middle center",
+    textfont: {size: 15, color: chartColors.ink}, hoverinfo: "skip",
+    marker: {size: 36, color: VM.plotting.alpha(chartColors.fn, 0.25), line: {color: chartColors.ink, width: 1.5}}}], {
+    showlegend: false, annotations,
+    xaxis: {...hidden, range: [-0.3, 2.3]}, yaxis: {...hidden, range: [-1, 1], scaleanchor: "x"}
+  })
+}
+```
 
+Transition matrix of the Markov chain:
 
-# Generate the transition matrix
-T = nx.to_numpy_array(G)
+```{ojs}
+{
+  const rows = []
+  for (let i = 0; i < mcStates.length; i++) {
+    const row = [mcStates[i]]
+    for (const p of mcP[i]) row.push(mcRound(p, 2))
+    rows.push(row)
+  }
+  return VM.ui.renderTable({html, rows, headers: ["From \\ to", ...mcStates], filename: "transition-matrix.csv"})
+}
+```
 
-print("Transition matrix of the Markov chain:")
-print(np.round(T, 2))
+Evolution of the Markov chain starting from state A:
 
-## Example: Evolution of a Markov Chain
-
-import pandas as pd
-
-print("\nEvolution of the Markov chain starting from state A:\n")
-
-# Initial state distribution (start at A)
-state = np.array([1, 0, 0, 0])
-evolution = [state.copy()]
-
-# Compute the distribution at each time step for 10 steps
-for t in range(1, 11):
-  state = state @ T
-  evolution.append(state.copy())
-
-# Create a DataFrame to display the evolution of probabilities for each state
-df = pd.DataFrame(np.round(evolution, 3), columns=['A', 'B', 'C', 'D'])
-# df.index.name = "Time"
-print(df)
+```{ojs}
+{
+  const rows = []
+  for (let t = 0; t <= 10; t++) {
+    const row = [t]
+    for (const p of mcEvolution[t]) row.push(mcRound(p, 3))
+    rows.push(row)
+  }
+  return VM.ui.renderTable({html, rows, headers: ["Time", ...mcStates], filename: "chain-evolution.csv"})
+}
 ```
 
 ## Stationary Distribution
@@ -246,7 +270,6 @@ where $\deg(i)$ is the degree of vertex $i$ and $|E|$ is the number of edges in 
 :::
 
 
-
 ## Mixing Time
 
 Assume that the Markov chain is ergodic, and hence has a stationary distribution $\Pi$. We know that any initial distribution $\pi_0$ converges to $\Pi$ as $n \to \infty$. The mixing time measures the rate of this convergence.
@@ -279,34 +302,26 @@ This only computes the mixing time for the initial distribution $\pi_0 = [1, 0, 
 
 In practice, we either provide a theoretical bound on the mixing time or "visually" inspect the convergence of the chain to the stationary distribution. Running a simulation to compute the mixing time is computationally expensive and not commonly done.
 
-```{python}
-## Compute mixing time of the previous example 
-
-distribution = np.array([1, 0, 0, 0])
-stationary_distribution = np.array([1/8, 3/8, 2/8, 2/8])
-
-def total_variation_distance(p, q):
-    return 0.5 * np.sum(np.abs(p - q))
-
-tvd = []
-tvd.append(total_variation_distance(distribution, stationary_distribution))
-
-for i in range(15):
-    distribution = distribution @ T
-    tvd.append(total_variation_distance(distribution, stationary_distribution))
-
-mixing_time = np.argmax(np.array(tvd) < 0.25)
-
-plt.figure(figsize=(8,4))
-plt.plot(tvd, marker='o')
-plt.xlabel('Time')
-plt.ylabel('Total variation distance')
-
-plt.axhline(y=0.25, color='r', linestyle='--', label='Threshold of 0.25')
-
-plt.title(f'Mixing time = {mixing_time}')
-plt.legend()
-plt.show()
+```{ojs}
+{
+  // Total variation distance from the stationary distribution (1/8, 3/8,
+  // 2/8, 2/8) over 15 steps; the mixing time is the first step below 1/4.
+  const stationary = [1 / 8, 3 / 8, 2 / 8, 2 / 8]
+  const steps = [], tvd = []
+  let mixingTime = null
+  for (let t = 0; t < mcEvolution.length; t++) {
+    const d = VM.mcmc.totalVariation(mcEvolution[t], stationary)
+    steps.push(t)
+    tvd.push(d)
+    if (mixingTime === null && d < 0.25) mixingTime = t
+  }
+  return VM.plotting.plotWithLegend(mcTvPlot, [
+    {x: steps, y: tvd, type: "scatter", mode: "lines+markers", name: "TV distance", line: {color: chartColors.fn, width: 2}},
+    {x: [0, steps.length - 1], y: [0.25, 0.25], type: "scatter", mode: "lines", name: "Threshold of 0.25",
+      line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {title: {text: `Mixing time = ${mixingTime}`}, margin: {t: 40},
+    xaxis: {title: "Time"}, yaxis: {title: "Total variation distance", rangemode: "tozero"}})
+}
 ```
 
 ### Connection to Spectral Theory
@@ -737,73 +752,100 @@ We can either discard the first 40 samples or select every 40th sample to reduce
 
 :::
 
-```{python}
-#| fold: true
-class GraphMC(nx.Graph):
-    def __init__(self, graph):
-        super().__init__()
-        self.add_edges_from(graph.edges())  
-        self.add_nodes_from(graph.nodes())  
+```{ojs}
+//| output: false
+mcCyclePlot = VM.plotting.persistentPlot({height: "380px"})
+mcBurnInPlot = VM.plotting.persistentPlot({height: "320px"})
+mcThinPlot = VM.plotting.persistentPlot({height: "320px"})
+mcTraceShortPlot = VM.plotting.persistentPlot({height: "320px"})
+mcTraceLongPlot = VM.plotting.persistentPlot({height: "320px"})
+mcRunningPlot = VM.plotting.persistentPlot({height: "380px"})
+mcAcfPlot = VM.plotting.persistentPlot({height: "380px"})
 
-    def next_node(self, current_node):
-        assert current_node in self.nodes, "Current node is not in the graph."
-        neighbors = list(self.neighbors(current_node))
-        return neighbors[np.random.choice(len(neighbors))]  
+// A simple random walk on the 15-cycle: 5000 steps from vertex 0, each
+// step to one of the two neighbours with probability 1/2.
+mcCycleN = 15
+mcWalk = {
+  const rng = VM.sampling.seededRandom(3)
+  const walk = [0]
+  for (let i = 0; i < 5000; i++) {
+    let step = 1
+    if (rng() < 0.5) step = -1
+    walk.push((walk[i] + step + mcCycleN) % mcCycleN)
+  }
+  return walk
+}
 
-    def random_walk(self, start_node, num_steps):
-        assert start_node in self.nodes, "Start node is not in the graph."
-        walk = [start_node]
-        for _ in range(num_steps):
-            walk.append(self.next_node(walk[-1]))
-        return walk
+// Fraction of time spent at each vertex.
+function mcVisitFrequencies(walk) {
+  const counts = new Array(mcCycleN).fill(0)
+  for (const v of walk) counts[v] += 1
+  const out = []
+  for (const c of counts) out.push(c / walk.length)
+  return out
+}
 
+function mcFrequencyFigure(plot, walk, title) {
+  const vertices = []
+  for (let v = 0; v < mcCycleN; v++) vertices.push(v)
+  return VM.plotting.plotWithLegend(plot, [
+    {x: vertices, y: mcVisitFrequencies(walk), type: "bar", name: "Frequency", marker: {color: chartColors.fn}},
+    {x: [-0.5, mcCycleN - 0.5], y: [1 / mcCycleN, 1 / mcCycleN], type: "scatter", mode: "lines", name: "Expected",
+      line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {title: {text: title}, margin: {t: 40}, xaxis: {title: "Nodes"}, yaxis: {title: "Frequency"},
+    legend: {orientation: "h", y: -0.25}})
+}
 
-# Create an n-cycle graph
-n = 15
-G = nx.cycle_graph(n)
-mc = GraphMC(G)
-N = 5000
-T = 100
-
-nx.draw(G, with_labels=True)
-plt.title("Generating {} samples on {}-cycle".format(N, n))
-plt.show()
-
-walk = mc.random_walk(0, N)
-
-# Remove transient phase (first 40)
-walk1 = walk[T:]
-
-# Count visits per node
-node_counts1 = {node: walk1.count(node)/len(walk1) for node in mc.nodes}
-
-k = 20
-
-# discard first 40 samples and keep only every k-th sample
-walk2 = walk[T::k]
-
-# Count visits per node
-node_counts2 = {node: walk2.count(node)/len(walk2) for node in mc.nodes}
-
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
-
-axs[0].bar(range(len(node_counts1)), list(node_counts1.values()))
-axs[0].set_xlabel('Nodes')
-axs[0].set_ylabel('Frequency')
-axs[0].axhline(1/len(mc.nodes), color='r', linestyle='--', label='Expected')
-axs[0].set_title('Discarding First {} Samples'.format(T))
-axs[0].legend()
-
-axs[1].bar(range(len(node_counts2)), list(node_counts2.values()))
-axs[1].set_xlabel('Nodes')
-axs[1].set_ylabel('Frequency')
-axs[1].set_title('Keeping only every {}-th Sample'.format(k))
-axs[1].axhline(1/len(mc.nodes), color='r', linestyle='--', label='Expected')
-axs[1].legend()
-
-plt.tight_layout()
-plt.show()
+function mcTraceFigure(plot, count) {
+  const steps = []
+  for (let i = 0; i < count; i++) steps.push(i)
+  return plot([{x: steps, y: mcWalk.slice(0, count), type: "scattergl", mode: "markers",
+    marker: {color: chartColors.fn, size: 2}, hoverinfo: "skip"}], {
+    title: {text: `Trace plot of walk (${count} steps)`}, margin: {t: 40}, showlegend: false,
+    xaxis: {title: "Step"}, yaxis: {title: "Node"}
+  })
+}
 ```
+
+```{ojs}
+{
+  const xs = [], ys = [], labels = [], edgeX = [], edgeY = []
+  for (let v = 0; v < mcCycleN; v++) {
+    const angle = 2 * Math.PI * v / mcCycleN
+    xs.push(Math.cos(angle))
+    ys.push(Math.sin(angle))
+    labels.push(String(v))
+  }
+  for (let v = 0; v < mcCycleN; v++) {
+    const w = (v + 1) % mcCycleN
+    edgeX.push(xs[v], xs[w], null)
+    edgeY.push(ys[v], ys[w], null)
+  }
+  const hidden = {showticklabels: false, showgrid: false, zeroline: false, showline: false, ticks: ""}
+  return mcCyclePlot([
+    {x: edgeX, y: edgeY, type: "scatter", mode: "lines", line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"},
+    {x: xs, y: ys, text: labels, type: "scatter", mode: "markers+text", textposition: "middle center", hoverinfo: "skip",
+      textfont: {color: chartColors.ink}, marker: {size: 26, color: VM.plotting.alpha(chartColors.fn, 0.3), line: {color: chartColors.fn, width: 1}}}
+  ], {title: {text: `Generating 5000 samples on the ${mcCycleN}-cycle`}, margin: {t: 40}, showlegend: false,
+    xaxis: {...hidden, range: [-1.25, 1.25]}, yaxis: {...hidden, range: [-1.25, 1.25], scaleanchor: "x"}})
+}
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+mcFrequencyFigure(mcBurnInPlot, mcWalk.slice(100), "Discarding first 100 samples")
+```
+
+```{ojs}
+{
+  const thinned = []
+  for (let i = 100; i < mcWalk.length; i += 20) thinned.push(mcWalk[i])
+  return mcFrequencyFigure(mcThinPlot, thinned, "Keeping only every 20th sample")
+}
+```
+
+:::
 
 ## Reversible Markov Chains
 
@@ -1013,26 +1055,17 @@ A trace plot is simply a scatter plot of the samples generated by the Markov cha
 Below are the trace plots for @exm-random-walk-on-graph. We can see that the chain does not look uniform even after 1000 samples but after 5000 samples it is starting to look uniform.
 
 
-```{python}
-#| fold: true
-# trace plot of walk
-fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+::: {layout-ncol=2}
 
-temp = 1000
-axs[0].scatter(range(temp), walk[:temp], s=1)
-axs[0].set_xlabel('Step')
-axs[0].set_ylabel('Node')
-axs[0].set_title('Trace Plot of Walk ({} steps)'.format(temp))
-
-temp = len(walk)
-axs[1].scatter(range(temp), walk[:temp], s=1)
-axs[1].set_xlabel('Step')
-axs[1].set_ylabel('Node')
-axs[1].set_title('Trace Plot of Walk ({} steps)'.format(temp))
-
-plt.tight_layout()
-plt.show()
+```{ojs}
+mcTraceFigure(mcTraceShortPlot, 1000)
 ```
+
+```{ojs}
+mcTraceFigure(mcTraceLongPlot, mcWalk.length)
+```
+
+:::
 ### Running Average
 
 The **running average** (also called cumulative mean) is the average of the first $n$ samples:
@@ -1073,37 +1106,34 @@ Use running averages as **supporting evidence** for your autocorrelation-based b
 
 Below is the running average analysis for @exm-random-walk-on-graph. 
 
-```{python}
-#| fold: true
-import numpy as np
-import matplotlib.pyplot as plt
+```{ojs}
+{
+  // Running averages of the vertex label, from the start of the chain and
+  // after discarding the first 10% and 20%.
+  const n = mcWalk.length
+  const starts = [[0, "Full chain", "fn"], [Math.floor(n / 10), "90% of chain", "alt"], [Math.floor(n / 5), "80% of chain", "ok"]]
+  const traces = []
+  for (const [start, name, color] of starts) {
+    const iterations = []
+    for (let i = start; i < n; i++) iterations.push(i)
+    traces.push({x: iterations, y: VM.mcmc.runningMean(mcWalk.slice(start)), type: "scatter", mode: "lines", name,
+      line: {color: chartColors[color], width: 2}})
+  }
+  return VM.plotting.plotWithLegend(mcRunningPlot, traces, {title: {text: "Running averages from different starting points"}, margin: {t: 40},
+    xaxis: {title: "Iteration"}, yaxis: {title: "Running average"}})
+}
+```
 
-# Calculate running averages from different starting points
-start_points = [0, len(walk)//10, len(walk)//5]
-colors = ['blue', 'red', 'green']
-labels = ['Full chain', '90% of chain', '80% of chain']
-
-plt.figure(figsize=(10, 6))
-plt.title('Running Averages from Different Starting Points')
-
-for i, start in enumerate(start_points):
-    x_subset = walk[start:]
-    running_avg = np.cumsum(x_subset) / np.arange(1, len(x_subset) + 1)
-    iterations = np.arange(start, start + len(running_avg))
-    plt.plot(iterations, running_avg, color=colors[i], label=labels[i])
-
-plt.xlabel('Iteration')
-plt.ylabel('Running Average')
-plt.legend()
-plt.grid(True, alpha=0.3)
-plt.show()
-
-# Quantitative analysis - compare full chain vs 80% chain averages
-final_running_avg = np.cumsum(walk)[-1] / len(walk)
-last_80_percent_avg = np.mean(walk[len(walk)//5:])  # Average of last 80% of chain
-print(f"Final running average (full chain): {final_running_avg:.3f}")
-print(f"Average of last 80% of chain: {last_80_percent_avg:.3f}")
-print(f"Difference: {abs(final_running_avg - last_80_percent_avg):.3f}")
+```{ojs}
+{
+  const full = VM.distributions.sampleStats(mcWalk).mean
+  const last80 = VM.distributions.sampleStats(mcWalk.slice(Math.floor(mcWalk.length / 5))).mean
+  return VM.ui.statRow([
+    {label: "Final running average (full chain)", value: full.toFixed(3)},
+    {label: "Average of last 80% of chain", value: last80.toFixed(3)},
+    {label: "Difference", value: Math.abs(full - last80).toFixed(3)}
+  ])
+}
 ```
 
 :::
@@ -1158,61 +1188,52 @@ From this analysis, we can see whether the autocorrelation patterns are similar 
 
 Below is the autocorrelation analysis for @exm-random-walk-on-graph. Rather than simply looking for where autocorrelation drops below a threshold, we examine whether the autocorrelation pattern has stabilized across different portions of the chain.
 
-```{python}
-#| fold: true
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Autocorrelation analysis of walk
-def autocorr(x, max_lag=50):
-    """Calculate autocorrelation function up to max_lag"""
-    n = len(x)
-    x_centered = x - np.mean(x)
-    autocorrs = []
-    
-    for lag in range(max_lag):
-        if n - lag > lag:
-            corr = np.corrcoef(x_centered[:-lag] if lag > 0 else x_centered, 
-                              x_centered[lag:])[0, 1]
-            autocorrs.append(corr)
-        else:
-            break
-    return np.array(autocorrs)
-
-# Calculate autocorrelation from different starting points
-candidate_burn_ins = [0, len(walk)//10, len(walk)//5, len(walk)//4]
-colors = ['blue', 'red', 'green', 'orange']
-
-plt.figure(figsize=(12, 5))
-
-# Autocorrelation functions from different starting points
-autocorr_functions = {}
-for i, burn_in in enumerate(candidate_burn_ins):
-    if len(walk) - burn_in > 100:  # Ensure enough data
-        post_burn_walk = walk[burn_in:]
-        autocorrs = autocorr(post_burn_walk, 50)
-        autocorr_functions[burn_in] = autocorrs
-        plt.plot(autocorrs, color=colors[i], 
-                label=f'Start at {burn_in} ({burn_in/len(walk)*100:.0f}%)')
-plt.xlabel('Lag')
-plt.ylabel('Autocorrelation')
-plt.title('ACF Stability Analysis')
-plt.legend()
-plt.grid(True, alpha=0.3)
-plt.show()
-
-# Check similarity between consecutive autocorrelation functions
-print("Similarity analysis:")
-burn_in_list = sorted(autocorr_functions.keys())
-for i in range(len(burn_in_list)-1):
-    current = autocorr_functions[burn_in_list[i]]
-    next_one = autocorr_functions[burn_in_list[i+1]]
-    min_len = min(len(current), len(next_one))
-    similarity = np.mean(np.abs(current[:min_len] - next_one[:min_len]))
-    print(f"Burn-in {burn_in_list[i]} vs {burn_in_list[i+1]}: similarity = {similarity:.3f}")
-
-print(f"\nBased on visual inspection and similarity analysis, no burn-in is required.")
+```{ojs}
+//| output: false
+// The autocorrelation function (lags 0..49) of the chain after each
+// candidate burn-in.
+mcAcfRuns = {
+  const n = mcWalk.length
+  const runs = []
+  for (const burnIn of [0, Math.floor(n / 10), Math.floor(n / 5), Math.floor(n / 4)]) {
+    runs.push({burnIn, acf: VM.mcmc.autocorrelation(mcWalk.slice(burnIn), 49)})
+  }
+  return runs
+}
 ```
+
+```{ojs}
+{
+  const palette = ["fn", "alt", "ok", "warn"]
+  const traces = []
+  for (let i = 0; i < mcAcfRuns.length; i++) {
+    const run = mcAcfRuns[i]
+    const lags = []
+    for (let lag = 0; lag < run.acf.length; lag++) lags.push(lag)
+    traces.push({x: lags, y: run.acf, type: "scatter", mode: "lines", line: {color: chartColors[palette[i]], width: 2},
+      name: `Start at ${run.burnIn} (${Math.round(100 * run.burnIn / mcWalk.length)}%)`})
+  }
+  return VM.plotting.plotWithLegend(mcAcfPlot, traces, {title: {text: "ACF stability analysis"}, margin: {t: 40}, xaxis: {title: "Lag"}, yaxis: {title: "Autocorrelation"}})
+}
+```
+
+Similarity between consecutive autocorrelation functions (the mean absolute difference over all lags):
+
+```{ojs}
+{
+  const rows = []
+  for (let i = 0; i + 1 < mcAcfRuns.length; i++) {
+    const a = mcAcfRuns[i].acf, b = mcAcfRuns[i + 1].acf
+    const count = Math.min(a.length, b.length)
+    let total = 0
+    for (let lag = 0; lag < count; lag++) total += Math.abs(a[lag] - b[lag])
+    rows.push([`${mcAcfRuns[i].burnIn} vs ${mcAcfRuns[i + 1].burnIn}`, (total / count).toFixed(3)])
+  }
+  return VM.ui.renderTable({html, rows, headers: ["Burn-in", "Similarity"], filename: "acf-similarity.csv"})
+}
+```
+
+Based on visual inspection and similarity analysis, no burn-in is required.
 :::
 
 ## Concluding Remarks

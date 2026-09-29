@@ -22,7 +22,7 @@ A **small** change may be committed straight onto `develop` and pushed: a
 typo or wording fix in prose, a comment, or repo-only docs and tooling
 (`CLAUDE.md`, `README.md`, `.claude/**`, `Makefile`). Stop after the push.
 
-Anything touching a code cell (Python or OJS), CSS, `_quarto.yml`,
+Anything touching a code cell, CSS, `_quarto.yml`,
 `_extensions/`, `scripts/` or `.github/` is **not** small, however few lines.
 Carry on.
 
@@ -41,7 +41,6 @@ folder holds which branch.
   git stash push -u -m ship-pr
   git worktree add -b <prefix>/<slug> ../Monte-Carlo-Methods-<slug> develop
   git -C ../Monte-Carlo-Methods-<slug> stash pop
-  ln -s ../Monte-Carlo-Methods/.venv ../Monte-Carlo-Methods-<slug>/.venv
   ```
 
   Prefixes: `app/`, `chapter/`, `fix/`, `ci/`, `docs/`.
@@ -50,7 +49,7 @@ folder holds which branch.
 
 In the worktree:
 
-- `quarto render` finishes with no errors or Python tracebacks in the output.
+- `quarto render` finishes with no errors in the output.
 - Every chapter the change touches is opened in that worktree's
   `quarto preview`, and its apps exercised: every button, every slider moved,
   dark mode toggled, the `?embed=<id>` view loaded. The browser console shows
@@ -149,8 +148,8 @@ git branch -d <branch>
 git push origin --delete <branch>
 ```
 
-`--force` because the folder still holds untracked build output and the
-`.venv` symlink, which a plain `remove` refuses to delete.
+`--force` because the folder still holds untracked build output, which a
+plain `remove` refuses to delete.
 
 ## Report
 
