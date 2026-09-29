@@ -3,9 +3,12 @@
 # Authors: Apurva Nakade
 
 # Renders the book on every push to main (a release: `make release`
-# fast-forwards main to develop) and publishes docs/ to the gh-pages branch.
-# deploy.yml then deploys gh-pages to GitHub Pages. gh-pages is force-orphaned
-# each time, so it holds only the current build rather than a history of them.
+# fast-forwards main to develop) and publishes docs/ to the gh-pages branch,
+# which GitHub Pages serves directly (Pages source: gh-pages, /), deployed by
+# GitHub's own pages-build-deployment. There is deliberately no deploy.yml
+# triggered by the gh-pages push: a push made with GITHUB_TOKEN never triggers
+# another workflow. gh-pages is force-orphaned each time, so it holds only the
+# current build rather than a history of them.
 
 name: Render and publish to gh-pages
 

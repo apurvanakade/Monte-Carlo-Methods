@@ -35,7 +35,7 @@ apps/                 the Interactive Apps gallery (links to each app's ?embed= 
 assets/               site CSS
 scripts/              build hooks
 references.bib
-.github/              render on PRs (pr-check), publish main to gh-pages (publish, deploy)
+.github/              render on PRs (pr-check), publish main to gh-pages (publish)
 docs/                 local build output (untracked)
 ```
 
