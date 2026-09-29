@@ -72,10 +72,12 @@ attribution line from the system reminder.
 
 ## 3. Wait for the review
 
-Copilot reviews a few minutes after a PR opens or a push lands, if it is
-enabled on the repo. Poll `gh pr view <N> --json reviews,reviewRequests`
-every minute or two for up to ~10 minutes. If nothing arrives, go on and say
-so in the final report.
+Automatic Copilot review is off in this repo (its ruleset "Copilot review on
+PRs into develop" is disabled, to save the Copilot quota for mathviz and
+VisualMathLab), so don't wait for one. Only if the PR already has a review
+request (`gh pr view <N> --json reviews,reviewRequests`), or the user asks for
+one, poll every minute or two for up to ~10 minutes; otherwise skip to step 5
+and note in the final report that there was no review.
 
 ## 4. Triage every comment
 
