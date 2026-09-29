@@ -67,11 +67,11 @@ We can easily sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the
 // The figures in this chapter, before the app. VM and chartColors are
 // defined with the app below.
 g2ExpContourPlot = VM.plotting.persistentPlot({height: "420px"})
-g2ExpSurfacePlot = VM.plotting.persistentPlot({height: "460px"})
+g2ExpSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
 g2ExpScatterPlot = VM.plotting.persistentPlot({height: "480px"})
 g2ExpPathPlot = VM.plotting.persistentPlot({height: "480px"})
 g2NormContourPlot = VM.plotting.persistentPlot({height: "420px"})
-g2NormSurfacePlot = VM.plotting.persistentPlot({height: "460px"})
+g2NormSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
 g2NormScatterPlot = VM.plotting.persistentPlot({height: "480px"})
 g2NormPathPlot = VM.plotting.persistentPlot({height: "480px"})
 
@@ -118,10 +118,9 @@ function g2Contour(plot, grid, title) {
 }
 
 function g2Surface(plot, grid, title) {
-  const axis = {color: chartColors.ink, gridcolor: VM.plotting.alpha(chartColors.muted, 0.4)}
   return plot([{...grid, type: "surface", colorscale: g2Colorscale(), showscale: false}], {
-    title: {text: title}, margin: {t: 40},
-    scene: {xaxis: {...axis, title: "X"}, yaxis: {...axis, title: "Y"}, zaxis: {...axis, title: "Density"},
+    title: {text: title}, margin: {t: 40}, uirevision: "static",
+    scene: {xaxis: {title: {text: "X"}}, yaxis: {title: {text: "Y"}}, zaxis: {title: {text: "Density"}},
       camera: {eye: {x: 1.6, y: 1.6, z: 0.8}}}
   })
 }
