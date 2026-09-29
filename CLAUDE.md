@@ -9,9 +9,20 @@ Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), r
 - `make build` (= `quarto render`) — render the whole book into `docs/`.
 - `make preview` (= `quarto preview`) — live-reload preview; the right tool for iterating on one chapter.
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
-- `make deploy` — builds, then commits **everything** (`git add -A`) and pushes. Only run it when asked.
+- `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). Only run it when asked.
 
 Python cells run in the project's `.venv` (`QUARTO_PYTHON=.venv/bin/python` in `_environment`); create it with `python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt`. `execute.cache: true` is on, so an edited Python cell re-runs but an unchanged one is served from `.jupyter_cache/`.
+
+## Branches, PRs and releases
+
+Same rules as VisualMathLab. `develop` is where work lands; `main` is a pointer to the last published state.
+
+- **One worktree per branch.** `~/Github/Monte-Carlo-Methods` is the long-lived `develop` checkout and stays on `develop` — never `git checkout` another branch there (a checkout rewrites `_quarto.yml`/`_extensions/`, and a running `quarto preview` then re-renders the whole book). A feature branch gets a sibling folder: `git worktree add -b <prefix>/<slug> ../Monte-Carlo-Methods-<slug> develop` (prefixes: `app/`, `chapter/`, `fix/`, `ci/`, `docs/`). In it, `ln -s ../Monte-Carlo-Methods/.venv .venv` (`_environment` finds Python there) and run its own `quarto preview --port <4201, 4202, ...> --no-browser`. Its first render executes every Python cell, since `.jupyter_cache/` is per folder.
+- **Major changes go through a PR into `develop`**, after being verified: `quarto render` finishes cleanly, and every chapter the change touches is loaded in the preview with its apps exercised (buttons, sliders, dark-mode toggle) and no console errors. Then `gh pr create --base develop`, triage the review, merge with `--merge` (not `--squash`). The `ship-pr` skill (`.claude/skills/ship-pr/SKILL.md`) carries this through end to end; when a rule here changes, update it there too.
+- **Small changes may be pushed straight to `develop`** without a PR: a typo or wording fix in prose, a comment, or repo-only docs and tooling (`CLAUDE.md`, `README.md`, `.claude/**`, `Makefile`). Anything touching a code cell (Python or OJS), CSS, `_quarto.yml`, `_extensions/`, `scripts/` or a workflow is not small, however few lines.
+- **Releasing is a fast-forward of `main` to `develop`**: `make release` (`git push origin origin/develop:main`, which the remote refuses unless it is a fast-forward — no checkout needed). Never squash- or merge-commit into `main`, and never force-push it. If the fast-forward is refused, the histories have diverged: reconcile once with `git merge -s ours origin/main` on `develop`, push, and retry.
+- **Cleanup** after the merge: stop the worktree's preview, check `git -C ../Monte-Carlo-Methods-<slug> status --short` lists no modified tracked file, then `git worktree remove --force ../Monte-Carlo-Methods-<slug>`, `git branch -d <branch>`, `git push origin --delete <branch>`.
+- Old unmerged work is kept on `archive/*` branches (e.g. `archive/graph-theory-experiment`, the pre-2026-09 `develop`), not deleted.
 
 ## Source vs. generated output
 
