@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Estimating Integrals – Monte Carlo Methods Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/sampling/index.html" rel="next">
+<link href="../../chapters/estimation/estimating_pi.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b72d44010710761ef2be279569eaa82e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-e5aa573e41f45164f2241380f035b026.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="referrer" content="same-origin">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-chrome-site-0.1.13/site.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
+<script src="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.css" rel="stylesheet">
+<meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
+<link href="../../site_libs/quarto-contrib/mathviz-fonts-0.1.13/fonts.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="module" src="../../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/style.css">
+<meta property="og:title" content="4&nbsp; Estimating Integrals – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../apps/index.html" aria-current="page"> 
+<span class="menu-text">Interactive Apps</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/integrals.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Monte Carlo Estimation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interactive Apps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#statistical-properties" id="toc-statistical-properties" class="nav-link active" data-scroll-target="#statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</a></li>
+  <li><a href="#function-characteristics-and-performance" id="toc-function-characteristics-and-performance" class="nav-link" data-scroll-target="#function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</a>
+  <ul class="collapse">
+  <li><a href="#example-low-vs.-high-frequency-functions" id="toc-example-low-vs.-high-frequency-functions" class="nav-link" data-scroll-target="#example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</a></li>
+  <li><a href="#remarks" id="toc-remarks" class="nav-link" data-scroll-target="#remarks"><span class="header-section-number">4.2.2</span> Remarks</a></li>
+  <li><a href="#variance-bounds-using-derivatives" id="toc-variance-bounds-using-derivatives" class="nav-link" data-scroll-target="#variance-bounds-using-derivatives"><span class="header-section-number">4.2.3</span> Variance Bounds Using Derivatives</a></li>
+  </ul></li>
+  <li><a href="#multidimensional-integration" id="toc-multidimensional-integration" class="nav-link" data-scroll-target="#multidimensional-integration"><span class="header-section-number">4.3</span> Multidimensional Integration</a>
+  <ul class="collapse">
+  <li><a href="#example-gaussian-like-function-in-multiple-dimensions" id="toc-example-gaussian-like-function-in-multiple-dimensions" class="nav-link" data-scroll-target="#example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.3.1</span> Example: Gaussian-like Function in Multiple Dimensions</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">4.4</span> Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/estimation/index.html">Monte Carlo Estimation</a></li><li class="breadcrumb-item"><a href="../../chapters/estimation/integrals.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Monte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.</p>
+<p>Consider the problem of estimating the integral <span class="math inline">\(\ell = \int_a^b f(x) \, dx\)</span>. The key insight is to rewrite this integral as an expectation. If <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>, then: <span class="math display">\[\int_a^b f(x) \, dx = (b-a) \mathbb{E}[f(X)]\]</span></p>
+<p>This reformulation allows us to estimate the integral using sample averages. Given <span class="math inline">\(N\)</span> independent samples <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>, our Monte Carlo estimator is: <span class="math display">\[\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Geometric Interpretation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We’re approximating the area under <span class="math inline">\(f(x)\)</span> by averaging function values at random points and scaling by interval width.</p>
+</div>
+</div>
+<section id="statistical-properties" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="statistical-properties"><span class="header-section-number">4.1</span> Statistical Properties</h2>
+<p>The Monte Carlo integration estimator possesses several important statistical properties. First, it is unbiased: <span class="math display">\[\begin{aligned}
+\mathbb{E}[\hat{\ell}_N] &amp;= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
+\end{aligned}\]</span></p>
+<p>The variance of our estimator is: <span class="math display">\[\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f\]</span> where <span class="math inline">\(\sigma^2_f = \text{Var}(f(X))\)</span> is the variance of <span class="math inline">\(f(X)\)</span> under the uniform distribution.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key Properties
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p><strong>Standard Error</strong>: <span class="math inline">\(\text{SE} = \frac{(b-a)\sigma_f}{\sqrt{N}}\)</span></p></li>
+<li><p><strong>Convergence Rate</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> regardless of dimension</p></li>
+<li><p><strong>CLT</strong>: <span class="math inline">\(\sqrt{N}(\hat{\ell}_N - \ell) \xrightarrow{d} \mathcal{N}(0, (b-a)^2\sigma^2_f)\)</span></p></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="function-characteristics-and-performance" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="function-characteristics-and-performance"><span class="header-section-number">4.2</span> Function Characteristics and Performance</h2>
+<p>Monte Carlo integration’s performance depends heavily on the function’s characteristics. While the convergence rate is theoretically independent of function complexity, practical performance varies significantly with function smoothness and oscillatory behavior.</p>
+<p>Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.</p>
+<section id="example-low-vs.-high-frequency-functions" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="example-low-vs.-high-frequency-functions"><span class="header-section-number">4.2.1</span> Example: Low vs.&nbsp;High Frequency Functions</h3>
+<p>The following example integrates two functions over the interval <span class="math inline">\([0, \pi]\)</span>:</p>
+<ul>
+<li><p><strong>Smooth decay</strong>: <span class="math inline">\(f_1(x) = \sin(x)\)</span> — a smooth, slowly varying function</p></li>
+<li><p><strong>Oscillatory</strong>: <span class="math inline">\(f_2(x) = 25\sin(25x)\)</span> — a rapidly oscillating function with many periods</p></li>
+</ul>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="59" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 58;"><span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>VM <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">VM</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>vmTheme <span class="op">=</span> Generators<span class="op">.</span><span class="fu">observe</span>(notify <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">onThemeChange</span>(notify))</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>chartColors <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">colors</span>(vmTheme)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>intSmoothPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"300px"</span>})</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>intOscPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"300px"</span>})</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>intEstimatePlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"380px"</span>})</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>intErrorPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"380px"</span>})</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="co">// The two integrands on [0, pi]; both integrate to exactly 2.</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>intFunctions <span class="op">=</span> [</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="st">"Smooth"</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"Smooth: sin(x)"</span><span class="op">,</span> <span class="dt">f</span><span class="op">:</span> x <span class="kw">=&gt;</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(x)<span class="op">,</span> <span class="dt">trueValue</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"fn"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> <span class="st">"circle"</span>}<span class="op">,</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="st">"Oscillatory"</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"Oscillatory: 25 sin(25x)"</span><span class="op">,</span> <span class="dt">f</span><span class="op">:</span> x <span class="kw">=&gt;</span> <span class="dv">25</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(<span class="dv">25</span> <span class="op">*</span> x)<span class="op">,</span> <span class="dt">trueValue</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"alt"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> <span class="st">"square"</span>}</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="co">// (b - a) times the average of f at n uniform points in [a, b].</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">monteCarloIntegrate</span>(f<span class="op">,</span> a<span class="op">,</span> b<span class="op">,</span> n<span class="op">,</span> rng) {</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> sum <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++</span>) sum <span class="op">+=</span> <span class="fu">f</span>(a <span class="op">+</span> (b <span class="op">-</span> a) <span class="op">*</span> <span class="fu">rng</span>())</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (b <span class="op">-</span> a) <span class="op">*</span> sum <span class="op">/</span> n</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="co">// n = 10^2 ... 10^5, 20 sizes evenly spaced on a log scale.</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>intSampleSizes <span class="op">=</span> {</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sizes <span class="op">=</span> []</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">20</span><span class="op">;</span> i<span class="op">++</span>) sizes<span class="op">.</span><span class="fu">push</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(<span class="dv">10</span><span class="op">,</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> i <span class="op">/</span> <span class="dv">19</span>)))</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> sizes</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>intResults <span class="op">=</span> {</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rng <span class="op">=</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">0</span>)</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> results <span class="op">=</span> []</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> fn <span class="kw">of</span> intFunctions) {</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> estimates <span class="op">=</span> []<span class="op">,</span> errors <span class="op">=</span> []</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> n <span class="kw">of</span> intSampleSizes) {</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> estimate <span class="op">=</span> <span class="fu">monteCarloIntegrate</span>(fn<span class="op">.</span><span class="at">f</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span><span class="op">,</span> n<span class="op">,</span> rng)</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>      estimates<span class="op">.</span><span class="fu">push</span>(estimate)</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>      errors<span class="op">.</span><span class="fu">push</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(estimate <span class="op">-</span> fn<span class="op">.</span><span class="at">trueValue</span>))</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>    <span class="co">// 25 independent estimates at n = 10,000, for the spread of the estimator.</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> repeats <span class="op">=</span> []</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> run <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> run <span class="op">&lt;</span> <span class="dv">25</span><span class="op">;</span> run<span class="op">++</span>) repeats<span class="op">.</span><span class="fu">push</span>(<span class="fu">monteCarloIntegrate</span>(fn<span class="op">.</span><span class="at">f</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span><span class="op">,</span> <span class="dv">10000</span><span class="op">,</span> rng))</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>    results<span class="op">.</span><span class="fu">push</span>({<span class="op">...</span>fn<span class="op">,</span> estimates<span class="op">,</span> errors<span class="op">,</span> <span class="dt">repeat</span><span class="op">:</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">sampleStats</span>(repeats<span class="op">,</span> {<span class="dt">ddof</span><span class="op">:</span> <span class="dv">0</span>})})</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> results</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">intFunctionFigure</span>(fn<span class="op">,</span> plot) {</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> xs <span class="op">=</span> []<span class="op">,</span> ys <span class="op">=</span> []</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">2000</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> x <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> i <span class="op">/</span> <span class="dv">2000</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>    xs<span class="op">.</span><span class="fu">push</span>(x)</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>    ys<span class="op">.</span><span class="fu">push</span>(fn<span class="op">.</span><span class="fu">f</span>(x))</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> color <span class="op">=</span> chartColors[fn<span class="op">.</span><span class="at">color</span>]</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">plot</span>([{<span class="dt">x</span><span class="op">:</span> xs<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> ys<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"tozeroy"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>    <span class="dt">fillcolor</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(color<span class="op">,</span> <span class="fl">0.3</span>)}]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> fn<span class="op">.</span><span class="at">title</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"x"</span>}})</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-8" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-9" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-10" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-11" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-12" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="121" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 120;"><span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a><span class="fu">intFunctionFigure</span>(intFunctions[<span class="dv">0</span>]<span class="op">,</span> intSmoothPlot)</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a><span class="fu">intFunctionFigure</span>(intFunctions[<span class="dv">1</span>]<span class="op">,</span> intOscPlot)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-2" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="132" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 131;"><span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>intEstimateTraces <span class="op">=</span> {</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> r <span class="kw">of</span> intResults) {</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> color <span class="op">=</span> chartColors[r<span class="op">.</span><span class="at">color</span>]</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> intSampleSizes<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> r<span class="op">.</span><span class="at">estimates</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> r<span class="op">.</span><span class="at">name</span><span class="op">,</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {color}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> r<span class="op">.</span><span class="at">marker</span>}})</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>  traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> [intSampleSizes[<span class="dv">0</span>]<span class="op">,</span> intSampleSizes[<span class="dv">19</span>]]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [<span class="dv">2</span><span class="op">,</span> <span class="dv">2</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>    <span class="dt">name</span><span class="op">:</span> <span class="st">"True value"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span>}})</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> traces</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="146" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 145;"><span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a>VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(intEstimatePlot<span class="op">,</span> intEstimateTraces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Estimate vs sample size"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a>  <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Sample size"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Integral estimate"</span>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="152" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 151;"><span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>intErrorTraces <span class="op">=</span> {</span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> r <span class="kw">of</span> intResults) {</span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> color <span class="op">=</span> chartColors[r<span class="op">.</span><span class="at">color</span>]</span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> intSampleSizes<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> r<span class="op">.</span><span class="at">errors</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> r<span class="op">.</span><span class="at">name</span><span class="op">,</span></span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> r<span class="op">.</span><span class="at">marker</span>}})</span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> traces</span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="164" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 163;"><span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(intErrorPlot<span class="op">,</span> intErrorTraces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Error vs sample size"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>  <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Sample size"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Absolute error"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb7" data-startfrom="169" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 168;"><span id="cb7-169"><a href="#cb7-169" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb7-170"><a href="#cb7-170" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> []</span>
+<span id="cb7-171"><a href="#cb7-171" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> smoothSd <span class="op">=</span> intResults[<span class="dv">0</span>]<span class="op">.</span><span class="at">repeat</span><span class="op">.</span><span class="at">sd</span></span>
+<span id="cb7-172"><a href="#cb7-172" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> r <span class="kw">of</span> intResults) {</span>
+<span id="cb7-173"><a href="#cb7-173" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> ratio <span class="op">=</span> <span class="st">"–"</span></span>
+<span id="cb7-174"><a href="#cb7-174" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (r<span class="op">.</span><span class="at">name</span> <span class="op">===</span> <span class="st">"Oscillatory"</span>) ratio <span class="op">=</span> (r<span class="op">.</span><span class="at">repeat</span><span class="op">.</span><span class="at">sd</span> <span class="op">/</span> smoothSd)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)</span>
+<span id="cb7-175"><a href="#cb7-175" aria-hidden="true" tabindex="-1"></a>    rows<span class="op">.</span><span class="fu">push</span>([r<span class="op">.</span><span class="at">name</span><span class="op">,</span> r<span class="op">.</span><span class="at">trueValue</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> r<span class="op">.</span><span class="at">repeat</span><span class="op">.</span><span class="at">mean</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span></span>
+<span id="cb7-176"><a href="#cb7-176" aria-hidden="true" tabindex="-1"></a>      <span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(r<span class="op">.</span><span class="at">repeat</span><span class="op">.</span><span class="at">mean</span> <span class="op">-</span> r<span class="op">.</span><span class="at">trueValue</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> r<span class="op">.</span><span class="at">repeat</span><span class="op">.</span><span class="at">sd</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> ratio])</span>
+<span id="cb7-177"><a href="#cb7-177" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-178"><a href="#cb7-178" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"smooth-vs-oscillatory.csv"</span><span class="op">,</span></span>
+<span id="cb7-179"><a href="#cb7-179" aria-hidden="true" tabindex="-1"></a>    <span class="dt">headers</span><span class="op">:</span> [<span class="st">"Function"</span><span class="op">,</span> <span class="st">"True value"</span><span class="op">,</span> <span class="st">"Mean est. (25 runs, n = 10,000)"</span><span class="op">,</span> <span class="st">"Error"</span><span class="op">,</span> <span class="st">"Std dev"</span><span class="op">,</span> <span class="st">"Std ratio"</span>]})</span>
+<span id="cb7-180"><a href="#cb7-180" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-8" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<p>The contrast between the smooth <span class="math inline">\(\sin(x)\)</span> and rapidly oscillating <span class="math inline">\(25\sin(25x)\)</span> demonstrates why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.</p>
+<p>The log-log error plot reveals that while both functions follow the expected <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes. The variance ratio indicates that the oscillatory function’s variance is around 70 times higher than the smooth function’s variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.</p>
+</section>
+<section id="remarks" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="remarks"><span class="header-section-number">4.2.2</span> Remarks</h3>
+<ul>
+<li><p><strong>Smooth functions</strong> are well-suited for Monte Carlo integration, converging quickly with relatively few samples.</p></li>
+<li><p><strong>Highly oscillatory functions</strong> present challenges, requiring larger sample sizes and exhibiting higher variance.</p></li>
+<li><p>For oscillatory integrals, consider <strong>alternative approaches</strong> such as:</p>
+<ul>
+<li>Stratified sampling to ensure adequate coverage of oscillation periods</li>
+<li>Importance sampling with distributions that account for function behavior</li>
+<li>Transformation techniques to reduce oscillations.</li>
+</ul></li>
+</ul>
+<p>This example demonstrates why understanding your function’s characteristics is crucial for effective Monte Carlo integration.</p>
+</section>
+<section id="variance-bounds-using-derivatives" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="variance-bounds-using-derivatives"><span class="header-section-number">4.2.3</span> Variance Bounds Using Derivatives</h3>
+<p>For smooth functions, we can bound the variance using derivative information.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Theorem (Variance Bound via Derivatives)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If <span class="math inline">\(g\)</span> is differentiable on <span class="math inline">\([a,b]\)</span> with derivative <span class="math inline">\(g'\)</span>, then: <span class="math display">\[\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2\]</span></p>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Proof</em>. </span>Let <span class="math inline">\(M = \max_{x \in [a,b]} |g'(x)|\)</span> and <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span>.</p>
+<p>Since <span class="math inline">\(g\)</span> is continuous on the compact interval <span class="math inline">\([a,b]\)</span>, it attains its minimum and maximum values. Let <span class="math inline">\(g_{\min} = \min_{x \in [a,b]} g(x)\)</span> and <span class="math inline">\(g_{\max} = \max_{x \in [a,b]} g(x)\)</span>.</p>
+<p>By the mean value theorem, for any two points in <span class="math inline">\([a,b]\)</span>: <span class="math display">\[g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Since <span class="math inline">\(\mu = \mathbb{E}[g(X)]\)</span> lies between <span class="math inline">\(g_{\min}\)</span> and <span class="math inline">\(g_{\max}\)</span>, we have for any <span class="math inline">\(x \in [a,b]\)</span>: <span class="math display">\[|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)\]</span></p>
+<p>Squaring both sides and taking expectations: <span class="math display">\[\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2\]</span></p>
+<p>This gives us the desired bound.</p>
+</div>
+<hr>
+<p>Note that this is a very weak bound and not useful in practice. There are no universal techniques that give us good bounds on <span class="math inline">\(\text{Var}(g(X))\)</span>. In practice, we rely on the heuristic that oscillatory functions are high variance.</p>
+</section>
+</section>
+<section id="multidimensional-integration" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="multidimensional-integration"><span class="header-section-number">4.3</span> Multidimensional Integration</h2>
+<p>One of Monte Carlo integration’s greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson’s rule) suffer from the “curse of dimensionality”—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their <span class="math inline">\(O(1/\sqrt{n})\)</span> convergence rate regardless of dimension.</p>
+<p>In <span class="math inline">\(d\)</span> dimensions, a grid-based method with <span class="math inline">\(m\)</span> points per dimension requires <span class="math inline">\(m^d\)</span> total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.</p>
+<section id="example-gaussian-like-function-in-multiple-dimensions" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="example-gaussian-like-function-in-multiple-dimensions"><span class="header-section-number">4.3.1</span> Example: Gaussian-like Function in Multiple Dimensions</h3>
+<p>The following example demonstrates Monte Carlo integration of the function <span class="math inline">\(f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}\)</span> over the unit hypercube <span class="math inline">\([0,1]^d\)</span> for dimensions <span class="math inline">\(d = 1, 2, 3, 4, 5\)</span>.</p>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb8" data-startfrom="246" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 245;"><span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a>intErrorDimPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"380px"</span>})</span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a>intSdDimPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"380px"</span>})</span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a><span class="co">// Integrate f(x) = exp(-|x|²) over [0, 1]^d, d = 1..5. The exact value is</span></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="co">// (∫_0^1 e^{-t²} dt)^d = (sqrt(pi)/2 · erf(1))^d, and erf(1) = 2 Φ(√2) - 1.</span></span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a>intDimensions <span class="op">=</span> {</span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> oneDim <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(<span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span>) <span class="op">/</span> <span class="dv">2</span> <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">normalCdf</span>(<span class="bu">Math</span><span class="op">.</span><span class="cn">SQRT2</span>) <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sizes <span class="op">=</span> []</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">15</span><span class="op">;</span> i<span class="op">++</span>) sizes<span class="op">.</span><span class="fu">push</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(<span class="dv">10</span><span class="op">,</span> <span class="dv">2</span> <span class="op">+</span> <span class="fl">1.5</span> <span class="op">*</span> i <span class="op">/</span> <span class="dv">14</span>)))</span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> runs <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rng <span class="op">=</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">0</span>)</span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> results <span class="op">=</span> []</span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> d <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> d <span class="op">&lt;=</span> <span class="dv">5</span><span class="op">;</span> d<span class="op">++</span>) {</span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> exact <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(oneDim<span class="op">,</span> d)</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> relErrors <span class="op">=</span> []<span class="op">,</span> sds <span class="op">=</span> []</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> n <span class="kw">of</span> sizes) {</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> estimates <span class="op">=</span> []</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (<span class="kw">let</span> run <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> run <span class="op">&lt;</span> runs<span class="op">;</span> run<span class="op">++</span>) {</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a>        <span class="kw">let</span> sum <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a>          <span class="kw">let</span> normSq <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> d<span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a>            <span class="kw">const</span> x <span class="op">=</span> <span class="fu">rng</span>()</span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a>            normSq <span class="op">+=</span> x <span class="op">*</span> x</span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a>          sum <span class="op">+=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(<span class="op">-</span>normSq)</span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>        estimates<span class="op">.</span><span class="fu">push</span>(sum <span class="op">/</span> n)</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> stats <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">sampleStats</span>(estimates<span class="op">,</span> {<span class="dt">ddof</span><span class="op">:</span> <span class="dv">0</span>})</span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>      relErrors<span class="op">.</span><span class="fu">push</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">abs</span>(stats<span class="op">.</span><span class="at">mean</span> <span class="op">-</span> exact) <span class="op">/</span> exact)</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a>      sds<span class="op">.</span><span class="fu">push</span>(stats<span class="op">.</span><span class="at">sd</span>)</span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a>    results<span class="op">.</span><span class="fu">push</span>({d<span class="op">,</span> relErrors<span class="op">,</span> sds})</span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {sizes<span class="op">,</span> results}</span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a>intDimColors <span class="op">=</span> [<span class="st">"fn"</span><span class="op">,</span> <span class="st">"alt"</span><span class="op">,</span> <span class="st">"ok"</span><span class="op">,</span> <span class="st">"warn"</span><span class="op">,</span> <span class="st">"accent2"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-9-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-9-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-9-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-9-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb9" data-startfrom="288" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 287;"><span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a>intErrorDimTraces <span class="op">=</span> {</span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> intDimensions<span class="op">.</span><span class="at">results</span><span class="op">.</span><span class="at">length</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> r <span class="op">=</span> intDimensions<span class="op">.</span><span class="at">results</span>[i]</span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> color <span class="op">=</span> chartColors[intDimColors[i]]</span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> intDimensions<span class="op">.</span><span class="at">sizes</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> r<span class="op">.</span><span class="at">relErrors</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="vs">`Dim </span><span class="sc">${</span>r<span class="op">.</span><span class="at">d</span><span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">5</span>}})</span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> traces</span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-10" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb10" data-startfrom="302" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 301;"><span id="cb10-302"><a href="#cb10-302" aria-hidden="true" tabindex="-1"></a>intSdDimTraces <span class="op">=</span> {</span>
+<span id="cb10-303"><a href="#cb10-303" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> sizes <span class="op">=</span> intDimensions<span class="op">.</span><span class="at">sizes</span></span>
+<span id="cb10-304"><a href="#cb10-304" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb10-305"><a href="#cb10-305" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> firstSdTotal <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb10-306"><a href="#cb10-306" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> intDimensions<span class="op">.</span><span class="at">results</span><span class="op">.</span><span class="at">length</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb10-307"><a href="#cb10-307" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> r <span class="op">=</span> intDimensions<span class="op">.</span><span class="at">results</span>[i]</span>
+<span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> color <span class="op">=</span> chartColors[intDimColors[i]]</span>
+<span id="cb10-309"><a href="#cb10-309" aria-hidden="true" tabindex="-1"></a>    firstSdTotal <span class="op">+=</span> r<span class="op">.</span><span class="at">sds</span>[<span class="dv">0</span>]</span>
+<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> sizes<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> r<span class="op">.</span><span class="at">sds</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="vs">`Dim </span><span class="sc">${</span>r<span class="op">.</span><span class="at">d</span><span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb10-311"><a href="#cb10-311" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {color<span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">5</span>}})</span>
+<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a>  <span class="co">// A 1/sqrt(n) line through the average first standard deviation.</span></span>
+<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> scale <span class="op">=</span> firstSdTotal <span class="op">/</span> intDimensions<span class="op">.</span><span class="at">results</span><span class="op">.</span><span class="at">length</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(sizes[<span class="dv">0</span>])</span>
+<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> reference <span class="op">=</span> []</span>
+<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> n <span class="kw">of</span> sizes) reference<span class="op">.</span><span class="fu">push</span>(scale <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(n))</span>
+<span id="cb10-317"><a href="#cb10-317" aria-hidden="true" tabindex="-1"></a>  traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> sizes<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> reference<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"∝ 1/√n"</span><span class="op">,</span></span>
+<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a>    <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}})</span>
+<span id="cb10-319"><a href="#cb10-319" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> traces</span>
+<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-11" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div id="fig-multidimensional" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multidimensional-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb11" data-startfrom="326" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 325;"><span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a>VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(intErrorDimPlot<span class="op">,</span> intErrorDimTraces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Relative error vs sample size"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb11-327"><a href="#cb11-327" aria-hidden="true" tabindex="-1"></a>  <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Number of samples"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-12" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb12" data-startfrom="331" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 330;"><span id="cb12-331"><a href="#cb12-331" aria-hidden="true" tabindex="-1"></a>VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(intSdDimPlot<span class="op">,</span> intSdDimTraces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Standard deviation vs sample size"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb12-332"><a href="#cb12-332" aria-hidden="true" tabindex="-1"></a>  <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Number of samples"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Standard deviation"</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"log"</span>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-13" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multidimensional-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Monte Carlo advantage in higher dimensions
+</figcaption>
+</figure>
+</div>
+<p>The example reveals several important properties of multidimensional integration:</p>
+<ol type="1">
+<li><p><strong>Dimension-Independent Convergence</strong>: The relative error plots demonstrate Monte Carlo’s key advantage - convergence behavior remains consistent across all dimensions, avoiding the curse of dimensionality that plagues grid-based methods.</p></li>
+<li><p><strong>Theoretical Validation</strong>: The standard deviation follows the expected <span class="math inline">\(1/\sqrt{n}\)</span> scaling (shown by the dashed reference line) regardless of dimension, confirming Monte Carlo’s theoretical foundation.</p></li>
+<li><p><strong>Constant Computational Cost</strong>: Unlike deterministic methods requiring <span class="math inline">\(n^d\)</span> evaluations, Monte Carlo uses the same number of function evaluations per sample regardless of dimension.</p></li>
+</ol>
+<p>This dimensional robustness makes Monte Carlo indispensable for high-dimensional applications in physics, statistics, and finance where traditional methods become computationally intractable.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>When to Use Monte Carlo Integration
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Advantages:</strong></p>
+<ul>
+<li><p><strong>High dimensions</strong>: Performance doesn’t degrade with dimension</p></li>
+<li><p><strong>Complex domains</strong>: Easy to handle irregular integration regions</p></li>
+<li><p><strong>Rough functions</strong>: Works with discontinuous or highly oscillatory functions</p></li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li><p><strong>Slow convergence</strong>: <span class="math inline">\(O(1/\sqrt{N})\)</span> rate</p></li>
+<li><p><strong>Random error</strong>: Introduces stochastic uncertainty</p></li>
+<li><p><strong>Low dimensions</strong>: Often outperformed by deterministic methods</p></li>
+</ul>
+<p><strong>Practical Considerations:</strong></p>
+<ul>
+<li><p><strong>Sample size</strong>: Need large <span class="math inline">\(N\)</span> for high precision</p></li>
+<li><p><strong>Function smoothness</strong>: Smoother functions → lower variance → better estimates</p></li>
+<li><p><strong>Variance reduction</strong>: Techniques like antithetic variables can improve efficiency</p></li>
+<li><p><strong>Error estimation</strong>: Use sample variance to estimate uncertainty</p></li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">4.4</span> Conclusion</h2>
+<p>Monte Carlo integration transforms integration into a sampling problem, making it invaluable for high-dimensional problems where traditional quadrature fails. While it converges slowly, its dimension-independent performance and ability to handle complex functions make it essential for modern computational statistics and machine learning applications.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlZNID0gd2luZG93LlZNXG52bVRoZW1lID0gR2VuZXJhdG9ycy5vYnNlcnZlKG5vdGlmeSA9PiBWTS5wbG90dGluZy5vblRoZW1lQ2hhbmdlKG5vdGlmeSkpXG5jaGFydENvbG9ycyA9IFZNLnBsb3R0aW5nLmNvbG9ycyh2bVRoZW1lKVxuXG5pbnRTbW9vdGhQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzMDBweFwifSlcbmludE9zY1Bsb3QgPSBWTS5wbG90dGluZy5wZXJzaXN0ZW50UGxvdCh7aGVpZ2h0OiBcIjMwMHB4XCJ9KVxuaW50RXN0aW1hdGVQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzODBweFwifSlcbmludEVycm9yUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzgwcHhcIn0pXG5cbi8vIFRoZSB0d28gaW50ZWdyYW5kcyBvbiBbMCwgcGldOyBib3RoIGludGVncmF0ZSB0byBleGFjdGx5IDIuXG5pbnRGdW5jdGlvbnMgPSBbXG4gIHtuYW1lOiBcIlNtb290aFwiLCB0aXRsZTogXCJTbW9vdGg6IHNpbih4KVwiLCBmOiB4ID0+IE1hdGguc2luKHgpLCB0cnVlVmFsdWU6IDIsIGNvbG9yOiBcImZuXCIsIG1hcmtlcjogXCJjaXJjbGVcIn0sXG4gIHtuYW1lOiBcIk9zY2lsbGF0b3J5XCIsIHRpdGxlOiBcIk9zY2lsbGF0b3J5OiAyNSBzaW4oMjV4KVwiLCBmOiB4ID0+IDI1ICogTWF0aC5zaW4oMjUgKiB4KSwgdHJ1ZVZhbHVlOiAyLCBjb2xvcjogXCJhbHRcIiwgbWFya2VyOiBcInNxdWFyZVwifVxuXVxuXG4vLyAoYiAtIGEpIHRpbWVzIHRoZSBhdmVyYWdlIG9mIGYgYXQgbiB1bmlmb3JtIHBvaW50cyBpbiBbYSwgYl0uXG5mdW5jdGlvbiBtb250ZUNhcmxvSW50ZWdyYXRlKGYsIGEsIGIsIG4sIHJuZykge1xuICBsZXQgc3VtID0gMFxuICBmb3IgKGxldCBpID0gMDsgaSA8IG47IGkrKykgc3VtICs9IGYoYSArIChiIC0gYSkgKiBybmcoKSlcbiAgcmV0dXJuIChiIC0gYSkgKiBzdW0gLyBuXG59XG5cbi8vIG4gPSAxMF4yIC4uLiAxMF41LCAyMCBzaXplcyBldmVubHkgc3BhY2VkIG9uIGEgbG9nIHNjYWxlLlxuaW50U2FtcGxlU2l6ZXMgPSB7XG4gIGNvbnN0IHNpemVzID0gW11cbiAgZm9yIChsZXQgaSA9IDA7IGkgPCAyMDsgaSsrKSBzaXplcy5wdXNoKE1hdGguZmxvb3IoTWF0aC5wb3coMTAsIDIgKyAzICogaSAvIDE5KSkpXG4gIHJldHVybiBzaXplc1xufVxuXG5pbnRSZXN1bHRzID0ge1xuICBjb25zdCBybmcgPSBWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oMClcbiAgY29uc3QgcmVzdWx0cyA9IFtdXG4gIGZvciAoY29uc3QgZm4gb2YgaW50RnVuY3Rpb25zKSB7XG4gICAgY29uc3QgZXN0aW1hdGVzID0gW10sIGVycm9ycyA9IFtdXG4gICAgZm9yIChjb25zdCBuIG9mIGludFNhbXBsZVNpemVzKSB7XG4gICAgICBjb25zdCBlc3RpbWF0ZSA9IG1vbnRlQ2FybG9JbnRlZ3JhdGUoZm4uZiwgMCwgTWF0aC5QSSwgbiwgcm5nKVxuICAgICAgZXN0aW1hdGVzLnB1c2goZXN0aW1hdGUpXG4gICAgICBlcnJvcnMucHVzaChNYXRoLmFicyhlc3RpbWF0ZSAtIGZuLnRydWVWYWx1ZSkpXG4gICAgfVxuICAgIC8vIDI1IGluZGVwZW5kZW50IGVzdGltYXRlcyBhdCBuID0gMTAsMDAwLCBmb3IgdGhlIHNwcmVhZCBvZiB0aGUgZXN0aW1hdG9yLlxuICAgIGNvbnN0IHJlcGVhdHMgPSBbXVxuICAgIGZvciAobGV0IHJ1biA9IDA7IHJ1biA8IDI1OyBydW4rKykgcmVwZWF0cy5wdXNoKG1vbnRlQ2FybG9JbnRlZ3JhdGUoZm4uZiwgMCwgTWF0aC5QSSwgMTAwMDAsIHJuZykpXG4gICAgcmVzdWx0cy5wdXNoKHsuLi5mbiwgZXN0aW1hdGVzLCBlcnJvcnMsIHJlcGVhdDogVk0uZGlzdHJpYnV0aW9ucy5zYW1wbGVTdGF0cyhyZXBlYXRzLCB7ZGRvZjogMH0pfSlcbiAgfVxuICByZXR1cm4gcmVzdWx0c1xufVxuXG5mdW5jdGlvbiBpbnRGdW5jdGlvbkZpZ3VyZShmbiwgcGxvdCkge1xuICBjb25zdCB4cyA9IFtdLCB5cyA9IFtdXG4gIGZvciAobGV0IGkgPSAwOyBpIDw9IDIwMDA7IGkrKykge1xuICAgIGNvbnN0IHggPSBNYXRoLlBJICogaSAvIDIwMDBcbiAgICB4cy5wdXNoKHgpXG4gICAgeXMucHVzaChmbi5mKHgpKVxuICB9XG4gIGNvbnN0IGNvbG9yID0gY2hhcnRDb2xvcnNbZm4uY29sb3JdXG4gIHJldHVybiBwbG90KFt7eDogeHMsIHk6IHlzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBmaWxsOiBcInRvemVyb3lcIiwgbGluZToge2NvbG9yLCB3aWR0aDogMn0sXG4gICAgZmlsbGNvbG9yOiBWTS5wbG90dGluZy5hbHBoYShjb2xvciwgMC4zKX1dLCB7dGl0bGU6IHt0ZXh0OiBmbi50aXRsZX0sIG1hcmdpbjoge3Q6IDQwfSwgc2hvd2xlZ2VuZDogZmFsc2UsIHhheGlzOiB7dGl0bGU6IFwieFwifX0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTIiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRGdW5jdGlvbkZpZ3VyZShpbnRGdW5jdGlvbnNbMF0sIGludFNtb290aFBsb3QpXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRGdW5jdGlvbkZpZ3VyZShpbnRGdW5jdGlvbnNbMV0sIGludE9zY1Bsb3QpXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRFc3RpbWF0ZVRyYWNlcyA9IHtcbiAgY29uc3QgdHJhY2VzID0gW11cbiAgZm9yIChjb25zdCByIG9mIGludFJlc3VsdHMpIHtcbiAgICBjb25zdCBjb2xvciA9IGNoYXJ0Q29sb3JzW3IuY29sb3JdXG4gICAgdHJhY2VzLnB1c2goe3g6IGludFNhbXBsZVNpemVzLCB5OiByLmVzdGltYXRlcywgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXMrbWFya2Vyc1wiLCBuYW1lOiByLm5hbWUsXG4gICAgICBsaW5lOiB7Y29sb3J9LCBtYXJrZXI6IHtjb2xvciwgc3ltYm9sOiByLm1hcmtlcn19KVxuICB9XG4gIHRyYWNlcy5wdXNoKHt4OiBbaW50U2FtcGxlU2l6ZXNbMF0sIGludFNhbXBsZVNpemVzWzE5XV0sIHk6IFsyLCAyXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIixcbiAgICBuYW1lOiBcIlRydWUgdmFsdWVcIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5pbmssIGRhc2g6IFwiZGFzaFwifX0pXG4gIHJldHVybiB0cmFjZXNcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlZNLnBsb3R0aW5nLnBsb3RXaXRoTGVnZW5kKGludEVzdGltYXRlUGxvdCwgaW50RXN0aW1hdGVUcmFjZXMsIHt0aXRsZToge3RleHQ6IFwiRXN0aW1hdGUgdnMgc2FtcGxlIHNpemVcIn0sIG1hcmdpbjoge3Q6IDQwfSxcbiAgeGF4aXM6IHt0aXRsZTogXCJTYW1wbGUgc2l6ZVwiLCB0eXBlOiBcImxvZ1wifSwgeWF4aXM6IHt0aXRsZTogXCJJbnRlZ3JhbCBlc3RpbWF0ZVwifX0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTYiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRFcnJvclRyYWNlcyA9IHtcbiAgY29uc3QgdHJhY2VzID0gW11cbiAgZm9yIChjb25zdCByIG9mIGludFJlc3VsdHMpIHtcbiAgICBjb25zdCBjb2xvciA9IGNoYXJ0Q29sb3JzW3IuY29sb3JdXG4gICAgdHJhY2VzLnB1c2goe3g6IGludFNhbXBsZVNpemVzLCB5OiByLmVycm9ycywgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXMrbWFya2Vyc1wiLCBuYW1lOiByLm5hbWUsXG4gICAgICBsaW5lOiB7Y29sb3IsIHdpZHRoOiAyfSwgbWFya2VyOiB7Y29sb3IsIHN5bWJvbDogci5tYXJrZXJ9fSlcbiAgfVxuICByZXR1cm4gdHJhY2VzXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTciLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJWTS5wbG90dGluZy5wbG90V2l0aExlZ2VuZChpbnRFcnJvclBsb3QsIGludEVycm9yVHJhY2VzLCB7dGl0bGU6IHt0ZXh0OiBcIkVycm9yIHZzIHNhbXBsZSBzaXplXCJ9LCBtYXJnaW46IHt0OiA0MH0sXG4gIHhheGlzOiB7dGl0bGU6IFwiU2FtcGxlIHNpemVcIiwgdHlwZTogXCJsb2dcIn0sIHlheGlzOiB7dGl0bGU6IFwiQWJzb2x1dGUgZXJyb3JcIiwgdHlwZTogXCJsb2dcIn19KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC04IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCByb3dzID0gW11cbiAgY29uc3Qgc21vb3RoU2QgPSBpbnRSZXN1bHRzWzBdLnJlcGVhdC5zZFxuICBmb3IgKGNvbnN0IHIgb2YgaW50UmVzdWx0cykge1xuICAgIGxldCByYXRpbyA9IFwi4oCTXCJcbiAgICBpZiAoci5uYW1lID09PSBcIk9zY2lsbGF0b3J5XCIpIHJhdGlvID0gKHIucmVwZWF0LnNkIC8gc21vb3RoU2QpLnRvRml4ZWQoNClcbiAgICByb3dzLnB1c2goW3IubmFtZSwgci50cnVlVmFsdWUudG9GaXhlZCg0KSwgci5yZXBlYXQubWVhbi50b0ZpeGVkKDQpLFxuICAgICAgTWF0aC5hYnMoci5yZXBlYXQubWVhbiAtIHIudHJ1ZVZhbHVlKS50b0ZpeGVkKDQpLCByLnJlcGVhdC5zZC50b0ZpeGVkKDQpLCByYXRpb10pXG4gIH1cbiAgcmV0dXJuIFZNLnVpLnJlbmRlclRhYmxlKHtodG1sLCByb3dzLCBmaWxlbmFtZTogXCJzbW9vdGgtdnMtb3NjaWxsYXRvcnkuY3N2XCIsXG4gICAgaGVhZGVyczogW1wiRnVuY3Rpb25cIiwgXCJUcnVlIHZhbHVlXCIsIFwiTWVhbiBlc3QuICgyNSBydW5zLCBuID0gMTAsMDAwKVwiLCBcIkVycm9yXCIsIFwiU3RkIGRldlwiLCBcIlN0ZCByYXRpb1wiXX0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTkiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRFcnJvckRpbVBsb3QgPSBWTS5wbG90dGluZy5wZXJzaXN0ZW50UGxvdCh7aGVpZ2h0OiBcIjM4MHB4XCJ9KVxuaW50U2REaW1QbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzODBweFwifSlcblxuLy8gSW50ZWdyYXRlIGYoeCkgPSBleHAoLXx4fMKyKSBvdmVyIFswLCAxXV5kLCBkID0gMS4uNS4gVGhlIGV4YWN0IHZhbHVlIGlzXG4vLyAo4oirXzBeMSBlXnstdMKyfSBkdCleZCA9IChzcXJ0KHBpKS8yIMK3IGVyZigxKSleZCwgYW5kIGVyZigxKSA9IDIgzqYo4oiaMikgLSAxLlxuaW50RGltZW5zaW9ucyA9IHtcbiAgY29uc3Qgb25lRGltID0gTWF0aC5zcXJ0KE1hdGguUEkpIC8gMiAqICgyICogVk0uZGlzdHJpYnV0aW9ucy5ub3JtYWxDZGYoTWF0aC5TUVJUMikgLSAxKVxuICBjb25zdCBzaXplcyA9IFtdXG4gIGZvciAobGV0IGkgPSAwOyBpIDwgMTU7IGkrKykgc2l6ZXMucHVzaChNYXRoLmZsb29yKE1hdGgucG93KDEwLCAyICsgMS41ICogaSAvIDE0KSkpXG4gIGNvbnN0IHJ1bnMgPSAzMFxuICBjb25zdCBybmcgPSBWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oMClcbiAgY29uc3QgcmVzdWx0cyA9IFtdXG4gIGZvciAobGV0IGQgPSAxOyBkIDw9IDU7IGQrKykge1xuICAgIGNvbnN0IGV4YWN0ID0gTWF0aC5wb3cob25lRGltLCBkKVxuICAgIGNvbnN0IHJlbEVycm9ycyA9IFtdLCBzZHMgPSBbXVxuICAgIGZvciAoY29uc3QgbiBvZiBzaXplcykge1xuICAgICAgY29uc3QgZXN0aW1hdGVzID0gW11cbiAgICAgIGZvciAobGV0IHJ1biA9IDA7IHJ1biA8IHJ1bnM7IHJ1bisrKSB7XG4gICAgICAgIGxldCBzdW0gPSAwXG4gICAgICAgIGZvciAobGV0IGkgPSAwOyBpIDwgbjsgaSsrKSB7XG4gICAgICAgICAgbGV0IG5vcm1TcSA9IDBcbiAgICAgICAgICBmb3IgKGxldCBrID0gMDsgayA8IGQ7IGsrKykge1xuICAgICAgICAgICAgY29uc3QgeCA9IHJuZygpXG4gICAgICAgICAgICBub3JtU3EgKz0geCAqIHhcbiAgICAgICAgICB9XG4gICAgICAgICAgc3VtICs9IE1hdGguZXhwKC1ub3JtU3EpXG4gICAgICAgIH1cbiAgICAgICAgZXN0aW1hdGVzLnB1c2goc3VtIC8gbilcbiAgICAgIH1cbiAgICAgIGNvbnN0IHN0YXRzID0gVk0uZGlzdHJpYnV0aW9ucy5zYW1wbGVTdGF0cyhlc3RpbWF0ZXMsIHtkZG9mOiAwfSlcbiAgICAgIHJlbEVycm9ycy5wdXNoKE1hdGguYWJzKHN0YXRzLm1lYW4gLSBleGFjdCkgLyBleGFjdClcbiAgICAgIHNkcy5wdXNoKHN0YXRzLnNkKVxuICAgIH1cbiAgICByZXN1bHRzLnB1c2goe2QsIHJlbEVycm9ycywgc2RzfSlcbiAgfVxuICByZXR1cm4ge3NpemVzLCByZXN1bHRzfVxufVxuXG5pbnREaW1Db2xvcnMgPSBbXCJmblwiLCBcImFsdFwiLCBcIm9rXCIsIFwid2FyblwiLCBcImFjY2VudDJcIl1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTAiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRFcnJvckRpbVRyYWNlcyA9IHtcbiAgY29uc3QgdHJhY2VzID0gW11cbiAgZm9yIChsZXQgaSA9IDA7IGkgPCBpbnREaW1lbnNpb25zLnJlc3VsdHMubGVuZ3RoOyBpKyspIHtcbiAgICBjb25zdCByID0gaW50RGltZW5zaW9ucy5yZXN1bHRzW2ldXG4gICAgY29uc3QgY29sb3IgPSBjaGFydENvbG9yc1tpbnREaW1Db2xvcnNbaV1dXG4gICAgdHJhY2VzLnB1c2goe3g6IGludERpbWVuc2lvbnMuc2l6ZXMsIHk6IHIucmVsRXJyb3JzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lcyttYXJrZXJzXCIsIG5hbWU6IGBEaW0gJHtyLmR9YCxcbiAgICAgIGxpbmU6IHtjb2xvciwgd2lkdGg6IDJ9LCBtYXJrZXI6IHtjb2xvciwgc2l6ZTogNX19KVxuICB9XG4gIHJldHVybiB0cmFjZXNcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTEiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJpbnRTZERpbVRyYWNlcyA9IHtcbiAgY29uc3Qgc2l6ZXMgPSBpbnREaW1lbnNpb25zLnNpemVzXG4gIGNvbnN0IHRyYWNlcyA9IFtdXG4gIGxldCBmaXJzdFNkVG90YWwgPSAwXG4gIGZvciAobGV0IGkgPSAwOyBpIDwgaW50RGltZW5zaW9ucy5yZXN1bHRzLmxlbmd0aDsgaSsrKSB7XG4gICAgY29uc3QgciA9IGludERpbWVuc2lvbnMucmVzdWx0c1tpXVxuICAgIGNvbnN0IGNvbG9yID0gY2hhcnRDb2xvcnNbaW50RGltQ29sb3JzW2ldXVxuICAgIGZpcnN0U2RUb3RhbCArPSByLnNkc1swXVxuICAgIHRyYWNlcy5wdXNoKHt4OiBzaXplcywgeTogci5zZHMsIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzK21hcmtlcnNcIiwgbmFtZTogYERpbSAke3IuZH1gLFxuICAgICAgbGluZToge2NvbG9yLCB3aWR0aDogMn0sIG1hcmtlcjoge2NvbG9yLCBzaXplOiA1fX0pXG4gIH1cbiAgLy8gQSAxL3NxcnQobikgbGluZSB0aHJvdWdoIHRoZSBhdmVyYWdlIGZpcnN0IHN0YW5kYXJkIGRldmlhdGlvbi5cbiAgY29uc3Qgc2NhbGUgPSBmaXJzdFNkVG90YWwgLyBpbnREaW1lbnNpb25zLnJlc3VsdHMubGVuZ3RoICogTWF0aC5zcXJ0KHNpemVzWzBdKVxuICBjb25zdCByZWZlcmVuY2UgPSBbXVxuICBmb3IgKGNvbnN0IG4gb2Ygc2l6ZXMpIHJlZmVyZW5jZS5wdXNoKHNjYWxlIC8gTWF0aC5zcXJ0KG4pKVxuICB0cmFjZXMucHVzaCh7eDogc2l6ZXMsIHk6IHJlZmVyZW5jZSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCLiiJ0gMS/iiJpuXCIsXG4gICAgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5pbmssIGRhc2g6IFwiZGFzaFwiLCB3aWR0aDogMn19KVxuICByZXR1cm4gdHJhY2VzXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTEyIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiVk0ucGxvdHRpbmcucGxvdFdpdGhMZWdlbmQoaW50RXJyb3JEaW1QbG90LCBpbnRFcnJvckRpbVRyYWNlcywge3RpdGxlOiB7dGV4dDogXCJSZWxhdGl2ZSBlcnJvciB2cyBzYW1wbGUgc2l6ZVwifSwgbWFyZ2luOiB7dDogNDB9LFxuICB4YXhpczoge3RpdGxlOiBcIk51bWJlciBvZiBzYW1wbGVzXCIsIHR5cGU6IFwibG9nXCJ9LCB5YXhpczoge3R5cGU6IFwibG9nXCJ9fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJWTS5wbG90dGluZy5wbG90V2l0aExlZ2VuZChpbnRTZERpbVBsb3QsIGludFNkRGltVHJhY2VzLCB7dGl0bGU6IHt0ZXh0OiBcIlN0YW5kYXJkIGRldmlhdGlvbiB2cyBzYW1wbGUgc2l6ZVwifSwgbWFyZ2luOiB7dDogNDB9LFxuICB4YXhpczoge3RpdGxlOiBcIk51bWJlciBvZiBzYW1wbGVzXCIsIHR5cGU6IFwibG9nXCJ9LCB5YXhpczoge3RpdGxlOiBcIlN0YW5kYXJkIGRldmlhdGlvblwiLCB0eXBlOiBcImxvZ1wifX0pXG4ifV19
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../chapters/estimation";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "../..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/estimation/estimating_pi.html" class="pagination-link" aria-label="Estimating $\pi$">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/sampling/index.html" class="pagination-link" aria-label="Sampling Techniques">
+        <span class="nav-page-text">Sampling Techniques</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

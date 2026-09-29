@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Random Number Generators – Monte Carlo Methods Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/sampling/discrete.html" rel="next">
+<link href="../../chapters/sampling/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b72d44010710761ef2be279569eaa82e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-e5aa573e41f45164f2241380f035b026.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="referrer" content="same-origin">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-chrome-site-0.1.13/site.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
+<script src="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.css" rel="stylesheet">
+<meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
+<link href="../../site_libs/quarto-contrib/mathviz-fonts-0.1.13/fonts.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="module" src="../../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/style.css">
+<meta property="og:title" content="5&nbsp; Random Number Generators – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="">
+<meta property="og:image" content="../images/lava-lamps.jpg">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../apps/index.html" aria-current="page"> 
+<span class="menu-text">Interactive Apps</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Monte Carlo Estimation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interactive Apps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#pseudo-random-number-generators" id="toc-pseudo-random-number-generators" class="nav-link active" data-scroll-target="#pseudo-random-number-generators"><span class="header-section-number">5.1</span> Pseudo-random number generators</a>
+  <ul class="collapse">
+  <li><a href="#cycle-length" id="toc-cycle-length" class="nav-link" data-scroll-target="#cycle-length"><span class="header-section-number">5.1.1</span> Cycle length</a></li>
+  <li><a href="#linear-congruential-generator" id="toc-linear-congruential-generator" class="nav-link" data-scroll-target="#linear-congruential-generator"><span class="header-section-number">5.1.2</span> Linear Congruential Generator</a></li>
+  </ul></li>
+  <li><a href="#statistical-test-of-randomness" id="toc-statistical-test-of-randomness" class="nav-link" data-scroll-target="#statistical-test-of-randomness"><span class="header-section-number">5.2</span> Statistical test of randomness</a>
+  <ul class="collapse">
+  <li><a href="#chi-square-test" id="toc-chi-square-test" class="nav-link" data-scroll-target="#chi-square-test"><span class="header-section-number">5.2.1</span> Chi-square test</a></li>
+  <li><a href="#mono-bit-test" id="toc-mono-bit-test" class="nav-link" data-scroll-target="#mono-bit-test"><span class="header-section-number">5.2.2</span> Mono-bit test</a></li>
+  <li><a href="#runs-test" id="toc-runs-test" class="nav-link" data-scroll-target="#runs-test"><span class="header-section-number">5.2.3</span> Runs test</a></li>
+  <li><a href="#kolmogorov-smirnov-test" id="toc-kolmogorov-smirnov-test" class="nav-link" data-scroll-target="#kolmogorov-smirnov-test"><span class="header-section-number">5.2.4</span> Kolmogorov-Smirnov test</a></li>
+  <li><a href="#spectral-test" id="toc-spectral-test" class="nav-link" data-scroll-target="#spectral-test"><span class="header-section-number">5.2.5</span> Spectral test</a></li>
+  <li><a href="#final-remarks" id="toc-final-remarks" class="nav-link" data-scroll-target="#final-remarks"><span class="header-section-number">5.2.6</span> Final remarks</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/sampling/index.html">Sampling Techniques</a></li><li class="breadcrumb-item"><a href="../../chapters/sampling/rng.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In the problem of estimating the value of <span class="math inline">\(\pi\)</span> using a Monte Carlo method, we encountered three fundamental principles that underpin all Monte Carlo simulations:</p>
+<ol type="1">
+<li><p>Random Number Generation All Monte Carlo simulations require a <strong>source of random numbers</strong>. In our <span class="math inline">\(\pi\)</span> estimation example, we used <code>np.random.uniform()</code> to generate uniformly distributed random coordinates. The choice of random number generator is crucial and can significantly impact simulation quality—a poor random number generator can introduce bias and lead to unreliable results.</p></li>
+<li><p>Sampling from Target Distributions Our simulation effectively <strong>generated samples from a distribution <span class="math inline">\(X_N\)</span></strong> (more precisely, samples from the probability density function of <span class="math inline">\(X_N\)</span>) whose expected value is <span class="math inline">\(\pi/4\)</span>. This exemplifies a core Monte Carlo principle: we construct and sample from distributions whose statistical properties (mean, variance, or other moments) correspond to the quantities we wish to estimate.</p></li>
+<li><p>Uncertainty Quantification Beyond computing point estimates, we must <strong>quantify the uncertainty</strong> in our results. Large uncertainties indicate that additional simulation runs are needed to achieve reliable estimates. This uncertainty analysis is essential for determining the statistical significance of our Monte Carlo results.</p></li>
+</ol>
+<p>These three principles form the foundation of Monte Carlo methodology and will resurface throughout our exploration of more sophisticated simulation techniques. We begin our deeper investigation with the first principle: the generation and properties of random numbers.</p>
+<section id="pseudo-random-number-generators" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="pseudo-random-number-generators"><span class="header-section-number">5.1</span> Pseudo-random number generators</h2>
+<p>A <strong>random number generator</strong> is a function that produces a sequence of numbers that meet certain statistical requirements for randomness. <em>True</em> random number generators are based on physical processes that are fundamentally random, such as radioactive decay or thermal noise. Such systems are useful in cryptography and other applications where true randomness is important for security.</p>
+<p>Below is an example of a true random number generator based on lava lamps called the “wall of entropy”. The lava lamps are used to generate random bits, which are then combined to generate random keys for encryption.</p>
+<p><img src="../images/lava-lamps.jpg" width="600"></p>
+<p>There are less exotic ways to generate random numbers. Computer chips have a hardware random number generator that uses thermal noise to generate random bits.</p>
+<p>However, true random number generators are slow and expensive. These are not useful for simulations as they are not reproducible. Instead, we use <strong>pseudo-random number generators</strong> (PRNGs) to generate random numbers for simulations.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Reproducibility in Simulations
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>pseudo-random number generator</strong> (PRNG) is a random number generator that produces a sequence of numbers that are not truly random, but are generated by a deterministic algorithm. The sequence of numbers produced by a PRNG is completely determined by the seed: if you know the seed, you can predict the entire sequence of numbers.</p>
+<p>The reason for using PRNGs in simulations is to be able to reproduce the results. If you run a simulation with a given seed, you should get the same results every time. This is important for testing, debugging, and for sharing results with others.</p>
+</div>
+</div>
+<p>We test the quality of a PRNG by running statistical tests on the sequence of numbers it generates. A good PRNG should produce numbers that are indistinguishable from true random numbers. It is said to fool the statistical tests of randomness.</p>
+<p>PRNGs need to satisfy several statistical requirements to be useful in simulations. The most important requirements are:</p>
+<ol type="1">
+<li><strong>Uniformity</strong>: The numbers generated should be uniformly distributed between 0 and 1.</li>
+<li><strong>Independence</strong>: The numbers generated should be independent of each other. Knowing one number should not give you any information about the next number.</li>
+<li><strong>Speed</strong>: The PRNG should be fast. Generating random numbers is a common operation in simulations, so the PRNG should be as fast as possible.</li>
+</ol>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>These are all difficult requirements to satisfy simultaneously. In practice, most PRNGs are imperfect. You have to choose a PRNG that is appropriate for your application. You have to decide which statistical tests of randomness are most important for your application, and choose a PRNG that satisfies those tests.</p>
+</div>
+</div>
+<p>For example:</p>
+<ol type="1">
+<li><p><strong>Linear congruential generators</strong> are simple and fast, but they have some statistical problems, as you’ll see in the exercises. These are good enough if you only need a few random numbers. These were the first PRNGs to be widely used and have stayed popular for a long time because of their simplicity.</p></li>
+<li><p>The <strong>Mersenne Twister</strong> is a widely-used PRNG that is fast and has good statistical properties. It is the default PRNG in many programming languages, including Python. However, it is not suitable for cryptographic applications.</p></li>
+<li><p><strong>Cryptographically secure PRNGs</strong> are designed to be secure against cryptographic attacks. They are slower than other PRNGs, but they are necessary for applications where security is important.</p></li>
+</ol>
+<section id="cycle-length" class="level3" data-number="5.1.1">
+<h3 data-number="5.1.1" class="anchored" data-anchor-id="cycle-length"><span class="header-section-number">5.1.1</span> Cycle length</h3>
+<p>In practice, PRNGs generate a random integer between 0 and <span class="math inline">\(M\)</span> for some large number <span class="math inline">\(M\)</span>, and then divide by <span class="math inline">\(M\)</span> to get a random number between 0 and 1. The <strong>period</strong> or <strong>cycle length</strong> of a PRNG is the number of random numbers it can generate before it starts repeating itself. A good PRNG should have a long cycle length.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Cycle Length ≠ Quality
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Relying solely on the cycle length to determine the quality of a PRNG is a mistake. A PRNG can have a long cycle length and still have poor statistical properties. For example, a PRNG that generates the sequence</p>
+<p><span class="math display">\[1, 2, 3, 4, 5, \ldots, M-1, M, 1, 2, 3, 4, 5,\]</span></p>
+<p>has a cycle length of <span class="math inline">\(M\)</span>, but it is a terrible PRNG!</p>
+</div>
+</div>
+</section>
+<section id="linear-congruential-generator" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="linear-congruential-generator"><span class="header-section-number">5.1.2</span> Linear Congruential Generator</h3>
+<p>A <strong>linear congruential generator (LCG)</strong> is an algorithm that yields a sequence of pseudo-randomized <em>integers</em> using a simple recurrence relation. The generator is defined by the recurrence relation:</p>
+<p><span class="math display">\[\begin{equation}
+X_{n+1} = (aX_n + c) \mod m
+\end{equation}\]</span></p>
+<p>where: - <span class="math inline">\(X_n\)</span> is the sequence of pseudo-randomized numbers - <span class="math inline">\(a\)</span> is the multiplier - <span class="math inline">\(c\)</span> is the increment - <span class="math inline">\(m\)</span> is the modulus</p>
+<p>The above equation generates a sequence of integers between 0 and <span class="math inline">\(m-1\)</span>. To generate a sequence of random numbers between 0 and 1, we divide the sequence by <span class="math inline">\(m\)</span>:</p>
+<p><span class="math display">\[\begin{equation}
+  r_n = \frac{X_n}{m}
+\end{equation}\]</span></p>
+<p>LCGs are simple to implement and are computationally efficient. However, as you’ll see in the homework, they have some statistical problems. The modulus <span class="math inline">\(m\)</span> is the largest integer that the generator can produce. The modulus <span class="math inline">\(m\)</span> is usually a power of 2, which makes the modulo operation fast.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Hull-Dobell Theorem
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <strong>Hull-Dobell Theorem</strong> states that an LCG will have a full period for all seed values if and only if:</p>
+<ol type="1">
+<li><span class="math inline">\(c\)</span> and <span class="math inline">\(m\)</span> are relatively prime,</li>
+<li><span class="math inline">\(a - 1\)</span> is divisible by all prime factors of <span class="math inline">\(m\)</span>,</li>
+<li><span class="math inline">\(a - 1\)</span> is a multiple of 4 if <span class="math inline">\(m\)</span> is a multiple of 4.</li>
+</ol>
+<p>In the special case when <span class="math inline">\(m\)</span> is a power of 2, the Hull-Dobell Theorem simplifies to:</p>
+<ol type="1">
+<li><span class="math inline">\(c\)</span> is odd,</li>
+<li><span class="math inline">\(a\)</span> is congruent to 1 modulo 4.</li>
+</ol>
+<p>It is in fact enough to take <span class="math inline">\(c = 1\)</span>. Thus when the modulus is a power of 2, a full period LCG will be of the form:</p>
+<p><span class="math display">\[\begin{equation}
+X_{n+1} = (aX_n + 1) \mod 2^b,
+\end{equation}\]</span></p>
+<p>with <span class="math inline">\(a \equiv 1 \mod 4\)</span>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="statistical-test-of-randomness" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="statistical-test-of-randomness"><span class="header-section-number">5.2</span> Statistical test of randomness</h2>
+<p>As mentioned earlier, we test the quality of a PRNG by running statistical tests on the sequence of numbers it generates. The more tests a PRNG passes, the better it is. There exist many “test suites” that are used to evaluate the quality of PRNGs such as the Diehard tests, the TestU01 suite, and the NIST Statistical Test Suite.</p>
+<p>We’ll look at the following three simple statistical tests of randomness from the NIST Statistical Test Suite:</p>
+<ol type="1">
+<li><p><strong>Chi-square test</strong>: The chi-square test checks whether the observed frequency of the sequence is consistent with the expected frequency. If the sequence is truly random, then the observed frequency should be consistent with the expected frequency.</p></li>
+<li><p><strong>Mono-bit test</strong>: The mono-bit test checks whether the number of 0s and 1s in the sequence is approximately equal. If the sequence is truly random, then the number of 0s and 1s should be roughly equal.</p></li>
+<li><p><strong>Runs test</strong>: The runs test checks whether the number of runs of 0s and 1s in the sequence is consistent with a random sequence. A run is a sequence of consecutive 0s or 1s. If the sequence is truly random, then the number of runs of 0s and 1s should be consistent with a random sequence.</p></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Hypothesis Testing Framework
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For each of these tests, we’ll set up the null hypothesis and the alternative hypothesis as:</p>
+<ul>
+<li><span class="math inline">\(H_0\)</span>: The sequence is random.</li>
+<li><span class="math inline">\(H_1\)</span>: The sequence is not random.</li>
+</ul>
+<p>We’ll use the p-value to determine whether to reject the null hypothesis. If the p-value is less than the significance level <span class="math inline">\(\alpha\)</span>, we reject the null hypothesis. If the p-value is greater than <span class="math inline">\(\alpha\)</span>, we fail to reject the null hypothesis.</p>
+</div>
+</div>
+<section id="chi-square-test" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="chi-square-test"><span class="header-section-number">5.2.1</span> Chi-square test</h3>
+<p>The chi-square test is a one-sided statistical test that measures how well a sample of data matches a theoretical distribution. The chi-square test is used to test whether the observed data is consistent with the expected data. The test statistic is given by:</p>
+<p><span class="math display">\[\begin{equation}
+\chi^2 = \sum_{i=1}^k \frac{(O_i - E_i)^2}{E_i}
+\end{equation}\]</span></p>
+<p>where: - <span class="math inline">\(O_i\)</span> is the observed frequency of the <span class="math inline">\(i\)</span>-th bin - <span class="math inline">\(E_i\)</span> is the expected frequency of the <span class="math inline">\(i\)</span>-th bin - <span class="math inline">\(k\)</span> is the number of bins</p>
+<p>In our case of testing the randomness of a sequence of random numbers, we divide the interval <span class="math inline">\([0, 1]\)</span> into <span class="math inline">\(k\)</span> bins and count the number of random numbers that fall into each bin. The expected frequency of each bin is <span class="math inline">\(n/k\)</span>, where <span class="math inline">\(n\)</span> is the total number of random numbers.</p>
+<p>The chi-square test is used to test the null hypothesis that the observed data is consistent with the expected data. If the chi-square test statistic is large, then the null hypothesis is rejected.</p>
+<p>The critical value of the chi-square test statistic depends on the number of degrees of freedom. The degrees of freedom is given by <span class="math inline">\(k-1\)</span>. In Python, <code>scipy.stats.chi2.ppf</code> computes this critical value.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Choosing the Number of Bins
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The chi-square test is sensitive to the number of bins <span class="math inline">\(k\)</span>. If <span class="math inline">\(k\)</span> is too small, then the test may not be sensitive enough to detect deviations from the expected distribution. If <span class="math inline">\(k\)</span> is too large, then the test may be too sensitive and may detect deviations that are not significant.</p>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="167" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 166;"><span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>VM <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">VM</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>vmTheme <span class="op">=</span> Generators<span class="op">.</span><span class="fu">observe</span>(notify <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">onThemeChange</span>(notify))</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>chartColors <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">colors</span>(vmTheme)</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>chiPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>zPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>ksPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="co">// A density curve over [lo, hi], plus the shaded rejection region(s): each</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="co">// entry of `tails` is an [from, to] interval.</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">rejectionFigure</span>(pdf<span class="op">,</span> lo<span class="op">,</span> hi<span class="op">,</span> tails<span class="op">,</span> criticalValues) {</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> xs <span class="op">=</span> []<span class="op">,</span> ys <span class="op">=</span> []</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">500</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> x <span class="op">=</span> lo <span class="op">+</span> (hi <span class="op">-</span> lo) <span class="op">*</span> i <span class="op">/</span> <span class="dv">500</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>    xs<span class="op">.</span><span class="fu">push</span>(x)</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>    ys<span class="op">.</span><span class="fu">push</span>(<span class="fu">pdf</span>(x))</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [<span class="im">from</span><span class="op">,</span> to] <span class="kw">of</span> tails) {</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> tx <span class="op">=</span> []<span class="op">,</span> ty <span class="op">=</span> []</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">200</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> x <span class="op">=</span> <span class="im">from</span> <span class="op">+</span> (to <span class="op">-</span> <span class="im">from</span>) <span class="op">*</span> i <span class="op">/</span> <span class="dv">200</span></span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>      tx<span class="op">.</span><span class="fu">push</span>(x)</span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>      ty<span class="op">.</span><span class="fu">push</span>(<span class="fu">pdf</span>(x))</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> tx<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> ty<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"tozeroy"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">width</span><span class="op">:</span> <span class="dv">0</span>}<span class="op">,</span></span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>      <span class="dt">fillcolor</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="fl">0.45</span>)<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Rejection region"</span>})</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>  traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> xs<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> ys<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"pdf"</span>})</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> shapes <span class="op">=</span> []</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> c <span class="kw">of</span> criticalValues) {</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>    shapes<span class="op">.</span><span class="fu">push</span>({<span class="dt">type</span><span class="op">:</span> <span class="st">"line"</span><span class="op">,</span> <span class="dt">x0</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">x1</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">yref</span><span class="op">:</span> <span class="st">"paper"</span><span class="op">,</span> <span class="dt">y0</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}})</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {traces<span class="op">,</span> shapes}</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="204" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 203;"><span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> critical <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">chiSquaredQuantile</span>(<span class="fl">0.95</span><span class="op">,</span> <span class="dv">3</span>)</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> fig <span class="op">=</span> <span class="fu">rejectionFigure</span>(x <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">chiSquaredPdf</span>(x<span class="op">,</span> <span class="dv">3</span>)<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">20</span><span class="op">,</span> [[critical<span class="op">,</span> <span class="dv">20</span>]]<span class="op">,</span> [critical])</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">chiPlot</span>(fig<span class="op">.</span><span class="at">traces</span><span class="op">,</span> {</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Chi-square pdf with 3 degrees of freedom"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"x"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"pdf"</span><span class="op">,</span> <span class="dt">rangemode</span><span class="op">:</span> <span class="st">"tozero"</span>}<span class="op">,</span> <span class="dt">shapes</span><span class="op">:</span> fig<span class="op">.</span><span class="at">shapes</span><span class="op">,</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="dt">annotations</span><span class="op">:</span> [{<span class="dt">x</span><span class="op">:</span> critical<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="fl">0.05</span><span class="op">,</span> <span class="dt">xanchor</span><span class="op">:</span> <span class="st">"left"</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="vs">` Critical value for 5% significance: </span><span class="sc">${</span>critical<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="dt">showarrow</span><span class="op">:</span> <span class="kw">false</span>}]</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-2" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="mono-bit-test" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="mono-bit-test"><span class="header-section-number">5.2.2</span> Mono-bit test</h3>
+<p>The mono-bit test is a two-sided statistical test that checks whether the number of 0s and 1s in the sequence is approximately equal. In a uniform binary sequence, roughly half the bits are 0s and half the bits are 1s.</p>
+<p>Let <span class="math inline">\(X_i\)</span> be the <span class="math inline">\(i\)</span>-th bit in the sequence. Then <span class="math inline">\(X_i\)</span> is a Bernoulli random variable with probability <span class="math inline">\(p = 0.5\)</span>. Because the random variables <span class="math inline">\(X_i\)</span> are independent and identically distributed, by the <strong>central limit theorem</strong>, their average</p>
+<p><span class="math display">\[\begin{equation}
+  \bar{X} = \dfrac{X_1 + X_2 + \cdots + X_k}{k}
+\end{equation}\]</span></p>
+<p>approaches a normal distribution with mean <span class="math inline">\(0.5\)</span> and variance <span class="math inline">\(1/(4k)\)</span> as <span class="math inline">\(k\)</span> approaches infinity. We can hence use the z-test to test the null hypothesis that the sequence is random. The z-test statistic is given by</p>
+<p><span class="math display">\[\begin{equation}
+  Z = \dfrac{\bar{X} - 0.5}{\sqrt{1/(4k)}}
+\end{equation}\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Two-Sided Test
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that because this is a two-sided test, we reject the null hypothesis if <span class="math inline">\(Z &gt; z_{\alpha/2}\)</span> or <span class="math inline">\(Z &lt; -z_{\alpha/2}\)</span> where <span class="math inline">\(z_{\alpha/2}\)</span> is the critical value of the z-test statistic at the significance level <span class="math inline">\(\alpha/2\)</span>.</p>
+<p>In Python, you can use the <code>scipy.stats.norm.ppf</code> function to compute the critical values for the z-test.</p>
+</div>
+</div>
+<p>To find the critical value, we find <span class="math inline">\(x\)</span> such that <span class="math inline">\(P(-x &lt; X &lt; x) = 0.95\)</span> for a standard normal distribution. In the figure below, this is the area between the green dashed lines. If your z-score is outside of the critical values, you can reject the null hypothesis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="241" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 240;"><span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> upper <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">normalQuantile</span>(<span class="fl">0.975</span>)</span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> lower <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">normalQuantile</span>(<span class="fl">0.025</span>)</span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> fig <span class="op">=</span> <span class="fu">rejectionFigure</span>(x <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">normalPdf</span>(x<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span> <span class="op">-</span><span class="dv">4</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> [[<span class="op">-</span><span class="dv">4</span><span class="op">,</span> lower]<span class="op">,</span> [upper<span class="op">,</span> <span class="dv">4</span>]]<span class="op">,</span> [lower<span class="op">,</span> upper])</span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">zPlot</span>(fig<span class="op">.</span><span class="at">traces</span><span class="op">,</span> {</span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Standard normal pdf"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"x"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"pdf"</span><span class="op">,</span> <span class="dt">rangemode</span><span class="op">:</span> <span class="st">"tozero"</span>}<span class="op">,</span> <span class="dt">shapes</span><span class="op">:</span> fig<span class="op">.</span><span class="at">shapes</span><span class="op">,</span></span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a>    <span class="dt">annotations</span><span class="op">:</span> [</span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">x</span><span class="op">:</span> upper<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="fl">0.25</span><span class="op">,</span> <span class="dt">xanchor</span><span class="op">:</span> <span class="st">"left"</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="vs">` x = </span><span class="sc">${</span>upper<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="dt">showarrow</span><span class="op">:</span> <span class="kw">false</span>}<span class="op">,</span></span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">x</span><span class="op">:</span> lower<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="fl">0.25</span><span class="op">,</span> <span class="dt">xanchor</span><span class="op">:</span> <span class="st">"left"</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="vs">` x = </span><span class="sc">${</span>lower<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="dt">showarrow</span><span class="op">:</span> <span class="kw">false</span>}</span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="runs-test" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="runs-test"><span class="header-section-number">5.2.3</span> Runs test</h3>
+<p>The Wald-Wolfowitz runs test is a two-sided statistical test that checks whether the number of runs of 0s and 1s in the sequence is consistent with a random sequence. A run is a sequence of consecutive 0s or 1s. In a random sequence, the number of runs of 0s and 1s should be consistent with a random sequence.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Example
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the sequence 0011100110, there are 5 runs: 00, 111, 00, 11, 0. The runs test checks whether the number of runs of 0s and 1s is consistent with a random sequence.</p>
+</div>
+</div>
+<p>Consider a binary sequence of length <span class="math inline">\(k\)</span>. Define a random variable</p>
+<p><span class="math display">\[\begin{equation}
+  Z_i = \begin{cases}
+  1 &amp; \text{if the $(i+1)^{\text{st}}$ bit is different from the $i^{\text{th}}$ bit} \\
+  0 &amp; \text{otherwise}
+  \end{cases}
+\end{equation}\]</span></p>
+<p>One can check that the number of runs in the sequence is given by the random variable</p>
+<p><span class="math display">\[\begin{equation}
+  R = 1 + \sum_{i=1}^{k-1} Z_i
+\end{equation}\]</span></p>
+<p>Note that the random variables <span class="math inline">\(Z_i\)</span> are independent. Hence,</p>
+<p><span class="math display">\[\begin{align}
+  \text{E}[R] &amp;= 1 + \sum_{i=1}^{k-1} \text{E}[Z_i] \\
+  \text{Var}[R] &amp;= \sum_{i=1}^{k-1} \text{Var}[Z_i]
+\end{align}\]</span></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The calculation of this expectation and variance is left as an exercise.</p>
+</div>
+</div>
+<p>We assume that for large <span class="math inline">\(k\)</span> the number of runs is approximately normally distributed. We can hence use the z-test to test the null hypothesis that the sequence is random. The z-test statistic is given by</p>
+<p><span class="math display">\[\begin{equation}
+  Z = \dfrac{R - \text{E}[R]}{\sqrt{\text{Var}[R]}}
+\end{equation}\]</span></p>
+<p>We reject the null hypothesis if <span class="math inline">\(Z &gt; z_{\alpha/2}\)</span> or <span class="math inline">\(Z &lt; -z_{\alpha/2}\)</span> where <span class="math inline">\(z_{\alpha/2}\)</span> is the critical value of the z-test statistic at the significance level <span class="math inline">\(\alpha/2\)</span>. Note that here we use <span class="math inline">\(\alpha/2\)</span> instead of <span class="math inline">\(\alpha\)</span> because this is a two-sided test.</p>
+</section>
+<section id="kolmogorov-smirnov-test" class="level3" data-number="5.2.4">
+<h3 data-number="5.2.4" class="anchored" data-anchor-id="kolmogorov-smirnov-test"><span class="header-section-number">5.2.4</span> Kolmogorov-Smirnov test</h3>
+<p>The Kolmogorov-Smirnov (KS) test is a non-parametric statistical test that checks whether a sample follows a specified probability distribution by comparing the empirical distribution function with the theoretical cumulative distribution function. For RNG testing, we typically test whether the generated numbers follow a uniform distribution on [0,1].</p>
+<p>Given a sample <span class="math inline">\(U_1, U_2, \ldots, U_n\)</span>, the <strong>empirical distribution function</strong> (EDF) is defined as:</p>
+<p><span class="math display">\[\begin{equation}
+F_n(x) = \frac{1}{n} \sum_{i=1}^{n} \mathbf{1}_{U_i \leq x}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{1}_{U_i \leq x}\)</span> is the indicator function that equals 1 if <span class="math inline">\(U_i \leq x\)</span> and 0 otherwise. The EDF represents the proportion of sample values that are less than or equal to <span class="math inline">\(x\)</span>, creating a step function that jumps by <span class="math inline">\(1/n\)</span> at each observed data point.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Example: Constructing the Empirical CDF
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider the sequence 0.23, 0.67, 0.12, 0.89, 0.45. First, we order the values: 0.12, 0.23, 0.45, 0.67, 0.89.</p>
+<p>The empirical CDF is a step function that jumps by 0.2 at each point:</p>
+<ul>
+<li><span class="math inline">\(F_5(x) = 0.2\)</span> for <span class="math inline">\(0.12 \leq x &lt; 0.23\)</span></li>
+<li><span class="math inline">\(F_5(x) = 0.4\)</span> for <span class="math inline">\(0.23 \leq x &lt; 0.45\)</span><br>
+</li>
+<li><span class="math inline">\(F_5(x) = 0.6\)</span> for <span class="math inline">\(0.45 \leq x &lt; 0.67\)</span></li>
+<li>And so on…</li>
+</ul>
+<p>For a uniform distribution on [0,1], the theoretical CDF is <span class="math inline">\(F(x) = x\)</span>.</p>
+</div>
+</div>
+<p>The <strong>KS test statistic</strong> measures the maximum absolute difference between the empirical and theoretical distribution functions:</p>
+<p><span class="math display">\[\begin{equation}
+D_n = \sup_{x} |F_n(x) - F(x)|
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(F(x)\)</span> is the theoretical CDF under the null hypothesis. For computational purposes, we don’t need to check every possible value of x x. Since the empirical distribution function is a step function that only changes at the observed data points, it suffices to check the maximum difference at each of the sample values. Let <span class="math inline">\(U_{(1)} \leq U_{(2)} \leq \cdots \leq U_{(n)}\)</span> be the order statistics. It is enough to compare the values:</p>
+<p><span class="math display">\[\begin{equation}
+\frac{i}{n} - F(U_{(i)}), \text{ and } F(U_{(i)}) - \frac{i-1}{n}
+\end{equation}\]</span></p>
+<p>The first term <span class="math inline">\(\frac{i}{n} - F(U_{(i)})\)</span> measures the “positive deviation” (empirical CDF above theoretical), while the second term <span class="math inline">\(F(U_{(i)}) - \frac{i-1}{n}\)</span> measures the “negative deviation” (empirical CDF below theoretical).</p>
+<p>Under the null hypothesis that the sample follows the specified continuous distribution <span class="math inline">\(F(x)\)</span>, the test statistic <span class="math inline">\(D_n\)</span> follows the <strong>Kolmogorov distribution</strong> asymptotically. This remarkable result shows that as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to a distribution that is independent of the specific form of <span class="math inline">\(F(x)\)</span>, making the KS test truly distribution-free.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Theorem: Kolmogorov’s Result
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Under <span class="math inline">\(H_0\)</span>, as <span class="math inline">\(n \to \infty\)</span>, the distribution of <span class="math inline">\(\sqrt{n}D_n\)</span> converges to the Kolmogorov distribution with CDF: <span class="math display">\[K(z) = 1 - 2\sum_{j=1}^{\infty} (-1)^{j-1} e^{-2j^2z^2}\]</span></p>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="350" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 349;"><span id="cb4-350"><a href="#cb4-350" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb4-351"><a href="#cb4-351" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Density of the Kolmogorov distribution, the derivative of K(z). The</span></span>
+<span id="cb4-352"><a href="#cb4-352" aria-hidden="true" tabindex="-1"></a>  <span class="co">// alternating series above converges slowly for small z, so there we</span></span>
+<span id="cb4-353"><a href="#cb4-353" aria-hidden="true" tabindex="-1"></a>  <span class="co">// differentiate the equivalent form K(z) = (sqrt(2 pi) / z) sum_j</span></span>
+<span id="cb4-354"><a href="#cb4-354" aria-hidden="true" tabindex="-1"></a>  <span class="co">// exp(-(2j - 1)² pi² / (8 z²)) instead.</span></span>
+<span id="cb4-355"><a href="#cb4-355" aria-hidden="true" tabindex="-1"></a>  <span class="kw">function</span> <span class="fu">kolmogorovPdf</span>(z) {</span>
+<span id="cb4-356"><a href="#cb4-356" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-357"><a href="#cb4-357" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (z <span class="op">&lt;</span> <span class="dv">1</span>) {</span>
+<span id="cb4-358"><a href="#cb4-358" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (<span class="kw">let</span> j <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;=</span> <span class="dv">20</span><span class="op">;</span> j<span class="op">++</span>) {</span>
+<span id="cb4-359"><a href="#cb4-359" aria-hidden="true" tabindex="-1"></a>        <span class="kw">const</span> a <span class="op">=</span> (<span class="dv">2</span> <span class="op">*</span> j <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> j <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">/</span> <span class="dv">8</span></span>
+<span id="cb4-360"><a href="#cb4-360" aria-hidden="true" tabindex="-1"></a>        total <span class="op">+=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(<span class="op">-</span>a <span class="op">/</span> (z <span class="op">*</span> z)) <span class="op">*</span> (<span class="dv">2</span> <span class="op">*</span> a <span class="op">/</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">pow</span>(z<span class="op">,</span> <span class="dv">4</span>) <span class="op">-</span> <span class="dv">1</span> <span class="op">/</span> (z <span class="op">*</span> z))</span>
+<span id="cb4-361"><a href="#cb4-361" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb4-362"><a href="#cb4-362" aria-hidden="true" tabindex="-1"></a>      <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(<span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span>) <span class="op">*</span> total</span>
+<span id="cb4-363"><a href="#cb4-363" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-364"><a href="#cb4-364" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> j <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> j <span class="op">&lt;=</span> <span class="dv">100</span><span class="op">;</span> j<span class="op">++</span>) {</span>
+<span id="cb4-365"><a href="#cb4-365" aria-hidden="true" tabindex="-1"></a>      <span class="kw">let</span> sign <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb4-366"><a href="#cb4-366" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (j <span class="op">%</span> <span class="dv">2</span> <span class="op">===</span> <span class="dv">0</span>) sign <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb4-367"><a href="#cb4-367" aria-hidden="true" tabindex="-1"></a>      total <span class="op">+=</span> sign <span class="op">*</span> j <span class="op">*</span> j <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">*</span> j <span class="op">*</span> j <span class="op">*</span> z <span class="op">*</span> z)</span>
+<span id="cb4-368"><a href="#cb4-368" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-369"><a href="#cb4-369" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">8</span> <span class="op">*</span> z <span class="op">*</span> total</span>
+<span id="cb4-370"><a href="#cb4-370" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-371"><a href="#cb4-371" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> fig <span class="op">=</span> <span class="fu">rejectionFigure</span>(kolmogorovPdf<span class="op">,</span> <span class="fl">0.01</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> [[<span class="fl">1.36</span><span class="op">,</span> <span class="dv">2</span>]]<span class="op">,</span> [<span class="fl">1.36</span>])</span>
+<span id="cb4-372"><a href="#cb4-372" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">ksPlot</span>(fig<span class="op">.</span><span class="at">traces</span><span class="op">,</span> {</span>
+<span id="cb4-373"><a href="#cb4-373" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"PDF of Kolmogorov distribution"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb4-374"><a href="#cb4-374" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"z"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"pdf"</span><span class="op">,</span> <span class="dt">rangemode</span><span class="op">:</span> <span class="st">"tozero"</span>}<span class="op">,</span> <span class="dt">shapes</span><span class="op">:</span> fig<span class="op">.</span><span class="at">shapes</span><span class="op">,</span></span>
+<span id="cb4-375"><a href="#cb4-375" aria-hidden="true" tabindex="-1"></a>    <span class="dt">annotations</span><span class="op">:</span> [{<span class="dt">x</span><span class="op">:</span> <span class="fl">1.36</span><span class="op">,</span> <span class="dt">yref</span><span class="op">:</span> <span class="st">"paper"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="fl">0.95</span><span class="op">,</span> <span class="dt">xanchor</span><span class="op">:</span> <span class="st">"left"</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="st">" 5% critical value 1.36"</span><span class="op">,</span> <span class="dt">showarrow</span><span class="op">:</span> <span class="kw">false</span>}]</span>
+<span id="cb4-376"><a href="#cb4-376" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb4-377"><a href="#cb4-377" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-4" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<p>For hypothesis testing, we reject the null hypothesis <span class="math inline">\(H_0\)</span> (that the sample follows the specified distribution) if <span class="math inline">\(D_n &gt; D_{\alpha}\)</span> where <span class="math inline">\(D_{\alpha}\)</span> is the critical value at significance level <span class="math inline">\(\alpha\)</span>. For large <span class="math inline">\(n\)</span>, the critical value can be approximated as:</p>
+<p><span class="math display">\[\begin{equation}
+D_{\alpha} \approx \sqrt{-\frac{1}{2n} \ln\left(\frac{\alpha}{2}\right)}
+\end{equation}\]</span></p>
+<p>Common approximations include <span class="math inline">\(D_{0.05} \approx \frac{1.36}{\sqrt{n}}\)</span> for 5% significance level and <span class="math inline">\(D_{0.01} \approx \frac{1.63}{\sqrt{n}}\)</span> for 1% significance level.</p>
+<p>The KS test assumes the theoretical distribution is completely specified (no parameters estimated from data) and works best for detecting differences in location and scale. For small samples (<span class="math inline">\(n &lt; 30\)</span>), exact critical values should be used instead of asymptotic approximations.</p>
+</section>
+<section id="spectral-test" class="level3" data-number="5.2.5">
+<h3 data-number="5.2.5" class="anchored" data-anchor-id="spectral-test"><span class="header-section-number">5.2.5</span> Spectral test</h3>
+<p>The previous tests fail to detect some of the problems with generating vectors using LCGs. One test for detecting these problems is the spectral test. The spectral test uses the Fast Fourier Transform (FFT) to analyze the spectral properties of the sequence. This test is beyond the scope of this class but you can see some examples in the homework.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This would be a good topic for a project!</p>
+</div>
+</div>
+</section>
+<section id="final-remarks" class="level3" data-number="5.2.6">
+<h3 data-number="5.2.6" class="anchored" data-anchor-id="final-remarks"><span class="header-section-number">5.2.6</span> Final remarks</h3>
+<p>Note that <em>by definition</em>, a PRNG is not “random” in an absolute sense. The PRNG used in Python, the Mersenne Twister, is sufficiently random for most applications involving simulations. However, it is not suitable for cryptographic applications as it is possible to predict the entire sequence of numbers if you know a limited set of numbers.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Cryptographic Security
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For cryptographic applications, you should use a cryptographically secure PRNG whose future numbers cannot be predicted easily from past numbers.</p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlZNID0gd2luZG93LlZNXG52bVRoZW1lID0gR2VuZXJhdG9ycy5vYnNlcnZlKG5vdGlmeSA9PiBWTS5wbG90dGluZy5vblRoZW1lQ2hhbmdlKG5vdGlmeSkpXG5jaGFydENvbG9ycyA9IFZNLnBsb3R0aW5nLmNvbG9ycyh2bVRoZW1lKVxuXG5jaGlQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzNjBweFwifSlcbnpQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzNjBweFwifSlcbmtzUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzYwcHhcIn0pXG5cbi8vIEEgZGVuc2l0eSBjdXJ2ZSBvdmVyIFtsbywgaGldLCBwbHVzIHRoZSBzaGFkZWQgcmVqZWN0aW9uIHJlZ2lvbihzKTogZWFjaFxuLy8gZW50cnkgb2YgYHRhaWxzYCBpcyBhbiBbZnJvbSwgdG9dIGludGVydmFsLlxuZnVuY3Rpb24gcmVqZWN0aW9uRmlndXJlKHBkZiwgbG8sIGhpLCB0YWlscywgY3JpdGljYWxWYWx1ZXMpIHtcbiAgY29uc3QgeHMgPSBbXSwgeXMgPSBbXVxuICBmb3IgKGxldCBpID0gMDsgaSA8PSA1MDA7IGkrKykge1xuICAgIGNvbnN0IHggPSBsbyArIChoaSAtIGxvKSAqIGkgLyA1MDBcbiAgICB4cy5wdXNoKHgpXG4gICAgeXMucHVzaChwZGYoeCkpXG4gIH1cbiAgY29uc3QgdHJhY2VzID0gW11cbiAgZm9yIChjb25zdCBbZnJvbSwgdG9dIG9mIHRhaWxzKSB7XG4gICAgY29uc3QgdHggPSBbXSwgdHkgPSBbXVxuICAgIGZvciAobGV0IGkgPSAwOyBpIDw9IDIwMDsgaSsrKSB7XG4gICAgICBjb25zdCB4ID0gZnJvbSArICh0byAtIGZyb20pICogaSAvIDIwMFxuICAgICAgdHgucHVzaCh4KVxuICAgICAgdHkucHVzaChwZGYoeCkpXG4gICAgfVxuICAgIHRyYWNlcy5wdXNoKHt4OiB0eCwgeTogdHksIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIGZpbGw6IFwidG96ZXJveVwiLCBsaW5lOiB7d2lkdGg6IDB9LFxuICAgICAgZmlsbGNvbG9yOiBWTS5wbG90dGluZy5hbHBoYShjaGFydENvbG9ycy5mbiwgMC40NSksIGhvdmVyaW5mbzogXCJza2lwXCIsIG5hbWU6IFwiUmVqZWN0aW9uIHJlZ2lvblwifSlcbiAgfVxuICB0cmFjZXMucHVzaCh7eDogeHMsIHk6IHlzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFsdCwgd2lkdGg6IDJ9LCBuYW1lOiBcInBkZlwifSlcbiAgY29uc3Qgc2hhcGVzID0gW11cbiAgZm9yIChjb25zdCBjIG9mIGNyaXRpY2FsVmFsdWVzKSB7XG4gICAgc2hhcGVzLnB1c2goe3R5cGU6IFwibGluZVwiLCB4MDogYywgeDE6IGMsIHlyZWY6IFwicGFwZXJcIiwgeTA6IDAsIHkxOiAxLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLm9rLCBkYXNoOiBcImRhc2hcIiwgd2lkdGg6IDJ9fSlcbiAgfVxuICByZXR1cm4ge3RyYWNlcywgc2hhcGVzfVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBjcml0aWNhbCA9IFZNLmRpc3RyaWJ1dGlvbnMuY2hpU3F1YXJlZFF1YW50aWxlKDAuOTUsIDMpXG4gIGNvbnN0IGZpZyA9IHJlamVjdGlvbkZpZ3VyZSh4ID0+IFZNLmRpc3RyaWJ1dGlvbnMuY2hpU3F1YXJlZFBkZih4LCAzKSwgMCwgMjAsIFtbY3JpdGljYWwsIDIwXV0sIFtjcml0aWNhbF0pXG4gIHJldHVybiBjaGlQbG90KGZpZy50cmFjZXMsIHtcbiAgICB0aXRsZToge3RleHQ6IFwiQ2hpLXNxdWFyZSBwZGYgd2l0aCAzIGRlZ3JlZXMgb2YgZnJlZWRvbVwifSwgbWFyZ2luOiB7dDogNDB9LCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICB4YXhpczoge3RpdGxlOiBcInhcIn0sIHlheGlzOiB7dGl0bGU6IFwicGRmXCIsIHJhbmdlbW9kZTogXCJ0b3plcm9cIn0sIHNoYXBlczogZmlnLnNoYXBlcyxcbiAgICBhbm5vdGF0aW9uczogW3t4OiBjcml0aWNhbCwgeTogMC4wNSwgeGFuY2hvcjogXCJsZWZ0XCIsIHRleHQ6IGAgQ3JpdGljYWwgdmFsdWUgZm9yIDUlIHNpZ25pZmljYW5jZTogJHtjcml0aWNhbC50b0ZpeGVkKDIpfWAsIHNob3dhcnJvdzogZmFsc2V9XVxuICB9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCB1cHBlciA9IFZNLmRpc3RyaWJ1dGlvbnMubm9ybWFsUXVhbnRpbGUoMC45NzUpXG4gIGNvbnN0IGxvd2VyID0gVk0uZGlzdHJpYnV0aW9ucy5ub3JtYWxRdWFudGlsZSgwLjAyNSlcbiAgY29uc3QgZmlnID0gcmVqZWN0aW9uRmlndXJlKHggPT4gVk0uZGlzdHJpYnV0aW9ucy5ub3JtYWxQZGYoeCwgMCwgMSksIC00LCA0LCBbWy00LCBsb3dlcl0sIFt1cHBlciwgNF1dLCBbbG93ZXIsIHVwcGVyXSlcbiAgcmV0dXJuIHpQbG90KGZpZy50cmFjZXMsIHtcbiAgICB0aXRsZToge3RleHQ6IFwiU3RhbmRhcmQgbm9ybWFsIHBkZlwifSwgbWFyZ2luOiB7dDogNDB9LCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICB4YXhpczoge3RpdGxlOiBcInhcIn0sIHlheGlzOiB7dGl0bGU6IFwicGRmXCIsIHJhbmdlbW9kZTogXCJ0b3plcm9cIn0sIHNoYXBlczogZmlnLnNoYXBlcyxcbiAgICBhbm5vdGF0aW9uczogW1xuICAgICAge3g6IHVwcGVyLCB5OiAwLjI1LCB4YW5jaG9yOiBcImxlZnRcIiwgdGV4dDogYCB4ID0gJHt1cHBlci50b0ZpeGVkKDIpfWAsIHNob3dhcnJvdzogZmFsc2V9LFxuICAgICAge3g6IGxvd2VyLCB5OiAwLjI1LCB4YW5jaG9yOiBcImxlZnRcIiwgdGV4dDogYCB4ID0gJHtsb3dlci50b0ZpeGVkKDIpfWAsIHNob3dhcnJvdzogZmFsc2V9XG4gICAgXVxuICB9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC00IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICAvLyBEZW5zaXR5IG9mIHRoZSBLb2xtb2dvcm92IGRpc3RyaWJ1dGlvbiwgdGhlIGRlcml2YXRpdmUgb2YgSyh6KS4gVGhlXG4gIC8vIGFsdGVybmF0aW5nIHNlcmllcyBhYm92ZSBjb252ZXJnZXMgc2xvd2x5IGZvciBzbWFsbCB6LCBzbyB0aGVyZSB3ZVxuICAvLyBkaWZmZXJlbnRpYXRlIHRoZSBlcXVpdmFsZW50IGZvcm0gSyh6KSA9IChzcXJ0KDIgcGkpIC8geikgc3VtX2pcbiAgLy8gZXhwKC0oMmogLSAxKcKyIHBpwrIgLyAoOCB6wrIpKSBpbnN0ZWFkLlxuICBmdW5jdGlvbiBrb2xtb2dvcm92UGRmKHopIHtcbiAgICBsZXQgdG90YWwgPSAwXG4gICAgaWYgKHogPCAxKSB7XG4gICAgICBmb3IgKGxldCBqID0gMTsgaiA8PSAyMDsgaisrKSB7XG4gICAgICAgIGNvbnN0IGEgPSAoMiAqIGogLSAxKSAqICgyICogaiAtIDEpICogTWF0aC5QSSAqIE1hdGguUEkgLyA4XG4gICAgICAgIHRvdGFsICs9IE1hdGguZXhwKC1hIC8gKHogKiB6KSkgKiAoMiAqIGEgLyBNYXRoLnBvdyh6LCA0KSAtIDEgLyAoeiAqIHopKVxuICAgICAgfVxuICAgICAgcmV0dXJuIE1hdGguc3FydCgyICogTWF0aC5QSSkgKiB0b3RhbFxuICAgIH1cbiAgICBmb3IgKGxldCBqID0gMTsgaiA8PSAxMDA7IGorKykge1xuICAgICAgbGV0IHNpZ24gPSAxXG4gICAgICBpZiAoaiAlIDIgPT09IDApIHNpZ24gPSAtMVxuICAgICAgdG90YWwgKz0gc2lnbiAqIGogKiBqICogTWF0aC5leHAoLTIgKiBqICogaiAqIHogKiB6KVxuICAgIH1cbiAgICByZXR1cm4gOCAqIHogKiB0b3RhbFxuICB9XG4gIGNvbnN0IGZpZyA9IHJlamVjdGlvbkZpZ3VyZShrb2xtb2dvcm92UGRmLCAwLjAxLCAyLCBbWzEuMzYsIDJdXSwgWzEuMzZdKVxuICByZXR1cm4ga3NQbG90KGZpZy50cmFjZXMsIHtcbiAgICB0aXRsZToge3RleHQ6IFwiUERGIG9mIEtvbG1vZ29yb3YgZGlzdHJpYnV0aW9uXCJ9LCBtYXJnaW46IHt0OiA0MH0sIHNob3dsZWdlbmQ6IGZhbHNlLFxuICAgIHhheGlzOiB7dGl0bGU6IFwielwifSwgeWF4aXM6IHt0aXRsZTogXCJwZGZcIiwgcmFuZ2Vtb2RlOiBcInRvemVyb1wifSwgc2hhcGVzOiBmaWcuc2hhcGVzLFxuICAgIGFubm90YXRpb25zOiBbe3g6IDEuMzYsIHlyZWY6IFwicGFwZXJcIiwgeTogMC45NSwgeGFuY2hvcjogXCJsZWZ0XCIsIHRleHQ6IFwiIDUlIGNyaXRpY2FsIHZhbHVlIDEuMzZcIiwgc2hvd2Fycm93OiBmYWxzZX1dXG4gIH0pXG59XG4ifV19
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../chapters/sampling";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "../..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/sampling/index.html" class="pagination-link" aria-label="Sampling Techniques">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Sampling Techniques</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/sampling/discrete.html" class="pagination-link" aria-label="Discrete Distributions">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

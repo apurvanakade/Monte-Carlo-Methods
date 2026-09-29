@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Apurva Nakade">
+<meta name="dcterms.date" content="2025-08-02">
+
+<title>18&nbsp; Particle Filters – Monte Carlo Methods Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/optimization/index.html" rel="next">
+<link href="../../chapters/dynamical/kalman_filters.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b72d44010710761ef2be279569eaa82e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-e5aa573e41f45164f2241380f035b026.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-9d1d5b5c2231d7574f0faa0d4c467b13.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="referrer" content="same-origin">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-0.1.13/mathviz.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-embed-0.1.13/embed.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-chrome-site-0.1.13/site.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-share-0.1.13/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
+<script src="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.13/report-bug.css" rel="stylesheet">
+<meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
+<link href="../../site_libs/quarto-contrib/mathviz-fonts-0.1.13/fonts.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="module" src="../../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../assets/style.css">
+<meta property="og:title" content="18&nbsp; Particle Filters – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../apps/index.html" aria-current="page"> 
+<span class="menu-text">Interactive Apps</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Welcome</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Monte Carlo Methods</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Monte Carlo Estimation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/estimating_pi.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Estimating <span class="math inline">\(\pi\)</span></span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/estimation/integrals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Estimating Integrals</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../chapters/sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling Techniques</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/rng.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Random Number Generators</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/discrete.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Discrete Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/inverse_transform.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Inverse Transform Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/other_distributions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Other Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/accept_reject.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Rejection Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/gibbs_2d.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Gibbs Sampling</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/sampling/mh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Metropolis–Hastings Algorithm</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/variance_reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Variance Reduction Techniques</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/SDE.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Stochastic Differential Equations</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/ising.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Ising Model</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/applications/bootstrap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Bootstrap</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/dynamical/particle_filters.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Optimization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">References</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Interactive Apps</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Interactive Apps</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/probability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Review of Probability Theory</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/markov_chains.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Markov Chains</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">18.1</span> Introduction</a>
+  <ul class="collapse">
+  <li><a href="#the-challenge" id="toc-the-challenge" class="nav-link" data-scroll-target="#the-challenge"><span class="header-section-number">18.1.1</span> The Challenge</a></li>
+  <li><a href="#the-particle-filter-solution" id="toc-the-particle-filter-solution" class="nav-link" data-scroll-target="#the-particle-filter-solution"><span class="header-section-number">18.1.2</span> The Particle Filter Solution</a></li>
+  <li><a href="#applications" id="toc-applications" class="nav-link" data-scroll-target="#applications"><span class="header-section-number">18.1.3</span> Applications</a></li>
+  </ul></li>
+  <li><a href="#background-state-space-models-and-hidden-markov-models" id="toc-background-state-space-models-and-hidden-markov-models" class="nav-link" data-scroll-target="#background-state-space-models-and-hidden-markov-models"><span class="header-section-number">18.2</span> Background: State-Space Models and Hidden Markov Models</a>
+  <ul class="collapse">
+  <li><a href="#state-space-model-framework" id="toc-state-space-model-framework" class="nav-link" data-scroll-target="#state-space-model-framework"><span class="header-section-number">18.2.1</span> State-Space Model Framework</a></li>
+  <li><a href="#probabilistic-formulation" id="toc-probabilistic-formulation" class="nav-link" data-scroll-target="#probabilistic-formulation"><span class="header-section-number">18.2.2</span> Probabilistic Formulation</a></li>
+  <li><a href="#markov-assumptions" id="toc-markov-assumptions" class="nav-link" data-scroll-target="#markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</a></li>
+  <li><a href="#hidden-markov-models-hmms" id="toc-hidden-markov-models-hmms" class="nav-link" data-scroll-target="#hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</a></li>
+  <li><a href="#inference-problems" id="toc-inference-problems" class="nav-link" data-scroll-target="#inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</a></li>
+  </ul></li>
+  <li><a href="#particle-filtering-algorithm" id="toc-particle-filtering-algorithm" class="nav-link" data-scroll-target="#particle-filtering-algorithm"><span class="header-section-number">18.3</span> Particle Filtering Algorithm</a>
+  <ul class="collapse">
+  <li><a href="#the-bootstrap-filter---the-simple-case" id="toc-the-bootstrap-filter---the-simple-case" class="nav-link" data-scroll-target="#the-bootstrap-filter---the-simple-case"><span class="header-section-number">18.3.1</span> The Bootstrap Filter - The Simple Case</a></li>
+  <li><a href="#general-formula---correcting-for-different-proposals" id="toc-general-formula---correcting-for-different-proposals" class="nav-link" data-scroll-target="#general-formula---correcting-for-different-proposals"><span class="header-section-number">18.3.2</span> General Formula - Correcting for Different Proposals</a></li>
+  <li><a href="#effective-sample-size-and-resampling" id="toc-effective-sample-size-and-resampling" class="nav-link" data-scroll-target="#effective-sample-size-and-resampling"><span class="header-section-number">18.3.3</span> Effective Sample Size and Resampling</a></li>
+  <li><a href="#particle-filtering-for-2d-object-tracking" id="toc-particle-filtering-for-2d-object-tracking" class="nav-link" data-scroll-target="#particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.3.4</span> Particle Filtering for 2D Object Tracking</a></li>
+  </ul></li>
+  <li><a href="#particle-filter-implementation" id="toc-particle-filter-implementation" class="nav-link" data-scroll-target="#particle-filter-implementation"><span class="header-section-number">18.4</span> Particle Filter Implementation</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">18.5</span> Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#key-strengths" id="toc-key-strengths" class="nav-link" data-scroll-target="#key-strengths"><span class="header-section-number">18.5.1</span> Key Strengths</a></li>
+  <li><a href="#limitations-and-challenges" id="toc-limitations-and-challenges" class="nav-link" data-scroll-target="#limitations-and-challenges"><span class="header-section-number">18.5.2</span> Limitations and Challenges</a></li>
+  <li><a href="#when-to-use-particle-filters" id="toc-when-to-use-particle-filters" class="nav-link" data-scroll-target="#when-to-use-particle-filters"><span class="header-section-number">18.5.3</span> When to Use Particle Filters</a></li>
+  </ul></li>
+  <li><a href="#connection-between-kalman-filter-and-particle-filter" id="toc-connection-between-kalman-filter-and-particle-filter" class="nav-link" data-scroll-target="#connection-between-kalman-filter-and-particle-filter"><span class="header-section-number">18.6</span> Connection Between Kalman Filter and Particle Filter</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/dynamical/kalman_filters.html">Advanced Topics</a></li><li class="breadcrumb-item"><a href="../../chapters/dynamical/particle_filters.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Particle Filters</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Apurva Nakade </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 2, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">18.1</span> Introduction</h2>
+<p>Particle filtering, also known as Sequential Monte Carlo (SMC) or Sequential Importance Sampling, is a powerful computational method for performing inference in dynamic systems where we have:</p>
+<ol type="1">
+<li><strong>Sequential observations</strong> arriving over time</li>
+<li><strong>Hidden state variables</strong> that evolve according to some dynamics</li>
+<li><strong>Nonlinear or non-Gaussian</strong> relationships that make analytical solutions intractable</li>
+</ol>
+<p>Consider a hidden Markov model where we observe a sequence <span class="math inline">\(\mathbf{y}_{1:T} = \{\mathbf{y}_1, \mathbf{y}_2, \ldots, \mathbf{y}_T\}\)</span> and want to infer the hidden states <span class="math inline">\(\mathbf{x}_{1:T} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_T\}\)</span>. The system is characterized by:</p>
+<ul>
+<li><strong>State transition model</strong>: <span class="math inline">\(p(\mathbf{x}_t | \mathbf{x}_{t-1})\)</span> - how the hidden state evolves</li>
+<li><strong>Observation model</strong>: <span class="math inline">\(p(\mathbf{y}_t | \mathbf{x}_t)\)</span> - how observations relate to hidden states<br>
+</li>
+<li><strong>Initial state distribution</strong>: <span class="math inline">\(p(\mathbf{x}_0)\)</span></li>
+</ul>
+<p>Our goal is to compute the <strong>filtering distribution</strong> <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t})\)</span>, which represents our belief about the current state given all observations up to time <span class="math inline">\(t\)</span>.</p>
+<section id="the-challenge" class="level3" data-number="18.1.1">
+<h3 data-number="18.1.1" class="anchored" data-anchor-id="the-challenge"><span class="header-section-number">18.1.1</span> The Challenge</h3>
+<p>For linear-Gaussian systems, the Kalman filter provides an exact analytical solution. However, for nonlinear or non-Gaussian systems, the filtering distribution cannot be computed analytically. The key challenges are:</p>
+<ol type="1">
+<li><strong>Intractable integrals</strong>: Computing <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t})\)</span> requires high-dimensional integration</li>
+<li><strong>Sequential nature</strong>: We need real-time updates as new observations arrive</li>
+<li><strong>Curse of dimensionality</strong>: Grid-based methods become infeasible in high dimensions</li>
+</ol>
+</section>
+<section id="the-particle-filter-solution" class="level3" data-number="18.1.2">
+<h3 data-number="18.1.2" class="anchored" data-anchor-id="the-particle-filter-solution"><span class="header-section-number">18.1.2</span> The Particle Filter Solution</h3>
+<p>Particle filters address these challenges by representing the filtering distribution using a set of <strong>particles</strong> (samples) with associated <strong>weights</strong>:</p>
+<p><span class="math display">\[
+p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^{N} w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)}),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^{N}\)</span> are particles representing possible states</li>
+<li><span class="math inline">\(\{w_t^{(i)}\}_{i=1}^{N}\)</span> are normalized weights such that <span class="math inline">\(\sum_{i=1}^{N} w_t^{(i)} = 1\)</span></li>
+<li><span class="math inline">\(\delta(\cdot)\)</span> is the Dirac delta function</li>
+</ul>
+<p>This Monte Carlo approximation allows us to:</p>
+<ul>
+<li>Handle arbitrary nonlinearities and noise distributions</li>
+<li>Update beliefs sequentially as new data arrives</li>
+<li>Compute expectations: <span class="math inline">\(\mathbb{E}[f(\mathbf{x}_t) | \mathbf{y}_{1:t}] \approx \sum_{i=1}^{N} w_t^{(i)} f(\mathbf{x}_t^{(i)})\)</span></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Key Insight</strong>: Particle filters extend importance sampling to sequential settings, where we maintain and update a particle approximation over time rather than drawing fresh samples for each time step.</p>
+</div>
+</div>
+</section>
+<section id="applications" class="level3" data-number="18.1.3">
+<h3 data-number="18.1.3" class="anchored" data-anchor-id="applications"><span class="header-section-number">18.1.3</span> Applications</h3>
+<p>Particle filters are widely used in:</p>
+<ul>
+<li><strong>Object tracking</strong> in computer vision</li>
+<li><strong>Robot localization</strong> and SLAM (Simultaneous Localization and Mapping)</li>
+<li><strong>Financial modeling</strong> with stochastic volatility</li>
+<li><strong>Signal processing</strong> and communications</li>
+<li><strong>Epidemiological modeling</strong> and disease spread</li>
+<li><strong>Weather forecasting</strong> and climate modeling</li>
+</ul>
+<p>The flexibility to handle complex, nonlinear dynamics makes particle filters indispensable when Kalman filters fail.</p>
+</section>
+</section>
+<section id="background-state-space-models-and-hidden-markov-models" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="background-state-space-models-and-hidden-markov-models"><span class="header-section-number">18.2</span> Background: State-Space Models and Hidden Markov Models</h2>
+<section id="state-space-model-framework" class="level3" data-number="18.2.1">
+<h3 data-number="18.2.1" class="anchored" data-anchor-id="state-space-model-framework"><span class="header-section-number">18.2.1</span> State-Space Model Framework</h3>
+<p>A <strong>state-space model</strong> (SSM) provides a general framework for modeling dynamic systems with hidden states. The model consists of two key components:</p>
+<p><strong>State Evolution (Process Model)</strong>: <span class="math display">\[
+\mathbf{x}_t = \mathbf{f}_t(\mathbf{x}_{t-1}, \mathbf{v}_t),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{x}_t \in \mathbb{R}^{d_x}\)</span> is the hidden state at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mathbf{f}_t(\cdot, \cdot)\)</span> is the state transition function (possibly time-varying)</li>
+<li><span class="math inline">\(\mathbf{v}_t\)</span> is the process noise</li>
+</ul>
+<p><strong>Observation Model (Measurement Model)</strong>: <span class="math display">\[
+\mathbf{y}_t = \mathbf{h}_t(\mathbf{x}_t, \mathbf{w}_t),
+\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{y}_t \in \mathbb{R}^{d_y}\)</span> is the observation at time <span class="math inline">\(t\)</span></li>
+<li><span class="math inline">\(\mathbf{h}_t(\cdot, \cdot)\)</span> is the observation function (possibly time-varying)</li>
+<li><span class="math inline">\(\mathbf{w}_t\)</span> is the observation noise</li>
+</ul>
+<p>The noise terms <span class="math inline">\(\mathbf{v}_t\)</span> and <span class="math inline">\(\mathbf{w}_t\)</span> are typically assumed to be independent across time and mutually independent, though their distributions can be arbitrary.</p>
+</section>
+<section id="probabilistic-formulation" class="level3" data-number="18.2.2">
+<h3 data-number="18.2.2" class="anchored" data-anchor-id="probabilistic-formulation"><span class="header-section-number">18.2.2</span> Probabilistic Formulation</h3>
+<p>In probabilistic terms, the state-space model is characterized by:</p>
+<p><strong>State Transition Density</strong>: <span class="math display">\[
+p(\mathbf{x}_t | \mathbf{x}_{t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1}, \boldsymbol{\theta}),
+\]</span></p>
+<p><strong>Observation Density</strong>: <span class="math display">\[
+p(\mathbf{y}_t | \mathbf{x}_t) = p(\mathbf{y}_t | \mathbf{x}_t, \boldsymbol{\theta}),
+\]</span></p>
+<p><strong>Initial State Distribution</strong>: <span class="math display">\[
+p(\mathbf{x}_0) = p(\mathbf{x}_0 | \boldsymbol{\theta}),
+\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol{\theta}\)</span> represents model parameters (assumed known for now).</p>
+</section>
+<section id="markov-assumptions" class="level3" data-number="18.2.3">
+<h3 data-number="18.2.3" class="anchored" data-anchor-id="markov-assumptions"><span class="header-section-number">18.2.3</span> Markov Assumptions</h3>
+<p>The state-space model embodies two crucial Markov assumptions:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Markov Property for States</strong>: The future state depends only on the current state, not the entire history: <span class="math display">\[
+p(\mathbf{x}_t | \mathbf{x}_{0:t-1}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})
+\]</span></p>
+<p><strong>Conditional Independence of Observations</strong>: Given the current state, the observation is independent of all other states and observations: <span class="math display">\[
+p(\mathbf{y}_t | \mathbf{x}_{0:t}, \mathbf{y}_{1:t-1}) = p(\mathbf{y}_t | \mathbf{x}_t)
+\]</span></p>
+</div>
+</div>
+<p>These assumptions lead to the <strong>joint distribution</strong> of states and observations:</p>
+<p><span class="math display">\[
+p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) = p(\mathbf{x}_0) \prod_{t=1}^{T} p(\mathbf{x}_t | \mathbf{x}_{t-1}) p(\mathbf{y}_t | \mathbf{x}_t)
+\]</span></p>
+</section>
+<section id="hidden-markov-models-hmms" class="level3" data-number="18.2.4">
+<h3 data-number="18.2.4" class="anchored" data-anchor-id="hidden-markov-models-hmms"><span class="header-section-number">18.2.4</span> Hidden Markov Models (HMMs)</h3>
+<p>When the state space is <strong>discrete</strong> and <strong>finite</strong>, i.e., <span class="math inline">\(x_t \in \{1, 2, \ldots, K\}\)</span>, the state-space model becomes a <strong>Hidden Markov Model</strong>. HMMs are characterized by:</p>
+<p><strong>Transition Matrix</strong>: <span class="math display">\[
+A_{ij} = P(x_t = j | x_{t-1} = i), \quad \sum_{j=1}^{K} A_{ij} = 1
+\]</span></p>
+<p><strong>Emission Matrix</strong>: <span class="math display">\[
+B_{jk} = P(y_t = k | x_t = j) \quad \text{(for discrete observations)}
+\]</span></p>
+<p><strong>Initial Distribution</strong>: <span class="math display">\[
+\pi_i = P(x_0 = i), \quad \sum_{i=1}^{K} \pi_i = 1
+\]</span></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Example: Weather Tracking
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Consider a simple weather model where:</p>
+<ul>
+<li>Hidden states: <span class="math inline">\(x_t \in \{\text{Sunny}, \text{Rainy}\}\)</span></li>
+<li>Observations: <span class="math inline">\(y_t \in \{\text{Dry}, \text{Wet}\}\)</span> (ground condition)</li>
+</ul>
+<p>The transition matrix might be: <span class="math display">\[
+\mathbf{A} = \begin{pmatrix}
+0.8 &amp; 0.2 \\
+0.3 &amp; 0.7
+\end{pmatrix}
+\]</span></p>
+<p>The emission matrix might be: <span class="math display">\[
+\mathbf{B} = \begin{pmatrix}
+0.9 &amp; 0.1 \\
+0.2 &amp; 0.8
+\end{pmatrix}
+\]</span></p>
+<p>This captures the intuition that sunny days tend to follow sunny days, and wet ground is more likely when it’s raining.</p>
+</div>
+</div>
+<div id="exm-object-tracking" class="theorem example">
+<p><span class="theorem-title"><strong>Example 18.1 (Example: 2D Object Tracking)</strong></span> Consider tracking a moving object (e.g., aircraft, vehicle, or person) in a 2D plane using noisy position measurements from sensors like radar or GPS.</p>
+<p><strong>State</strong>: Position and velocity <span class="math inline">\(\mathbf{x}_t = [p_x, p_y, v_x, v_y]^{\top} \in \mathbb{R}^4\)</span></p>
+<p><strong>State Evolution</strong>: The object follows a constant velocity model with random acceleration disturbances: <span class="math display">\[
+\mathbf{x}_t = \mathbf{F} \mathbf{x}_{t-1} + \mathbf{G} \mathbf{a}_t
+\]</span></p>
+<p>where: <span class="math display">\[
+\mathbf{F} = \begin{pmatrix}
+1 &amp; 0 &amp; \Delta t &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; \Delta t \\
+0 &amp; 0 &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 1
+\end{pmatrix}, \quad
+\mathbf{G} = \begin{pmatrix}
+\frac{(\Delta t)^2}{2} &amp; 0 \\
+0 &amp; \frac{(\Delta t)^2}{2} \\
+\Delta t &amp; 0 \\
+0 &amp; \Delta t
+\end{pmatrix}
+\]</span></p>
+<p>and <span class="math inline">\(\mathbf{a}_t = [a_x, a_y]^{\top} \sim \mathcal{N}(\mathbf{0}, \sigma_a^2 \mathbf{I})\)</span> represents random acceleration.</p>
+<p><strong>Observations</strong>: Noisy position measurements from sensors: <span class="math display">\[
+\mathbf{y}_t = \mathbf{H} \mathbf{x}_t + \mathbf{w}_t = \begin{pmatrix} 1 &amp; 0 &amp; 0 &amp; 0 \\ 0 &amp; 1 &amp; 0 &amp; 0 \end{pmatrix} \mathbf{x}_t + \mathbf{w}_t
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{w}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R})\)</span> with <span class="math inline">\(\mathbf{R} = \text{diag}(\sigma_x^2, \sigma_y^2)\)</span>.</p>
+</div>
+</section>
+<section id="inference-problems" class="level3" data-number="18.2.5">
+<h3 data-number="18.2.5" class="anchored" data-anchor-id="inference-problems"><span class="header-section-number">18.2.5</span> Inference Problems</h3>
+<p>Given the state-space model, we are interested in several inference problems:</p>
+<p><strong>1. Filtering</strong>: Estimate the current state given past and current observations: <span class="math display">\[
+p(\mathbf{x}_t | \mathbf{y}_{1:t})
+\]</span></p>
+<p><strong>2. Prediction</strong>: Predict future states given current information: <span class="math display">\[
+p(\mathbf{x}_{t+k} | \mathbf{y}_{1:t}), \quad k &gt; 0
+\]</span></p>
+<p><strong>3. Smoothing</strong>: Estimate past states given all observations: <span class="math display">\[
+p(\mathbf{x}_t | \mathbf{y}_{1:T}), \quad t &lt; T
+\]</span></p>
+<p><strong>4. Marginal Likelihood</strong>: Compute the probability of the observed sequence: <span class="math display">\[
+p(\mathbf{y}_{1:T}) = \int p(\mathbf{x}_{0:T}, \mathbf{y}_{1:T}) d\mathbf{x}_{0:T}
+\]</span></p>
+</section>
+</section>
+<section id="particle-filtering-algorithm" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="particle-filtering-algorithm"><span class="header-section-number">18.3</span> Particle Filtering Algorithm</h2>
+<section id="the-bootstrap-filter---the-simple-case" class="level3" data-number="18.3.1">
+<h3 data-number="18.3.1" class="anchored" data-anchor-id="the-bootstrap-filter---the-simple-case"><span class="header-section-number">18.3.1</span> The Bootstrap Filter - The Simple Case</h3>
+<p>The most intuitive approach is the bootstrap filter. Here, we generate new particles by simply following the natural dynamics of the system (the state evolution model), then update weights based on how well each particle explains the new observation.</p>
+<p><strong>Bootstrap Weight Update</strong>: <span class="math display">\[
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})}
+\]</span></p>
+<p><strong>What this means</strong>:</p>
+<ul>
+<li><span class="math inline">\(w_{t-1}^{(i)}\)</span>: Previous weight of particle <span class="math inline">\(i\)</span></li>
+<li><span class="math inline">\(p(\mathbf{y}_t | \mathbf{x}_t^{(i)})\)</span>: <strong>Likelihood</strong> - How well particle <span class="math inline">\(i\)</span> explains the new observation</li>
+<li>Particles that better match the observation get higher weights</li>
+<li>We normalize so all weights sum to 1: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
+</ul>
+<p><strong>Why This Works</strong>: We’re essentially asking “given what we observed, which particles were in the right place?” Particles that predicted something close to the actual observation become more important.</p>
+</section>
+<section id="general-formula---correcting-for-different-proposals" class="level3" data-number="18.3.2">
+<h3 data-number="18.3.2" class="anchored" data-anchor-id="general-formula---correcting-for-different-proposals"><span class="header-section-number">18.3.2</span> General Formula - Correcting for Different Proposals</h3>
+<p>Sometimes we want to be smarter about where we place new particles instead of just following the natural dynamics. We might use a <strong>proposal distribution</strong> <span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot)\)</span> that incorporates the current observation to guide particles toward more promising regions.</p>
+<p><strong>Why Use a Different Proposal?</strong></p>
+<ul>
+<li><strong>Bootstrap problem</strong>: If the observation is very informative but the system dynamics are very noisy, most particles following natural dynamics will end up far from where the observation suggests they should be.</li>
+<li><strong>Efficiency</strong>: We waste computational effort on particles that will get very low weights.</li>
+<li><strong>Better exploration</strong>: A good proposal can guide particles toward regions that are both dynamically plausible AND consistent with the observation.</li>
+<li><strong>Computational efficiency</strong>: It might be computationally expensive to evolve many particles according to the state evolution model.</li>
+</ul>
+<p><strong>Example</strong>: If you are tracking an object in the 2D plane that usually moves slowly, but you suddenly observe it far from where you expected. The bootstrap filter would propose particles near the previous location (following slow dynamics), but they’d all get low weights. A smarter proposal would generate particles closer to where the observation suggests the object actually is.</p>
+<p>When we do this, we need to correct our weights using <strong>importance sampling</strong>:</p>
+<p><span class="math display">\[
+\boxed{\tilde{w}_t^{(i)} \propto w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) \cdot \frac{ p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})}{q(\mathbf{x}_t^{(i)} | \mathbf{x}_{0:t-1}^{(i)}, \mathbf{y}_{1:t})}}
+\]</span></p>
+<p><strong>What the correction does</strong>:</p>
+<ul>
+<li><span class="math inline">\(p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})\)</span>: <strong>Transition probability</strong> - How likely this particle movement is under the true dynamics</li>
+<li><span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot)\)</span>: <strong>Proposal probability</strong> - How likely this particle movement is under our artificial proposal</li>
+<li>The ratio <span class="math inline">\(\frac{p(\cdot)}{q(\cdot)}\)</span> corrects for the bias introduced by not sampling from the natural dynamics</li>
+</ul>
+<p><strong>Intuition</strong>: If we artificially push particles toward certain regions (high <span class="math inline">\(q\)</span>), we need to down-weight them proportionally. If we place particles in regions that are naturally likely (high <span class="math inline">\(p\)</span>), we up-weight them.</p>
+<p>The bootstrap filter is the special case where <span class="math inline">\(q(\mathbf{x}_t^{(i)} | \cdot) = p(\mathbf{x}_t^{(i)} | \mathbf{x}_{t-1}^{(i)})\)</span>, so the transition probabilities cancel out and we get the simpler formula.</p>
+</section>
+<section id="effective-sample-size-and-resampling" class="level3" data-number="18.3.3">
+<h3 data-number="18.3.3" class="anchored" data-anchor-id="effective-sample-size-and-resampling"><span class="header-section-number">18.3.3</span> Effective Sample Size and Resampling</h3>
+<p>The <strong>effective sample size</strong> <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2\)</span> measures particle diversity, with <span class="math inline">\(N_{\text{eff}} = 1\)</span> indicating complete degeneracy (one particle has weight 1) and <span class="math inline">\(N_{\text{eff}} = N\)</span> indicating uniform weights.</p>
+<p><strong>Connection to Variance</strong>: The effective sample size is inversely related to the variance of the weight distribution. For a discrete probability mass function with weights <span class="math inline">\(\{w^{(i)}\}\)</span>, the variance is:</p>
+<p><span class="math display">\[\text{Var}(w) = \sum_{i=1}^N (w^{(i)})^2 - \left(\sum_{i=1}^N w^{(i)}\right)^2\]</span></p>
+<p>Since the weights are normalized (<span class="math inline">\(\sum_{i=1}^N w^{(i)} = 1\)</span>), this becomes:</p>
+<p><span class="math display">\[\text{Var}(w) = \sum_{i=1}^N (w^{(i)})^2 - 1\]</span></p>
+<p>Therefore: <span class="math inline">\(\sum_{i=1}^N (w^{(i)})^2 = \text{Var}(w) + 1\)</span></p>
+<p>This shows that <span class="math inline">\(N_{\text{eff}} = \frac{1}{\text{Var}(w) + 1}\)</span>, meaning:</p>
+<ul>
+<li><strong>High variance</strong> in weights → <strong>Low</strong> <span class="math inline">\(N_{\text{eff}}\)</span> → Few effective particles</li>
+<li><strong>Low variance</strong> in weights → <strong>High</strong> <span class="math inline">\(N_{\text{eff}}\)</span> → Many effective particles</li>
+</ul>
+<p>When weights are highly unequal (high variance), most particles contribute little to the approximation, reducing the effective sample size. When weights are nearly uniform (low variance), all particles contribute meaningfully.</p>
+<p><strong>Resampling</strong> fixes the weight imbalance by creating a new set of particles <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span>. We randomly select particles based on their weights - particles with higher weights get picked more often, while particles with low weights may be discarded.</p>
+<p>We draw <span class="math inline">\(N\)</span> new particles from the current set, where each particle’s chance of being selected equals its weight. A particle with weight 0.4 has a 40% chance of being chosen on each draw. After resampling all particles get equal weight <span class="math inline">\(w_t^{(i)} = 1/N\)</span> since they now represent an unweighted sample from our belief distribution.</p>
+<p>Resampling solves the weight problem (restores <span class="math inline">\(N_{\text{eff}} = N\)</span>) but introduces randomness. Sometimes good particles are lost by bad luck, and we end up with multiple copies of the same particle, reducing diversity.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Bootstrap Particle Filter Algorithm
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Input</strong>: <span class="math inline">\(\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(\mathbf{y}_{1:T}\)</span></p>
+<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
+<ol type="1">
+<li><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\mathbf{x}_t^{(i)} \sim p(\mathbf{x}_t | \mathbf{x}_{t-1}^{(i)})\)</span></li>
+<li><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})\)</span></li>
+<li><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math inline">\(w_t^{(i)} = \tilde{w}_t^{(i)} / \sum_{j=1}^N \tilde{w}_t^{(j)}\)</span></li>
+<li><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:
+<ul>
+<li>Draw <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ol>
+<p><strong>Output</strong>: <span class="math inline">\(p(\mathbf{x}_t | \mathbf{y}_{1:t}) \approx \sum_{i=1}^N w_t^{(i)} \delta(\mathbf{x}_t - \mathbf{x}_t^{(i)})\)</span></p>
+</div>
+</div>
+</section>
+<section id="particle-filtering-for-2d-object-tracking" class="level3" data-number="18.3.4">
+<h3 data-number="18.3.4" class="anchored" data-anchor-id="particle-filtering-for-2d-object-tracking"><span class="header-section-number">18.3.4</span> Particle Filtering for 2D Object Tracking</h3>
+<p><strong>Weight Update Derivation</strong>: For the bootstrap proposal <span class="math inline">\(q(\mathbf{x}_t | \mathbf{x}_{t-1}, \mathbf{y}_{1:t}) = p(\mathbf{x}_t | \mathbf{x}_{t-1})\)</span>, the weight update simplifies to:</p>
+<p><span class="math display">\[
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot p(\mathbf{y}_t | \mathbf{x}_t^{(i)})
+\]</span></p>
+<p>For the tracking model, the likelihood is:</p>
+<p><span class="math display">\[
+p(\mathbf{y}_t | \mathbf{x}_t^{(i)}) = \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{H} \mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}]^{\top}\)</span> extracts the position components from the state vector <span class="math inline">\(\mathbf{x}_t^{(i)} = [p_x^{(i)}, p_y^{(i)}, v_x^{(i)}, v_y^{(i)}]^{\top}\)</span>. The observation residual is:</p>
+<p><span class="math display">\[
+\mathbf{r}_t^{(i)} = \mathbf{y}_t - \mathbf{H} \mathbf{x}_t^{(i)} = \begin{pmatrix} y_{x,t} - p_x^{(i)} \\ y_{y,t} - p_y^{(i)} \end{pmatrix}
+\]</span></p>
+<p>Therefore, the weight update becomes:</p>
+<p><span class="math display">\[
+\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R}) = w_{t-1}^{(i)} \cdot \frac{1}{\sqrt{(2\pi)^2 |\mathbf{R}|}} \exp\left(-\frac{1}{2} (\mathbf{r}_t^{(i)})^{\top} \mathbf{R}^{-1} \mathbf{r}_t^{(i)}\right)
+\]</span></p>
+<p><strong>Bootstrap Particle Filter Algorithm for Object Tracking</strong>:</p>
+<p><strong>Input</strong>: <span class="math inline">\(\{\mathbf{x}_0^{(i)}, w_0^{(i)} = 1/N\}_{i=1}^N\)</span>, observations <span class="math inline">\(\mathbf{y}_{1:T}\)</span></p>
+<p><strong>For</strong> <span class="math inline">\(t = 1, \ldots, T\)</span>:</p>
+<ol type="1">
+<li><p><strong>Predict</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\mathbf{x}_t^{(i)} = \mathbf{F} \mathbf{x}_{t-1}^{(i)} + \boldsymbol{\epsilon}_t^{(i)}, \quad \boldsymbol{\epsilon}_t^{(i)} \sim \mathcal{N}(\mathbf{0}, \mathbf{Q})\]</span></p></li>
+<li><p><strong>Weight</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[\tilde{w}_t^{(i)} = w_{t-1}^{(i)} \cdot \mathcal{N}(\mathbf{y}_t; \mathbf{H} \mathbf{x}_t^{(i)}, \mathbf{R})\]</span></p></li>
+<li><p><strong>Normalize</strong>: For <span class="math inline">\(i = 1, \ldots, N\)</span>: <span class="math display">\[w_t^{(i)} = \frac{\tilde{w}_t^{(i)}}{\sum_{j=1}^N \tilde{w}_t^{(j)}}\]</span></p></li>
+<li><p><strong>Estimate</strong>: <span class="math display">\[\hat{\mathbf{x}}_t = \sum_{i=1}^N w_t^{(i)} \mathbf{x}_t^{(i)}\]</span></p></li>
+<li><p><strong>Resample</strong>: If <span class="math inline">\(N_{\text{eff}} = 1/\sum_{i=1}^N (w_t^{(i)})^2 &lt; N_{\text{threshold}}\)</span>:</p>
+<ul>
+<li>Draw <span class="math inline">\(\{\tilde{\mathbf{x}}_t^{(i)}\}_{i=1}^N\)</span> from <span class="math inline">\(\{\mathbf{x}_t^{(i)}\}_{i=1}^N\)</span> with probabilities <span class="math inline">\(\{w_t^{(i)}\}_{i=1}^N\)</span></li>
+<li>Set <span class="math inline">\(\mathbf{x}_t^{(i)} = \tilde{\mathbf{x}}_t^{(i)}\)</span> and <span class="math inline">\(w_t^{(i)} = 1/N\)</span> for all <span class="math inline">\(i\)</span></li>
+</ul></li>
+</ol>
+<p><strong>Output</strong>: Position estimate <span class="math inline">\(\hat{\mathbf{p}}_t = [\hat{p}_{x,t}, \hat{p}_{y,t}]^{\top}\)</span> and velocity estimate <span class="math inline">\(\hat{\mathbf{v}}_t = [\hat{v}_{x,t}, \hat{v}_{y,t}]^{\top}\)</span></p>
+</section>
+</section>
+<section id="particle-filter-implementation" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="particle-filter-implementation"><span class="header-section-number">18.4</span> Particle Filter Implementation</h2>
+<p>The following implementation demonstrates a complete particle filter for 2D object tracking. The demonstration tracks an object moving in 2D space with:</p>
+<ul>
+<li><strong>Process noise</strong>: Models random accelerations (<span class="math inline">\(\sigma_a = 0.5\)</span>)</li>
+<li><strong>Observation noise</strong>: GPS-like position measurements (<span class="math inline">\(\sigma_r = 1.0\)</span>)</li>
+<li><strong>Particles</strong>: 500 particles provide good approximation quality</li>
+<li><strong>Duration</strong>: 30 time steps with unit time intervals</li>
+</ul>
+<p>The visualization shows the particle filter’s ability to track the true trajectory despite noisy observations, with automatic resampling maintaining particle diversity throughout the simulation.</p>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="410" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 409;"><span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a>VM <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">VM</span></span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a>vmTheme <span class="op">=</span> Generators<span class="op">.</span><span class="fu">observe</span>(notify <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">onThemeChange</span>(notify))</span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a>chartColors <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">colors</span>(vmTheme)</span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a><span class="co">// A constant-velocity model in 2-D: state [x, y, vx, vy], dt = 1. The</span></span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a><span class="co">// process noise is a random acceleration a ~ N(0, sigma_a²) per axis, which</span></span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a><span class="co">// moves the position by a dt²/2 and the velocity by a dt -- exactly the</span></span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a><span class="co">// covariance Q = sigma_a² [[dt⁴/4, dt³/2], [dt³/2, dt²]] per axis.</span></span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a><span class="co">// Observations are the position plus N(0, sigma_r² I) noise.</span></span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a>pfModel <span class="op">=</span> ({<span class="dt">dt</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">T</span><span class="op">:</span> <span class="dv">30</span><span class="op">,</span> <span class="dt">nParticles</span><span class="op">:</span> <span class="dv">500</span><span class="op">,</span> <span class="dt">sigmaA</span><span class="op">:</span> <span class="fl">0.5</span><span class="op">,</span> <span class="dt">sigmaR</span><span class="op">:</span> <span class="fl">1.0</span><span class="op">,</span> <span class="dt">start</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">0.5</span>]<span class="op">,</span> <span class="dt">initialVariances</span><span class="op">:</span> [<span class="dv">2</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>]})</span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pfPropagate</span>(state<span class="op">,</span> dt<span class="op">,</span> sigmaA<span class="op">,</span> gaussian) {</span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ax <span class="op">=</span> sigmaA <span class="op">*</span> <span class="fu">gaussian</span>()</span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ay <span class="op">=</span> sigmaA <span class="op">*</span> <span class="fu">gaussian</span>()</span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> [</span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a>    state[<span class="dv">0</span>] <span class="op">+</span> dt <span class="op">*</span> state[<span class="dv">2</span>] <span class="op">+</span> ax <span class="op">*</span> dt <span class="op">*</span> dt <span class="op">/</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a>    state[<span class="dv">1</span>] <span class="op">+</span> dt <span class="op">*</span> state[<span class="dv">3</span>] <span class="op">+</span> ay <span class="op">*</span> dt <span class="op">*</span> dt <span class="op">/</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a>    state[<span class="dv">2</span>] <span class="op">+</span> ax <span class="op">*</span> dt<span class="op">,</span></span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a>    state[<span class="dv">3</span>] <span class="op">+</span> ay <span class="op">*</span> dt</span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a><span class="co">// Simulate the truth and the observations, then run the bootstrap particle</span></span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a><span class="co">// filter: propagate, weight by the observation likelihood, resample</span></span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a><span class="co">// (systematically) when the effective sample size falls below N/2.</span></span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a>pfRun <span class="op">=</span> {</span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> m <span class="op">=</span> pfModel</span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rng <span class="op">=</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">42</span>)</span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> gaussian <span class="op">=</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">gaussianRandom</span>(rng)</span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> truth <span class="op">=</span> [m<span class="op">.</span><span class="at">start</span>]</span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> observations <span class="op">=</span> []</span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> m<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> next <span class="op">=</span> <span class="fu">pfPropagate</span>(truth[t]<span class="op">,</span> m<span class="op">.</span><span class="at">dt</span><span class="op">,</span> m<span class="op">.</span><span class="at">sigmaA</span><span class="op">,</span> gaussian)</span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a>    truth<span class="op">.</span><span class="fu">push</span>(next)</span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a>    observations<span class="op">.</span><span class="fu">push</span>([next[<span class="dv">0</span>] <span class="op">+</span> m<span class="op">.</span><span class="at">sigmaR</span> <span class="op">*</span> <span class="fu">gaussian</span>()<span class="op">,</span> next[<span class="dv">1</span>] <span class="op">+</span> m<span class="op">.</span><span class="at">sigmaR</span> <span class="op">*</span> <span class="fu">gaussian</span>()])</span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> particles <span class="op">=</span> []</span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> p <span class="op">=</span> []</span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">4</span><span class="op">;</span> k<span class="op">++</span>) p<span class="op">.</span><span class="fu">push</span>(m<span class="op">.</span><span class="at">start</span>[k] <span class="op">+</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(m<span class="op">.</span><span class="at">initialVariances</span>[k]) <span class="op">*</span> <span class="fu">gaussian</span>())</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a>    particles<span class="op">.</span><span class="fu">push</span>(p)</span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> weights <span class="op">=</span> <span class="kw">new</span> <span class="bu">Array</span>(m<span class="op">.</span><span class="at">nParticles</span>)<span class="op">.</span><span class="fu">fill</span>(<span class="dv">1</span> <span class="op">/</span> m<span class="op">.</span><span class="at">nParticles</span>)</span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> estimates <span class="op">=</span> []<span class="op">,</span> positionCovs <span class="op">=</span> []<span class="op">,</span> ess <span class="op">=</span> []<span class="op">,</span> resampledSteps <span class="op">=</span> []</span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> m<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Predict.</span></span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) particles[i] <span class="op">=</span> <span class="fu">pfPropagate</span>(particles[i]<span class="op">,</span> m<span class="op">.</span><span class="at">dt</span><span class="op">,</span> m<span class="op">.</span><span class="at">sigmaA</span><span class="op">,</span> gaussian)</span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Update: w_i *= p(y_t | x_t^(i)); the Gaussian's constant cancels on normalizing.</span></span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> total <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> dx <span class="op">=</span> observations[t][<span class="dv">0</span>] <span class="op">-</span> particles[i][<span class="dv">0</span>]</span>
+<span id="cb1-464"><a href="#cb1-464" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> dy <span class="op">=</span> observations[t][<span class="dv">1</span>] <span class="op">-</span> particles[i][<span class="dv">1</span>]</span>
+<span id="cb1-465"><a href="#cb1-465" aria-hidden="true" tabindex="-1"></a>      weights[i] <span class="op">*=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">exp</span>(<span class="op">-</span>(dx <span class="op">*</span> dx <span class="op">+</span> dy <span class="op">*</span> dy) <span class="op">/</span> (<span class="dv">2</span> <span class="op">*</span> m<span class="op">.</span><span class="at">sigmaR</span> <span class="op">*</span> m<span class="op">.</span><span class="at">sigmaR</span>))</span>
+<span id="cb1-466"><a href="#cb1-466" aria-hidden="true" tabindex="-1"></a>      total <span class="op">+=</span> weights[i]</span>
+<span id="cb1-467"><a href="#cb1-467" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-468"><a href="#cb1-468" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> sumSquares <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-469"><a href="#cb1-469" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-470"><a href="#cb1-470" aria-hidden="true" tabindex="-1"></a>      weights[i] <span class="op">/=</span> total</span>
+<span id="cb1-471"><a href="#cb1-471" aria-hidden="true" tabindex="-1"></a>      sumSquares <span class="op">+=</span> weights[i] <span class="op">*</span> weights[i]</span>
+<span id="cb1-472"><a href="#cb1-472" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-473"><a href="#cb1-473" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Weighted mean and position covariance, before any resampling.</span></span>
+<span id="cb1-474"><a href="#cb1-474" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> mean <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb1-475"><a href="#cb1-475" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-476"><a href="#cb1-476" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> <span class="dv">4</span><span class="op">;</span> k<span class="op">++</span>) mean[k] <span class="op">+=</span> weights[i] <span class="op">*</span> particles[i][k]</span>
+<span id="cb1-477"><a href="#cb1-477" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-478"><a href="#cb1-478" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> cxx <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> cxy <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> cyy <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-479"><a href="#cb1-479" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span><span class="op">;</span> i<span class="op">++</span>) {</span>
+<span id="cb1-480"><a href="#cb1-480" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> dx <span class="op">=</span> particles[i][<span class="dv">0</span>] <span class="op">-</span> mean[<span class="dv">0</span>]</span>
+<span id="cb1-481"><a href="#cb1-481" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> dy <span class="op">=</span> particles[i][<span class="dv">1</span>] <span class="op">-</span> mean[<span class="dv">1</span>]</span>
+<span id="cb1-482"><a href="#cb1-482" aria-hidden="true" tabindex="-1"></a>      cxx <span class="op">+=</span> weights[i] <span class="op">*</span> dx <span class="op">*</span> dx</span>
+<span id="cb1-483"><a href="#cb1-483" aria-hidden="true" tabindex="-1"></a>      cxy <span class="op">+=</span> weights[i] <span class="op">*</span> dx <span class="op">*</span> dy</span>
+<span id="cb1-484"><a href="#cb1-484" aria-hidden="true" tabindex="-1"></a>      cyy <span class="op">+=</span> weights[i] <span class="op">*</span> dy <span class="op">*</span> dy</span>
+<span id="cb1-485"><a href="#cb1-485" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-486"><a href="#cb1-486" aria-hidden="true" tabindex="-1"></a>    estimates<span class="op">.</span><span class="fu">push</span>(mean)</span>
+<span id="cb1-487"><a href="#cb1-487" aria-hidden="true" tabindex="-1"></a>    positionCovs<span class="op">.</span><span class="fu">push</span>([cxx<span class="op">,</span> cxy<span class="op">,</span> cyy])</span>
+<span id="cb1-488"><a href="#cb1-488" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Resample when the effective sample size 1 / sum w² drops below N/2.</span></span>
+<span id="cb1-489"><a href="#cb1-489" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> nEff <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> sumSquares</span>
+<span id="cb1-490"><a href="#cb1-490" aria-hidden="true" tabindex="-1"></a>    ess<span class="op">.</span><span class="fu">push</span>(nEff)</span>
+<span id="cb1-491"><a href="#cb1-491" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (nEff <span class="op">&lt;</span> m<span class="op">.</span><span class="at">nParticles</span> <span class="op">/</span> <span class="dv">2</span>) {</span>
+<span id="cb1-492"><a href="#cb1-492" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> indices <span class="op">=</span> VM<span class="op">.</span><span class="at">filters</span><span class="op">.</span><span class="fu">systematicResample</span>(weights<span class="op">,</span> <span class="fu">rng</span>())</span>
+<span id="cb1-493"><a href="#cb1-493" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> resampled <span class="op">=</span> []</span>
+<span id="cb1-494"><a href="#cb1-494" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (<span class="kw">const</span> j <span class="kw">of</span> indices) resampled<span class="op">.</span><span class="fu">push</span>(particles[j]<span class="op">.</span><span class="fu">slice</span>())</span>
+<span id="cb1-495"><a href="#cb1-495" aria-hidden="true" tabindex="-1"></a>      particles <span class="op">=</span> resampled</span>
+<span id="cb1-496"><a href="#cb1-496" aria-hidden="true" tabindex="-1"></a>      weights <span class="op">=</span> <span class="kw">new</span> <span class="bu">Array</span>(m<span class="op">.</span><span class="at">nParticles</span>)<span class="op">.</span><span class="fu">fill</span>(<span class="dv">1</span> <span class="op">/</span> m<span class="op">.</span><span class="at">nParticles</span>)</span>
+<span id="cb1-497"><a href="#cb1-497" aria-hidden="true" tabindex="-1"></a>      resampledSteps<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb1-498"><a href="#cb1-498" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-499"><a href="#cb1-499" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-500"><a href="#cb1-500" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-501"><a href="#cb1-501" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> errors <span class="op">=</span> []</span>
+<span id="cb1-502"><a href="#cb1-502" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> m<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb1-503"><a href="#cb1-503" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> dx <span class="op">=</span> estimates[t][<span class="dv">0</span>] <span class="op">-</span> truth[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">0</span>]</span>
+<span id="cb1-504"><a href="#cb1-504" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> dy <span class="op">=</span> estimates[t][<span class="dv">1</span>] <span class="op">-</span> truth[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">1</span>]</span>
+<span id="cb1-505"><a href="#cb1-505" aria-hidden="true" tabindex="-1"></a>    errors<span class="op">.</span><span class="fu">push</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(dx <span class="op">*</span> dx <span class="op">+</span> dy <span class="op">*</span> dy))</span>
+<span id="cb1-506"><a href="#cb1-506" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-507"><a href="#cb1-507" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {truth<span class="op">,</span> observations<span class="op">,</span> estimates<span class="op">,</span> positionCovs<span class="op">,</span> ess<span class="op">,</span> resampledSteps<span class="op">,</span> errors}</span>
+<span id="cb1-508"><a href="#cb1-508" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="513" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 512;"><span id="cb2-513"><a href="#cb2-513" aria-hidden="true" tabindex="-1"></a>pfTrajectoryPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"480px"</span>})</span>
+<span id="cb2-514"><a href="#cb2-514" aria-hidden="true" tabindex="-1"></a>pfErrorPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb2-515"><a href="#cb2-515" aria-hidden="true" tabindex="-1"></a>pfVelocityPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb2-516"><a href="#cb2-516" aria-hidden="true" tabindex="-1"></a>pfEssPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"360px"</span>})</span>
+<span id="cb2-517"><a href="#cb2-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-518"><a href="#cb2-518" aria-hidden="true" tabindex="-1"></a>pfSteps <span class="op">=</span> {</span>
+<span id="cb2-519"><a href="#cb2-519" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> out <span class="op">=</span> []</span>
+<span id="cb2-520"><a href="#cb2-520" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> pfModel<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) out<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb2-521"><a href="#cb2-521" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out</span>
+<span id="cb2-522"><a href="#cb2-522" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-523"><a href="#cb2-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-524"><a href="#cb2-524" aria-hidden="true" tabindex="-1"></a><span class="co">// Dotted vertical lines at the steps where the filter resampled.</span></span>
+<span id="cb2-525"><a href="#cb2-525" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pfResampleShapes</span>() {</span>
+<span id="cb2-526"><a href="#cb2-526" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> shapes <span class="op">=</span> []</span>
+<span id="cb2-527"><a href="#cb2-527" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> step <span class="kw">of</span> pfRun<span class="op">.</span><span class="at">resampledSteps</span>) {</span>
+<span id="cb2-528"><a href="#cb2-528" aria-hidden="true" tabindex="-1"></a>    shapes<span class="op">.</span><span class="fu">push</span>({<span class="dt">type</span><span class="op">:</span> <span class="st">"line"</span><span class="op">,</span> <span class="dt">x0</span><span class="op">:</span> step<span class="op">,</span> <span class="dt">x1</span><span class="op">:</span> step<span class="op">,</span> <span class="dt">yref</span><span class="op">:</span> <span class="st">"paper"</span><span class="op">,</span> <span class="dt">y0</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">warn</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}})</span>
+<span id="cb2-529"><a href="#cb2-529" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-530"><a href="#cb2-530" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> shapes</span>
+<span id="cb2-531"><a href="#cb2-531" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-532"><a href="#cb2-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-533"><a href="#cb2-533" aria-hidden="true" tabindex="-1"></a><span class="co">// The 95% confidence ellipse of a 2 x 2 covariance [[a, b], [b, c]]: the</span></span>
+<span id="cb2-534"><a href="#cb2-534" aria-hidden="true" tabindex="-1"></a><span class="co">// eigen-decomposition in closed form, scaled by the chi-squared(2) quantile.</span></span>
+<span id="cb2-535"><a href="#cb2-535" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pfEllipse</span>(center<span class="op">,</span> cov) {</span>
+<span id="cb2-536"><a href="#cb2-536" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> [a<span class="op">,</span> b<span class="op">,</span> c] <span class="op">=</span> cov</span>
+<span id="cb2-537"><a href="#cb2-537" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> scale <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">chiSquaredQuantile</span>(<span class="fl">0.95</span><span class="op">,</span> <span class="dv">2</span>)</span>
+<span id="cb2-538"><a href="#cb2-538" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> half <span class="op">=</span> (a <span class="op">+</span> c) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb2-539"><a href="#cb2-539" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> radius <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(((a <span class="op">-</span> c) <span class="op">/</span> <span class="dv">2</span>) <span class="op">*</span> ((a <span class="op">-</span> c) <span class="op">/</span> <span class="dv">2</span>) <span class="op">+</span> b <span class="op">*</span> b)</span>
+<span id="cb2-540"><a href="#cb2-540" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> major <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(scale <span class="op">*</span> (half <span class="op">+</span> radius))</span>
+<span id="cb2-541"><a href="#cb2-541" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> minor <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(scale <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(half <span class="op">-</span> radius<span class="op">,</span> <span class="dv">0</span>))</span>
+<span id="cb2-542"><a href="#cb2-542" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> theta <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">atan2</span>(<span class="dv">2</span> <span class="op">*</span> b<span class="op">,</span> a <span class="op">-</span> c)</span>
+<span id="cb2-543"><a href="#cb2-543" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> xs <span class="op">=</span> []<span class="op">,</span> ys <span class="op">=</span> []</span>
+<span id="cb2-544"><a href="#cb2-544" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;=</span> <span class="dv">60</span><span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb2-545"><a href="#cb2-545" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> s <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> k <span class="op">/</span> <span class="dv">60</span></span>
+<span id="cb2-546"><a href="#cb2-546" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> u <span class="op">=</span> major <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cos</span>(s)<span class="op">,</span> v <span class="op">=</span> minor <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(s)</span>
+<span id="cb2-547"><a href="#cb2-547" aria-hidden="true" tabindex="-1"></a>    xs<span class="op">.</span><span class="fu">push</span>(center[<span class="dv">0</span>] <span class="op">+</span> u <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cos</span>(theta) <span class="op">-</span> v <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(theta))</span>
+<span id="cb2-548"><a href="#cb2-548" aria-hidden="true" tabindex="-1"></a>    ys<span class="op">.</span><span class="fu">push</span>(center[<span class="dv">1</span>] <span class="op">+</span> u <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(theta) <span class="op">+</span> v <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cos</span>(theta))</span>
+<span id="cb2-549"><a href="#cb2-549" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-550"><a href="#cb2-550" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {xs<span class="op">,</span> ys}</span>
+<span id="cb2-551"><a href="#cb2-551" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="554" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 553;"><span id="cb3-554"><a href="#cb3-554" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb3-555"><a href="#cb3-555" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> pfRun</span>
+<span id="cb3-556"><a href="#cb3-556" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> trueX <span class="op">=</span> []<span class="op">,</span> trueY <span class="op">=</span> []<span class="op">,</span> estX <span class="op">=</span> []<span class="op">,</span> estY <span class="op">=</span> []<span class="op">,</span> obsX <span class="op">=</span> []<span class="op">,</span> obsY <span class="op">=</span> []</span>
+<span id="cb3-557"><a href="#cb3-557" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> pfModel<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb3-558"><a href="#cb3-558" aria-hidden="true" tabindex="-1"></a>    trueX<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">truth</span>[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">0</span>])</span>
+<span id="cb3-559"><a href="#cb3-559" aria-hidden="true" tabindex="-1"></a>    trueY<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">truth</span>[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">1</span>])</span>
+<span id="cb3-560"><a href="#cb3-560" aria-hidden="true" tabindex="-1"></a>    estX<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">estimates</span>[t][<span class="dv">0</span>])</span>
+<span id="cb3-561"><a href="#cb3-561" aria-hidden="true" tabindex="-1"></a>    estY<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">estimates</span>[t][<span class="dv">1</span>])</span>
+<span id="cb3-562"><a href="#cb3-562" aria-hidden="true" tabindex="-1"></a>    obsX<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">observations</span>[t][<span class="dv">0</span>])</span>
+<span id="cb3-563"><a href="#cb3-563" aria-hidden="true" tabindex="-1"></a>    obsY<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">observations</span>[t][<span class="dv">1</span>])</span>
+<span id="cb3-564"><a href="#cb3-564" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-565"><a href="#cb3-565" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> [</span>
+<span id="cb3-566"><a href="#cb3-566" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> trueX<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> trueY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"True trajectory"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">3</span>}}<span class="op">,</span></span>
+<span id="cb3-567"><a href="#cb3-567" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> estX<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> estY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"PF estimate"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span>}}<span class="op">,</span></span>
+<span id="cb3-568"><a href="#cb3-568" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> obsX<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> obsY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Observations"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">7</span>}}</span>
+<span id="cb3-569"><a href="#cb3-569" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb3-570"><a href="#cb3-570" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> first <span class="op">=</span> <span class="kw">true</span></span>
+<span id="cb3-571"><a href="#cb3-571" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> t <span class="kw">of</span> [<span class="dv">5</span><span class="op">,</span> <span class="dv">10</span><span class="op">,</span> <span class="dv">15</span><span class="op">,</span> <span class="dv">20</span><span class="op">,</span> <span class="dv">25</span>]) {</span>
+<span id="cb3-572"><a href="#cb3-572" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> e <span class="op">=</span> <span class="fu">pfEllipse</span>(r<span class="op">.</span><span class="at">estimates</span>[t]<span class="op">,</span> r<span class="op">.</span><span class="at">positionCovs</span>[t])</span>
+<span id="cb3-573"><a href="#cb3-573" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> e<span class="op">.</span><span class="at">xs</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> e<span class="op">.</span><span class="at">ys</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"95% ellipse"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> first<span class="op">,</span></span>
+<span id="cb3-574"><a href="#cb3-574" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="fl">0.6</span>)<span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb3-575"><a href="#cb3-575" aria-hidden="true" tabindex="-1"></a>    first <span class="op">=</span> <span class="kw">false</span></span>
+<span id="cb3-576"><a href="#cb3-576" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-577"><a href="#cb3-577" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(pfTrajectoryPlot<span class="op">,</span> traces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"2D trajectory tracking"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb3-578"><a href="#cb3-578" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"X position"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Y position"</span><span class="op">,</span> <span class="dt">scaleanchor</span><span class="op">:</span> <span class="st">"x"</span>}<span class="op">,</span> <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.2</span>}})</span>
+<span id="cb3-579"><a href="#cb3-579" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="583" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 582;"><span id="cb4-583"><a href="#cb4-583" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb4-584"><a href="#cb4-584" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> mean <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">sampleStats</span>(pfRun<span class="op">.</span><span class="at">errors</span>)<span class="op">.</span><span class="at">mean</span></span>
+<span id="cb4-585"><a href="#cb4-585" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(pfErrorPlot<span class="op">,</span> [</span>
+<span id="cb4-586"><a href="#cb4-586" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> pfRun<span class="op">.</span><span class="at">errors</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Position error"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb4-587"><a href="#cb4-587" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> pfModel<span class="op">.</span><span class="at">T</span> <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [mean<span class="op">,</span> mean]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="vs">`Mean error: </span><span class="sc">${</span>mean<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span></span>
+<span id="cb4-588"><a href="#cb4-588" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}</span>
+<span id="cb4-589"><a href="#cb4-589" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Tracking error over time"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">shapes</span><span class="op">:</span> <span class="fu">pfResampleShapes</span>()<span class="op">,</span></span>
+<span id="cb4-590"><a href="#cb4-590" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Time step"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Position error"</span><span class="op">,</span> <span class="dt">rangemode</span><span class="op">:</span> <span class="st">"tozero"</span>}<span class="op">,</span> <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.2</span>}})</span>
+<span id="cb4-591"><a href="#cb4-591" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-4" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="595" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 594;"><span id="cb5-595"><a href="#cb5-595" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-596"><a href="#cb5-596" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> pfRun</span>
+<span id="cb5-597"><a href="#cb5-597" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> series <span class="op">=</span> [[]<span class="op">,</span> []<span class="op">,</span> []<span class="op">,</span> []]</span>
+<span id="cb5-598"><a href="#cb5-598" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> pfModel<span class="op">.</span><span class="at">T</span><span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb5-599"><a href="#cb5-599" aria-hidden="true" tabindex="-1"></a>    series[<span class="dv">0</span>]<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">truth</span>[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">2</span>])</span>
+<span id="cb5-600"><a href="#cb5-600" aria-hidden="true" tabindex="-1"></a>    series[<span class="dv">1</span>]<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">estimates</span>[t][<span class="dv">2</span>])</span>
+<span id="cb5-601"><a href="#cb5-601" aria-hidden="true" tabindex="-1"></a>    series[<span class="dv">2</span>]<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">truth</span>[t <span class="op">+</span> <span class="dv">1</span>][<span class="dv">3</span>])</span>
+<span id="cb5-602"><a href="#cb5-602" aria-hidden="true" tabindex="-1"></a>    series[<span class="dv">3</span>]<span class="op">.</span><span class="fu">push</span>(r<span class="op">.</span><span class="at">estimates</span>[t][<span class="dv">3</span>])</span>
+<span id="cb5-603"><a href="#cb5-603" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-604"><a href="#cb5-604" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(pfVelocityPlot<span class="op">,</span> [</span>
+<span id="cb5-605"><a href="#cb5-605" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> series[<span class="dv">0</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"True Vx"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb5-606"><a href="#cb5-606" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> series[<span class="dv">1</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Estimated Vx"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span>}}<span class="op">,</span></span>
+<span id="cb5-607"><a href="#cb5-607" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> series[<span class="dv">2</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"True Vy"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span>}}<span class="op">,</span></span>
+<span id="cb5-608"><a href="#cb5-608" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> series[<span class="dv">3</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Estimated Vy"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span>}}</span>
+<span id="cb5-609"><a href="#cb5-609" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Velocity estimation"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Time step"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Velocity"</span>}<span class="op">,</span></span>
+<span id="cb5-610"><a href="#cb5-610" aria-hidden="true" tabindex="-1"></a>    <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.2</span>}})</span>
+<span id="cb5-611"><a href="#cb5-611" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="615" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 614;"><span id="cb6-615"><a href="#cb6-615" aria-hidden="true" tabindex="-1"></a>VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(pfEssPlot<span class="op">,</span> [</span>
+<span id="cb6-616"><a href="#cb6-616" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">x</span><span class="op">:</span> pfSteps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> pfRun<span class="op">.</span><span class="at">ess</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Effective sample size"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent2</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb6-617"><a href="#cb6-617" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">x</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> pfModel<span class="op">.</span><span class="at">T</span> <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [pfModel<span class="op">.</span><span class="at">nParticles</span> <span class="op">/</span> <span class="dv">2</span><span class="op">,</span> pfModel<span class="op">.</span><span class="at">nParticles</span> <span class="op">/</span> <span class="dv">2</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span></span>
+<span id="cb6-618"><a href="#cb6-618" aria-hidden="true" tabindex="-1"></a>    <span class="dt">name</span><span class="op">:</span> <span class="st">"Resampling threshold N/2"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}</span>
+<span id="cb6-619"><a href="#cb6-619" aria-hidden="true" tabindex="-1"></a>]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Particle degeneracy and resampling"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">shapes</span><span class="op">:</span> <span class="fu">pfResampleShapes</span>()<span class="op">,</span></span>
+<span id="cb6-620"><a href="#cb6-620" aria-hidden="true" tabindex="-1"></a>  <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Time step"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Effective sample size"</span><span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> pfModel<span class="op">.</span><span class="at">nParticles</span> <span class="op">*</span> <span class="fl">1.05</span>]}<span class="op">,</span></span>
+<span id="cb6-621"><a href="#cb6-621" aria-hidden="true" tabindex="-1"></a>  <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.2</span>}})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-6" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb7" data-startfrom="625" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 624;"><span id="cb7-625"><a href="#cb7-625" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb7-626"><a href="#cb7-626" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> errors <span class="op">=</span> pfRun<span class="op">.</span><span class="at">errors</span></span>
+<span id="cb7-627"><a href="#cb7-627" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([</span>
+<span id="cb7-628"><a href="#cb7-628" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Particles"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="bu">String</span>(pfModel<span class="op">.</span><span class="at">nParticles</span>)}<span class="op">,</span></span>
+<span id="cb7-629"><a href="#cb7-629" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Final position error"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> errors[errors<span class="op">.</span><span class="at">length</span> <span class="op">-</span> <span class="dv">1</span>]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)}<span class="op">,</span></span>
+<span id="cb7-630"><a href="#cb7-630" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Mean position error"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">sampleStats</span>(errors)<span class="op">.</span><span class="at">mean</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)}<span class="op">,</span></span>
+<span id="cb7-631"><a href="#cb7-631" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Resampled"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>pfRun<span class="op">.</span><span class="at">resampledSteps</span><span class="op">.</span><span class="at">length</span><span class="sc">}</span><span class="vs">/</span><span class="sc">${</span>pfModel<span class="op">.</span><span class="at">T</span><span class="sc">}</span><span class="vs"> steps`</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"Dotted orange lines in the plots above"</span>}</span>
+<span id="cb7-632"><a href="#cb7-632" aria-hidden="true" tabindex="-1"></a>  ])</span>
+<span id="cb7-633"><a href="#cb7-633" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="conclusion" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">18.5</span> Conclusion</h2>
+<p>Particle filters provide a powerful and flexible framework for tracking hidden states in complex dynamic systems. Unlike the Kalman filter, which requires linear dynamics and Gaussian noise, particle filters can handle arbitrary nonlinearities and any noise distribution by representing beliefs as a cloud of weighted samples.</p>
+<section id="key-strengths" class="level3" data-number="18.5.1">
+<h3 data-number="18.5.1" class="anchored" data-anchor-id="key-strengths"><span class="header-section-number">18.5.1</span> Key Strengths</h3>
+<ul>
+<li><strong>Flexibility</strong>: Works with any state evolution and observation model.</li>
+<li><strong>Intuitive</strong>: The particle representation mirrors how we naturally think about uncertainty.</li>
+<li><strong>Scalable</strong>: Performance degrades gracefully as system complexity increases.</li>
+<li><strong>Real-time capable</strong>: Sequential updates make it suitable for online applications.</li>
+</ul>
+</section>
+<section id="limitations-and-challenges" class="level3" data-number="18.5.2">
+<h3 data-number="18.5.2" class="anchored" data-anchor-id="limitations-and-challenges"><span class="header-section-number">18.5.2</span> Limitations and Challenges</h3>
+<ul>
+<li><strong>Computational cost</strong>: Requires many particles for good approximation, especially in high dimensions.</li>
+<li><strong>Sample impoverishment</strong>: Resampling can reduce particle diversity over time.</li>
+<li><strong>Curse of dimensionality</strong>: Performance degrades exponentially with state dimension.</li>
+<li><strong>Tuning required</strong>: Number of particles and resampling thresholds need careful selection.</li>
+</ul>
+</section>
+<section id="when-to-use-particle-filters" class="level3" data-number="18.5.3">
+<h3 data-number="18.5.3" class="anchored" data-anchor-id="when-to-use-particle-filters"><span class="header-section-number">18.5.3</span> When to Use Particle Filters</h3>
+<p>Particle filters excel when:</p>
+<ul>
+<li>The system is <strong>nonlinear</strong> or has <strong>non-Gaussian noise</strong>.</li>
+<li>You need <strong>real-time</strong> state estimation.</li>
+<li>The state space is <strong>moderate dimensional</strong> (typically &lt; 10-20 dimensions).</li>
+<li><strong>Computational resources</strong> are available for running many particles.</li>
+</ul>
+<p>Consider alternatives when:</p>
+<ul>
+<li>The system is linear-Gaussian (use Kalman filter).</li>
+<li>The state space is very high-dimensional (consider ensemble methods).</li>
+<li>Computational resources are severely limited.</li>
+</ul>
+</section>
+</section>
+<section id="connection-between-kalman-filter-and-particle-filter" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="connection-between-kalman-filter-and-particle-filter"><span class="header-section-number">18.6</span> Connection Between Kalman Filter and Particle Filter</h2>
+<p>The variance-minimizing proposal is: <span class="math display">\[
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t) = p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t).
+\]</span></p>
+<p>In general, we do not know how to sample from this proposal as <span class="math inline">\(p(\mathbf{x}_t \mid \mathbf{x}_{t-1}, \mathbf{y}_t)\)</span> is exactly the quantity we are trying to estimate. However, for linear-Gaussian models <span class="math display">\[
+\mathbf{x}_t = \mathbf{F}\mathbf{x}_{t-1} + \boldsymbol{\eta}_t, \quad \boldsymbol{\eta}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{Q}),
+\]</span> <span class="math display">\[
+\mathbf{y}_t = \mathbf{H}\mathbf{x}_t + \boldsymbol{\epsilon}_t, \quad \boldsymbol{\epsilon}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{R}),
+\]</span> this proposal is Gaussian for each parent particle <span class="math inline">\(\mathbf{x}_{t-1}^{(i)}\)</span>: <span class="math display">\[
+q^\star(\mathbf{x}_t \mid \mathbf{x}_{t-1}^{(i)}, \mathbf{y}_t)=\mathcal{N}(\mathbf{x}_t; \boldsymbol{\mu}_t^{(i)}, \mathbf{\Sigma}_t),
+\]</span> with <span class="math display">\[
+\mathbf{\Sigma}_t = \left(\mathbf{Q}^{-1} + \mathbf{H}^\top \mathbf{R}^{-1} \mathbf{H}\right)^{-1},
+\]</span> <span class="math display">\[
+\boldsymbol{\mu}_t^{(i)} = \mathbf{\Sigma}_t\left(\mathbf{Q}^{-1}\mathbf{F}\mathbf{x}_{t-1}^{(i)} + \mathbf{H}^\top\mathbf{R}^{-1}\mathbf{y}_t\right).
+\]</span></p>
+<p>These are exactly the same algebraic objects as a one-step Kalman conditioning update, but applied <strong>per particle parent state</strong> rather than to one global Gaussian. With this optimal proposal, the weight update collapses to: <span class="math display">\[
+    \tilde{w}_t^{(i)} \propto w_{t-1}^{(i)}\, p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}),
+\]</span> where <span class="math display">\[
+p(\mathbf{y}_t \mid \mathbf{x}_{t-1}^{(i)}) = \mathcal{N}\!\left(\mathbf{y}_t;\, \mathbf{H}\mathbf{F}\mathbf{x}_{t-1}^{(i)},\, \mathbf{S}_t\right), \quad
+\mathbf{S}_t = \mathbf{H}\mathbf{Q}\mathbf{H}^\top + \mathbf{R}.
+\]</span></p>
+<p>This makes the KF connection explicit:</p>
+<ul>
+<li><strong>Kalman filter</strong>: propagates one Gaussian <span class="math inline">\(\mathcal{N}(\mathbf{m}_t, \mathbf{P}_t)\)</span> exactly.</li>
+<li><strong>PF + optimal proposal</strong>: propagates many particles with local Kalman-style conditional proposals and importance weights.</li>
+</ul>
+<p>As <span class="math inline">\(N \to \infty\)</span>, the particle filter with optimal proposal converges to the Kalman filter in the linear-Gaussian case: <span class="math display">\[
+\sum_{i=1}^N w_t^i \, \delta_{\mathbf{x}_t^i} \xrightarrow{N \to \infty} \mathcal{N}(\mathbf{m}_t^{KF}, \mathbf{P}_t^{KF}).
+\]</span></p>
+<p>In this regime, the particle filter can be interpreted as a Monte Carlo approximation to the exact filtering solution computed analytically by the Kalman filter.</p>
+<p>In purely linear-Gaussian systems, Kalman filtering remains the exact and computationally preferred method. PF with optimal proposals is most useful once you need particle flexibility: nonlinear dynamics/observations, non-Gaussian noise, etc.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlZNID0gd2luZG93LlZNXG52bVRoZW1lID0gR2VuZXJhdG9ycy5vYnNlcnZlKG5vdGlmeSA9PiBWTS5wbG90dGluZy5vblRoZW1lQ2hhbmdlKG5vdGlmeSkpXG5jaGFydENvbG9ycyA9IFZNLnBsb3R0aW5nLmNvbG9ycyh2bVRoZW1lKVxuXG4vLyBBIGNvbnN0YW50LXZlbG9jaXR5IG1vZGVsIGluIDItRDogc3RhdGUgW3gsIHksIHZ4LCB2eV0sIGR0ID0gMS4gVGhlXG4vLyBwcm9jZXNzIG5vaXNlIGlzIGEgcmFuZG9tIGFjY2VsZXJhdGlvbiBhIH4gTigwLCBzaWdtYV9hwrIpIHBlciBheGlzLCB3aGljaFxuLy8gbW92ZXMgdGhlIHBvc2l0aW9uIGJ5IGEgZHTCsi8yIGFuZCB0aGUgdmVsb2NpdHkgYnkgYSBkdCAtLSBleGFjdGx5IHRoZVxuLy8gY292YXJpYW5jZSBRID0gc2lnbWFfYcKyIFtbZHTigbQvNCwgZHTCsy8yXSwgW2R0wrMvMiwgZHTCsl1dIHBlciBheGlzLlxuLy8gT2JzZXJ2YXRpb25zIGFyZSB0aGUgcG9zaXRpb24gcGx1cyBOKDAsIHNpZ21hX3LCsiBJKSBub2lzZS5cbnBmTW9kZWwgPSAoe2R0OiAxLCBUOiAzMCwgblBhcnRpY2xlczogNTAwLCBzaWdtYUE6IDAuNSwgc2lnbWFSOiAxLjAsIHN0YXJ0OiBbMCwgMCwgMSwgMC41XSwgaW5pdGlhbFZhcmlhbmNlczogWzIsIDIsIDEsIDFdfSlcblxuZnVuY3Rpb24gcGZQcm9wYWdhdGUoc3RhdGUsIGR0LCBzaWdtYUEsIGdhdXNzaWFuKSB7XG4gIGNvbnN0IGF4ID0gc2lnbWFBICogZ2F1c3NpYW4oKVxuICBjb25zdCBheSA9IHNpZ21hQSAqIGdhdXNzaWFuKClcbiAgcmV0dXJuIFtcbiAgICBzdGF0ZVswXSArIGR0ICogc3RhdGVbMl0gKyBheCAqIGR0ICogZHQgLyAyLFxuICAgIHN0YXRlWzFdICsgZHQgKiBzdGF0ZVszXSArIGF5ICogZHQgKiBkdCAvIDIsXG4gICAgc3RhdGVbMl0gKyBheCAqIGR0LFxuICAgIHN0YXRlWzNdICsgYXkgKiBkdFxuICBdXG59XG5cbi8vIFNpbXVsYXRlIHRoZSB0cnV0aCBhbmQgdGhlIG9ic2VydmF0aW9ucywgdGhlbiBydW4gdGhlIGJvb3RzdHJhcCBwYXJ0aWNsZVxuLy8gZmlsdGVyOiBwcm9wYWdhdGUsIHdlaWdodCBieSB0aGUgb2JzZXJ2YXRpb24gbGlrZWxpaG9vZCwgcmVzYW1wbGVcbi8vIChzeXN0ZW1hdGljYWxseSkgd2hlbiB0aGUgZWZmZWN0aXZlIHNhbXBsZSBzaXplIGZhbGxzIGJlbG93IE4vMi5cbnBmUnVuID0ge1xuICBjb25zdCBtID0gcGZNb2RlbFxuICBjb25zdCBybmcgPSBWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oNDIpXG4gIGNvbnN0IGdhdXNzaWFuID0gVk0uc2FtcGxpbmcuZ2F1c3NpYW5SYW5kb20ocm5nKVxuXG4gIGNvbnN0IHRydXRoID0gW20uc3RhcnRdXG4gIGNvbnN0IG9ic2VydmF0aW9ucyA9IFtdXG4gIGZvciAobGV0IHQgPSAwOyB0IDwgbS5UOyB0KyspIHtcbiAgICBjb25zdCBuZXh0ID0gcGZQcm9wYWdhdGUodHJ1dGhbdF0sIG0uZHQsIG0uc2lnbWFBLCBnYXVzc2lhbilcbiAgICB0cnV0aC5wdXNoKG5leHQpXG4gICAgb2JzZXJ2YXRpb25zLnB1c2goW25leHRbMF0gKyBtLnNpZ21hUiAqIGdhdXNzaWFuKCksIG5leHRbMV0gKyBtLnNpZ21hUiAqIGdhdXNzaWFuKCldKVxuICB9XG5cbiAgbGV0IHBhcnRpY2xlcyA9IFtdXG4gIGZvciAobGV0IGkgPSAwOyBpIDwgbS5uUGFydGljbGVzOyBpKyspIHtcbiAgICBjb25zdCBwID0gW11cbiAgICBmb3IgKGxldCBrID0gMDsgayA8IDQ7IGsrKykgcC5wdXNoKG0uc3RhcnRba10gKyBNYXRoLnNxcnQobS5pbml0aWFsVmFyaWFuY2VzW2tdKSAqIGdhdXNzaWFuKCkpXG4gICAgcGFydGljbGVzLnB1c2gocClcbiAgfVxuICBsZXQgd2VpZ2h0cyA9IG5ldyBBcnJheShtLm5QYXJ0aWNsZXMpLmZpbGwoMSAvIG0ublBhcnRpY2xlcylcblxuICBjb25zdCBlc3RpbWF0ZXMgPSBbXSwgcG9zaXRpb25Db3ZzID0gW10sIGVzcyA9IFtdLCByZXNhbXBsZWRTdGVwcyA9IFtdXG4gIGZvciAobGV0IHQgPSAwOyB0IDwgbS5UOyB0KyspIHtcbiAgICAvLyBQcmVkaWN0LlxuICAgIGZvciAobGV0IGkgPSAwOyBpIDwgbS5uUGFydGljbGVzOyBpKyspIHBhcnRpY2xlc1tpXSA9IHBmUHJvcGFnYXRlKHBhcnRpY2xlc1tpXSwgbS5kdCwgbS5zaWdtYUEsIGdhdXNzaWFuKVxuICAgIC8vIFVwZGF0ZTogd19pICo9IHAoeV90IHwgeF90XihpKSk7IHRoZSBHYXVzc2lhbidzIGNvbnN0YW50IGNhbmNlbHMgb24gbm9ybWFsaXppbmcuXG4gICAgbGV0IHRvdGFsID0gMFxuICAgIGZvciAobGV0IGkgPSAwOyBpIDwgbS5uUGFydGljbGVzOyBpKyspIHtcbiAgICAgIGNvbnN0IGR4ID0gb2JzZXJ2YXRpb25zW3RdWzBdIC0gcGFydGljbGVzW2ldWzBdXG4gICAgICBjb25zdCBkeSA9IG9ic2VydmF0aW9uc1t0XVsxXSAtIHBhcnRpY2xlc1tpXVsxXVxuICAgICAgd2VpZ2h0c1tpXSAqPSBNYXRoLmV4cCgtKGR4ICogZHggKyBkeSAqIGR5KSAvICgyICogbS5zaWdtYVIgKiBtLnNpZ21hUikpXG4gICAgICB0b3RhbCArPSB3ZWlnaHRzW2ldXG4gICAgfVxuICAgIGxldCBzdW1TcXVhcmVzID0gMFxuICAgIGZvciAobGV0IGkgPSAwOyBpIDwgbS5uUGFydGljbGVzOyBpKyspIHtcbiAgICAgIHdlaWdodHNbaV0gLz0gdG90YWxcbiAgICAgIHN1bVNxdWFyZXMgKz0gd2VpZ2h0c1tpXSAqIHdlaWdodHNbaV1cbiAgICB9XG4gICAgLy8gV2VpZ2h0ZWQgbWVhbiBhbmQgcG9zaXRpb24gY292YXJpYW5jZSwgYmVmb3JlIGFueSByZXNhbXBsaW5nLlxuICAgIGNvbnN0IG1lYW4gPSBbMCwgMCwgMCwgMF1cbiAgICBmb3IgKGxldCBpID0gMDsgaSA8IG0ublBhcnRpY2xlczsgaSsrKSB7XG4gICAgICBmb3IgKGxldCBrID0gMDsgayA8IDQ7IGsrKykgbWVhbltrXSArPSB3ZWlnaHRzW2ldICogcGFydGljbGVzW2ldW2tdXG4gICAgfVxuICAgIGxldCBjeHggPSAwLCBjeHkgPSAwLCBjeXkgPSAwXG4gICAgZm9yIChsZXQgaSA9IDA7IGkgPCBtLm5QYXJ0aWNsZXM7IGkrKykge1xuICAgICAgY29uc3QgZHggPSBwYXJ0aWNsZXNbaV1bMF0gLSBtZWFuWzBdXG4gICAgICBjb25zdCBkeSA9IHBhcnRpY2xlc1tpXVsxXSAtIG1lYW5bMV1cbiAgICAgIGN4eCArPSB3ZWlnaHRzW2ldICogZHggKiBkeFxuICAgICAgY3h5ICs9IHdlaWdodHNbaV0gKiBkeCAqIGR5XG4gICAgICBjeXkgKz0gd2VpZ2h0c1tpXSAqIGR5ICogZHlcbiAgICB9XG4gICAgZXN0aW1hdGVzLnB1c2gobWVhbilcbiAgICBwb3NpdGlvbkNvdnMucHVzaChbY3h4LCBjeHksIGN5eV0pXG4gICAgLy8gUmVzYW1wbGUgd2hlbiB0aGUgZWZmZWN0aXZlIHNhbXBsZSBzaXplIDEgLyBzdW0gd8KyIGRyb3BzIGJlbG93IE4vMi5cbiAgICBjb25zdCBuRWZmID0gMSAvIHN1bVNxdWFyZXNcbiAgICBlc3MucHVzaChuRWZmKVxuICAgIGlmIChuRWZmIDwgbS5uUGFydGljbGVzIC8gMikge1xuICAgICAgY29uc3QgaW5kaWNlcyA9IFZNLmZpbHRlcnMuc3lzdGVtYXRpY1Jlc2FtcGxlKHdlaWdodHMsIHJuZygpKVxuICAgICAgY29uc3QgcmVzYW1wbGVkID0gW11cbiAgICAgIGZvciAoY29uc3QgaiBvZiBpbmRpY2VzKSByZXNhbXBsZWQucHVzaChwYXJ0aWNsZXNbal0uc2xpY2UoKSlcbiAgICAgIHBhcnRpY2xlcyA9IHJlc2FtcGxlZFxuICAgICAgd2VpZ2h0cyA9IG5ldyBBcnJheShtLm5QYXJ0aWNsZXMpLmZpbGwoMSAvIG0ublBhcnRpY2xlcylcbiAgICAgIHJlc2FtcGxlZFN0ZXBzLnB1c2godClcbiAgICB9XG4gIH1cblxuICBjb25zdCBlcnJvcnMgPSBbXVxuICBmb3IgKGxldCB0ID0gMDsgdCA8IG0uVDsgdCsrKSB7XG4gICAgY29uc3QgZHggPSBlc3RpbWF0ZXNbdF1bMF0gLSB0cnV0aFt0ICsgMV1bMF1cbiAgICBjb25zdCBkeSA9IGVzdGltYXRlc1t0XVsxXSAtIHRydXRoW3QgKyAxXVsxXVxuICAgIGVycm9ycy5wdXNoKE1hdGguc3FydChkeCAqIGR4ICsgZHkgKiBkeSkpXG4gIH1cbiAgcmV0dXJuIHt0cnV0aCwgb2JzZXJ2YXRpb25zLCBlc3RpbWF0ZXMsIHBvc2l0aW9uQ292cywgZXNzLCByZXNhbXBsZWRTdGVwcywgZXJyb3JzfVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicGZUcmFqZWN0b3J5UGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiNDgwcHhcIn0pXG5wZkVycm9yUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzYwcHhcIn0pXG5wZlZlbG9jaXR5UGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzYwcHhcIn0pXG5wZkVzc1Bsb3QgPSBWTS5wbG90dGluZy5wZXJzaXN0ZW50UGxvdCh7aGVpZ2h0OiBcIjM2MHB4XCJ9KVxuXG5wZlN0ZXBzID0ge1xuICBjb25zdCBvdXQgPSBbXVxuICBmb3IgKGxldCB0ID0gMDsgdCA8IHBmTW9kZWwuVDsgdCsrKSBvdXQucHVzaCh0KVxuICByZXR1cm4gb3V0XG59XG5cbi8vIERvdHRlZCB2ZXJ0aWNhbCBsaW5lcyBhdCB0aGUgc3RlcHMgd2hlcmUgdGhlIGZpbHRlciByZXNhbXBsZWQuXG5mdW5jdGlvbiBwZlJlc2FtcGxlU2hhcGVzKCkge1xuICBjb25zdCBzaGFwZXMgPSBbXVxuICBmb3IgKGNvbnN0IHN0ZXAgb2YgcGZSdW4ucmVzYW1wbGVkU3RlcHMpIHtcbiAgICBzaGFwZXMucHVzaCh7dHlwZTogXCJsaW5lXCIsIHgwOiBzdGVwLCB4MTogc3RlcCwgeXJlZjogXCJwYXBlclwiLCB5MDogMCwgeTE6IDEsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMud2FybiwgZGFzaDogXCJkb3RcIiwgd2lkdGg6IDEuNX19KVxuICB9XG4gIHJldHVybiBzaGFwZXNcbn1cblxuLy8gVGhlIDk1JSBjb25maWRlbmNlIGVsbGlwc2Ugb2YgYSAyIHggMiBjb3ZhcmlhbmNlIFtbYSwgYl0sIFtiLCBjXV06IHRoZVxuLy8gZWlnZW4tZGVjb21wb3NpdGlvbiBpbiBjbG9zZWQgZm9ybSwgc2NhbGVkIGJ5IHRoZSBjaGktc3F1YXJlZCgyKSBxdWFudGlsZS5cbmZ1bmN0aW9uIHBmRWxsaXBzZShjZW50ZXIsIGNvdikge1xuICBjb25zdCBbYSwgYiwgY10gPSBjb3ZcbiAgY29uc3Qgc2NhbGUgPSBWTS5kaXN0cmlidXRpb25zLmNoaVNxdWFyZWRRdWFudGlsZSgwLjk1LCAyKVxuICBjb25zdCBoYWxmID0gKGEgKyBjKSAvIDJcbiAgY29uc3QgcmFkaXVzID0gTWF0aC5zcXJ0KCgoYSAtIGMpIC8gMikgKiAoKGEgLSBjKSAvIDIpICsgYiAqIGIpXG4gIGNvbnN0IG1ham9yID0gTWF0aC5zcXJ0KHNjYWxlICogKGhhbGYgKyByYWRpdXMpKVxuICBjb25zdCBtaW5vciA9IE1hdGguc3FydChzY2FsZSAqIE1hdGgubWF4KGhhbGYgLSByYWRpdXMsIDApKVxuICBjb25zdCB0aGV0YSA9IDAuNSAqIE1hdGguYXRhbjIoMiAqIGIsIGEgLSBjKVxuICBjb25zdCB4cyA9IFtdLCB5cyA9IFtdXG4gIGZvciAobGV0IGsgPSAwOyBrIDw9IDYwOyBrKyspIHtcbiAgICBjb25zdCBzID0gMiAqIE1hdGguUEkgKiBrIC8gNjBcbiAgICBjb25zdCB1ID0gbWFqb3IgKiBNYXRoLmNvcyhzKSwgdiA9IG1pbm9yICogTWF0aC5zaW4ocylcbiAgICB4cy5wdXNoKGNlbnRlclswXSArIHUgKiBNYXRoLmNvcyh0aGV0YSkgLSB2ICogTWF0aC5zaW4odGhldGEpKVxuICAgIHlzLnB1c2goY2VudGVyWzFdICsgdSAqIE1hdGguc2luKHRoZXRhKSArIHYgKiBNYXRoLmNvcyh0aGV0YSkpXG4gIH1cbiAgcmV0dXJuIHt4cywgeXN9XG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ7XG4gIGNvbnN0IHIgPSBwZlJ1blxuICBjb25zdCB0cnVlWCA9IFtdLCB0cnVlWSA9IFtdLCBlc3RYID0gW10sIGVzdFkgPSBbXSwgb2JzWCA9IFtdLCBvYnNZID0gW11cbiAgZm9yIChsZXQgdCA9IDA7IHQgPCBwZk1vZGVsLlQ7IHQrKykge1xuICAgIHRydWVYLnB1c2goci50cnV0aFt0ICsgMV1bMF0pXG4gICAgdHJ1ZVkucHVzaChyLnRydXRoW3QgKyAxXVsxXSlcbiAgICBlc3RYLnB1c2goci5lc3RpbWF0ZXNbdF1bMF0pXG4gICAgZXN0WS5wdXNoKHIuZXN0aW1hdGVzW3RdWzFdKVxuICAgIG9ic1gucHVzaChyLm9ic2VydmF0aW9uc1t0XVswXSlcbiAgICBvYnNZLnB1c2goci5vYnNlcnZhdGlvbnNbdF1bMV0pXG4gIH1cbiAgY29uc3QgdHJhY2VzID0gW1xuICAgIHt4OiB0cnVlWCwgeTogdHJ1ZVksIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwiVHJ1ZSB0cmFqZWN0b3J5XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMub2ssIHdpZHRoOiAzfX0sXG4gICAge3g6IGVzdFgsIHk6IGVzdFksIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwiUEYgZXN0aW1hdGVcIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIHdpZHRoOiAyLCBkYXNoOiBcImRhc2hcIn19LFxuICAgIHt4OiBvYnNYLCB5OiBvYnNZLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJtYXJrZXJzXCIsIG5hbWU6IFwiT2JzZXJ2YXRpb25zXCIsIG1hcmtlcjoge2NvbG9yOiBjaGFydENvbG9ycy5mbiwgc3ltYm9sOiBcInhcIiwgc2l6ZTogN319XG4gIF1cbiAgbGV0IGZpcnN0ID0gdHJ1ZVxuICBmb3IgKGNvbnN0IHQgb2YgWzUsIDEwLCAxNSwgMjAsIDI1XSkge1xuICAgIGNvbnN0IGUgPSBwZkVsbGlwc2Uoci5lc3RpbWF0ZXNbdF0sIHIucG9zaXRpb25Db3ZzW3RdKVxuICAgIHRyYWNlcy5wdXNoKHt4OiBlLnhzLCB5OiBlLnlzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIjk1JSBlbGxpcHNlXCIsIHNob3dsZWdlbmQ6IGZpcnN0LFxuICAgICAgbGluZToge2NvbG9yOiBWTS5wbG90dGluZy5hbHBoYShjaGFydENvbG9ycy5hbHQsIDAuNiksIGRhc2g6IFwiZG90XCIsIHdpZHRoOiAxLjV9LCBob3ZlcmluZm86IFwic2tpcFwifSlcbiAgICBmaXJzdCA9IGZhbHNlXG4gIH1cbiAgcmV0dXJuIFZNLnBsb3R0aW5nLnBsb3RXaXRoTGVnZW5kKHBmVHJhamVjdG9yeVBsb3QsIHRyYWNlcywge3RpdGxlOiB7dGV4dDogXCIyRCB0cmFqZWN0b3J5IHRyYWNraW5nXCJ9LCBtYXJnaW46IHt0OiA0MH0sXG4gICAgeGF4aXM6IHt0aXRsZTogXCJYIHBvc2l0aW9uXCJ9LCB5YXhpczoge3RpdGxlOiBcIlkgcG9zaXRpb25cIiwgc2NhbGVhbmNob3I6IFwieFwifSwgbGVnZW5kOiB7b3JpZW50YXRpb246IFwiaFwiLCB5OiAtMC4yfX0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ7XG4gIGNvbnN0IG1lYW4gPSBWTS5kaXN0cmlidXRpb25zLnNhbXBsZVN0YXRzKHBmUnVuLmVycm9ycykubWVhblxuICByZXR1cm4gVk0ucGxvdHRpbmcucGxvdFdpdGhMZWdlbmQocGZFcnJvclBsb3QsIFtcbiAgICB7eDogcGZTdGVwcywgeTogcGZSdW4uZXJyb3JzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIlBvc2l0aW9uIGVycm9yXCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuZm4sIHdpZHRoOiAyfX0sXG4gICAge3g6IFswLCBwZk1vZGVsLlQgLSAxXSwgeTogW21lYW4sIG1lYW5dLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBgTWVhbiBlcnJvcjogJHttZWFuLnRvRml4ZWQoMil9YCxcbiAgICAgIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWx0LCBkYXNoOiBcImRhc2hcIiwgd2lkdGg6IDJ9fVxuICBdLCB7dGl0bGU6IHt0ZXh0OiBcIlRyYWNraW5nIGVycm9yIG92ZXIgdGltZVwifSwgbWFyZ2luOiB7dDogNDB9LCBzaGFwZXM6IHBmUmVzYW1wbGVTaGFwZXMoKSxcbiAgICB4YXhpczoge3RpdGxlOiBcIlRpbWUgc3RlcFwifSwgeWF4aXM6IHt0aXRsZTogXCJQb3NpdGlvbiBlcnJvclwiLCByYW5nZW1vZGU6IFwidG96ZXJvXCJ9LCBsZWdlbmQ6IHtvcmllbnRhdGlvbjogXCJoXCIsIHk6IC0wLjJ9fSlcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgciA9IHBmUnVuXG4gIGNvbnN0IHNlcmllcyA9IFtbXSwgW10sIFtdLCBbXV1cbiAgZm9yIChsZXQgdCA9IDA7IHQgPCBwZk1vZGVsLlQ7IHQrKykge1xuICAgIHNlcmllc1swXS5wdXNoKHIudHJ1dGhbdCArIDFdWzJdKVxuICAgIHNlcmllc1sxXS5wdXNoKHIuZXN0aW1hdGVzW3RdWzJdKVxuICAgIHNlcmllc1syXS5wdXNoKHIudHJ1dGhbdCArIDFdWzNdKVxuICAgIHNlcmllc1szXS5wdXNoKHIuZXN0aW1hdGVzW3RdWzNdKVxuICB9XG4gIHJldHVybiBWTS5wbG90dGluZy5wbG90V2l0aExlZ2VuZChwZlZlbG9jaXR5UGxvdCwgW1xuICAgIHt4OiBwZlN0ZXBzLCB5OiBzZXJpZXNbMF0sIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwiVHJ1ZSBWeFwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLm9rLCB3aWR0aDogMn19LFxuICAgIHt4OiBwZlN0ZXBzLCB5OiBzZXJpZXNbMV0sIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwiRXN0aW1hdGVkIFZ4XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWx0LCB3aWR0aDogMiwgZGFzaDogXCJkYXNoXCJ9fSxcbiAgICB7eDogcGZTdGVwcywgeTogc2VyaWVzWzJdLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIlRydWUgVnlcIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5vaywgd2lkdGg6IDIsIGRhc2g6IFwiZG90XCJ9fSxcbiAgICB7eDogcGZTdGVwcywgeTogc2VyaWVzWzNdLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIkVzdGltYXRlZCBWeVwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFsdCwgd2lkdGg6IDIsIGRhc2g6IFwiZG90XCJ9fVxuICBdLCB7dGl0bGU6IHt0ZXh0OiBcIlZlbG9jaXR5IGVzdGltYXRpb25cIn0sIG1hcmdpbjoge3Q6IDQwfSwgeGF4aXM6IHt0aXRsZTogXCJUaW1lIHN0ZXBcIn0sIHlheGlzOiB7dGl0bGU6IFwiVmVsb2NpdHlcIn0sXG4gICAgbGVnZW5kOiB7b3JpZW50YXRpb246IFwiaFwiLCB5OiAtMC4yfX0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTYiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJWTS5wbG90dGluZy5wbG90V2l0aExlZ2VuZChwZkVzc1Bsb3QsIFtcbiAge3g6IHBmU3RlcHMsIHk6IHBmUnVuLmVzcywgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXMrbWFya2Vyc1wiLCBuYW1lOiBcIkVmZmVjdGl2ZSBzYW1wbGUgc2l6ZVwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFjY2VudDIsIHdpZHRoOiAyfX0sXG4gIHt4OiBbMCwgcGZNb2RlbC5UIC0gMV0sIHk6IFtwZk1vZGVsLm5QYXJ0aWNsZXMgLyAyLCBwZk1vZGVsLm5QYXJ0aWNsZXMgLyAyXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIixcbiAgICBuYW1lOiBcIlJlc2FtcGxpbmcgdGhyZXNob2xkIE4vMlwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFsdCwgZGFzaDogXCJkYXNoXCIsIHdpZHRoOiAyfX1cbl0sIHt0aXRsZToge3RleHQ6IFwiUGFydGljbGUgZGVnZW5lcmFjeSBhbmQgcmVzYW1wbGluZ1wifSwgbWFyZ2luOiB7dDogNDB9LCBzaGFwZXM6IHBmUmVzYW1wbGVTaGFwZXMoKSxcbiAgeGF4aXM6IHt0aXRsZTogXCJUaW1lIHN0ZXBcIn0sIHlheGlzOiB7dGl0bGU6IFwiRWZmZWN0aXZlIHNhbXBsZSBzaXplXCIsIHJhbmdlOiBbMCwgcGZNb2RlbC5uUGFydGljbGVzICogMS4wNV19LFxuICBsZWdlbmQ6IHtvcmllbnRhdGlvbjogXCJoXCIsIHk6IC0wLjJ9fSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNyIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgZXJyb3JzID0gcGZSdW4uZXJyb3JzXG4gIHJldHVybiBWTS51aS5zdGF0Um93KFtcbiAgICB7bGFiZWw6IFwiUGFydGljbGVzXCIsIHZhbHVlOiBTdHJpbmcocGZNb2RlbC5uUGFydGljbGVzKX0sXG4gICAge2xhYmVsOiBcIkZpbmFsIHBvc2l0aW9uIGVycm9yXCIsIHZhbHVlOiBlcnJvcnNbZXJyb3JzLmxlbmd0aCAtIDFdLnRvRml4ZWQoMyl9LFxuICAgIHtsYWJlbDogXCJNZWFuIHBvc2l0aW9uIGVycm9yXCIsIHZhbHVlOiBWTS5kaXN0cmlidXRpb25zLnNhbXBsZVN0YXRzKGVycm9ycykubWVhbi50b0ZpeGVkKDMpfSxcbiAgICB7bGFiZWw6IFwiUmVzYW1wbGVkXCIsIHZhbHVlOiBgJHtwZlJ1bi5yZXNhbXBsZWRTdGVwcy5sZW5ndGh9LyR7cGZNb2RlbC5UfSBzdGVwc2AsIHRpdGxlOiBcIkRvdHRlZCBvcmFuZ2UgbGluZXMgaW4gdGhlIHBsb3RzIGFib3ZlXCJ9XG4gIF0pXG59XG4ifV19
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../chapters/dynamical";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "../..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/dynamical/kalman_filters.html" class="pagination-link" aria-label="Kalman Filters">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Kalman Filters</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/optimization/index.html" class="pagination-link" aria-label="Optimization">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
