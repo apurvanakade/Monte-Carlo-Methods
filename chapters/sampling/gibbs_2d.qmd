@@ -8,9 +8,6 @@ execute:
   echo: false
 ---
 
-
-# Gibbs Sampling
-
 Gibbs Sampling is a Markov Chain Monte Carlo algorithm that is used to sample from a joint distribution using conditional distributions. For now, we'll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.
 
 ::: {.callout-note}
