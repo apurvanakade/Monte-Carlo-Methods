@@ -1,0 +1,42 @@
+# Copyright (c) 2026 Apurva Nakade. All rights reserved.
+# Released under Apache 2.0 license as described in the file LICENSE.
+# Authors: Apurva Nakade
+
+# Renders the book on every push to main (a release: `make release`
+# fast-forwards main to develop) and publishes docs/ to the gh-pages branch.
+# deploy.yml then deploys gh-pages to GitHub Pages. gh-pages is force-orphaned
+# each time, so it holds only the current build rather than a history of them.
+
+name: Render and publish to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Render the book
+        uses: ./.github/actions/render
+
+      - name: Publish docs/ to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          force_orphan: true

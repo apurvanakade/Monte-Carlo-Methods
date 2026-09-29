@@ -11,6 +11,9 @@ __pycache__/
 # render artifacts that land next to sources
 **/*_files/figure-pdf/
 **/*_files/libs/
-.venv/
+.venv
 
 /.luarc.json
+
+# rendered site: built and published by .github/workflows/publish.yml
+/docs/

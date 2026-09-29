@@ -1,6 +1,6 @@
 # Monte Carlo Methods Lecture Notes
 
-A Quarto book, published from `docs/` to GitHub Pages. Interactive apps are
+A Quarto book, rendered by GitHub Actions and published to GitHub Pages. Interactive apps are
 built with [mathviz](https://github.com/apurvanakade/mathviz).
 
 ## Build
@@ -35,7 +35,8 @@ apps/                 the Interactive Apps gallery (links to each app's ?embed= 
 assets/               site CSS
 scripts/              build hooks
 references.bib
-docs/                 rendered site (build output, committed for GitHub Pages)
+.github/              render on PRs (pr-check), publish main to gh-pages (publish, deploy)
+docs/                 local build output (untracked)
 ```
 
 ## Writing an app
