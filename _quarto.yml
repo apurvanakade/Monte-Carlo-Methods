@@ -66,11 +66,8 @@ bibliography: references.bib
 
 # mathviz (https://github.com/apurvanakade/mathviz): puts math.js, Plotly,
 # window.VM and the mathviz stylesheet into every page's <head>.
-# mathviz-local is this site's additions to VM, built from _mathviz/ (see
-# _mathviz/README.md); it must come after mathviz, whose VM it extends.
 filters:
   - mathviz
-  - mathviz-local
 mathviz:
   referrer: same-origin
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).

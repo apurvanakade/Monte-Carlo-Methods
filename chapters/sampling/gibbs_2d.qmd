@@ -380,9 +380,8 @@ The app below runs the sampler from $(2.5, -2.5)$. Drag $\rho$ toward $\pm 1$: t
 
 ```{ojs}
 //| output: false
-// VM is the mathviz library (loaded on every page by the mathviz extension,
-// plus this site's additions from _mathviz/ via mathviz-local). This page
-// uses VM.mcmc.gibbsBivariateNormal, VM.mcmc.autocorrelation,
+// VM is the mathviz library, loaded on every page by the mathviz extension.
+// This page uses VM.mcmc.gibbsBivariateNormal, VM.mcmc.autocorrelation,
 // VM.mcmc.effectiveSampleSize, VM.sampling.seededRandom,
 // VM.sampling.gaussianRandom, VM.plotting.persistentPlot, VM.ui.statRow,
 // VM.ui.urlParam and VM.ui.syncUrlParams.

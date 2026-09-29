@@ -331,9 +331,8 @@ The app below computes $\pi_t = \pi_0 P^t$ exactly, starting from all the mass o
 
 ```{ojs}
 //| output: false
-// VM is the mathviz library (loaded on every page by the mathviz extension,
-// plus this site's additions from _mathviz/ via mathviz-local). This page
-// uses VM.discreteMath.randomWalkMatrix, VM.discreteMath.springLayout,
+// VM is the mathviz library, loaded on every page by the mathviz extension.
+// This page uses VM.discreteMath.randomWalkMatrix, VM.discreteMath.springLayout,
 // VM.mcmc.evolveDistribution, VM.mcmc.totalVariation,
 // VM.numerical.symmetricEigenvalues, VM.plotting.persistentPlot,
 // VM.ui.statRow, VM.ui.urlParam and VM.ui.syncUrlParams.

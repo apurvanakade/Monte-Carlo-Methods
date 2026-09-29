@@ -19,9 +19,8 @@ np.random.seed(0)
 
 ```{ojs}
 //| output: false
-// VM is the mathviz library (loaded on every page by the mathviz extension,
-// plus this site's additions from _mathviz/ via mathviz-local). This page
-// uses VM.mcmc.randomWalkMetropolis, VM.mcmc.autocorrelation,
+// VM is the mathviz library, loaded on every page by the mathviz extension.
+// This page uses VM.mcmc.randomWalkMetropolis, VM.mcmc.autocorrelation,
 // VM.mcmc.effectiveSampleSize, VM.mcmc.runningMean,
 // VM.distributions.histogramBins, VM.distributions.normalPdf,
 // VM.sampling.seededRandom, VM.plotting.persistentPlot, VM.ui.statRow,

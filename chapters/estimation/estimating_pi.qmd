@@ -12,9 +12,8 @@ Drag the slider below to add points to the square; the fraction landing inside t
 
 ```{ojs}
 //| output: false
-// VM is the mathviz library (loaded on every page by the mathviz extension,
-// plus this site's additions from _mathviz/ via mathviz-local). This page
-// uses VM.sampling.seededRandom, VM.plotting.persistentPlot, VM.ui.statRow,
+// VM is the mathviz library, loaded on every page by the mathviz extension.
+// This page uses VM.sampling.seededRandom, VM.plotting.persistentPlot, VM.ui.statRow,
 // VM.ui.urlParam and VM.ui.syncUrlParams.
 VM = window.VM
 
