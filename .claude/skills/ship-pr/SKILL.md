@@ -72,12 +72,11 @@ attribution line from the system reminder.
 
 ## 3. Wait for the review
 
-Automatic Copilot review is off in this repo (its ruleset "Copilot review on
-PRs into develop" is disabled, to save the Copilot quota for mathviz and
-VisualMathLab), so don't wait for one. Only if the PR already has a review
-request (`gh pr view <N> --json reviews,reviewRequests`), or the user asks for
-one, poll every minute or two for up to ~10 minutes; otherwise skip to step 5
-and note in the final report that there was no review.
+Copilot reviews a few minutes after a PR opens, once only: pushes to the PR
+don't bring a new review (the ruleset has re-review on push off, to save
+Copilot quota). Poll `gh pr view <N> --json reviews,reviewRequests` every
+minute or two for up to ~10 minutes. If nothing arrives, go on and say so in
+the final report.
 
 ## 4. Triage every comment
 
@@ -102,9 +101,8 @@ gh api repos/apurvanakade/Monte-Carlo-Methods/pulls/<N>/comments/<id>/replies -f
 ```
 
 then resolve it (`resolveReviewThread` GraphQL mutation; thread ids from
-`pullRequest.reviewThreads`). Commit the fixes on the same branch and push. If
-that brings a new review, repeat; stop after two rounds and report what is
-still open.
+`pullRequest.reviewThreads`). Commit the fixes on the same branch and push. The push brings no new
+review, so this is a single round.
 
 ## 5. Checks
 
