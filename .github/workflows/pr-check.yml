@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Apurva Nakade. All rights reserved.
+# Released under Apache 2.0 license as described in the file LICENSE.
+# Authors: Apurva Nakade
+
+# Renders the whole book on every pull request to develop. A Python cell that
+# raises fails the render (execute.error is off), so a red check means some
+# chapter no longer builds. The rendered site is attached to the run as the
+# `site` artifact, for a reviewer to download and open.
+
+name: Verify pull request
+
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Render the book
+        uses: ./.github/actions/render
+
+      - name: Attach the rendered site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: docs/
+          retention-days: 7

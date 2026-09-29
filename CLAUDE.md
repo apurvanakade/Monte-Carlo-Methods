@@ -2,11 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered into `docs/` and published from there to GitHub Pages. Chapters are prose plus Python cells (run at render time, cached) and, in a few chapters, interactive apps written as Observable JS (OJS) cells. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the apps call, including `VM.mcmc.*`, is in mathviz itself; see the mathviz section below for how this site gets it and how to contribute to it.
+Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered by GitHub Actions and published to GitHub Pages from the `gh-pages` branch. Chapters are prose plus Python cells (run at render time, cached) and, in a few chapters, interactive apps written as Observable JS (OJS) cells. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the apps call, including `VM.mcmc.*`, is in mathviz itself; see the mathviz section below for how this site gets it and how to contribute to it.
 
 ## Commands
 
-- `make build` (= `quarto render`) — render the whole book into `docs/`.
+- `make build` (= `quarto render`) — render the whole book into `docs/` (untracked; for local checking only).
 - `make preview` (= `quarto preview`) — live-reload preview; the right tool for iterating on one chapter.
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
 - `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). Only run it when asked.
@@ -18,7 +18,7 @@ Python cells run in the project's `.venv` (`QUARTO_PYTHON=.venv/bin/python` in `
 Same rules as VisualMathLab. `develop` is where work lands; `main` is a pointer to the last published state.
 
 - **One worktree per branch.** `~/Github/Monte-Carlo-Methods` is the long-lived `develop` checkout and stays on `develop` — never `git checkout` another branch there (a checkout rewrites `_quarto.yml`/`_extensions/`, and a running `quarto preview` then re-renders the whole book). A feature branch gets a sibling folder: `git worktree add -b <prefix>/<slug> ../Monte-Carlo-Methods-<slug> develop` (prefixes: `app/`, `chapter/`, `fix/`, `ci/`, `docs/`). In it, `ln -s ../Monte-Carlo-Methods/.venv .venv` (`_environment` finds Python there) and run its own `quarto preview --port <4201, 4202, ...> --no-browser`. Its first render executes every Python cell, since `.jupyter_cache/` is per folder.
-- **Major changes go through a PR into `develop`**, after being verified: `quarto render` finishes cleanly, and every chapter the change touches is loaded in the preview with its apps exercised (buttons, sliders, dark-mode toggle) and no console errors. Then `gh pr create --base develop`, triage the review, merge with `--merge` (not `--squash`). The `ship-pr` skill (`.claude/skills/ship-pr/SKILL.md`) carries this through end to end; when a rule here changes, update it there too.
+- **Major changes go through a PR into `develop`**, after being verified (`pr-check.yml` re-renders the whole book on the PR as a gate, but it can't see OJS runtime errors): `quarto render` finishes cleanly, and every chapter the change touches is loaded in the preview with its apps exercised (buttons, sliders, dark-mode toggle) and no console errors. Then `gh pr create --base develop`, triage the review, merge with `--merge` (not `--squash`). The `ship-pr` skill (`.claude/skills/ship-pr/SKILL.md`) carries this through end to end; when a rule here changes, update it there too.
 - **Small changes may be pushed straight to `develop`** without a PR: a typo or wording fix in prose, a comment, or repo-only docs and tooling (`CLAUDE.md`, `README.md`, `.claude/**`, `Makefile`). Anything touching a code cell (Python or OJS), CSS, `_quarto.yml`, `_extensions/`, `scripts/` or a workflow is not small, however few lines.
 - **Releasing is a fast-forward of `main` to `develop`**: `make release` (`git push origin origin/develop:main`, which the remote refuses unless it is a fast-forward — no checkout needed). Never squash- or merge-commit into `main`, and never force-push it. If the fast-forward is refused, the histories have diverged: reconcile once with `git merge -s ours origin/main` on `develop`, push, and retry.
 - **Cleanup** after the merge: stop the worktree's preview, check `git -C ../Monte-Carlo-Methods-<slug> status --short` lists no modified tracked file, then `git worktree remove --force ../Monte-Carlo-Methods-<slug>`, `git branch -d <branch>`, `git push origin --delete <branch>`.
@@ -26,7 +26,8 @@ Same rules as VisualMathLab. `develop` is where work lands; `main` is a pointer 
 
 ## Source vs. generated output
 
-- `docs/` is build output, committed for GitHub Pages. Never edit it by hand; re-render.
+- `docs/` is local build output and is **not tracked** (`.gitignore`). Never commit it.
+- Publishing: a push to `main` runs `.github/workflows/publish.yml`, which renders the book (via the shared `.github/actions/render` composite: Python 3.12 + `requirements.txt` into `.venv`, pinned Quarto, `**/.jupyter_cache` restored from the last run) and force-pushes `docs/` to the orphan `gh-pages` branch, which Pages serves directly (Pages source: branch `gh-pages`, `/`). Don't add a workflow triggered by the `gh-pages` push: a push made with `GITHUB_TOKEN` never triggers another workflow. `pr-check.yml` runs the same render on every PR into `develop` and attaches the site as a downloadable `site` artifact. When bumping Quarto locally, bump the `version:` pin in the composite too.
 - `_extensions/apurvanakade/mathviz/` is the installed upstream release, managed by `scripts/update-mathviz.sh`. **Never edit it** — the next update overwrites it. A bug in it is fixed in mathviz, or hot-patched from a local overlay meanwhile (see "Contributing to mathviz").
 - `_legacy/` and the old per-chapter `app/` folders are gone; the apps now live in the chapters as OJS. Don't reintroduce D3/precomputed-JSON apps.
 
