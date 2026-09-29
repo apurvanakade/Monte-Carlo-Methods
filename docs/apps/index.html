@@ -38,6 +38,8 @@ ul.task-list li input[type="checkbox"] {
 <meta name="quarto:offset" content="../">
 <link href="../appendices/probability.html" rel="next">
 <link href="../chapters/references.html" rel="prev">
+<script src="../site_libs/quarto-listing/list.min.js"></script>
+<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -57,11 +59,18 @@ ul.task-list li input[type="checkbox"] {
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.js"></script>
 <link href="../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-embed-0.1.10/embed.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-embed-0.1.10/embed.css" rel="stylesheet">
 <script src="../site_libs/quarto-contrib/mathviz-chrome-site-0.1.10/site.js"></script>
+<script src="../site_libs/quarto-contrib/mathviz-share-0.1.10/share.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-share-0.1.10/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
 <script src="../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.js"></script>
 <link href="../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.css" rel="stylesheet">
 <meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
 <link href="../site_libs/quarto-contrib/mathviz-fonts-0.1.10/fonts.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-local-0.1.0/mathviz-local.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-local-0.1.0/mathviz-local.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -89,6 +98,35 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-image','listing-title','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-description","listing-image"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
@@ -123,6 +161,7 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/style.css">
 <meta property="og:title" content="23&nbsp; Interactive Apps – Monte Carlo Methods Lecture Notes">
 <meta property="og:description" content="Explore Monte Carlo methods through interactive visualizations">
+<meta property="og:image" content="images/estimating-pi.svg">
 <meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
 </head>
 
@@ -567,11 +606,112 @@ window.Quarto = {
 </header>
 
 
-<p>The apps are being rebuilt with <a href="https://apurvanakade.github.io/mathviz/">mathviz</a>. Check back soon.</p>
+<p>Each app opens on its own. You’ll find every one of them, with the explanation around it, in the chapter it belongs to – and the <strong>Share</strong> button on any app gives a link or an <code>&lt;iframe&gt;</code> snippet for embedding it elsewhere.</p>
 
 
 
-</main> <!-- /main -->
+
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0">
+<a href="../chapters/estimation/estimating_pi.html?embed=pi-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/estimating-pi.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Estimating π
+</h5>
+<div class="card-text listing-description delink">
+<p>Scatter points in a square and count how many land inside the circle.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="1">
+<a href="../chapters/estimation/estimating_pi.html?embed=buffon-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/buffons-needle.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Buffon’s Needle
+</h5>
+<div class="card-text listing-description delink">
+<p>Drop needles on a ruled floor; the fraction that cross a line estimates π.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="2">
+<a href="../chapters/sampling/mh.html?embed=rw-metropolis-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/metropolis-random-walk.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Random Walk in a Region
+</h5>
+<div class="card-text listing-description delink">
+<p>Sample uniformly from a non-convex region with random-walk Metropolis, and tune the step size.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="3">
+<a href="../chapters/sampling/mh.html?embed=metropolis-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/metropolis-hastings.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Metropolis–Hastings
+</h5>
+<div class="card-text listing-description delink">
+<p>A Metropolis chain for the standard normal: trace, rejected proposals and histogram.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="4">
+<a href="../chapters/sampling/gibbs_2d.html?embed=gibbs-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/gibbs-sampling.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Gibbs Sampling
+</h5>
+<div class="card-text listing-description delink">
+<p>Gibbs sampling a bivariate normal: watch correlation slow the staircase down.</p>
+</div>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="5">
+<a href="../appendices/markov_chains.html?embed=graph-walk-app" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="images/random-walks-on-graphs.svg" class="thumbnail-image card-img" style="height: 220px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Random Walks on Graphs
+</h5>
+<div class="card-text listing-description delink">
+<p>Watch a distribution spread over a graph and compare mixing times, bottlenecks and spectral gaps.</p>
+</div>
+</div>
+</div></a>
+</div>
+</div>
+<div class="listing-no-matching d-none">No matching items</div>
+</div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right

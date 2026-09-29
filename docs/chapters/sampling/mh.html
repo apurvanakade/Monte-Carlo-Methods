@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -58,11 +93,18 @@ ul.task-list li input[type="checkbox"] {
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="../../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.js"></script>
 <link href="../../site_libs/quarto-contrib/mathviz-0.1.10/mathviz.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-embed-0.1.10/embed.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-embed-0.1.10/embed.css" rel="stylesheet">
 <script src="../../site_libs/quarto-contrib/mathviz-chrome-site-0.1.10/site.js"></script>
+<script src="../../site_libs/quarto-contrib/mathviz-share-0.1.10/share.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-share-0.1.10/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
 <script src="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.js"></script>
 <link href="../../site_libs/quarto-contrib/mathviz-report-bug-0.1.10/report-bug.css" rel="stylesheet">
 <meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
 <link href="../../site_libs/quarto-contrib/mathviz-fonts-0.1.10/fonts.css" rel="stylesheet">
+<script src="../../site_libs/quarto-contrib/mathviz-local-0.1.0/mathviz-local.js"></script>
+<link href="../../site_libs/quarto-contrib/mathviz-local-0.1.0/mathviz-local.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -90,6 +132,8 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script type="module" src="../../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
@@ -597,6 +641,35 @@ window.Quarto = {
 </header>
 
 
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="29" data-source-offset="-446"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 28;"><span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>VM <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">VM</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">// vmTheme re-runs every cell that bakes a palette color into a trace when</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">// the reader toggles dark mode; chartColors is that palette.</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>vmTheme <span class="op">=</span> Generators<span class="op">.</span><span class="fu">observe</span>(notify <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">onThemeChange</span>(notify))</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>chartColors <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">colors</span>(vmTheme)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
 <!-- - random walks and uniform sampling
 - general algorithm
 - proof of detailed balance equations?
@@ -659,6 +732,448 @@ window.Quarto = {
 <figure class="figure">
 <p><img src="mh_files/figure-html/cell-5-output-1.png" width="1143" height="1140" class="figure-img"></p>
 </figure>
+</div>
+</div>
+</div>
+<p>Try it yourself below. Pick a region and a proposal, then try a few step sizes: small steps are almost always accepted but crawl, large steps explore quickly but are mostly rejected (the red crosses). The shaded patch around the current point is the proposal – a disc of radius <span class="math inline">\(\sigma\)</span> for the Gaussian, the square <span class="math inline">\([-\sigma, \sigma]^2\)</span> around the point for the uniform.</p>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="201" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 200;"><span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>rwMaxN <span class="op">=</span> <span class="dv">5000</span></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>rwDefaults <span class="op">=</span> ({<span class="dt">seed</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">n</span><span class="op">:</span> <span class="dv">300</span><span class="op">,</span> <span class="dt">sigma</span><span class="op">:</span> <span class="fl">0.2</span><span class="op">,</span> <span class="dt">region</span><span class="op">:</span> <span class="st">"L-shape"</span><span class="op">,</span> <span class="dt">proposal</span><span class="op">:</span> <span class="st">"Gaussian"</span>})</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a><span class="co">// Each region: membership test, outline (null-separated polyline), a</span></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a><span class="co">// starting point inside it, fixed axis ranges, and the uniform</span></span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a><span class="co">// distribution's mean -- the value the running averages below converge to.</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>rwRegions <span class="op">=</span> {</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> circle <span class="op">=</span> (cx<span class="op">,</span> cy<span class="op">,</span> r) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> xs <span class="op">=</span> []<span class="op">,</span> ys <span class="op">=</span> []</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;=</span> <span class="dv">120</span><span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>      xs<span class="op">.</span><span class="fu">push</span>(cx <span class="op">+</span> r <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cos</span>(<span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> k <span class="op">/</span> <span class="dv">120</span>))</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>      ys<span class="op">.</span><span class="fu">push</span>(cy <span class="op">+</span> r <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(<span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> k <span class="op">/</span> <span class="dv">120</span>))</span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {xs<span class="op">,</span> ys}</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> left <span class="op">=</span> <span class="fu">circle</span>(<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> right <span class="op">=</span> <span class="fu">circle</span>(<span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="kw">new</span> <span class="bu">Map</span>([</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"L-shape"</span><span class="op">,</span> {</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>      <span class="dt">inside</span><span class="op">:</span> (x<span class="op">,</span> y) <span class="kw">=&gt;</span> (x <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> x <span class="op">&lt;=</span> <span class="dv">1</span> <span class="op">&amp;&amp;</span> y <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> y <span class="op">&lt;=</span> <span class="fl">0.1</span>) <span class="op">||</span> (x <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> x <span class="op">&lt;=</span> <span class="fl">0.1</span> <span class="op">&amp;&amp;</span> y <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> y <span class="op">&lt;=</span> <span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>      <span class="dt">outlineX</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]<span class="op">,</span></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>      <span class="dt">outlineY</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">0</span>]<span class="op">,</span></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>      <span class="dt">start</span><span class="op">:</span> [<span class="fl">0.05</span><span class="op">,</span> <span class="fl">0.05</span>]<span class="op">,</span></span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Extra room on the left: the legend floats over the chart's top-left</span></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>      <span class="co">// corner, which is where the L's vertical arm would otherwise be.</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>      <span class="dt">xRange</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.6</span><span class="op">,</span> <span class="fl">1.1</span>]<span class="op">,</span></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>      <span class="dt">yRange</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">1.1</span>]<span class="op">,</span></span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Area 0.19: the two arms' means weighted by area.</span></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>      <span class="dt">mean</span><span class="op">:</span> [(<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.09</span> <span class="op">*</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="fl">0.19</span><span class="op">,</span> (<span class="fl">0.1</span> <span class="op">*</span> <span class="fl">0.5</span> <span class="op">+</span> <span class="fl">0.09</span> <span class="op">*</span> <span class="fl">0.05</span>) <span class="op">/</span> <span class="fl">0.19</span>]</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>    }]<span class="op">,</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Two discs"</span><span class="op">,</span> {</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>      <span class="dt">inside</span><span class="op">:</span> (x<span class="op">,</span> y) <span class="kw">=&gt;</span> (x <span class="op">+</span> <span class="dv">1</span>) <span class="op">*</span> (x <span class="op">+</span> <span class="dv">1</span>) <span class="op">+</span> y <span class="op">*</span> y <span class="op">&lt;=</span> <span class="dv">1</span> <span class="op">||</span> (x <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> (x <span class="op">-</span> <span class="dv">1</span>) <span class="op">+</span> y <span class="op">*</span> y <span class="op">&lt;=</span> <span class="dv">1</span><span class="op">,</span></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>      <span class="dt">outlineX</span><span class="op">:</span> [<span class="op">...</span>left<span class="op">.</span><span class="at">xs</span><span class="op">,</span> <span class="kw">null</span><span class="op">,</span> <span class="op">...</span>right<span class="op">.</span><span class="at">xs</span>]<span class="op">,</span></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>      <span class="dt">outlineY</span><span class="op">:</span> [<span class="op">...</span>left<span class="op">.</span><span class="at">ys</span><span class="op">,</span> <span class="kw">null</span><span class="op">,</span> <span class="op">...</span>right<span class="op">.</span><span class="at">ys</span>]<span class="op">,</span></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>      <span class="dt">start</span><span class="op">:</span> [<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span>]<span class="op">,</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>      <span class="dt">xRange</span><span class="op">:</span> [<span class="op">-</span><span class="fl">2.2</span><span class="op">,</span> <span class="fl">2.2</span>]<span class="op">,</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>      <span class="dt">yRange</span><span class="op">:</span> [<span class="op">-</span><span class="fl">1.3</span><span class="op">,</span> <span class="fl">1.3</span>]<span class="op">,</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>      <span class="dt">mean</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>    }]</span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>  ])</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>rwTraceOptions <span class="op">=</span> [<span class="st">"Region"</span><span class="op">,</span> <span class="st">"Path"</span><span class="op">,</span> <span class="st">"Samples"</span><span class="op">,</span> <span class="st">"Rejected proposals"</span><span class="op">,</span> <span class="st">"Proposal"</span><span class="op">,</span> <span class="st">"Current point"</span>]</span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>rwTraceColors <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>([</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Region"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">ink</span>]<span class="op">,</span></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Path"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">muted</span>]<span class="op">,</span></span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Samples"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">fn</span>]<span class="op">,</span></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Rejected proposals"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">alt</span>]<span class="op">,</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Proposal"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">warn</span>]<span class="op">,</span></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Current point"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">ok</span>]</span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-2-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div id="rw-metropolis-app" class="vm-app">
+<div class="ojs-panel ojs-grid">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="258" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 257;"><span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a>viewof rwRegionName <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>([<span class="op">...</span>rwRegions<span class="op">.</span><span class="fu">keys</span>()]<span class="op">,</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Region Ω"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"rw_region"</span><span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">region</span>)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="262" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 261;"><span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a>viewof rwProposal <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>([<span class="st">"Gaussian"</span><span class="op">,</span> <span class="st">"Uniform square"</span>]<span class="op">,</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Proposal"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"rw_proposal"</span><span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">proposal</span>)})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="266" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 265;"><span id="cb5-266"><a href="#cb5-266" aria-hidden="true" tabindex="-1"></a><span class="co">// A typed value rather than a slider: the step size is a setting to</span></span>
+<span id="cb5-267"><a href="#cb5-267" aria-hidden="true" tabindex="-1"></a><span class="co">// compare a few chosen values of (the chapter's 1, 0.5, 0.2, 0.01), not</span></span>
+<span id="cb5-268"><a href="#cb5-268" aria-hidden="true" tabindex="-1"></a><span class="co">// something to scrub through.</span></span>
+<span id="cb5-269"><a href="#cb5-269" aria-hidden="true" tabindex="-1"></a>viewof rwSigmaInput <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">text</span>({<span class="dt">label</span><span class="op">:</span> <span class="st">"Step size σ"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="bu">String</span>(VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"rw_sigma"</span><span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">sigma</span>))<span class="op">,</span> <span class="dt">placeholder</span><span class="op">:</span> <span class="st">"Example: 0.2, 1, 0.01"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="273" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 272;"><span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a>viewof rwRedraw <span class="op">=</span> {</span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> button <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Run a new chain"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a>  button<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"ojs-auto"</span>)</span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> button</span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb7" data-startfrom="284" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 283;"><span id="cb7-284"><a href="#cb7-284" aria-hidden="true" tabindex="-1"></a><span class="co">// rwSigma parses the step-size field; anything unusable (empty, zero,</span></span>
+<span id="cb7-285"><a href="#cb7-285" aria-hidden="true" tabindex="-1"></a><span class="co">// negative, mid-typing) falls back to the default.</span></span>
+<span id="cb7-286"><a href="#cb7-286" aria-hidden="true" tabindex="-1"></a>rwSigma <span class="op">=</span> {</span>
+<span id="cb7-287"><a href="#cb7-287" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> parsed <span class="op">=</span> VM<span class="op">.</span><span class="at">expressions</span><span class="op">.</span><span class="fu">makeNumber</span>(<span class="bu">window</span><span class="op">.</span><span class="at">math</span><span class="op">,</span> rwSigmaInput)</span>
+<span id="cb7-288"><a href="#cb7-288" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (parsed <span class="op">===</span> <span class="kw">null</span> <span class="op">||</span> <span class="op">!</span><span class="bu">Number</span><span class="op">.</span><span class="fu">isFinite</span>(parsed) <span class="op">||</span> parsed <span class="op">&lt;=</span> <span class="dv">0</span>) <span class="cf">return</span> rwDefaults<span class="op">.</span><span class="at">sigma</span></span>
+<span id="cb7-289"><a href="#cb7-289" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">5</span><span class="op">,</span> parsed)</span>
+<span id="cb7-290"><a href="#cb7-290" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb8" data-startfrom="295" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 294;"><span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a>rwSeed <span class="op">=</span> {</span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwRedraw <span class="op">===</span> <span class="dv">0</span>) <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"rw_seed"</span><span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">seed</span>)</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>() <span class="op">*</span> <span class="fl">1e9</span>)</span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-8" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb9" data-startfrom="303" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 302;"><span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a>rwRegion <span class="op">=</span> rwRegions<span class="op">.</span><span class="fu">get</span>(rwRegionName)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-9" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb10" data-startfrom="308" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 307;"><span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a><span class="co">// rwChain: rwMaxN steps of the random walk, rerun whenever the region,</span></span>
+<span id="cb10-309"><a href="#cb10-309" aria-hidden="true" tabindex="-1"></a><span class="co">// proposal, step size or seed changes. The same seed gives the same</span></span>
+<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a><span class="co">// underlying random numbers, so changing the step size shows the "same"</span></span>
+<span id="cb10-311"><a href="#cb10-311" aria-hidden="true" tabindex="-1"></a><span class="co">// walk taking bigger or smaller steps. The N slider only picks how much of</span></span>
+<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a><span class="co">// it to show.</span></span>
+<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a>rwChain <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">randomWalkMetropolis</span>({</span>
+<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a>  <span class="dt">logDensity</span><span class="op">:</span> p <span class="kw">=&gt;</span> (rwRegion<span class="op">.</span><span class="fu">inside</span>(p[<span class="dv">0</span>]<span class="op">,</span> p[<span class="dv">1</span>]) <span class="op">?</span> <span class="dv">0</span> <span class="op">:</span> <span class="op">-</span><span class="kw">Infinity</span>)<span class="op">,</span></span>
+<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a>  <span class="dt">start</span><span class="op">:</span> rwRegion<span class="op">.</span><span class="at">start</span><span class="op">,</span></span>
+<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a>  <span class="dt">n</span><span class="op">:</span> rwMaxN<span class="op">,</span></span>
+<span id="cb10-317"><a href="#cb10-317" aria-hidden="true" tabindex="-1"></a>  <span class="dt">scale</span><span class="op">:</span> rwSigma<span class="op">,</span></span>
+<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a>  <span class="dt">proposal</span><span class="op">:</span> rwProposal <span class="op">===</span> <span class="st">"Gaussian"</span> <span class="op">?</span> <span class="st">"gaussian"</span> <span class="op">:</span> <span class="st">"uniform"</span><span class="op">,</span></span>
+<span id="cb10-319"><a href="#cb10-319" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rng</span><span class="op">:</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(rwSeed)</span>
+<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-10" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb11" data-startfrom="325" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 324;"><span id="cb11-325"><a href="#cb11-325" aria-hidden="true" tabindex="-1"></a>rwView <span class="op">=</span> {</span>
+<span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> n <span class="op">=</span> rwN</span>
+<span id="cb11-327"><a href="#cb11-327" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> xs <span class="op">=</span> []<span class="op">,</span> ys <span class="op">=</span> []</span>
+<span id="cb11-328"><a href="#cb11-328" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> acceptedSteps <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb11-329"><a href="#cb11-329" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> n<span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb11-330"><a href="#cb11-330" aria-hidden="true" tabindex="-1"></a>    xs<span class="op">.</span><span class="fu">push</span>(rwChain<span class="op">.</span><span class="at">samples</span>[t][<span class="dv">0</span>])</span>
+<span id="cb11-331"><a href="#cb11-331" aria-hidden="true" tabindex="-1"></a>    ys<span class="op">.</span><span class="fu">push</span>(rwChain<span class="op">.</span><span class="at">samples</span>[t][<span class="dv">1</span>])</span>
+<span id="cb11-332"><a href="#cb11-332" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> rwChain<span class="op">.</span><span class="at">accepted</span>[t]) acceptedSteps<span class="op">++</span></span>
+<span id="cb11-333"><a href="#cb11-333" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-334"><a href="#cb11-334" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {n<span class="op">,</span> xs<span class="op">,</span> ys<span class="op">,</span> acceptedSteps}</span>
+<span id="cb11-335"><a href="#cb11-335" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-11" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb12" data-startfrom="339" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 338;"><span id="cb12-339"><a href="#cb12-339" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb12-340"><a href="#cb12-340" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> steps <span class="op">=</span> rwView<span class="op">.</span><span class="at">n</span> <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb12-341"><a href="#cb12-341" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> rate <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb12-342"><a href="#cb12-342" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (steps <span class="op">&gt;</span> <span class="dv">0</span>) rate <span class="op">=</span> rwView<span class="op">.</span><span class="at">acceptedSteps</span> <span class="op">/</span> steps</span>
+<span id="cb12-343"><a href="#cb12-343" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([</span>
+<span id="cb12-344"><a href="#cb12-344" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Samples N"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> rwView<span class="op">.</span><span class="at">n</span><span class="op">.</span><span class="fu">toLocaleString</span>()}<span class="op">,</span></span>
+<span id="cb12-345"><a href="#cb12-345" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Acceptance rate"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>(<span class="dv">100</span> <span class="op">*</span> rate)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs">%`</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>rwView<span class="op">.</span><span class="at">acceptedSteps</span><span class="sc">}</span><span class="vs"> of </span><span class="sc">${</span>steps<span class="sc">}</span><span class="vs"> proposals accepted`</span>}<span class="op">,</span></span>
+<span id="cb12-346"><a href="#cb12-346" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"ESS of x"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">effectiveSampleSize</span>(rwView<span class="op">.</span><span class="at">xs</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"Effective sample size: how many independent draws the correlated chain is worth"</span>}<span class="op">,</span></span>
+<span id="cb12-347"><a href="#cb12-347" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"ESS of y"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">effectiveSampleSize</span>(rwView<span class="op">.</span><span class="at">ys</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)}</span>
+<span id="cb12-348"><a href="#cb12-348" aria-hidden="true" tabindex="-1"></a>  ])</span>
+<span id="cb12-349"><a href="#cb12-349" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-12" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb13" data-startfrom="354" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 353;"><span id="cb13-354"><a href="#cb13-354" aria-hidden="true" tabindex="-1"></a>rwPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-13" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb14" data-startfrom="359" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 358;"><span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a>rwShow <span class="op">=</span> <span class="kw">new</span> <span class="bu">Set</span>(rwTraces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-14" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="ojs-chart-block">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb15" data-startfrom="365" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 364;"><span id="cb15-365"><a href="#cb15-365" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb15-366"><a href="#cb15-366" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> n <span class="op">=</span> rwView<span class="op">.</span><span class="at">n</span></span>
+<span id="cb15-367"><a href="#cb15-367" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> current <span class="op">=</span> rwChain<span class="op">.</span><span class="at">samples</span>[n <span class="op">-</span> <span class="dv">1</span>]</span>
+<span id="cb15-368"><a href="#cb15-368" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rejectedX <span class="op">=</span> []<span class="op">,</span> rejectedY <span class="op">=</span> []</span>
+<span id="cb15-369"><a href="#cb15-369" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> t <span class="op">&lt;</span> n<span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb15-370"><a href="#cb15-370" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="op">!</span>rwChain<span class="op">.</span><span class="at">accepted</span>[t]) {</span>
+<span id="cb15-371"><a href="#cb15-371" aria-hidden="true" tabindex="-1"></a>      rejectedX<span class="op">.</span><span class="fu">push</span>(rwChain<span class="op">.</span><span class="at">proposals</span>[t][<span class="dv">0</span>])</span>
+<span id="cb15-372"><a href="#cb15-372" aria-hidden="true" tabindex="-1"></a>      rejectedY<span class="op">.</span><span class="fu">push</span>(rwChain<span class="op">.</span><span class="at">proposals</span>[t][<span class="dv">1</span>])</span>
+<span id="cb15-373"><a href="#cb15-373" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-374"><a href="#cb15-374" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-375"><a href="#cb15-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-376"><a href="#cb15-376" aria-hidden="true" tabindex="-1"></a>  <span class="co">// The proposal around the current point: a 1-sigma disc for the</span></span>
+<span id="cb15-377"><a href="#cb15-377" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Gaussian, the whole support square for the uniform.</span></span>
+<span id="cb15-378"><a href="#cb15-378" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> patchX <span class="op">=</span> []<span class="op">,</span> patchY <span class="op">=</span> []</span>
+<span id="cb15-379"><a href="#cb15-379" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwProposal <span class="op">===</span> <span class="st">"Gaussian"</span>) {</span>
+<span id="cb15-380"><a href="#cb15-380" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;=</span> <span class="dv">80</span><span class="op">;</span> k<span class="op">++</span>) {</span>
+<span id="cb15-381"><a href="#cb15-381" aria-hidden="true" tabindex="-1"></a>      patchX<span class="op">.</span><span class="fu">push</span>(current[<span class="dv">0</span>] <span class="op">+</span> rwSigma <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">cos</span>(<span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> k <span class="op">/</span> <span class="dv">80</span>))</span>
+<span id="cb15-382"><a href="#cb15-382" aria-hidden="true" tabindex="-1"></a>      patchY<span class="op">.</span><span class="fu">push</span>(current[<span class="dv">1</span>] <span class="op">+</span> rwSigma <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sin</span>(<span class="dv">2</span> <span class="op">*</span> <span class="bu">Math</span><span class="op">.</span><span class="cn">PI</span> <span class="op">*</span> k <span class="op">/</span> <span class="dv">80</span>))</span>
+<span id="cb15-383"><a href="#cb15-383" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-384"><a href="#cb15-384" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb15-385"><a href="#cb15-385" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> s <span class="op">=</span> rwSigma</span>
+<span id="cb15-386"><a href="#cb15-386" aria-hidden="true" tabindex="-1"></a>    patchX<span class="op">.</span><span class="fu">push</span>(current[<span class="dv">0</span>] <span class="op">-</span> s<span class="op">,</span> current[<span class="dv">0</span>] <span class="op">+</span> s<span class="op">,</span> current[<span class="dv">0</span>] <span class="op">+</span> s<span class="op">,</span> current[<span class="dv">0</span>] <span class="op">-</span> s<span class="op">,</span> current[<span class="dv">0</span>] <span class="op">-</span> s)</span>
+<span id="cb15-387"><a href="#cb15-387" aria-hidden="true" tabindex="-1"></a>    patchY<span class="op">.</span><span class="fu">push</span>(current[<span class="dv">1</span>] <span class="op">-</span> s<span class="op">,</span> current[<span class="dv">1</span>] <span class="op">-</span> s<span class="op">,</span> current[<span class="dv">1</span>] <span class="op">+</span> s<span class="op">,</span> current[<span class="dv">1</span>] <span class="op">+</span> s<span class="op">,</span> current[<span class="dv">1</span>] <span class="op">-</span> s)</span>
+<span id="cb15-388"><a href="#cb15-388" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-389"><a href="#cb15-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-390"><a href="#cb15-390" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> data <span class="op">=</span> []</span>
+<span id="cb15-391"><a href="#cb15-391" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Proposal"</span>)) {</span>
+<span id="cb15-392"><a href="#cb15-392" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> patchX<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> patchY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">fill</span><span class="op">:</span> <span class="st">"toself"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Proposal"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-393"><a href="#cb15-393" aria-hidden="true" tabindex="-1"></a>      <span class="dt">fillcolor</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(<span class="st">"warn"</span><span class="op">,</span> <span class="fl">0.2</span>)<span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">warn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb15-394"><a href="#cb15-394" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-395"><a href="#cb15-395" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Region"</span>)) {</span>
+<span id="cb15-396"><a href="#cb15-396" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> rwRegion<span class="op">.</span><span class="at">outlineX</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> rwRegion<span class="op">.</span><span class="at">outlineY</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Region"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-397"><a href="#cb15-397" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb15-398"><a href="#cb15-398" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-399"><a href="#cb15-399" aria-hidden="true" tabindex="-1"></a>  <span class="co">// WebGL for the traces that grow to thousands of points as N plays.</span></span>
+<span id="cb15-400"><a href="#cb15-400" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Path"</span>)) {</span>
+<span id="cb15-401"><a href="#cb15-401" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> rwView<span class="op">.</span><span class="at">xs</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> rwView<span class="op">.</span><span class="at">ys</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scattergl"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Path"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-402"><a href="#cb15-402" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(<span class="st">"muted"</span><span class="op">,</span> <span class="fl">0.6</span>)<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb15-403"><a href="#cb15-403" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-404"><a href="#cb15-404" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Samples"</span>)) {</span>
+<span id="cb15-405"><a href="#cb15-405" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> rwView<span class="op">.</span><span class="at">xs</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> rwView<span class="op">.</span><span class="at">ys</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scattergl"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Samples"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-406"><a href="#cb15-406" aria-hidden="true" tabindex="-1"></a>      <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">4</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb15-407"><a href="#cb15-407" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-408"><a href="#cb15-408" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Rejected proposals"</span>)) {</span>
+<span id="cb15-409"><a href="#cb15-409" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> rejectedX<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> rejectedY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scattergl"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Rejected proposals"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-410"><a href="#cb15-410" aria-hidden="true" tabindex="-1"></a>      <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">6</span><span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> <span class="st">"x-thin"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb15-411"><a href="#cb15-411" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-412"><a href="#cb15-412" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (rwShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Current point"</span>)) {</span>
+<span id="cb15-413"><a href="#cb15-413" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> [current[<span class="dv">0</span>]]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [current[<span class="dv">1</span>]]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Current point"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-414"><a href="#cb15-414" aria-hidden="true" tabindex="-1"></a>      <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">11</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">halo</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}}<span class="op">,</span></span>
+<span id="cb15-415"><a href="#cb15-415" aria-hidden="true" tabindex="-1"></a>      <span class="dt">hovertemplate</span><span class="op">:</span> <span class="st">"Current point&lt;br&gt;(%{x:.3f}, %{y:.3f})&lt;extra&gt;&lt;/extra&gt;"</span>})</span>
+<span id="cb15-416"><a href="#cb15-416" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-417"><a href="#cb15-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-418"><a href="#cb15-418" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">rwPlot</span>(data<span class="op">,</span> {</span>
+<span id="cb15-419"><a href="#cb15-419" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">range</span><span class="op">:</span> rwRegion<span class="op">.</span><span class="at">xRange</span><span class="op">,</span> <span class="dt">zeroline</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">constrain</span><span class="op">:</span> <span class="st">"domain"</span>}<span class="op">,</span></span>
+<span id="cb15-420"><a href="#cb15-420" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">range</span><span class="op">:</span> rwRegion<span class="op">.</span><span class="at">yRange</span><span class="op">,</span> <span class="dt">zeroline</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">scaleanchor</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">constrain</span><span class="op">:</span> <span class="st">"domain"</span>}<span class="op">,</span></span>
+<span id="cb15-421"><a href="#cb15-421" aria-hidden="true" tabindex="-1"></a>    <span class="dt">hovermode</span><span class="op">:</span> <span class="st">"closest"</span><span class="op">,</span></span>
+<span id="cb15-422"><a href="#cb15-422" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Keyed on the region, so switching regions resets the view to the new</span></span>
+<span id="cb15-423"><a href="#cb15-423" aria-hidden="true" tabindex="-1"></a>    <span class="co">// region's ranges while zoom survives every other change.</span></span>
+<span id="cb15-424"><a href="#cb15-424" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> rwRegionName<span class="op">,</span></span>
+<span id="cb15-425"><a href="#cb15-425" aria-hidden="true" tabindex="-1"></a>    <span class="dt">autosize</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb15-426"><a href="#cb15-426" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb15-427"><a href="#cb15-427" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-15" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb16" data-startfrom="431" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 430;"><span id="cb16-431"><a href="#cb16-431" aria-hidden="true" tabindex="-1"></a>viewof rwTraces <span class="op">=</span> {</span>
+<span id="cb16-432"><a href="#cb16-432" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> items <span class="op">=</span> []</span>
+<span id="cb16-433"><a href="#cb16-433" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> label <span class="kw">of</span> rwTraceOptions) items<span class="op">.</span><span class="fu">push</span>({label<span class="op">,</span> <span class="dt">color</span><span class="op">:</span> rwTraceColors<span class="op">.</span><span class="fu">get</span>(label)})</span>
+<span id="cb16-434"><a href="#cb16-434" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">legendOverlay</span>(items<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> rwTraceOptions})</span>
+<span id="cb16-435"><a href="#cb16-435" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-16" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="ojs-chart-controls">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb17" data-startfrom="441" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 440;"><span id="cb17-441"><a href="#cb17-441" aria-hidden="true" tabindex="-1"></a>viewof rwN <span class="op">=</span> {</span>
+<span id="cb17-442"><a href="#cb17-442" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> initial <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(rwMaxN<span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">10</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"rw_n"</span><span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">n</span>))))</span>
+<span id="cb17-443"><a href="#cb17-443" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> slider <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">10</span><span class="op">,</span> rwMaxN]<span class="op">,</span> {<span class="dt">step</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> initial<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Samples N"</span>})</span>
+<span id="cb17-444"><a href="#cb17-444" aria-hidden="true" tabindex="-1"></a>  slider<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"ojs-fill"</span>)</span>
+<span id="cb17-445"><a href="#cb17-445" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> slider</span>
+<span id="cb17-446"><a href="#cb17-446" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-17" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb18" data-startfrom="457" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 456;"><span id="cb18-457"><a href="#cb18-457" aria-hidden="true" tabindex="-1"></a>rwUrlSync <span class="op">=</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">syncUrlParams</span>({</span>
+<span id="cb18-458"><a href="#cb18-458" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rw_region</span><span class="op">:</span> [rwRegionName<span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">region</span>]<span class="op">,</span></span>
+<span id="cb18-459"><a href="#cb18-459" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rw_proposal</span><span class="op">:</span> [rwProposal<span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">proposal</span>]<span class="op">,</span></span>
+<span id="cb18-460"><a href="#cb18-460" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rw_seed</span><span class="op">:</span> [rwSeed<span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">seed</span>]<span class="op">,</span></span>
+<span id="cb18-461"><a href="#cb18-461" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rw_sigma</span><span class="op">:</span> [rwSigmaInput<span class="op">,</span> <span class="bu">String</span>(rwDefaults<span class="op">.</span><span class="at">sigma</span>)]<span class="op">,</span></span>
+<span id="cb18-462"><a href="#cb18-462" aria-hidden="true" tabindex="-1"></a>  <span class="dt">rw_n</span><span class="op">:</span> [rwN<span class="op">,</span> rwDefaults<span class="op">.</span><span class="at">n</span>]</span>
+<span id="cb18-463"><a href="#cb18-463" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-18" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Diagnostics for the chain above">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Diagnostics for the chain above
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>The running averages of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> should settle on the region’s mean (dashed); the autocorrelation function shows how many steps the chain needs to forget where it was. A slowly decaying ACF means a small effective sample size.</p>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb19" data-startfrom="473" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 472;"><span id="cb19-473"><a href="#cb19-473" aria-hidden="true" tabindex="-1"></a>rwRunningPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"320px"</span>})</span>
+<span id="cb19-474"><a href="#cb19-474" aria-hidden="true" tabindex="-1"></a>rwAcfPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"320px"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-19-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-19-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb20" data-startfrom="479" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 478;"><span id="cb20-479"><a href="#cb20-479" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb20-480"><a href="#cb20-480" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> steps <span class="op">=</span> []</span>
+<span id="cb20-481"><a href="#cb20-481" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> t <span class="op">&lt;=</span> rwView<span class="op">.</span><span class="at">n</span><span class="op">;</span> t<span class="op">++</span>) steps<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb20-482"><a href="#cb20-482" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> meanX <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">runningMean</span>(rwView<span class="op">.</span><span class="at">xs</span>)</span>
+<span id="cb20-483"><a href="#cb20-483" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> meanY <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">runningMean</span>(rwView<span class="op">.</span><span class="at">ys</span>)</span>
+<span id="cb20-484"><a href="#cb20-484" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ends <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> rwView<span class="op">.</span><span class="at">n</span>]</span>
+<span id="cb20-485"><a href="#cb20-485" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">rwRunningPlot</span>([</span>
+<span id="cb20-486"><a href="#cb20-486" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> steps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> meanX<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent2</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb20-487"><a href="#cb20-487" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> steps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> meanY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent3</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb20-488"><a href="#cb20-488" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> ends<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [rwRegion<span class="op">.</span><span class="at">mean</span>[<span class="dv">0</span>]<span class="op">,</span> rwRegion<span class="op">.</span><span class="at">mean</span>[<span class="dv">0</span>]]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"mean of x"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent2</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span>}}<span class="op">,</span></span>
+<span id="cb20-489"><a href="#cb20-489" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> ends<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [rwRegion<span class="op">.</span><span class="at">mean</span>[<span class="dv">1</span>]<span class="op">,</span> rwRegion<span class="op">.</span><span class="at">mean</span>[<span class="dv">1</span>]]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"mean of y"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent3</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span>}}</span>
+<span id="cb20-490"><a href="#cb20-490" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {</span>
+<span id="cb20-491"><a href="#cb20-491" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Running averages"</span><span class="op">,</span> <span class="dt">font</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">14</span>}}<span class="op">,</span></span>
+<span id="cb20-492"><a href="#cb20-492" aria-hidden="true" tabindex="-1"></a>    <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb20-493"><a href="#cb20-493" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"step"</span>}<span class="op">,</span></span>
+<span id="cb20-494"><a href="#cb20-494" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"average"</span>}<span class="op">,</span></span>
+<span id="cb20-495"><a href="#cb20-495" aria-hidden="true" tabindex="-1"></a>    <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb20-496"><a href="#cb20-496" aria-hidden="true" tabindex="-1"></a>    <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.25</span>}<span class="op">,</span></span>
+<span id="cb20-497"><a href="#cb20-497" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> <span class="st">"static"</span></span>
+<span id="cb20-498"><a href="#cb20-498" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb20-499"><a href="#cb20-499" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb20-500"><a href="#cb20-500" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb20-501"><a href="#cb20-501" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> maxLag <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">100</span><span class="op">,</span> rwView<span class="op">.</span><span class="at">n</span> <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb20-502"><a href="#cb20-502" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> acfX <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">autocorrelation</span>(rwView<span class="op">.</span><span class="at">xs</span><span class="op">,</span> maxLag)</span>
+<span id="cb20-503"><a href="#cb20-503" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> acfY <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">autocorrelation</span>(rwView<span class="op">.</span><span class="at">ys</span><span class="op">,</span> maxLag)</span>
+<span id="cb20-504"><a href="#cb20-504" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> lags <span class="op">=</span> []</span>
+<span id="cb20-505"><a href="#cb20-505" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> acfX<span class="op">.</span><span class="at">length</span><span class="op">;</span> k<span class="op">++</span>) lags<span class="op">.</span><span class="fu">push</span>(k)</span>
+<span id="cb20-506"><a href="#cb20-506" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">rwAcfPlot</span>([</span>
+<span id="cb20-507"><a href="#cb20-507" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> lags<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> acfX<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent2</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb20-508"><a href="#cb20-508" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> lags<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> acfY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">accent3</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}</span>
+<span id="cb20-509"><a href="#cb20-509" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {</span>
+<span id="cb20-510"><a href="#cb20-510" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Autocorrelation"</span><span class="op">,</span> <span class="dt">font</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">14</span>}}<span class="op">,</span></span>
+<span id="cb20-511"><a href="#cb20-511" aria-hidden="true" tabindex="-1"></a>    <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb20-512"><a href="#cb20-512" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"lag"</span><span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">100</span>]}<span class="op">,</span></span>
+<span id="cb20-513"><a href="#cb20-513" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"ACF"</span><span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">1.05</span>]}<span class="op">,</span></span>
+<span id="cb20-514"><a href="#cb20-514" aria-hidden="true" tabindex="-1"></a>    <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb20-515"><a href="#cb20-515" aria-hidden="true" tabindex="-1"></a>    <span class="dt">legend</span><span class="op">:</span> {<span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> <span class="op">-</span><span class="fl">0.25</span>}<span class="op">,</span></span>
+<span id="cb20-516"><a href="#cb20-516" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> <span class="st">"static"</span></span>
+<span id="cb20-517"><a href="#cb20-517" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb20-518"><a href="#cb20-518" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-20" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-21" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -799,8 +1314,380 @@ q(y | x) = \mathcal{N}(y ; x, \sigma^2 I).
 </ol></li>
 <li>Return the sequence of points <span class="math inline">\(x_0, x_1, \ldots, x_{N-1}\)</span>.</li>
 </ol>
+<div id="exm-metropolis-normal" class="theorem example">
+<p><span class="theorem-title"><strong>Example 11.2</strong></span> Take the standard normal target <span class="math inline">\(p(x) \propto e^{-x^2/2}\)</span> and the uniform proposal <span class="math inline">\(y \sim \text{Uniform}(x_i - d, x_i + d)\)</span>, which is symmetric. A proposal toward the mode (<span class="math inline">\(p(y) \ge p(x_i)\)</span>) is always accepted; one away from it is accepted with probability <span class="math inline">\(p(y)/p(x_i) = e^{(x_i^2 - y^2)/2}\)</span>. Below, the left panel is the trace <span class="math inline">\(x_0, x_1, \ldots\)</span> with the rejected proposals marked, and the right panel the histogram of the samples against the target density.</p>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb21" data-startfrom="654" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 653;"><span id="cb21-654"><a href="#cb21-654" aria-hidden="true" tabindex="-1"></a>mhDefaults <span class="op">=</span> ({<span class="dt">seed</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">n</span><span class="op">:</span> <span class="dv">100</span><span class="op">,</span> <span class="dt">d</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">max</span><span class="op">:</span> <span class="st">"500"</span>})</span>
+<span id="cb21-655"><a href="#cb21-655" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-656"><a href="#cb21-656" aria-hidden="true" tabindex="-1"></a>mhTraceOptions <span class="op">=</span> [<span class="st">"Chain"</span><span class="op">,</span> <span class="st">"Rejected proposals"</span><span class="op">,</span> <span class="st">"Histogram"</span><span class="op">,</span> <span class="st">"Target N(0, 1)"</span>]</span>
+<span id="cb21-657"><a href="#cb21-657" aria-hidden="true" tabindex="-1"></a>mhTraceColors <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>([</span>
+<span id="cb21-658"><a href="#cb21-658" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Chain"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">fn</span>]<span class="op">,</span></span>
+<span id="cb21-659"><a href="#cb21-659" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Rejected proposals"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">alt</span>]<span class="op">,</span></span>
+<span id="cb21-660"><a href="#cb21-660" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Histogram"</span><span class="op">,</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(<span class="st">"accent3"</span><span class="op">,</span> <span class="fl">0.55</span>)]<span class="op">,</span></span>
+<span id="cb21-661"><a href="#cb21-661" aria-hidden="true" tabindex="-1"></a>  [<span class="st">"Target N(0, 1)"</span><span class="op">,</span> chartColors<span class="op">.</span><span class="at">ink</span>]</span>
+<span id="cb21-662"><a href="#cb21-662" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb21-663"><a href="#cb21-663" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-664"><a href="#cb21-664" aria-hidden="true" tabindex="-1"></a><span class="co">// The y-axis (sample value) is fixed at +-4.5 for every chain, so neither</span></span>
+<span id="cb21-665"><a href="#cb21-665" aria-hidden="true" tabindex="-1"></a><span class="co">// slider rescales it; the histogram shares it.</span></span>
+<span id="cb21-666"><a href="#cb21-666" aria-hidden="true" tabindex="-1"></a>mhYRange <span class="op">=</span> [<span class="op">-</span><span class="fl">4.5</span><span class="op">,</span> <span class="fl">4.5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-22-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-22-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-22-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-22-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div id="metropolis-app" class="vm-app">
+<div class="ojs-panel ojs-grid">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb22" data-startfrom="673" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 672;"><span id="cb22-673"><a href="#cb22-673" aria-hidden="true" tabindex="-1"></a><span class="co">// Always-live, like the sliders: it sets the step slider's range and the</span></span>
+<span id="cb22-674"><a href="#cb22-674" aria-hidden="true" tabindex="-1"></a><span class="co">// trace's x-axis, so a long run and a short one each fill the chart.</span></span>
+<span id="cb22-675"><a href="#cb22-675" aria-hidden="true" tabindex="-1"></a>viewof mhMaxInput <span class="op">=</span> {</span>
+<span id="cb22-676"><a href="#cb22-676" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> input <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">text</span>({<span class="dt">label</span><span class="op">:</span> <span class="st">"Max N"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="bu">String</span>(VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"mh_max"</span><span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">max</span>))<span class="op">,</span> <span class="dt">placeholder</span><span class="op">:</span> <span class="st">"Example: 500, 5000"</span>})</span>
+<span id="cb22-677"><a href="#cb22-677" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> input</span>
+<span id="cb22-678"><a href="#cb22-678" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-23" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb23" data-startfrom="682" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 681;"><span id="cb23-682"><a href="#cb23-682" aria-hidden="true" tabindex="-1"></a>viewof mhRedraw <span class="op">=</span> {</span>
+<span id="cb23-683"><a href="#cb23-683" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> button <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">button</span>(<span class="st">"Run a new chain"</span><span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">reduce</span><span class="op">:</span> v <span class="kw">=&gt;</span> v <span class="op">+</span> <span class="dv">1</span>})</span>
+<span id="cb23-684"><a href="#cb23-684" aria-hidden="true" tabindex="-1"></a>  button<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"ojs-auto"</span>)</span>
+<span id="cb23-685"><a href="#cb23-685" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> button</span>
+<span id="cb23-686"><a href="#cb23-686" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-24" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb24" data-startfrom="693" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 692;"><span id="cb24-693"><a href="#cb24-693" aria-hidden="true" tabindex="-1"></a><span class="co">// mhMax parses the Max N field, falling back to 500 on anything unusable.</span></span>
+<span id="cb24-694"><a href="#cb24-694" aria-hidden="true" tabindex="-1"></a>mhMax <span class="op">=</span> {</span>
+<span id="cb24-695"><a href="#cb24-695" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> parsed <span class="op">=</span> VM<span class="op">.</span><span class="at">expressions</span><span class="op">.</span><span class="fu">makeNumber</span>(<span class="bu">window</span><span class="op">.</span><span class="at">math</span><span class="op">,</span> mhMaxInput)</span>
+<span id="cb24-696"><a href="#cb24-696" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (parsed <span class="op">===</span> <span class="kw">null</span> <span class="op">||</span> <span class="op">!</span><span class="bu">Number</span><span class="op">.</span><span class="fu">isFinite</span>(parsed)) <span class="cf">return</span> <span class="dv">500</span></span>
+<span id="cb24-697"><a href="#cb24-697" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">20000</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">20</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(parsed)))</span>
+<span id="cb24-698"><a href="#cb24-698" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-25" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb25" data-startfrom="703" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 702;"><span id="cb25-703"><a href="#cb25-703" aria-hidden="true" tabindex="-1"></a>mhSeed <span class="op">=</span> {</span>
+<span id="cb25-704"><a href="#cb25-704" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (mhRedraw <span class="op">===</span> <span class="dv">0</span>) <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"mh_seed"</span><span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">seed</span>)</span>
+<span id="cb25-705"><a href="#cb25-705" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">floor</span>(<span class="bu">Math</span><span class="op">.</span><span class="fu">random</span>() <span class="op">*</span> <span class="fl">1e9</span>)</span>
+<span id="cb25-706"><a href="#cb25-706" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-26" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb26" data-startfrom="711" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 710;"><span id="cb26-711"><a href="#cb26-711" aria-hidden="true" tabindex="-1"></a><span class="co">// mhChain: mhMax states of the chain from x0 = 0. The same seed reuses the</span></span>
+<span id="cb26-712"><a href="#cb26-712" aria-hidden="true" tabindex="-1"></a><span class="co">// same random numbers, so dragging d shows the same chain with a wider or</span></span>
+<span id="cb26-713"><a href="#cb26-713" aria-hidden="true" tabindex="-1"></a><span class="co">// narrower proposal.</span></span>
+<span id="cb26-714"><a href="#cb26-714" aria-hidden="true" tabindex="-1"></a>mhChain <span class="op">=</span> {</span>
+<span id="cb26-715"><a href="#cb26-715" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> run <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">randomWalkMetropolis</span>({</span>
+<span id="cb26-716"><a href="#cb26-716" aria-hidden="true" tabindex="-1"></a>    <span class="dt">logDensity</span><span class="op">:</span> p <span class="kw">=&gt;</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> p[<span class="dv">0</span>] <span class="op">*</span> p[<span class="dv">0</span>]<span class="op">,</span></span>
+<span id="cb26-717"><a href="#cb26-717" aria-hidden="true" tabindex="-1"></a>    <span class="dt">start</span><span class="op">:</span> [<span class="dv">0</span>]<span class="op">,</span></span>
+<span id="cb26-718"><a href="#cb26-718" aria-hidden="true" tabindex="-1"></a>    <span class="dt">n</span><span class="op">:</span> mhMax<span class="op">,</span></span>
+<span id="cb26-719"><a href="#cb26-719" aria-hidden="true" tabindex="-1"></a>    <span class="dt">scale</span><span class="op">:</span> mhD<span class="op">,</span></span>
+<span id="cb26-720"><a href="#cb26-720" aria-hidden="true" tabindex="-1"></a>    <span class="dt">proposal</span><span class="op">:</span> <span class="st">"uniform"</span><span class="op">,</span></span>
+<span id="cb26-721"><a href="#cb26-721" aria-hidden="true" tabindex="-1"></a>    <span class="dt">rng</span><span class="op">:</span> VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(mhSeed)</span>
+<span id="cb26-722"><a href="#cb26-722" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb26-723"><a href="#cb26-723" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> samples <span class="op">=</span> []</span>
+<span id="cb26-724"><a href="#cb26-724" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> s <span class="kw">of</span> run<span class="op">.</span><span class="at">samples</span>) samples<span class="op">.</span><span class="fu">push</span>(s[<span class="dv">0</span>])</span>
+<span id="cb26-725"><a href="#cb26-725" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {samples<span class="op">,</span> <span class="dt">proposals</span><span class="op">:</span> run<span class="op">.</span><span class="at">proposals</span><span class="op">,</span> <span class="dt">accepted</span><span class="op">:</span> run<span class="op">.</span><span class="at">accepted</span>}</span>
+<span id="cb26-726"><a href="#cb26-726" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-27" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb27" data-startfrom="731" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 730;"><span id="cb27-731"><a href="#cb27-731" aria-hidden="true" tabindex="-1"></a>mhView <span class="op">=</span> {</span>
+<span id="cb27-732"><a href="#cb27-732" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> n <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(mhN<span class="op">,</span> mhMax)</span>
+<span id="cb27-733"><a href="#cb27-733" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> samples <span class="op">=</span> mhChain<span class="op">.</span><span class="at">samples</span><span class="op">.</span><span class="fu">slice</span>(<span class="dv">0</span><span class="op">,</span> n)</span>
+<span id="cb27-734"><a href="#cb27-734" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> acceptedSteps <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb27-735"><a href="#cb27-735" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> sum <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb27-736"><a href="#cb27-736" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> n<span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb27-737"><a href="#cb27-737" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> mhChain<span class="op">.</span><span class="at">accepted</span>[t]) acceptedSteps<span class="op">++</span></span>
+<span id="cb27-738"><a href="#cb27-738" aria-hidden="true" tabindex="-1"></a>    sum <span class="op">+=</span> samples[t]</span>
+<span id="cb27-739"><a href="#cb27-739" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-740"><a href="#cb27-740" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> mean <span class="op">=</span> sum <span class="op">/</span> n</span>
+<span id="cb27-741"><a href="#cb27-741" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> sumSq <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb27-742"><a href="#cb27-742" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> x <span class="kw">of</span> samples) sumSq <span class="op">+=</span> (x <span class="op">-</span> mean) <span class="op">*</span> (x <span class="op">-</span> mean)</span>
+<span id="cb27-743"><a href="#cb27-743" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {n<span class="op">,</span> samples<span class="op">,</span> acceptedSteps<span class="op">,</span> mean<span class="op">,</span> <span class="dt">sd</span><span class="op">:</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(sumSq <span class="op">/</span> n)}</span>
+<span id="cb27-744"><a href="#cb27-744" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-28" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb28" data-startfrom="748" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 747;"><span id="cb28-748"><a href="#cb28-748" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb28-749"><a href="#cb28-749" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> steps <span class="op">=</span> mhView<span class="op">.</span><span class="at">n</span> <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb28-750"><a href="#cb28-750" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> rate <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb28-751"><a href="#cb28-751" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (steps <span class="op">&gt;</span> <span class="dv">0</span>) rate <span class="op">=</span> mhView<span class="op">.</span><span class="at">acceptedSteps</span> <span class="op">/</span> steps</span>
+<span id="cb28-752"><a href="#cb28-752" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([</span>
+<span id="cb28-753"><a href="#cb28-753" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Samples N"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> mhView<span class="op">.</span><span class="at">n</span><span class="op">.</span><span class="fu">toLocaleString</span>()}<span class="op">,</span></span>
+<span id="cb28-754"><a href="#cb28-754" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Acceptance rate"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>(<span class="dv">100</span> <span class="op">*</span> rate)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs">%`</span><span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>mhView<span class="op">.</span><span class="at">acceptedSteps</span><span class="sc">}</span><span class="vs"> of </span><span class="sc">${</span>steps<span class="sc">}</span><span class="vs"> proposals accepted`</span>}<span class="op">,</span></span>
+<span id="cb28-755"><a href="#cb28-755" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"ESS"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">effectiveSampleSize</span>(mhView<span class="op">.</span><span class="at">samples</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"Effective sample size: how many independent draws the correlated chain is worth"</span>}<span class="op">,</span></span>
+<span id="cb28-756"><a href="#cb28-756" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"Mean (target 0)"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> mhView<span class="op">.</span><span class="at">mean</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)}<span class="op">,</span></span>
+<span id="cb28-757"><a href="#cb28-757" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">label</span><span class="op">:</span> <span class="st">"SD (target 1)"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> mhView<span class="op">.</span><span class="at">sd</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)}</span>
+<span id="cb28-758"><a href="#cb28-758" aria-hidden="true" tabindex="-1"></a>  ])</span>
+<span id="cb28-759"><a href="#cb28-759" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-29" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb29" data-startfrom="764" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 763;"><span id="cb29-764"><a href="#cb29-764" aria-hidden="true" tabindex="-1"></a>mhPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-30" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb30" data-startfrom="769" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 768;"><span id="cb30-769"><a href="#cb30-769" aria-hidden="true" tabindex="-1"></a>mhShow <span class="op">=</span> <span class="kw">new</span> <span class="bu">Set</span>(mhTraces)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-31" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="ojs-chart-block">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb31" data-startfrom="775" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 774;"><span id="cb31-775"><a href="#cb31-775" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb31-776"><a href="#cb31-776" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> n <span class="op">=</span> mhView<span class="op">.</span><span class="at">n</span></span>
+<span id="cb31-777"><a href="#cb31-777" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> steps <span class="op">=</span> []<span class="op">,</span> rejectedT <span class="op">=</span> []<span class="op">,</span> rejectedY <span class="op">=</span> []</span>
+<span id="cb31-778"><a href="#cb31-778" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> n<span class="op">;</span> t<span class="op">++</span>) {</span>
+<span id="cb31-779"><a href="#cb31-779" aria-hidden="true" tabindex="-1"></a>    steps<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb31-780"><a href="#cb31-780" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t <span class="op">&gt;</span> <span class="dv">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>mhChain<span class="op">.</span><span class="at">accepted</span>[t]) {</span>
+<span id="cb31-781"><a href="#cb31-781" aria-hidden="true" tabindex="-1"></a>      rejectedT<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb31-782"><a href="#cb31-782" aria-hidden="true" tabindex="-1"></a>      rejectedY<span class="op">.</span><span class="fu">push</span>(mhChain<span class="op">.</span><span class="at">proposals</span>[t][<span class="dv">0</span>])</span>
+<span id="cb31-783"><a href="#cb31-783" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb31-784"><a href="#cb31-784" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-785"><a href="#cb31-785" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-786"><a href="#cb31-786" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> bins <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">histogramBins</span>(mhView<span class="op">.</span><span class="at">samples</span><span class="op">,</span> <span class="dv">36</span><span class="op">,</span> {<span class="dt">lo</span><span class="op">:</span> mhYRange[<span class="dv">0</span>]<span class="op">,</span> <span class="dt">hi</span><span class="op">:</span> mhYRange[<span class="dv">1</span>]})</span>
+<span id="cb31-787"><a href="#cb31-787" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> binWidth <span class="op">=</span> (mhYRange[<span class="dv">1</span>] <span class="op">-</span> mhYRange[<span class="dv">0</span>]) <span class="op">/</span> <span class="dv">36</span></span>
+<span id="cb31-788"><a href="#cb31-788" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> curve <span class="op">=</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">sampleCurve</span>(y <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">distributions</span><span class="op">.</span><span class="fu">normalPdf</span>(y<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span> mhYRange[<span class="dv">0</span>]<span class="op">,</span> mhYRange[<span class="dv">1</span>]<span class="op">,</span> {<span class="dt">n</span><span class="op">:</span> <span class="dv">200</span>})</span>
+<span id="cb31-789"><a href="#cb31-789" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-790"><a href="#cb31-790" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> data <span class="op">=</span> []</span>
+<span id="cb31-791"><a href="#cb31-791" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (mhShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Chain"</span>)) {</span>
+<span id="cb31-792"><a href="#cb31-792" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> steps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> mhView<span class="op">.</span><span class="at">samples</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scattergl"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Chain"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb31-793"><a href="#cb31-793" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">4</span>}<span class="op">,</span></span>
+<span id="cb31-794"><a href="#cb31-794" aria-hidden="true" tabindex="-1"></a>      <span class="dt">hovertemplate</span><span class="op">:</span> <span class="st">"x&lt;sub&gt;%{x}&lt;/sub&gt; = %{y:.3f}&lt;extra&gt;&lt;/extra&gt;"</span>})</span>
+<span id="cb31-795"><a href="#cb31-795" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-796"><a href="#cb31-796" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (mhShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Rejected proposals"</span>)) {</span>
+<span id="cb31-797"><a href="#cb31-797" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> rejectedT<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> rejectedY<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scattergl"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Rejected proposals"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb31-798"><a href="#cb31-798" aria-hidden="true" tabindex="-1"></a>      <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">7</span><span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> <span class="st">"x-thin"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="fl">1.5</span>}}<span class="op">,</span></span>
+<span id="cb31-799"><a href="#cb31-799" aria-hidden="true" tabindex="-1"></a>      <span class="dt">hovertemplate</span><span class="op">:</span> <span class="st">"rejected at step %{x}: y = %{y:.3f}&lt;extra&gt;&lt;/extra&gt;"</span>})</span>
+<span id="cb31-800"><a href="#cb31-800" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-801"><a href="#cb31-801" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (mhShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Histogram"</span>)) {</span>
+<span id="cb31-802"><a href="#cb31-802" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> bins<span class="op">.</span><span class="at">densities</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> bins<span class="op">.</span><span class="at">centers</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"bar"</span><span class="op">,</span> <span class="dt">orientation</span><span class="op">:</span> <span class="st">"h"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> binWidth <span class="op">*</span> <span class="fl">0.95</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Histogram"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb31-803"><a href="#cb31-803" aria-hidden="true" tabindex="-1"></a>      <span class="dt">xaxis</span><span class="op">:</span> <span class="st">"x2"</span><span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(<span class="st">"accent3"</span><span class="op">,</span> <span class="fl">0.55</span>)}<span class="op">,</span></span>
+<span id="cb31-804"><a href="#cb31-804" aria-hidden="true" tabindex="-1"></a>      <span class="dt">hovertemplate</span><span class="op">:</span> <span class="st">"density %{x:.3f}&lt;extra&gt;&lt;/extra&gt;"</span>})</span>
+<span id="cb31-805"><a href="#cb31-805" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-806"><a href="#cb31-806" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (mhShow<span class="op">.</span><span class="fu">has</span>(<span class="st">"Target N(0, 1)"</span>)) {</span>
+<span id="cb31-807"><a href="#cb31-807" aria-hidden="true" tabindex="-1"></a>    data<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> curve<span class="op">.</span><span class="at">ys</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> curve<span class="op">.</span><span class="at">xs</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Target N(0, 1)"</span><span class="op">,</span> <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb31-808"><a href="#cb31-808" aria-hidden="true" tabindex="-1"></a>      <span class="dt">xaxis</span><span class="op">:</span> <span class="st">"x2"</span><span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}<span class="op">,</span> <span class="dt">hoverinfo</span><span class="op">:</span> <span class="st">"skip"</span>})</span>
+<span id="cb31-809"><a href="#cb31-809" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-810"><a href="#cb31-810" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-811"><a href="#cb31-811" aria-hidden="true" tabindex="-1"></a>  <span class="co">// mathviz themes xaxis/yaxis; the histogram's own x-axis copies that</span></span>
+<span id="cb31-812"><a href="#cb31-812" aria-hidden="true" tabindex="-1"></a>  <span class="co">// chrome from VM.plotting.layout() (this cell re-runs on a theme toggle</span></span>
+<span id="cb31-813"><a href="#cb31-813" aria-hidden="true" tabindex="-1"></a>  <span class="co">// through chartColors, so the copy stays current).</span></span>
+<span id="cb31-814"><a href="#cb31-814" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> themedAxis <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">layout</span>()<span class="op">.</span><span class="at">xaxis</span></span>
+<span id="cb31-815"><a href="#cb31-815" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">mhPlot</span>(data<span class="op">,</span> {</span>
+<span id="cb31-816"><a href="#cb31-816" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">0.74</span>]<span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.02</span> <span class="op">*</span> mhMax<span class="op">,</span> mhMax <span class="op">*</span> <span class="fl">1.02</span>]<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"step t"</span><span class="op">,</span> <span class="dt">zeroline</span><span class="op">:</span> <span class="kw">false</span>}<span class="op">,</span></span>
+<span id="cb31-817"><a href="#cb31-817" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis2</span><span class="op">:</span> {<span class="op">...</span>themedAxis<span class="op">,</span> <span class="dt">domain</span><span class="op">:</span> [<span class="fl">0.78</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">0.8</span>]<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> {<span class="op">...</span>themedAxis<span class="op">.</span><span class="at">title</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="st">"density"</span>}<span class="op">,</span> <span class="dt">anchor</span><span class="op">:</span> <span class="st">"y"</span>}<span class="op">,</span></span>
+<span id="cb31-818"><a href="#cb31-818" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">range</span><span class="op">:</span> mhYRange<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">zeroline</span><span class="op">:</span> <span class="kw">true</span>}<span class="op">,</span></span>
+<span id="cb31-819"><a href="#cb31-819" aria-hidden="true" tabindex="-1"></a>    <span class="dt">bargap</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb31-820"><a href="#cb31-820" aria-hidden="true" tabindex="-1"></a>    <span class="dt">hovermode</span><span class="op">:</span> <span class="st">"closest"</span><span class="op">,</span></span>
+<span id="cb31-821"><a href="#cb31-821" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> <span class="st">"static"</span><span class="op">,</span></span>
+<span id="cb31-822"><a href="#cb31-822" aria-hidden="true" tabindex="-1"></a>    <span class="dt">autosize</span><span class="op">:</span> <span class="kw">true</span></span>
+<span id="cb31-823"><a href="#cb31-823" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb31-824"><a href="#cb31-824" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-32" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb32" data-startfrom="828" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 827;"><span id="cb32-828"><a href="#cb32-828" aria-hidden="true" tabindex="-1"></a>viewof mhTraces <span class="op">=</span> {</span>
+<span id="cb32-829"><a href="#cb32-829" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> items <span class="op">=</span> []</span>
+<span id="cb32-830"><a href="#cb32-830" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> label <span class="kw">of</span> mhTraceOptions) items<span class="op">.</span><span class="fu">push</span>({label<span class="op">,</span> <span class="dt">color</span><span class="op">:</span> mhTraceColors<span class="op">.</span><span class="fu">get</span>(label)})</span>
+<span id="cb32-831"><a href="#cb32-831" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">legendOverlay</span>(items<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> mhTraceOptions})</span>
+<span id="cb32-832"><a href="#cb32-832" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-33" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="ojs-chart-controls ojs-grid">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb33" data-startfrom="838" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 837;"><span id="cb33-838"><a href="#cb33-838" aria-hidden="true" tabindex="-1"></a>viewof mhD <span class="op">=</span> {</span>
+<span id="cb33-839"><a href="#cb33-839" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> initial <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">6</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="fl">0.1</span><span class="op">,</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"mh_d"</span><span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">d</span>)))</span>
+<span id="cb33-840"><a href="#cb33-840" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> slider <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="fl">0.1</span><span class="op">,</span> <span class="dv">6</span>]<span class="op">,</span> {<span class="dt">step</span><span class="op">:</span> <span class="fl">0.1</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> initial<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Proposal half-width d"</span>})</span>
+<span id="cb33-841"><a href="#cb33-841" aria-hidden="true" tabindex="-1"></a>  slider<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"ojs-fill"</span>)</span>
+<span id="cb33-842"><a href="#cb33-842" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> slider</span>
+<span id="cb33-843"><a href="#cb33-843" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-34" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb34" data-startfrom="847" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 846;"><span id="cb34-847"><a href="#cb34-847" aria-hidden="true" tabindex="-1"></a>viewof mhN <span class="op">=</span> {</span>
+<span id="cb34-848"><a href="#cb34-848" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> initial <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(mhMax<span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="dv">10</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">round</span>(VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">urlParam</span>(<span class="st">"mh_n"</span><span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">n</span>))))</span>
+<span id="cb34-849"><a href="#cb34-849" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> slider <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">range</span>([<span class="dv">10</span><span class="op">,</span> mhMax]<span class="op">,</span> {<span class="dt">step</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> initial<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Samples N"</span>})</span>
+<span id="cb34-850"><a href="#cb34-850" aria-hidden="true" tabindex="-1"></a>  slider<span class="op">.</span><span class="at">classList</span><span class="op">.</span><span class="fu">add</span>(<span class="st">"ojs-fill"</span>)</span>
+<span id="cb34-851"><a href="#cb34-851" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> slider</span>
+<span id="cb34-852"><a href="#cb34-852" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-35" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb35" data-startfrom="863" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 862;"><span id="cb35-863"><a href="#cb35-863" aria-hidden="true" tabindex="-1"></a>mhUrlSync <span class="op">=</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">syncUrlParams</span>({</span>
+<span id="cb35-864"><a href="#cb35-864" aria-hidden="true" tabindex="-1"></a>  <span class="dt">mh_seed</span><span class="op">:</span> [mhSeed<span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">seed</span>]<span class="op">,</span></span>
+<span id="cb35-865"><a href="#cb35-865" aria-hidden="true" tabindex="-1"></a>  <span class="dt">mh_d</span><span class="op">:</span> [mhD<span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">d</span>]<span class="op">,</span></span>
+<span id="cb35-866"><a href="#cb35-866" aria-hidden="true" tabindex="-1"></a>  <span class="dt">mh_n</span><span class="op">:</span> [mhN<span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">n</span>]<span class="op">,</span></span>
+<span id="cb35-867"><a href="#cb35-867" aria-hidden="true" tabindex="-1"></a>  <span class="dt">mh_max</span><span class="op">:</span> [mhMaxInput<span class="op">,</span> mhDefaults<span class="op">.</span><span class="at">max</span>]</span>
+<span id="cb35-868"><a href="#cb35-868" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div id="ojs-cell-36" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="Diagnostics for the chain above">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Diagnostics for the chain above
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>A tiny <span class="math inline">\(d\)</span> gives an acceptance rate near 100% but a chain that barely moves: the ACF decays slowly and the effective sample size is a small fraction of <span class="math inline">\(N\)</span>. A huge <span class="math inline">\(d\)</span> rejects almost everything, and the chain sits still for long stretches. The effective sample size is largest in between.</p>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb36" data-startfrom="878" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 877;"><span id="cb36-878"><a href="#cb36-878" aria-hidden="true" tabindex="-1"></a>mhRunningPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"320px"</span>})</span>
+<span id="cb36-879"><a href="#cb36-879" aria-hidden="true" tabindex="-1"></a>mhAcfPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"320px"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-37-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-37-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb37" data-startfrom="884" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 883;"><span id="cb37-884"><a href="#cb37-884" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb37-885"><a href="#cb37-885" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> steps <span class="op">=</span> []</span>
+<span id="cb37-886"><a href="#cb37-886" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> t <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> t <span class="op">&lt;</span> mhView<span class="op">.</span><span class="at">n</span><span class="op">;</span> t<span class="op">++</span>) steps<span class="op">.</span><span class="fu">push</span>(t)</span>
+<span id="cb37-887"><a href="#cb37-887" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">mhRunningPlot</span>([</span>
+<span id="cb37-888"><a href="#cb37-888" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> steps<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">runningMean</span>(mhView<span class="op">.</span><span class="at">samples</span>)<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"running mean"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb37-889"><a href="#cb37-889" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> mhView<span class="op">.</span><span class="at">n</span> <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"target mean"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span>}}</span>
+<span id="cb37-890"><a href="#cb37-890" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {</span>
+<span id="cb37-891"><a href="#cb37-891" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Running mean"</span><span class="op">,</span> <span class="dt">font</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">14</span>}}<span class="op">,</span></span>
+<span id="cb37-892"><a href="#cb37-892" aria-hidden="true" tabindex="-1"></a>    <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb37-893"><a href="#cb37-893" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"step t"</span>}<span class="op">,</span></span>
+<span id="cb37-894"><a href="#cb37-894" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"mean of x₀, …, xₜ"</span>}<span class="op">,</span></span>
+<span id="cb37-895"><a href="#cb37-895" aria-hidden="true" tabindex="-1"></a>    <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb37-896"><a href="#cb37-896" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> <span class="st">"static"</span></span>
+<span id="cb37-897"><a href="#cb37-897" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb37-898"><a href="#cb37-898" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-899"><a href="#cb37-899" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb37-900"><a href="#cb37-900" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> acf <span class="op">=</span> VM<span class="op">.</span><span class="at">mcmc</span><span class="op">.</span><span class="fu">autocorrelation</span>(mhView<span class="op">.</span><span class="at">samples</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="dv">50</span><span class="op">,</span> mhView<span class="op">.</span><span class="at">n</span> <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb37-901"><a href="#cb37-901" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> lags <span class="op">=</span> []</span>
+<span id="cb37-902"><a href="#cb37-902" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> k <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> k <span class="op">&lt;</span> acf<span class="op">.</span><span class="at">length</span><span class="op">;</span> k<span class="op">++</span>) lags<span class="op">.</span><span class="fu">push</span>(k)</span>
+<span id="cb37-903"><a href="#cb37-903" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">mhAcfPlot</span>([</span>
+<span id="cb37-904"><a href="#cb37-904" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> lags<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> acf<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"bar"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"ACF"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span>}}</span>
+<span id="cb37-905"><a href="#cb37-905" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {</span>
+<span id="cb37-906"><a href="#cb37-906" aria-hidden="true" tabindex="-1"></a>    <span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Autocorrelation"</span><span class="op">,</span> <span class="dt">font</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">14</span>}}<span class="op">,</span></span>
+<span id="cb37-907"><a href="#cb37-907" aria-hidden="true" tabindex="-1"></a>    <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb37-908"><a href="#cb37-908" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"lag"</span><span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.5</span><span class="op">,</span> <span class="fl">50.5</span>]}<span class="op">,</span></span>
+<span id="cb37-909"><a href="#cb37-909" aria-hidden="true" tabindex="-1"></a>    <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"ACF"</span><span class="op">,</span> <span class="dt">range</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.3</span><span class="op">,</span> <span class="fl">1.05</span>]}<span class="op">,</span></span>
+<span id="cb37-910"><a href="#cb37-910" aria-hidden="true" tabindex="-1"></a>    <span class="dt">showlegend</span><span class="op">:</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb37-911"><a href="#cb37-911" aria-hidden="true" tabindex="-1"></a>    <span class="dt">uirevision</span><span class="op">:</span> <span class="st">"static"</span></span>
+<span id="cb37-912"><a href="#cb37-912" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb37-913"><a href="#cb37-913" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-38" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-39" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div id="exm-Metropolis-to-random-walk" class="theorem example">
-<p><span class="theorem-title"><strong>Example 11.2</strong></span> If <span class="math inline">\(p(x)\)</span> is a uniform distribution over the region <span class="math inline">\(\Omega\)</span>, then the Metropolis algorithm reduces to the random walk Metropolis–Hastings algorithm. In this case, the acceptance ratio becomes</p>
+<p><span class="theorem-title"><strong>Example 11.3</strong></span> If <span class="math inline">\(p(x)\)</span> is a uniform distribution over the region <span class="math inline">\(\Omega\)</span>, then the Metropolis algorithm reduces to the random walk Metropolis–Hastings algorithm. In this case, the acceptance ratio becomes</p>
 <p><span class="math display">\[
 \alpha(y | x) = \begin{cases}
 1, &amp; \text{if } y \in \Omega, \\
@@ -947,6 +1834,17 @@ p(a) \cdot \mathbb{P}(X = b | X = a)
 </section>
 
 </main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIFZNIGlzIHRoZSBtYXRodml6IGxpYnJhcnkgKGxvYWRlZCBvbiBldmVyeSBwYWdlIGJ5IHRoZSBtYXRodml6IGV4dGVuc2lvbixcbi8vIHBsdXMgdGhpcyBzaXRlJ3MgYWRkaXRpb25zIGZyb20gX21hdGh2aXovIHZpYSBtYXRodml6LWxvY2FsKS4gVGhpcyBwYWdlXG4vLyB1c2VzIFZNLm1jbWMucmFuZG9tV2Fsa01ldHJvcG9saXMsIFZNLm1jbWMuYXV0b2NvcnJlbGF0aW9uLFxuLy8gVk0ubWNtYy5lZmZlY3RpdmVTYW1wbGVTaXplLCBWTS5tY21jLnJ1bm5pbmdNZWFuLFxuLy8gVk0uZGlzdHJpYnV0aW9ucy5oaXN0b2dyYW1CaW5zLCBWTS5kaXN0cmlidXRpb25zLm5vcm1hbFBkZixcbi8vIFZNLnNhbXBsaW5nLnNlZWRlZFJhbmRvbSwgVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3QsIFZNLnVpLnN0YXRSb3csXG4vLyBWTS51aS51cmxQYXJhbSBhbmQgVk0udWkuc3luY1VybFBhcmFtcy5cblZNID0gd2luZG93LlZNXG5cbi8vIHZtVGhlbWUgcmUtcnVucyBldmVyeSBjZWxsIHRoYXQgYmFrZXMgYSBwYWxldHRlIGNvbG9yIGludG8gYSB0cmFjZSB3aGVuXG4vLyB0aGUgcmVhZGVyIHRvZ2dsZXMgZGFyayBtb2RlOyBjaGFydENvbG9ycyBpcyB0aGF0IHBhbGV0dGUuXG52bVRoZW1lID0gR2VuZXJhdG9ycy5vYnNlcnZlKG5vdGlmeSA9PiBWTS5wbG90dGluZy5vblRoZW1lQ2hhbmdlKG5vdGlmeSkpXG5jaGFydENvbG9ycyA9IFZNLnBsb3R0aW5nLmNvbG9ycyh2bVRoZW1lKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicndNYXhOID0gNTAwMFxucndEZWZhdWx0cyA9ICh7c2VlZDogMSwgbjogMzAwLCBzaWdtYTogMC4yLCByZWdpb246IFwiTC1zaGFwZVwiLCBwcm9wb3NhbDogXCJHYXVzc2lhblwifSlcblxuLy8gRWFjaCByZWdpb246IG1lbWJlcnNoaXAgdGVzdCwgb3V0bGluZSAobnVsbC1zZXBhcmF0ZWQgcG9seWxpbmUpLCBhXG4vLyBzdGFydGluZyBwb2ludCBpbnNpZGUgaXQsIGZpeGVkIGF4aXMgcmFuZ2VzLCBhbmQgdGhlIHVuaWZvcm1cbi8vIGRpc3RyaWJ1dGlvbidzIG1lYW4gLS0gdGhlIHZhbHVlIHRoZSBydW5uaW5nIGF2ZXJhZ2VzIGJlbG93IGNvbnZlcmdlIHRvLlxucndSZWdpb25zID0ge1xuICBjb25zdCBjaXJjbGUgPSAoY3gsIGN5LCByKSA9PiB7XG4gICAgY29uc3QgeHMgPSBbXSwgeXMgPSBbXVxuICAgIGZvciAobGV0IGsgPSAwOyBrIDw9IDEyMDsgaysrKSB7XG4gICAgICB4cy5wdXNoKGN4ICsgciAqIE1hdGguY29zKDIgKiBNYXRoLlBJICogayAvIDEyMCkpXG4gICAgICB5cy5wdXNoKGN5ICsgciAqIE1hdGguc2luKDIgKiBNYXRoLlBJICogayAvIDEyMCkpXG4gICAgfVxuICAgIHJldHVybiB7eHMsIHlzfVxuICB9XG4gIGNvbnN0IGxlZnQgPSBjaXJjbGUoLTEsIDAsIDEpXG4gIGNvbnN0IHJpZ2h0ID0gY2lyY2xlKDEsIDAsIDEpXG4gIHJldHVybiBuZXcgTWFwKFtcbiAgICBbXCJMLXNoYXBlXCIsIHtcbiAgICAgIGluc2lkZTogKHgsIHkpID0+ICh4ID49IDAgJiYgeCA8PSAxICYmIHkgPj0gMCAmJiB5IDw9IDAuMSkgfHwgKHggPj0gMCAmJiB4IDw9IDAuMSAmJiB5ID49IDAgJiYgeSA8PSAxKSxcbiAgICAgIG91dGxpbmVYOiBbMCwgMSwgMSwgMC4xLCAwLjEsIDAsIDBdLFxuICAgICAgb3V0bGluZVk6IFswLCAwLCAwLjEsIDAuMSwgMSwgMSwgMF0sXG4gICAgICBzdGFydDogWzAuMDUsIDAuMDVdLFxuICAgICAgLy8gRXh0cmEgcm9vbSBvbiB0aGUgbGVmdDogdGhlIGxlZ2VuZCBmbG9hdHMgb3ZlciB0aGUgY2hhcnQncyB0b3AtbGVmdFxuICAgICAgLy8gY29ybmVyLCB3aGljaCBpcyB3aGVyZSB0aGUgTCdzIHZlcnRpY2FsIGFybSB3b3VsZCBvdGhlcndpc2UgYmUuXG4gICAgICB4UmFuZ2U6IFstMC42LCAxLjFdLFxuICAgICAgeVJhbmdlOiBbLTAuMSwgMS4xXSxcbiAgICAgIC8vIEFyZWEgMC4xOTogdGhlIHR3byBhcm1zJyBtZWFucyB3ZWlnaHRlZCBieSBhcmVhLlxuICAgICAgbWVhbjogWygwLjEgKiAwLjUgKyAwLjA5ICogMC4wNSkgLyAwLjE5LCAoMC4xICogMC41ICsgMC4wOSAqIDAuMDUpIC8gMC4xOV1cbiAgICB9XSxcbiAgICBbXCJUd28gZGlzY3NcIiwge1xuICAgICAgaW5zaWRlOiAoeCwgeSkgPT4gKHggKyAxKSAqICh4ICsgMSkgKyB5ICogeSA8PSAxIHx8ICh4IC0gMSkgKiAoeCAtIDEpICsgeSAqIHkgPD0gMSxcbiAgICAgIG91dGxpbmVYOiBbLi4ubGVmdC54cywgbnVsbCwgLi4ucmlnaHQueHNdLFxuICAgICAgb3V0bGluZVk6IFsuLi5sZWZ0LnlzLCBudWxsLCAuLi5yaWdodC55c10sXG4gICAgICBzdGFydDogWy0xLCAwXSxcbiAgICAgIHhSYW5nZTogWy0yLjIsIDIuMl0sXG4gICAgICB5UmFuZ2U6IFstMS4zLCAxLjNdLFxuICAgICAgbWVhbjogWzAsIDBdXG4gICAgfV1cbiAgXSlcbn1cblxucndUcmFjZU9wdGlvbnMgPSBbXCJSZWdpb25cIiwgXCJQYXRoXCIsIFwiU2FtcGxlc1wiLCBcIlJlamVjdGVkIHByb3Bvc2Fsc1wiLCBcIlByb3Bvc2FsXCIsIFwiQ3VycmVudCBwb2ludFwiXVxucndUcmFjZUNvbG9ycyA9IG5ldyBNYXAoW1xuICBbXCJSZWdpb25cIiwgY2hhcnRDb2xvcnMuaW5rXSxcbiAgW1wiUGF0aFwiLCBjaGFydENvbG9ycy5tdXRlZF0sXG4gIFtcIlNhbXBsZXNcIiwgY2hhcnRDb2xvcnMuZm5dLFxuICBbXCJSZWplY3RlZCBwcm9wb3NhbHNcIiwgY2hhcnRDb2xvcnMuYWx0XSxcbiAgW1wiUHJvcG9zYWxcIiwgY2hhcnRDb2xvcnMud2Fybl0sXG4gIFtcIkN1cnJlbnQgcG9pbnRcIiwgY2hhcnRDb2xvcnMub2tdXG5dKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIHJ3UmVnaW9uTmFtZSA9IElucHV0cy5zZWxlY3QoWy4uLnJ3UmVnaW9ucy5rZXlzKCldLCB7bGFiZWw6IFwiUmVnaW9uIM6pXCIsIHZhbHVlOiBWTS51aS51cmxQYXJhbShcInJ3X3JlZ2lvblwiLCByd0RlZmF1bHRzLnJlZ2lvbil9KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC00IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIHJ3UHJvcG9zYWwgPSBJbnB1dHMuc2VsZWN0KFtcIkdhdXNzaWFuXCIsIFwiVW5pZm9ybSBzcXVhcmVcIl0sIHtsYWJlbDogXCJQcm9wb3NhbFwiLCB2YWx1ZTogVk0udWkudXJsUGFyYW0oXCJyd19wcm9wb3NhbFwiLCByd0RlZmF1bHRzLnByb3Bvc2FsKX0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTUiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiIvLyBBIHR5cGVkIHZhbHVlIHJhdGhlciB0aGFuIGEgc2xpZGVyOiB0aGUgc3RlcCBzaXplIGlzIGEgc2V0dGluZyB0b1xuLy8gY29tcGFyZSBhIGZldyBjaG9zZW4gdmFsdWVzIG9mICh0aGUgY2hhcHRlcidzIDEsIDAuNSwgMC4yLCAwLjAxKSwgbm90XG4vLyBzb21ldGhpbmcgdG8gc2NydWIgdGhyb3VnaC5cbnZpZXdvZiByd1NpZ21hSW5wdXQgPSBJbnB1dHMudGV4dCh7bGFiZWw6IFwiU3RlcCBzaXplIM+DXCIsIHZhbHVlOiBTdHJpbmcoVk0udWkudXJsUGFyYW0oXCJyd19zaWdtYVwiLCByd0RlZmF1bHRzLnNpZ21hKSksIHBsYWNlaG9sZGVyOiBcIkV4YW1wbGU6IDAuMiwgMSwgMC4wMVwifSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiByd1JlZHJhdyA9IHtcbiAgY29uc3QgYnV0dG9uID0gSW5wdXRzLmJ1dHRvbihcIlJ1biBhIG5ldyBjaGFpblwiLCB7dmFsdWU6IDAsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG4gIGJ1dHRvbi5jbGFzc0xpc3QuYWRkKFwib2pzLWF1dG9cIilcbiAgcmV0dXJuIGJ1dHRvblxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC03IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gcndTaWdtYSBwYXJzZXMgdGhlIHN0ZXAtc2l6ZSBmaWVsZDsgYW55dGhpbmcgdW51c2FibGUgKGVtcHR5LCB6ZXJvLFxuLy8gbmVnYXRpdmUsIG1pZC10eXBpbmcpIGZhbGxzIGJhY2sgdG8gdGhlIGRlZmF1bHQuXG5yd1NpZ21hID0ge1xuICBjb25zdCBwYXJzZWQgPSBWTS5leHByZXNzaW9ucy5tYWtlTnVtYmVyKHdpbmRvdy5tYXRoLCByd1NpZ21hSW5wdXQpXG4gIGlmIChwYXJzZWQgPT09IG51bGwgfHwgIU51bWJlci5pc0Zpbml0ZShwYXJzZWQpIHx8IHBhcnNlZCA8PSAwKSByZXR1cm4gcndEZWZhdWx0cy5zaWdtYVxuICByZXR1cm4gTWF0aC5taW4oNSwgcGFyc2VkKVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC04IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicndTZWVkID0ge1xuICBpZiAocndSZWRyYXcgPT09IDApIHJldHVybiBWTS51aS51cmxQYXJhbShcInJ3X3NlZWRcIiwgcndEZWZhdWx0cy5zZWVkKVxuICByZXR1cm4gTWF0aC5mbG9vcihNYXRoLnJhbmRvbSgpICogMWU5KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC05IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicndSZWdpb24gPSByd1JlZ2lvbnMuZ2V0KHJ3UmVnaW9uTmFtZSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTAiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiIvLyByd0NoYWluOiByd01heE4gc3RlcHMgb2YgdGhlIHJhbmRvbSB3YWxrLCByZXJ1biB3aGVuZXZlciB0aGUgcmVnaW9uLFxuLy8gcHJvcG9zYWwsIHN0ZXAgc2l6ZSBvciBzZWVkIGNoYW5nZXMuIFRoZSBzYW1lIHNlZWQgZ2l2ZXMgdGhlIHNhbWVcbi8vIHVuZGVybHlpbmcgcmFuZG9tIG51bWJlcnMsIHNvIGNoYW5naW5nIHRoZSBzdGVwIHNpemUgc2hvd3MgdGhlIFwic2FtZVwiXG4vLyB3YWxrIHRha2luZyBiaWdnZXIgb3Igc21hbGxlciBzdGVwcy4gVGhlIE4gc2xpZGVyIG9ubHkgcGlja3MgaG93IG11Y2ggb2Zcbi8vIGl0IHRvIHNob3cuXG5yd0NoYWluID0gVk0ubWNtYy5yYW5kb21XYWxrTWV0cm9wb2xpcyh7XG4gIGxvZ0RlbnNpdHk6IHAgPT4gKHJ3UmVnaW9uLmluc2lkZShwWzBdLCBwWzFdKSA/IDAgOiAtSW5maW5pdHkpLFxuICBzdGFydDogcndSZWdpb24uc3RhcnQsXG4gIG46IHJ3TWF4TixcbiAgc2NhbGU6IHJ3U2lnbWEsXG4gIHByb3Bvc2FsOiByd1Byb3Bvc2FsID09PSBcIkdhdXNzaWFuXCIgPyBcImdhdXNzaWFuXCIgOiBcInVuaWZvcm1cIixcbiAgcm5nOiBWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20ocndTZWVkKVxufSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTEiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJyd1ZpZXcgPSB7XG4gIGNvbnN0IG4gPSByd05cbiAgY29uc3QgeHMgPSBbXSwgeXMgPSBbXVxuICBsZXQgYWNjZXB0ZWRTdGVwcyA9IDBcbiAgZm9yIChsZXQgdCA9IDA7IHQgPCBuOyB0KyspIHtcbiAgICB4cy5wdXNoKHJ3Q2hhaW4uc2FtcGxlc1t0XVswXSlcbiAgICB5cy5wdXNoKHJ3Q2hhaW4uc2FtcGxlc1t0XVsxXSlcbiAgICBpZiAodCA+IDAgJiYgcndDaGFpbi5hY2NlcHRlZFt0XSkgYWNjZXB0ZWRTdGVwcysrXG4gIH1cbiAgcmV0dXJuIHtuLCB4cywgeXMsIGFjY2VwdGVkU3RlcHN9XG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTEyIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBzdGVwcyA9IHJ3Vmlldy5uIC0gMVxuICBsZXQgcmF0ZSA9IDBcbiAgaWYgKHN0ZXBzID4gMCkgcmF0ZSA9IHJ3Vmlldy5hY2NlcHRlZFN0ZXBzIC8gc3RlcHNcbiAgcmV0dXJuIFZNLnVpLnN0YXRSb3coW1xuICAgIHtsYWJlbDogXCJTYW1wbGVzIE5cIiwgdmFsdWU6IHJ3Vmlldy5uLnRvTG9jYWxlU3RyaW5nKCl9LFxuICAgIHtsYWJlbDogXCJBY2NlcHRhbmNlIHJhdGVcIiwgdmFsdWU6IGAkeygxMDAgKiByYXRlKS50b0ZpeGVkKDEpfSVgLCB0aXRsZTogYCR7cndWaWV3LmFjY2VwdGVkU3RlcHN9IG9mICR7c3RlcHN9IHByb3Bvc2FscyBhY2NlcHRlZGB9LFxuICAgIHtsYWJlbDogXCJFU1Mgb2YgeFwiLCB2YWx1ZTogVk0ubWNtYy5lZmZlY3RpdmVTYW1wbGVTaXplKHJ3Vmlldy54cykudG9GaXhlZCgxKSwgdGl0bGU6IFwiRWZmZWN0aXZlIHNhbXBsZSBzaXplOiBob3cgbWFueSBpbmRlcGVuZGVudCBkcmF3cyB0aGUgY29ycmVsYXRlZCBjaGFpbiBpcyB3b3J0aFwifSxcbiAgICB7bGFiZWw6IFwiRVNTIG9mIHlcIiwgdmFsdWU6IFZNLm1jbWMuZWZmZWN0aXZlU2FtcGxlU2l6ZShyd1ZpZXcueXMpLnRvRml4ZWQoMSl9XG4gIF0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTEzIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicndQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3QoKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0xNCIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InJ3U2hvdyA9IG5ldyBTZXQocndUcmFjZXMpXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTE1IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBuID0gcndWaWV3Lm5cbiAgY29uc3QgY3VycmVudCA9IHJ3Q2hhaW4uc2FtcGxlc1tuIC0gMV1cbiAgY29uc3QgcmVqZWN0ZWRYID0gW10sIHJlamVjdGVkWSA9IFtdXG4gIGZvciAobGV0IHQgPSAxOyB0IDwgbjsgdCsrKSB7XG4gICAgaWYgKCFyd0NoYWluLmFjY2VwdGVkW3RdKSB7XG4gICAgICByZWplY3RlZFgucHVzaChyd0NoYWluLnByb3Bvc2Fsc1t0XVswXSlcbiAgICAgIHJlamVjdGVkWS5wdXNoKHJ3Q2hhaW4ucHJvcG9zYWxzW3RdWzFdKVxuICAgIH1cbiAgfVxuXG4gIC8vIFRoZSBwcm9wb3NhbCBhcm91bmQgdGhlIGN1cnJlbnQgcG9pbnQ6IGEgMS1zaWdtYSBkaXNjIGZvciB0aGVcbiAgLy8gR2F1c3NpYW4sIHRoZSB3aG9sZSBzdXBwb3J0IHNxdWFyZSBmb3IgdGhlIHVuaWZvcm0uXG4gIGNvbnN0IHBhdGNoWCA9IFtdLCBwYXRjaFkgPSBbXVxuICBpZiAocndQcm9wb3NhbCA9PT0gXCJHYXVzc2lhblwiKSB7XG4gICAgZm9yIChsZXQgayA9IDA7IGsgPD0gODA7IGsrKykge1xuICAgICAgcGF0Y2hYLnB1c2goY3VycmVudFswXSArIHJ3U2lnbWEgKiBNYXRoLmNvcygyICogTWF0aC5QSSAqIGsgLyA4MCkpXG4gICAgICBwYXRjaFkucHVzaChjdXJyZW50WzFdICsgcndTaWdtYSAqIE1hdGguc2luKDIgKiBNYXRoLlBJICogayAvIDgwKSlcbiAgICB9XG4gIH0gZWxzZSB7XG4gICAgY29uc3QgcyA9IHJ3U2lnbWFcbiAgICBwYXRjaFgucHVzaChjdXJyZW50WzBdIC0gcywgY3VycmVudFswXSArIHMsIGN1cnJlbnRbMF0gKyBzLCBjdXJyZW50WzBdIC0gcywgY3VycmVudFswXSAtIHMpXG4gICAgcGF0Y2hZLnB1c2goY3VycmVudFsxXSAtIHMsIGN1cnJlbnRbMV0gLSBzLCBjdXJyZW50WzFdICsgcywgY3VycmVudFsxXSArIHMsIGN1cnJlbnRbMV0gLSBzKVxuICB9XG5cbiAgY29uc3QgZGF0YSA9IFtdXG4gIGlmIChyd1Nob3cuaGFzKFwiUHJvcG9zYWxcIikpIHtcbiAgICBkYXRhLnB1c2goe3g6IHBhdGNoWCwgeTogcGF0Y2hZLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBmaWxsOiBcInRvc2VsZlwiLCBuYW1lOiBcIlByb3Bvc2FsXCIsIHNob3dsZWdlbmQ6IGZhbHNlLFxuICAgICAgZmlsbGNvbG9yOiBWTS5wbG90dGluZy5hbHBoYShcIndhcm5cIiwgMC4yKSwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy53YXJuLCB3aWR0aDogMS41fSwgaG92ZXJpbmZvOiBcInNraXBcIn0pXG4gIH1cbiAgaWYgKHJ3U2hvdy5oYXMoXCJSZWdpb25cIikpIHtcbiAgICBkYXRhLnB1c2goe3g6IHJ3UmVnaW9uLm91dGxpbmVYLCB5OiByd1JlZ2lvbi5vdXRsaW5lWSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJSZWdpb25cIiwgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgICBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmluaywgd2lkdGg6IDJ9LCBob3ZlcmluZm86IFwic2tpcFwifSlcbiAgfVxuICAvLyBXZWJHTCBmb3IgdGhlIHRyYWNlcyB0aGF0IGdyb3cgdG8gdGhvdXNhbmRzIG9mIHBvaW50cyBhcyBOIHBsYXlzLlxuICBpZiAocndTaG93LmhhcyhcIlBhdGhcIikpIHtcbiAgICBkYXRhLnB1c2goe3g6IHJ3Vmlldy54cywgeTogcndWaWV3LnlzLCB0eXBlOiBcInNjYXR0ZXJnbFwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwiUGF0aFwiLCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICAgIGxpbmU6IHtjb2xvcjogVk0ucGxvdHRpbmcuYWxwaGEoXCJtdXRlZFwiLCAwLjYpLCB3aWR0aDogMX0sIGhvdmVyaW5mbzogXCJza2lwXCJ9KVxuICB9XG4gIGlmIChyd1Nob3cuaGFzKFwiU2FtcGxlc1wiKSkge1xuICAgIGRhdGEucHVzaCh7eDogcndWaWV3LnhzLCB5OiByd1ZpZXcueXMsIHR5cGU6IFwic2NhdHRlcmdsXCIsIG1vZGU6IFwibWFya2Vyc1wiLCBuYW1lOiBcIlNhbXBsZXNcIiwgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgICBtYXJrZXI6IHtjb2xvcjogY2hhcnRDb2xvcnMuZm4sIHNpemU6IDR9LCBob3ZlcmluZm86IFwic2tpcFwifSlcbiAgfVxuICBpZiAocndTaG93LmhhcyhcIlJlamVjdGVkIHByb3Bvc2Fsc1wiKSkge1xuICAgIGRhdGEucHVzaCh7eDogcmVqZWN0ZWRYLCB5OiByZWplY3RlZFksIHR5cGU6IFwic2NhdHRlcmdsXCIsIG1vZGU6IFwibWFya2Vyc1wiLCBuYW1lOiBcIlJlamVjdGVkIHByb3Bvc2Fsc1wiLCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICAgIG1hcmtlcjoge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIHNpemU6IDYsIHN5bWJvbDogXCJ4LXRoaW5cIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIHdpZHRoOiAxLjV9fSwgaG92ZXJpbmZvOiBcInNraXBcIn0pXG4gIH1cbiAgaWYgKHJ3U2hvdy5oYXMoXCJDdXJyZW50IHBvaW50XCIpKSB7XG4gICAgZGF0YS5wdXNoKHt4OiBbY3VycmVudFswXV0sIHk6IFtjdXJyZW50WzFdXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibWFya2Vyc1wiLCBuYW1lOiBcIkN1cnJlbnQgcG9pbnRcIiwgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgICBtYXJrZXI6IHtjb2xvcjogY2hhcnRDb2xvcnMub2ssIHNpemU6IDExLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmhhbG8sIHdpZHRoOiAxLjV9fSxcbiAgICAgIGhvdmVydGVtcGxhdGU6IFwiQ3VycmVudCBwb2ludDxicj4oJXt4Oi4zZn0sICV7eTouM2Z9KTxleHRyYT48L2V4dHJhPlwifSlcbiAgfVxuXG4gIHJldHVybiByd1Bsb3QoZGF0YSwge1xuICAgIHhheGlzOiB7cmFuZ2U6IHJ3UmVnaW9uLnhSYW5nZSwgemVyb2xpbmU6IGZhbHNlLCB0aXRsZTogXCJ4XCIsIGNvbnN0cmFpbjogXCJkb21haW5cIn0sXG4gICAgeWF4aXM6IHtyYW5nZTogcndSZWdpb24ueVJhbmdlLCB6ZXJvbGluZTogZmFsc2UsIHRpdGxlOiBcInlcIiwgc2NhbGVhbmNob3I6IFwieFwiLCBjb25zdHJhaW46IFwiZG9tYWluXCJ9LFxuICAgIGhvdmVybW9kZTogXCJjbG9zZXN0XCIsXG4gICAgLy8gS2V5ZWQgb24gdGhlIHJlZ2lvbiwgc28gc3dpdGNoaW5nIHJlZ2lvbnMgcmVzZXRzIHRoZSB2aWV3IHRvIHRoZSBuZXdcbiAgICAvLyByZWdpb24ncyByYW5nZXMgd2hpbGUgem9vbSBzdXJ2aXZlcyBldmVyeSBvdGhlciBjaGFuZ2UuXG4gICAgdWlyZXZpc2lvbjogcndSZWdpb25OYW1lLFxuICAgIGF1dG9zaXplOiB0cnVlXG4gIH0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTE2IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIHJ3VHJhY2VzID0ge1xuICBjb25zdCBpdGVtcyA9IFtdXG4gIGZvciAoY29uc3QgbGFiZWwgb2YgcndUcmFjZU9wdGlvbnMpIGl0ZW1zLnB1c2goe2xhYmVsLCBjb2xvcjogcndUcmFjZUNvbG9ycy5nZXQobGFiZWwpfSlcbiAgcmV0dXJuIFZNLnVpLmxlZ2VuZE92ZXJsYXkoaXRlbXMsIHt2YWx1ZTogcndUcmFjZU9wdGlvbnN9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0xNyIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiByd04gPSB7XG4gIGNvbnN0IGluaXRpYWwgPSBNYXRoLm1pbihyd01heE4sIE1hdGgubWF4KDEwLCBNYXRoLnJvdW5kKFZNLnVpLnVybFBhcmFtKFwicndfblwiLCByd0RlZmF1bHRzLm4pKSkpXG4gIGNvbnN0IHNsaWRlciA9IElucHV0cy5yYW5nZShbMTAsIHJ3TWF4Tl0sIHtzdGVwOiAxMCwgdmFsdWU6IGluaXRpYWwsIGxhYmVsOiBcIlNhbXBsZXMgTlwifSlcbiAgc2xpZGVyLmNsYXNzTGlzdC5hZGQoXCJvanMtZmlsbFwiKVxuICByZXR1cm4gc2xpZGVyXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTE4IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoicndVcmxTeW5jID0gVk0udWkuc3luY1VybFBhcmFtcyh7XG4gIHJ3X3JlZ2lvbjogW3J3UmVnaW9uTmFtZSwgcndEZWZhdWx0cy5yZWdpb25dLFxuICByd19wcm9wb3NhbDogW3J3UHJvcG9zYWwsIHJ3RGVmYXVsdHMucHJvcG9zYWxdLFxuICByd19zZWVkOiBbcndTZWVkLCByd0RlZmF1bHRzLnNlZWRdLFxuICByd19zaWdtYTogW3J3U2lnbWFJbnB1dCwgU3RyaW5nKHJ3RGVmYXVsdHMuc2lnbWEpXSxcbiAgcndfbjogW3J3TiwgcndEZWZhdWx0cy5uXVxufSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTkiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJyd1J1bm5pbmdQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzMjBweFwifSlcbnJ3QWNmUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzIwcHhcIn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTIwIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBzdGVwcyA9IFtdXG4gIGZvciAobGV0IHQgPSAxOyB0IDw9IHJ3Vmlldy5uOyB0KyspIHN0ZXBzLnB1c2godClcbiAgY29uc3QgbWVhblggPSBWTS5tY21jLnJ1bm5pbmdNZWFuKHJ3Vmlldy54cylcbiAgY29uc3QgbWVhblkgPSBWTS5tY21jLnJ1bm5pbmdNZWFuKHJ3Vmlldy55cylcbiAgY29uc3QgZW5kcyA9IFsxLCByd1ZpZXcubl1cbiAgcmV0dXJuIHJ3UnVubmluZ1Bsb3QoW1xuICAgIHt4OiBzdGVwcywgeTogbWVhblgsIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwieFwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFjY2VudDIsIHdpZHRoOiAyfX0sXG4gICAge3g6IHN0ZXBzLCB5OiBtZWFuWSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJ5XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWNjZW50Mywgd2lkdGg6IDJ9fSxcbiAgICB7eDogZW5kcywgeTogW3J3UmVnaW9uLm1lYW5bMF0sIHJ3UmVnaW9uLm1lYW5bMF1dLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIm1lYW4gb2YgeFwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFjY2VudDIsIHdpZHRoOiAxLCBkYXNoOiBcImRhc2hcIn19LFxuICAgIHt4OiBlbmRzLCB5OiBbcndSZWdpb24ubWVhblsxXSwgcndSZWdpb24ubWVhblsxXV0sIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsIG5hbWU6IFwibWVhbiBvZiB5XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWNjZW50Mywgd2lkdGg6IDEsIGRhc2g6IFwiZG90XCJ9fVxuICBdLCB7XG4gICAgdGl0bGU6IHt0ZXh0OiBcIlJ1bm5pbmcgYXZlcmFnZXNcIiwgZm9udDoge3NpemU6IDE0fX0sXG4gICAgbWFyZ2luOiB7dDogNDB9LFxuICAgIHhheGlzOiB7dGl0bGU6IFwic3RlcFwifSxcbiAgICB5YXhpczoge3RpdGxlOiBcImF2ZXJhZ2VcIn0sXG4gICAgc2hvd2xlZ2VuZDogdHJ1ZSxcbiAgICBsZWdlbmQ6IHtvcmllbnRhdGlvbjogXCJoXCIsIHk6IC0wLjI1fSxcbiAgICB1aXJldmlzaW9uOiBcInN0YXRpY1wiXG4gIH0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTIxIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBtYXhMYWcgPSBNYXRoLm1pbigxMDAsIHJ3Vmlldy5uIC0gMSlcbiAgY29uc3QgYWNmWCA9IFZNLm1jbWMuYXV0b2NvcnJlbGF0aW9uKHJ3Vmlldy54cywgbWF4TGFnKVxuICBjb25zdCBhY2ZZID0gVk0ubWNtYy5hdXRvY29ycmVsYXRpb24ocndWaWV3LnlzLCBtYXhMYWcpXG4gIGNvbnN0IGxhZ3MgPSBbXVxuICBmb3IgKGxldCBrID0gMDsgayA8IGFjZlgubGVuZ3RoOyBrKyspIGxhZ3MucHVzaChrKVxuICByZXR1cm4gcndBY2ZQbG90KFtcbiAgICB7eDogbGFncywgeTogYWNmWCwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJ4XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWNjZW50Miwgd2lkdGg6IDJ9fSxcbiAgICB7eDogbGFncywgeTogYWNmWSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJ5XCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuYWNjZW50Mywgd2lkdGg6IDJ9fVxuICBdLCB7XG4gICAgdGl0bGU6IHt0ZXh0OiBcIkF1dG9jb3JyZWxhdGlvblwiLCBmb250OiB7c2l6ZTogMTR9fSxcbiAgICBtYXJnaW46IHt0OiA0MH0sXG4gICAgeGF4aXM6IHt0aXRsZTogXCJsYWdcIiwgcmFuZ2U6IFswLCAxMDBdfSxcbiAgICB5YXhpczoge3RpdGxlOiBcIkFDRlwiLCByYW5nZTogWy0wLjMsIDEuMDVdfSxcbiAgICBzaG93bGVnZW5kOiB0cnVlLFxuICAgIGxlZ2VuZDoge29yaWVudGF0aW9uOiBcImhcIiwgeTogLTAuMjV9LFxuICAgIHVpcmV2aXNpb246IFwic3RhdGljXCJcbiAgfSlcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMjIiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJtaERlZmF1bHRzID0gKHtzZWVkOiAxLCBuOiAxMDAsIGQ6IDIsIG1heDogXCI1MDBcIn0pXG5cbm1oVHJhY2VPcHRpb25zID0gW1wiQ2hhaW5cIiwgXCJSZWplY3RlZCBwcm9wb3NhbHNcIiwgXCJIaXN0b2dyYW1cIiwgXCJUYXJnZXQgTigwLCAxKVwiXVxubWhUcmFjZUNvbG9ycyA9IG5ldyBNYXAoW1xuICBbXCJDaGFpblwiLCBjaGFydENvbG9ycy5mbl0sXG4gIFtcIlJlamVjdGVkIHByb3Bvc2Fsc1wiLCBjaGFydENvbG9ycy5hbHRdLFxuICBbXCJIaXN0b2dyYW1cIiwgVk0ucGxvdHRpbmcuYWxwaGEoXCJhY2NlbnQzXCIsIDAuNTUpXSxcbiAgW1wiVGFyZ2V0IE4oMCwgMSlcIiwgY2hhcnRDb2xvcnMuaW5rXVxuXSlcblxuLy8gVGhlIHktYXhpcyAoc2FtcGxlIHZhbHVlKSBpcyBmaXhlZCBhdCArLTQuNSBmb3IgZXZlcnkgY2hhaW4sIHNvIG5laXRoZXJcbi8vIHNsaWRlciByZXNjYWxlcyBpdDsgdGhlIGhpc3RvZ3JhbSBzaGFyZXMgaXQuXG5taFlSYW5nZSA9IFstNC41LCA0LjVdXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTIzIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gQWx3YXlzLWxpdmUsIGxpa2UgdGhlIHNsaWRlcnM6IGl0IHNldHMgdGhlIHN0ZXAgc2xpZGVyJ3MgcmFuZ2UgYW5kIHRoZVxuLy8gdHJhY2UncyB4LWF4aXMsIHNvIGEgbG9uZyBydW4gYW5kIGEgc2hvcnQgb25lIGVhY2ggZmlsbCB0aGUgY2hhcnQuXG52aWV3b2YgbWhNYXhJbnB1dCA9IHtcbiAgY29uc3QgaW5wdXQgPSBJbnB1dHMudGV4dCh7bGFiZWw6IFwiTWF4IE5cIiwgdmFsdWU6IFN0cmluZyhWTS51aS51cmxQYXJhbShcIm1oX21heFwiLCBtaERlZmF1bHRzLm1heCkpLCBwbGFjZWhvbGRlcjogXCJFeGFtcGxlOiA1MDAsIDUwMDBcIn0pXG4gIHJldHVybiBpbnB1dFxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yNCIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiBtaFJlZHJhdyA9IHtcbiAgY29uc3QgYnV0dG9uID0gSW5wdXRzLmJ1dHRvbihcIlJ1biBhIG5ldyBjaGFpblwiLCB7dmFsdWU6IDAsIHJlZHVjZTogdiA9PiB2ICsgMX0pXG4gIGJ1dHRvbi5jbGFzc0xpc3QuYWRkKFwib2pzLWF1dG9cIilcbiAgcmV0dXJuIGJ1dHRvblxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ii8vIG1oTWF4IHBhcnNlcyB0aGUgTWF4IE4gZmllbGQsIGZhbGxpbmcgYmFjayB0byA1MDAgb24gYW55dGhpbmcgdW51c2FibGUuXG5taE1heCA9IHtcbiAgY29uc3QgcGFyc2VkID0gVk0uZXhwcmVzc2lvbnMubWFrZU51bWJlcih3aW5kb3cubWF0aCwgbWhNYXhJbnB1dClcbiAgaWYgKHBhcnNlZCA9PT0gbnVsbCB8fCAhTnVtYmVyLmlzRmluaXRlKHBhcnNlZCkpIHJldHVybiA1MDBcbiAgcmV0dXJuIE1hdGgubWluKDIwMDAwLCBNYXRoLm1heCgyMCwgTWF0aC5yb3VuZChwYXJzZWQpKSlcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMjYiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJtaFNlZWQgPSB7XG4gIGlmIChtaFJlZHJhdyA9PT0gMCkgcmV0dXJuIFZNLnVpLnVybFBhcmFtKFwibWhfc2VlZFwiLCBtaERlZmF1bHRzLnNlZWQpXG4gIHJldHVybiBNYXRoLmZsb29yKE1hdGgucmFuZG9tKCkgKiAxZTkpXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTI3IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiLy8gbWhDaGFpbjogbWhNYXggc3RhdGVzIG9mIHRoZSBjaGFpbiBmcm9tIHgwID0gMC4gVGhlIHNhbWUgc2VlZCByZXVzZXMgdGhlXG4vLyBzYW1lIHJhbmRvbSBudW1iZXJzLCBzbyBkcmFnZ2luZyBkIHNob3dzIHRoZSBzYW1lIGNoYWluIHdpdGggYSB3aWRlciBvclxuLy8gbmFycm93ZXIgcHJvcG9zYWwuXG5taENoYWluID0ge1xuICBjb25zdCBydW4gPSBWTS5tY21jLnJhbmRvbVdhbGtNZXRyb3BvbGlzKHtcbiAgICBsb2dEZW5zaXR5OiBwID0+IC0wLjUgKiBwWzBdICogcFswXSxcbiAgICBzdGFydDogWzBdLFxuICAgIG46IG1oTWF4LFxuICAgIHNjYWxlOiBtaEQsXG4gICAgcHJvcG9zYWw6IFwidW5pZm9ybVwiLFxuICAgIHJuZzogVk0uc2FtcGxpbmcuc2VlZGVkUmFuZG9tKG1oU2VlZClcbiAgfSlcbiAgY29uc3Qgc2FtcGxlcyA9IFtdXG4gIGZvciAoY29uc3QgcyBvZiBydW4uc2FtcGxlcykgc2FtcGxlcy5wdXNoKHNbMF0pXG4gIHJldHVybiB7c2FtcGxlcywgcHJvcG9zYWxzOiBydW4ucHJvcG9zYWxzLCBhY2NlcHRlZDogcnVuLmFjY2VwdGVkfVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yOCIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Im1oVmlldyA9IHtcbiAgY29uc3QgbiA9IE1hdGgubWluKG1oTiwgbWhNYXgpXG4gIGNvbnN0IHNhbXBsZXMgPSBtaENoYWluLnNhbXBsZXMuc2xpY2UoMCwgbilcbiAgbGV0IGFjY2VwdGVkU3RlcHMgPSAwXG4gIGxldCBzdW0gPSAwXG4gIGZvciAobGV0IHQgPSAwOyB0IDwgbjsgdCsrKSB7XG4gICAgaWYgKHQgPiAwICYmIG1oQ2hhaW4uYWNjZXB0ZWRbdF0pIGFjY2VwdGVkU3RlcHMrK1xuICAgIHN1bSArPSBzYW1wbGVzW3RdXG4gIH1cbiAgY29uc3QgbWVhbiA9IHN1bSAvIG5cbiAgbGV0IHN1bVNxID0gMFxuICBmb3IgKGNvbnN0IHggb2Ygc2FtcGxlcykgc3VtU3EgKz0gKHggLSBtZWFuKSAqICh4IC0gbWVhbilcbiAgcmV0dXJuIHtuLCBzYW1wbGVzLCBhY2NlcHRlZFN0ZXBzLCBtZWFuLCBzZDogTWF0aC5zcXJ0KHN1bVNxIC8gbil9XG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTI5IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBzdGVwcyA9IG1oVmlldy5uIC0gMVxuICBsZXQgcmF0ZSA9IDBcbiAgaWYgKHN0ZXBzID4gMCkgcmF0ZSA9IG1oVmlldy5hY2NlcHRlZFN0ZXBzIC8gc3RlcHNcbiAgcmV0dXJuIFZNLnVpLnN0YXRSb3coW1xuICAgIHtsYWJlbDogXCJTYW1wbGVzIE5cIiwgdmFsdWU6IG1oVmlldy5uLnRvTG9jYWxlU3RyaW5nKCl9LFxuICAgIHtsYWJlbDogXCJBY2NlcHRhbmNlIHJhdGVcIiwgdmFsdWU6IGAkeygxMDAgKiByYXRlKS50b0ZpeGVkKDEpfSVgLCB0aXRsZTogYCR7bWhWaWV3LmFjY2VwdGVkU3RlcHN9IG9mICR7c3RlcHN9IHByb3Bvc2FscyBhY2NlcHRlZGB9LFxuICAgIHtsYWJlbDogXCJFU1NcIiwgdmFsdWU6IFZNLm1jbWMuZWZmZWN0aXZlU2FtcGxlU2l6ZShtaFZpZXcuc2FtcGxlcykudG9GaXhlZCgxKSwgdGl0bGU6IFwiRWZmZWN0aXZlIHNhbXBsZSBzaXplOiBob3cgbWFueSBpbmRlcGVuZGVudCBkcmF3cyB0aGUgY29ycmVsYXRlZCBjaGFpbiBpcyB3b3J0aFwifSxcbiAgICB7bGFiZWw6IFwiTWVhbiAodGFyZ2V0IDApXCIsIHZhbHVlOiBtaFZpZXcubWVhbi50b0ZpeGVkKDMpfSxcbiAgICB7bGFiZWw6IFwiU0QgKHRhcmdldCAxKVwiLCB2YWx1ZTogbWhWaWV3LnNkLnRvRml4ZWQoMyl9XG4gIF0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMwIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoibWhQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3QoKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Im1oU2hvdyA9IG5ldyBTZXQobWhUcmFjZXMpXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTMyIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBuID0gbWhWaWV3Lm5cbiAgY29uc3Qgc3RlcHMgPSBbXSwgcmVqZWN0ZWRUID0gW10sIHJlamVjdGVkWSA9IFtdXG4gIGZvciAobGV0IHQgPSAwOyB0IDwgbjsgdCsrKSB7XG4gICAgc3RlcHMucHVzaCh0KVxuICAgIGlmICh0ID4gMCAmJiAhbWhDaGFpbi5hY2NlcHRlZFt0XSkge1xuICAgICAgcmVqZWN0ZWRULnB1c2godClcbiAgICAgIHJlamVjdGVkWS5wdXNoKG1oQ2hhaW4ucHJvcG9zYWxzW3RdWzBdKVxuICAgIH1cbiAgfVxuXG4gIGNvbnN0IGJpbnMgPSBWTS5kaXN0cmlidXRpb25zLmhpc3RvZ3JhbUJpbnMobWhWaWV3LnNhbXBsZXMsIDM2LCB7bG86IG1oWVJhbmdlWzBdLCBoaTogbWhZUmFuZ2VbMV19KVxuICBjb25zdCBiaW5XaWR0aCA9IChtaFlSYW5nZVsxXSAtIG1oWVJhbmdlWzBdKSAvIDM2XG4gIGNvbnN0IGN1cnZlID0gVk0uZGlzdHJpYnV0aW9ucy5zYW1wbGVDdXJ2ZSh5ID0+IFZNLmRpc3RyaWJ1dGlvbnMubm9ybWFsUGRmKHksIDAsIDEpLCBtaFlSYW5nZVswXSwgbWhZUmFuZ2VbMV0sIHtuOiAyMDB9KVxuXG4gIGNvbnN0IGRhdGEgPSBbXVxuICBpZiAobWhTaG93LmhhcyhcIkNoYWluXCIpKSB7XG4gICAgZGF0YS5wdXNoKHt4OiBzdGVwcywgeTogbWhWaWV3LnNhbXBsZXMsIHR5cGU6IFwic2NhdHRlcmdsXCIsIG1vZGU6IFwibGluZXMrbWFya2Vyc1wiLCBuYW1lOiBcIkNoYWluXCIsIHNob3dsZWdlbmQ6IGZhbHNlLFxuICAgICAgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5mbiwgd2lkdGg6IDEuNX0sIG1hcmtlcjoge2NvbG9yOiBjaGFydENvbG9ycy5mbiwgc2l6ZTogNH0sXG4gICAgICBob3ZlcnRlbXBsYXRlOiBcIng8c3ViPiV7eH08L3N1Yj4gPSAle3k6LjNmfTxleHRyYT48L2V4dHJhPlwifSlcbiAgfVxuICBpZiAobWhTaG93LmhhcyhcIlJlamVjdGVkIHByb3Bvc2Fsc1wiKSkge1xuICAgIGRhdGEucHVzaCh7eDogcmVqZWN0ZWRULCB5OiByZWplY3RlZFksIHR5cGU6IFwic2NhdHRlcmdsXCIsIG1vZGU6IFwibWFya2Vyc1wiLCBuYW1lOiBcIlJlamVjdGVkIHByb3Bvc2Fsc1wiLCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICAgIG1hcmtlcjoge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIHNpemU6IDcsIHN5bWJvbDogXCJ4LXRoaW5cIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIHdpZHRoOiAxLjV9fSxcbiAgICAgIGhvdmVydGVtcGxhdGU6IFwicmVqZWN0ZWQgYXQgc3RlcCAle3h9OiB5ID0gJXt5Oi4zZn08ZXh0cmE+PC9leHRyYT5cIn0pXG4gIH1cbiAgaWYgKG1oU2hvdy5oYXMoXCJIaXN0b2dyYW1cIikpIHtcbiAgICBkYXRhLnB1c2goe3g6IGJpbnMuZGVuc2l0aWVzLCB5OiBiaW5zLmNlbnRlcnMsIHR5cGU6IFwiYmFyXCIsIG9yaWVudGF0aW9uOiBcImhcIiwgd2lkdGg6IGJpbldpZHRoICogMC45NSwgbmFtZTogXCJIaXN0b2dyYW1cIiwgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgICB4YXhpczogXCJ4MlwiLCB5YXhpczogXCJ5XCIsIG1hcmtlcjoge2NvbG9yOiBWTS5wbG90dGluZy5hbHBoYShcImFjY2VudDNcIiwgMC41NSl9LFxuICAgICAgaG92ZXJ0ZW1wbGF0ZTogXCJkZW5zaXR5ICV7eDouM2Z9PGV4dHJhPjwvZXh0cmE+XCJ9KVxuICB9XG4gIGlmIChtaFNob3cuaGFzKFwiVGFyZ2V0IE4oMCwgMSlcIikpIHtcbiAgICBkYXRhLnB1c2goe3g6IGN1cnZlLnlzLCB5OiBjdXJ2ZS54cywgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJUYXJnZXQgTigwLCAxKVwiLCBzaG93bGVnZW5kOiBmYWxzZSxcbiAgICAgIHhheGlzOiBcIngyXCIsIHlheGlzOiBcInlcIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5pbmssIHdpZHRoOiAyfSwgaG92ZXJpbmZvOiBcInNraXBcIn0pXG4gIH1cblxuICAvLyBtYXRodml6IHRoZW1lcyB4YXhpcy95YXhpczsgdGhlIGhpc3RvZ3JhbSdzIG93biB4LWF4aXMgY29waWVzIHRoYXRcbiAgLy8gY2hyb21lIGZyb20gVk0ucGxvdHRpbmcubGF5b3V0KCkgKHRoaXMgY2VsbCByZS1ydW5zIG9uIGEgdGhlbWUgdG9nZ2xlXG4gIC8vIHRocm91Z2ggY2hhcnRDb2xvcnMsIHNvIHRoZSBjb3B5IHN0YXlzIGN1cnJlbnQpLlxuICBjb25zdCB0aGVtZWRBeGlzID0gVk0ucGxvdHRpbmcubGF5b3V0KCkueGF4aXNcbiAgcmV0dXJuIG1oUGxvdChkYXRhLCB7XG4gICAgeGF4aXM6IHtkb21haW46IFswLCAwLjc0XSwgcmFuZ2U6IFstMC4wMiAqIG1oTWF4LCBtaE1heCAqIDEuMDJdLCB0aXRsZTogXCJzdGVwIHRcIiwgemVyb2xpbmU6IGZhbHNlfSxcbiAgICB4YXhpczI6IHsuLi50aGVtZWRBeGlzLCBkb21haW46IFswLjc4LCAxXSwgcmFuZ2U6IFswLCAwLjhdLCB0aXRsZTogey4uLnRoZW1lZEF4aXMudGl0bGUsIHRleHQ6IFwiZGVuc2l0eVwifSwgYW5jaG9yOiBcInlcIn0sXG4gICAgeWF4aXM6IHtyYW5nZTogbWhZUmFuZ2UsIHRpdGxlOiBcInhcIiwgemVyb2xpbmU6IHRydWV9LFxuICAgIGJhcmdhcDogMCxcbiAgICBob3Zlcm1vZGU6IFwiY2xvc2VzdFwiLFxuICAgIHVpcmV2aXNpb246IFwic3RhdGljXCIsXG4gICAgYXV0b3NpemU6IHRydWVcbiAgfSlcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMzMiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ2aWV3b2YgbWhUcmFjZXMgPSB7XG4gIGNvbnN0IGl0ZW1zID0gW11cbiAgZm9yIChjb25zdCBsYWJlbCBvZiBtaFRyYWNlT3B0aW9ucykgaXRlbXMucHVzaCh7bGFiZWwsIGNvbG9yOiBtaFRyYWNlQ29sb3JzLmdldChsYWJlbCl9KVxuICByZXR1cm4gVk0udWkubGVnZW5kT3ZlcmxheShpdGVtcywge3ZhbHVlOiBtaFRyYWNlT3B0aW9uc30pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTM0IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIG1oRCA9IHtcbiAgY29uc3QgaW5pdGlhbCA9IE1hdGgubWluKDYsIE1hdGgubWF4KDAuMSwgVk0udWkudXJsUGFyYW0oXCJtaF9kXCIsIG1oRGVmYXVsdHMuZCkpKVxuICBjb25zdCBzbGlkZXIgPSBJbnB1dHMucmFuZ2UoWzAuMSwgNl0sIHtzdGVwOiAwLjEsIHZhbHVlOiBpbml0aWFsLCBsYWJlbDogXCJQcm9wb3NhbCBoYWxmLXdpZHRoIGRcIn0pXG4gIHNsaWRlci5jbGFzc0xpc3QuYWRkKFwib2pzLWZpbGxcIilcbiAgcmV0dXJuIHNsaWRlclxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZpZXdvZiBtaE4gPSB7XG4gIGNvbnN0IGluaXRpYWwgPSBNYXRoLm1pbihtaE1heCwgTWF0aC5tYXgoMTAsIE1hdGgucm91bmQoVk0udWkudXJsUGFyYW0oXCJtaF9uXCIsIG1oRGVmYXVsdHMubikpKSlcbiAgY29uc3Qgc2xpZGVyID0gSW5wdXRzLnJhbmdlKFsxMCwgbWhNYXhdLCB7c3RlcDogMSwgdmFsdWU6IGluaXRpYWwsIGxhYmVsOiBcIlNhbXBsZXMgTlwifSlcbiAgc2xpZGVyLmNsYXNzTGlzdC5hZGQoXCJvanMtZmlsbFwiKVxuICByZXR1cm4gc2xpZGVyXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTM2IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoibWhVcmxTeW5jID0gVk0udWkuc3luY1VybFBhcmFtcyh7XG4gIG1oX3NlZWQ6IFttaFNlZWQsIG1oRGVmYXVsdHMuc2VlZF0sXG4gIG1oX2Q6IFttaEQsIG1oRGVmYXVsdHMuZF0sXG4gIG1oX246IFttaE4sIG1oRGVmYXVsdHMubl0sXG4gIG1oX21heDogW21oTWF4SW5wdXQsIG1oRGVmYXVsdHMubWF4XVxufSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMzciLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJtaFJ1bm5pbmdQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCIzMjBweFwifSlcbm1oQWNmUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiMzIwcHhcIn0pXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTM4IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBzdGVwcyA9IFtdXG4gIGZvciAobGV0IHQgPSAwOyB0IDwgbWhWaWV3Lm47IHQrKykgc3RlcHMucHVzaCh0KVxuICByZXR1cm4gbWhSdW5uaW5nUGxvdChbXG4gICAge3g6IHN0ZXBzLCB5OiBWTS5tY21jLnJ1bm5pbmdNZWFuKG1oVmlldy5zYW1wbGVzKSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJydW5uaW5nIG1lYW5cIiwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5mbiwgd2lkdGg6IDJ9fSxcbiAgICB7eDogWzAsIG1oVmlldy5uIC0gMV0sIHk6IFswLCAwXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJ0YXJnZXQgbWVhblwiLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmluaywgd2lkdGg6IDEsIGRhc2g6IFwiZGFzaFwifX1cbiAgXSwge1xuICAgIHRpdGxlOiB7dGV4dDogXCJSdW5uaW5nIG1lYW5cIiwgZm9udDoge3NpemU6IDE0fX0sXG4gICAgbWFyZ2luOiB7dDogNDB9LFxuICAgIHhheGlzOiB7dGl0bGU6IFwic3RlcCB0XCJ9LFxuICAgIHlheGlzOiB7dGl0bGU6IFwibWVhbiBvZiB44oKALCDigKYsIHjigpxcIn0sXG4gICAgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgdWlyZXZpc2lvbjogXCJzdGF0aWNcIlxuICB9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zOSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgYWNmID0gVk0ubWNtYy5hdXRvY29ycmVsYXRpb24obWhWaWV3LnNhbXBsZXMsIE1hdGgubWluKDUwLCBtaFZpZXcubiAtIDEpKVxuICBjb25zdCBsYWdzID0gW11cbiAgZm9yIChsZXQgayA9IDA7IGsgPCBhY2YubGVuZ3RoOyBrKyspIGxhZ3MucHVzaChrKVxuICByZXR1cm4gbWhBY2ZQbG90KFtcbiAgICB7eDogbGFncywgeTogYWNmLCB0eXBlOiBcImJhclwiLCBuYW1lOiBcIkFDRlwiLCBtYXJrZXI6IHtjb2xvcjogY2hhcnRDb2xvcnMuZm59fVxuICBdLCB7XG4gICAgdGl0bGU6IHt0ZXh0OiBcIkF1dG9jb3JyZWxhdGlvblwiLCBmb250OiB7c2l6ZTogMTR9fSxcbiAgICBtYXJnaW46IHt0OiA0MH0sXG4gICAgeGF4aXM6IHt0aXRsZTogXCJsYWdcIiwgcmFuZ2U6IFstMC41LCA1MC41XX0sXG4gICAgeWF4aXM6IHt0aXRsZTogXCJBQ0ZcIiwgcmFuZ2U6IFstMC4zLCAxLjA1XX0sXG4gICAgc2hvd2xlZ2VuZDogZmFsc2UsXG4gICAgdWlyZXZpc2lvbjogXCJzdGF0aWNcIlxuICB9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCdyd1JlZ2lvbk5hbWUnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncndQcm9wb3NhbCcpIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCdyd1NpZ21hSW5wdXQnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncndSZWRyYXcnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncndUcmFjZXMnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgncndOJykifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ21oTWF4SW5wdXQnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnbWhSZWRyYXcnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnbWhUcmFjZXMnKSJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnbWhEJykifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXRRdWlldCIsInNvdXJjZSI6InNoaW55SW5wdXQoJ21oTicpIn1dfQ==
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../chapters/sampling";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "../..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
