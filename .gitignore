@@ -12,3 +12,5 @@ __pycache__/
 **/*_files/figure-pdf/
 **/*_files/libs/
 .venv/
+
+/.luarc.json

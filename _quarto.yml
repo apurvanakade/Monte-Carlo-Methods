@@ -52,7 +52,8 @@ book:
         - chapters/optimization/simulated_annealing.qmd
         - chapters/optimization/cross_entropy.qmd
     - chapters/references.qmd
-    # Add each app page here as it is built (apps/<name>.qmd).
+    # The apps live in the chapters (each a <div class="vm-app" id="...">);
+    # apps/index.qmd links to each one's ?embed=<id> view.
     - part: "Interactive Apps"
       chapters:
         - apps/index.qmd
@@ -65,8 +66,11 @@ bibliography: references.bib
 
 # mathviz (https://github.com/apurvanakade/mathviz): puts math.js, Plotly,
 # window.VM and the mathviz stylesheet into every page's <head>.
+# mathviz-local is this site's additions to VM, built from _mathviz/ (see
+# _mathviz/README.md); it must come after mathviz, whose VM it extends.
 filters:
   - mathviz
+  - mathviz-local
 mathviz:
   referrer: same-origin
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
@@ -74,6 +78,11 @@ mathviz:
   # Select text -> "Report bug" opens an issue linking the page's .qmd source.
   report-bug:
     repo: apurvanakade/Monte-Carlo-Methods
+  # A "Share" button on every app (each <div class="vm-app">) with the page
+  # link and an <iframe> snippet. Turns on embed mode too: any app page
+  # loaded with ?embed=1 shows the app alone, for a frame.
+  share:
+    site-url: https://apurvanakade.github.io/Monte-Carlo-Methods
 
 format:
   html:
