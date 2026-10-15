@@ -1,6 +1,7 @@
 ---
 title: "Interactive Apps"
 subtitle: "Explore Monte Carlo methods through interactive visualizations"
+comments: false
 # Each app lives in the chapter that explains it, wrapped in
 # <div class="vm-app" id="...">; the chapter URL with ?embed=<id> shows that
 # app alone (mathviz embed mode). The cards below link to those views, so
