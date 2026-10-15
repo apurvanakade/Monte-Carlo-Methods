@@ -64,6 +64,20 @@ book:
 
 bibliography: references.bib
 
+# A comment thread under every page (https://giscus.app): each page's thread
+# is a GitHub Discussion in this repo's "General" category, keyed by the
+# page's path. The ids are from the repo's GraphQL API; giscus's GitHub app
+# must be installed on the repo. A page opts out with `comments: false`.
+comments:
+  giscus:
+    repo: apurvanakade/Monte-Carlo-Methods
+    repo-id: R_kgDOPX0lZg
+    category: General
+    category-id: DIC_kwDOPX0lZs4DIeN8
+    mapping: pathname
+    reactions-enabled: true
+    input-position: top
+
 # mathviz (https://github.com/apurvanakade/mathviz): puts math.js, Plotly,
 # window.VM and the mathviz stylesheet into every page's <head>.
 filters:
@@ -92,6 +106,10 @@ format:
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
     css:
       - assets/style.css
+    # No comment thread in mathviz embed mode (?embed=), which shows the app
+    # alone. Drop this once mathviz's chrome/embed.css lists .giscus.
+    include-in-header:
+      text: "<style>html.vm-embed .giscus { display: none !important; }</style>"
     bread-crumbs: true
     back-to-top-navigation: true
 
