@@ -1,6 +1,6 @@
 ---
 name: ship-pr
-description: Take a finished Monte Carlo Methods change all the way to the live site -- commit it on a branch in its own worktree, verify it, open a pull request into develop, triage the review, merge, fast-forward main (which publishes), and clean up. Use when asked to commit, push, open a PR, ship, land, merge or release a change in this repository.
+description: Take a finished Monte Carlo Methods change all the way to the live site -- commit it on a branch in its own worktree, verify it, open a pull request into develop, have a fresh maintainer agent review it, triage its findings and Copilot's, merge, fast-forward main (which publishes), and clean up. Use when asked to commit, push, open a PR, ship, land, merge or release a change in this repository.
 argument-hint: "[PR number]  (default: open a PR for the current worktree's changes)"
 ---
 
@@ -26,7 +26,8 @@ Anything touching a code cell, CSS, `_quarto.yml`,
 `_extensions/`, `scripts/` or `.github/` is **not** small, however few lines.
 Carry on.
 
-If a PR number was given, skip to step 3.
+If a PR number was given, skip to step 3 (unless it already has a
+maintainer review, in which case skip to step 4).
 
 ## 1. Branch and worktree
 
@@ -70,22 +71,51 @@ gh pr create --base develop --title "..." --body "..."
 The body says what changed, why, and how it was verified, and ends with the
 attribution line from the system reminder.
 
-## 3. Wait for the review
+## 3. Reviews
 
-Copilot reviews a few minutes after a PR opens, once only: pushes to the PR
-don't bring a new review (the ruleset has re-review on push off, to save
-Copilot quota). Poll `gh pr view <N> --json reviews,reviewRequests` every
+Every PR gets two reviews, and both are a gate for the merge.
+
+**Maintainer review.** A local review from an agent that has not seen this
+session:
+
+1. Spawn a fresh `general-purpose` agent (the Agent tool, not a fork, so it
+   starts without this session's context) with the prompt in
+   [maintainer-review.md](maintainer-review.md), filling in the PR number and
+   the worktree path. Add nothing about the change: the point is a reviewer
+   who knows the codebase but not the reasoning behind this work, the way a
+   maintainer reading the PR cold would. Run it in the foreground; the next
+   step needs its answer.
+2. Post its findings on the PR as one review, so they become threads. Write
+   the payload to the scratchpad and send it:
+
+   ```sh
+   gh api repos/apurvanakade/Monte-Carlo-Methods/pulls/<N>/reviews --input review.json
+   ```
+
+   with `{"event": "COMMENT", "body": "Local maintainer review.\n\n<VERDICT line>", "comments": [{"path": ..., "line": ..., "side": "RIGHT", "body": "**<severity>**: <comment>"}, ...]}`.
+   A finding whose line isn't part of the diff can't be an inline comment
+   (the API rejects the whole review); put it in `body` instead, as
+   `` `path:line` -- comment ``. With no findings, post the verdict alone.
+   A body finding has no thread to reply to or resolve, so step 4 must still
+   fix or decline it and answer it with one PR comment
+   (`gh pr comment <N> --body ...`) covering every body finding.
+
+**Copilot.** It reviews a few minutes after a PR opens, once only: pushes to
+the PR don't bring a new review (the ruleset has re-review on push off, to
+save Copilot quota). The maintainer review usually takes long enough for it to
+arrive; if not, poll `gh pr view <N> --json reviews,reviewRequests` every
 minute or two for up to ~10 minutes. If nothing arrives, go on and say so in
 the final report.
 
-## 4. Triage every comment
+## 4. Triage every finding
 
 ```sh
 gh pr view <N> --comments
 gh api repos/apurvanakade/Monte-Carlo-Methods/pulls/<N>/comments   # inline
 ```
 
-The reviewer doesn't know CLAUDE.md. For each unresolved thread:
+Copilot doesn't know CLAUDE.md; the maintainer agent read it but can still
+be wrong. Check each finding against the code. For each unresolved thread:
 
 - **Valid**: fix it. If it points at `_extensions/apurvanakade/mathviz/**`,
   it belongs in apurvanakade/mathviz: tell the user rather than editing the
@@ -101,8 +131,8 @@ gh api repos/apurvanakade/Monte-Carlo-Methods/pulls/<N>/comments/<id>/replies -f
 ```
 
 then resolve it (`resolveReviewThread` GraphQL mutation; thread ids from
-`pullRequest.reviewThreads`). Commit the fixes on the same branch and push. The push brings no new
-review, so this is a single round.
+`pullRequest.reviewThreads`). Commit the fixes on the same branch and push. Neither review is
+repeated on the fixes, so this is a single round.
 
 ## 5. Checks
 
@@ -115,7 +145,7 @@ push, and wait again.
 
 ## 6. Merge into develop
 
-Only when every check is green and every thread has a reply:
+Only when every check is green and every finding has a reply:
 
 ```sh
 gh pr merge <N> --merge
@@ -153,5 +183,5 @@ plain `remove` refuses to delete.
 
 ## Report
 
-Say what shipped: the PR link, the review comments fixed or declined (with
-the reason), anything left open, and whether `main` was pushed.
+Say what shipped: the PR link, the maintainer review's and Copilot's
+findings fixed or declined (with the reason), anything left open, and whether `main` was pushed.
