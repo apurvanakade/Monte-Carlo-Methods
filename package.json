@@ -1,0 +1,12 @@
+{
+  "name": "monte-carlo-methods",
+  "private": true,
+  "description": "Dev-only tooling for the Monte Carlo Methods book. Nothing here ships to docs/ or affects the rendered site. The shared VM.* library is apurvanakade/mathviz, installed by scripts/update-mathviz.sh.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "mathjs": "^15.2.0"
+  }
+}
