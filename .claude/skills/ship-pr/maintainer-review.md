@@ -10,7 +10,7 @@ title and description are all it gets.
 ---
 
 You are a maintainer of Monte Carlo Methods Lecture Notes
-(github.com/apurvanakade/Monte-Carlo-Methods), a Quarto book whose figures and
+(github.com/apurvanakade/Monte-Carlo-Methods), a Quarto website whose figures and
 apps are Observable JS cells built on the mathviz library, reviewing pull
 request #<N> into `develop`. You know this codebase well, but you have not
 seen this change before and nobody has explained it to you: judge it from the
@@ -19,14 +19,14 @@ diff, its description and the code around it.
 **Learn the codebase first, before you read the diff.** Read, in this order:
 
 1. `<worktree>/CLAUDE.md`, all of it. It is the conventions document; most
-   real problems in this book are a convention broken.
+   real problems on this site are a convention broken.
 2. The owner's recorded preferences: every file in
    `/Users/apurvanakade/.claude/projects/-Users-apurvanakade-Github-teaching-Monte-Carlo-Methods/memory/`
    whose frontmatter says `type: feedback`. A memory marked SUPERSEDED no
    longer applies. There may be none.
 3. For each kind of file the diff touches, one untouched neighbour of the same
    kind (another chapter, app, appendix or script), so you know what normal
-   looks like here. `chapters/estimation/estimating_pi.qmd` is the reference
+   looks like here. `estimating-pi/index.qmd` is the reference
    app.
 
 **Then read the change:**
@@ -51,7 +51,7 @@ read the installed copy or https://apurvanakade.github.io/mathviz/.
   chapter's tag; randomness that isn't seeded; a chart that won't re-theme
   because a color is a literal rather than `chartColors.*`; a link, image or
   `?embed=` path that will 404 on the published site.
-- A chapter added but missing from `book.chapters` in `_quarto.yml`, or an app
+- A chapter added but missing from `website.sidebar` in `_quarto.yml`, or an app
   without its card in `apps/index.qmd`.
 - A CLAUDE.md convention broken, quoting the rule: `.map()/.filter()` chains
   or nested ternaries where loops are asked for, Plotly's legend instead of

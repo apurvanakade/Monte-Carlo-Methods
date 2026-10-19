@@ -42,7 +42,7 @@ jobs:
       - name: Test the methods
         run: npm test
 
-      - name: Render the book
+      - name: Render the site
         uses: ./.github/actions/render
 
       - name: Attach the rendered site

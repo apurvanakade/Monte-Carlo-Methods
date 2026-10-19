@@ -1,14 +1,19 @@
 project:
-  type: book
+  type: website
   output-dir: docs
+  # Only the pages: keeps CLAUDE.md and README.md out of the site.
+  render:
+    - "*.qmd"
+    - "**/*.qmd"
   # Pulls the latest mathviz release into _extensions/ before every build.
   pre-render: scripts/update-mathviz.sh
 
-book:
+website:
   title: "Monte Carlo Methods Lecture Notes"
-  author: "Apurva Nakade"
-  sidebar:
-    style: docked
+  site-url: https://apurvanakade.github.io/Monte-Carlo-Methods
+  open-graph: true
+  page-navigation: true
+  bread-crumbs: false
   navbar:
     search: true
     left:
@@ -18,48 +23,44 @@ book:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
         aria-label: GitHub
-  open-graph: true
-  chapters:
-    - index.qmd
-    - chapters/intro.qmd
-    - part: chapters/estimation/index.qmd
-      chapters:
-        - chapters/estimation/estimating_pi.qmd
-        - chapters/estimation/integrals.qmd
-    - part: chapters/sampling/index.qmd
-      chapters:
-        - chapters/sampling/rng.qmd
-        - chapters/sampling/discrete.qmd
-        - chapters/sampling/inverse_transform.qmd
-        - chapters/sampling/other_distributions.qmd
-        - chapters/sampling/accept_reject.qmd
-        - chapters/sampling/gibbs_2d.qmd
-        - chapters/sampling/mh.qmd
-    - chapters/variance_reduction.qmd
-    - part: "Applications"
-      chapters:
-        - chapters/applications/SDE.qmd
-        - chapters/applications/ising.qmd
-        - chapters/applications/mmn.qmd
-        - chapters/applications/bootstrap.qmd
-    - part: "Advanced Topics"
-      chapters:
-        - chapters/dynamical/kalman_filters.qmd
-        - chapters/dynamical/particle_filters.qmd
-    - part: "Optimization"
-      chapters:
-        - chapters/optimization/index.qmd
-        - chapters/optimization/simulated_annealing.qmd
-        - chapters/optimization/cross_entropy.qmd
-    - chapters/references.qmd
-    # The apps live in the chapters (each a <div class="vm-app" id="...">);
-    # apps/index.qmd links to each one's ?embed=<id> view.
-    - part: "Interactive Apps"
-      chapters:
-        - apps/index.qmd
-  appendices:
-    - appendices/probability.qmd
-    - appendices/markov_chains.qmd
+  # Hand-written. Every page is <slug>/index.qmd; the draft pages (mmn,
+  # kalman-filters, optimization, simulated-annealing, cross-entropy) are
+  # left out until they are ready.
+  sidebar:
+    style: floating
+    contents:
+      - text: Preface
+        href: index.qmd
+      - intro/index.qmd
+      - section: Estimation
+        href: estimation/index.qmd
+        contents:
+          - estimating-pi/index.qmd
+          - integrals/index.qmd
+      - section: Sampling
+        href: sampling/index.qmd
+        contents:
+          - rng/index.qmd
+          - discrete/index.qmd
+          - inverse-transform/index.qmd
+          - other-distributions/index.qmd
+          - accept-reject/index.qmd
+          - gibbs-2d/index.qmd
+          - mh/index.qmd
+      - variance-reduction/index.qmd
+      - section: Applications
+        contents:
+          - sde/index.qmd
+          - ising/index.qmd
+          - bootstrap/index.qmd
+      - section: Advanced Topics
+        contents:
+          - particle-filters/index.qmd
+      - section: Appendices
+        contents:
+          - probability/index.qmd
+          - markov-chains/index.qmd
+      - apps/index.qmd
   page-footer: "© 2025 Apurva Nakade. All rights reserved."
 
 bibliography: references.bib
@@ -84,6 +85,10 @@ filters:
   - mathviz
 mathviz:
   referrer: same-origin
+  # Pin/unpin the sidebar (state kept in localStorage under this key), and
+  # a title search box at the top of it.
+  sidebar-rail: mcm-sidebar-pinned
+  sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
   fonts: true
   # Select text -> "Report bug" opens an issue linking the page's .qmd source.
@@ -97,7 +102,11 @@ mathviz:
 
 format:
   html:
-    reader-mode: true
+    # The sidebar rail's layout assumes these widths.
+    grid:
+      body-width: 1000px
+      sidebar-width: 260px
+      margin-width: 200px
     # mathviz's Quarto theme: Bootstrap chrome in the same palette as the
     # mathviz panels. Site overrides go in a second file listed after each
     # (set $vm-* variables under /*-- scss:defaults --*/).
@@ -110,8 +119,6 @@ format:
     # alone. Drop this once mathviz's chrome/embed.css lists .giscus.
     include-in-header:
       text: "<style>html.vm-embed .giscus { display: none !important; }</style>"
-    bread-crumbs: true
-    back-to-top-navigation: true
 
 # Every code cell is OJS, run in the reader's browser; nothing executes at
 # render time.

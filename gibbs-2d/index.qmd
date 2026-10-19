@@ -1,0 +1,635 @@
+---
+title: "Gibbs Sampling"
+date: 2025-06-18
+author: Unknown Author
+toc: true  
+
+execute:
+  echo: false
+---
+
+Gibbs Sampling is a Markov Chain Monte Carlo algorithm that is used to sample from a joint distribution using conditional distributions. For now, we'll focus on sampling in 2D, but the algorithm generalizes to higher dimensions.
+
+::: {.callout-note}
+## Gibbs Sampling Algorithm
+
+The Gibbs sampling algorithm for sampling from a joint distribution $f_{X, Y}(x, y)$ is as follows:
+
+1. Start with some initial values $X_0$ and $Y_0$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim f_{X|Y}(\cdot \mid Y_{i-1})$.
+   b. Sample $Y_i \sim f_{Y|X}(\cdot \mid X_i)$.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
+
+The algorithm generates a sample path of length $N$ of the Markov Chain as described in @sec-gibbs-markov-chain. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.
+
+## Joint Exponential Distribution
+
+Let $X$ and $Y$ be two random variables with the truncated exponential distribution:
+
+$$
+f_{X,Y}(x, y) = c e^{-\lambda xy} \quad \text{for } 0 \leq x \leq D_1, \, 0 \leq y \leq D_2,
+$$
+
+where $c$ is the normalization constant. We want to sample from the joint distribution $f_{X,Y}$.
+
+One can show that the conditionals are:
+
+$$
+\begin{aligned}
+f_{X|Y}(x \mid y_0) &= c_{y_0} e^{-\lambda x y_0} \quad \text{for } 0 \leq x \leq D_1 \\
+f_{Y|X}(y \mid x_0) &= c_{x_0} e^{-\lambda y x_0} \quad \text{for } 0 \leq y \leq D_2,
+\end{aligned}
+$$
+
+where $c_{y_0}$ and $c_{x_0}$ are the normalization constants.
+
+::: {.callout-tip}
+## Key Insight
+Notice that each conditional distribution is simply a truncated exponential distribution with rate parameter that depends on the conditioning variable. This makes sampling straightforward using the inverse transform method.
+:::
+
+We can easily sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using the inverse transform method (even for truncated distributions).
+
+::: {.callout-note}
+## Gibbs Algorithm for Joint Exponential Distribution
+
+1. Start with some initial values $X_0$ and $Y_0$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim \text{Exp}(\lambda Y_{i-1})$ restricted to $[0, D_1]$ using the inverse transform method.
+   b. Sample $Y_i \sim \text{Exp}(\lambda X_i)$ restricted to $[0, D_2]$ using the inverse transform method.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
+
+```{ojs}
+//| output: false
+import {jointExponentialDensity, bivariateNormalDensity, truncatedExponential, densityGrid, gibbsJointExponential, chainSummary, normalContours, staircasePath, gibbsAcfTheory} from "./method.js"
+```
+
+```{ojs}
+//| output: false
+// The figures in this chapter, before the app. VM and chartColors are
+// defined with the app below.
+g2ExpContourPlot = VM.plotting.persistentPlot({height: "420px"})
+g2ExpSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
+g2ExpScatterPlot = VM.plotting.persistentPlot({height: "480px"})
+g2ExpPathPlot = VM.plotting.persistentPlot({height: "480px"})
+g2NormContourPlot = VM.plotting.persistentPlot({height: "420px"})
+g2NormSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
+g2NormScatterPlot = VM.plotting.persistentPlot({height: "480px"})
+g2NormPathPlot = VM.plotting.persistentPlot({height: "480px"})
+
+// Joint exponential: f(x, y) = c exp(-lambda x y) on [0, D1] x [0, D2].
+g2Lambda = 2
+g2D1 = 5
+g2D2 = 3
+g2N = 10000
+
+// Unnormalized: the contour and surface plots only need the shape.
+function g2ExpDensity(x, y) {
+  return jointExponentialDensity(x, y, g2Lambda, g2D1, g2D2)
+}
+
+// A density on a grid, for Plotly's contour and surface traces.
+function g2Grid(density, lo, hi, count) {
+  return densityGrid(density, lo, hi, count)
+}
+
+function g2Colorscale() {
+  return [[0, VM.plotting.alpha(chartColors.fn, 0.04)], [1, chartColors.fn]]
+}
+
+function g2Contour(plot, grid, title) {
+  return plot([{...grid, type: "contour", colorscale: g2Colorscale(), ncontours: 20, showscale: false,
+    contours: {coloring: "lines"}, line: {width: 1.5}}], {
+    title: {text: title}, margin: {t: 40}, xaxis: {title: "X"}, yaxis: {title: "Y", scaleanchor: "x"}
+  })
+}
+
+function g2Surface(plot, grid, title) {
+  return plot([{...grid, type: "surface", colorscale: g2Colorscale(), showscale: false}], {
+    title: {text: title}, margin: {t: 40}, uirevision: "static",
+    scene: {xaxis: {title: {text: "X"}}, yaxis: {title: {text: "Y"}}, zaxis: {title: {text: "Density"}},
+      camera: {eye: {x: 1.6, y: 1.6, z: 0.8}}}
+  })
+}
+
+function g2Scatter(plot, chain, title) {
+  return plot([{x: chain.x, y: chain.y, type: "scattergl", mode: "markers",
+    marker: {color: VM.plotting.alpha(chartColors.alt, 0.4), size: 3}, hoverinfo: "skip"}], {
+    title: {text: title}, margin: {t: 40}, showlegend: false, xaxis: {title: "X"}, yaxis: {title: "Y"}
+  })
+}
+
+// The first k sweeps as a staircase: a horizontal move to the new X, then a
+// vertical move to the new Y. Later sweeps are drawn more opaque.
+function g2Path(plot, chain, k, title) {
+  const traces = []
+  for (let i = 1; i <= k; i++) {
+    const opacity = Math.log(1 + i / k) / Math.log(2)
+    traces.push({x: [chain.x[i - 1], chain.x[i], chain.x[i]], y: [chain.y[i - 1], chain.y[i - 1], chain.y[i]],
+      type: "scatter", mode: "lines", line: {color: chartColors.fn, width: 1.5}, opacity, showlegend: false, hoverinfo: "skip"})
+  }
+  traces.push({x: chain.x.slice(0, k + 1), y: chain.y.slice(0, k + 1), type: "scatter", mode: "markers",
+    marker: {color: chartColors.alt, size: 5}, name: "Samples"})
+  traces.push({x: [chain.x[0]], y: [chain.y[0]], type: "scatter", mode: "markers",
+    marker: {color: chartColors.ok, size: 12}, name: "Start"})
+  traces.push({x: [chain.x[k]], y: [chain.y[k]], type: "scatter", mode: "markers",
+    marker: {color: chartColors.fn, size: 12}, name: `${k}-th sample`})
+  return VM.plotting.plotWithLegend(plot, traces, {title: {text: title}, margin: {t: 40}, xaxis: {title: "X"}, yaxis: {title: "Y"}})
+}
+```
+
+
+```{ojs}
+g2Contour(g2ExpContourPlot, g2Grid(g2ExpDensity, 0, 3, 120), "Joint exponential: contour plot")
+```
+
+```{ojs}
+g2Surface(g2ExpSurfacePlot, g2Grid(g2ExpDensity, 0, 3, 60), "Joint exponential density")
+```
+
+```{ojs}
+//| output: false
+// Gibbs sampler for the joint exponential, from (X0, Y0) = (1, 1):
+// X_i ~ Exp(lambda Y_{i-1}) on [0, D1], then Y_i ~ Exp(lambda X_i) on [0, D2].
+g2ExpChain = gibbsJointExponential(VM.sampling.seededRandom(0), g2N, g2Lambda, g2D1, g2D2, 1, 1)
+```
+
+```{ojs}
+g2Scatter(g2ExpScatterPlot, g2ExpChain, "Gibbs sampler for the joint exponential")
+```
+
+```{ojs}
+g2Path(g2ExpPathPlot, g2ExpChain, 20, "Gibbs sampler trajectory for the joint exponential")
+```
+
+## Bivariate Normal Distribution
+
+Suppose $(X, Y)$ has a bivariate normal distribution with mean $(0, 0)$ and covariance matrix $\Sigma = \begin{pmatrix} 1 & \rho \\ \rho & 1 \end{pmatrix}$. We want to sample from the joint distribution $f_{X, Y}$.
+
+One can show that the conditional distributions are:
+
+$$
+\begin{aligned}
+(X \mid Y = y_0) &\sim \mathcal{N}(\rho y_0, 1 - \rho^2) \\
+(Y \mid X = x_0) &\sim \mathcal{N}(\rho x_0, 1 - \rho^2).
+\end{aligned}
+$$
+
+::: {.callout-important}
+## Key Property
+Notice that both conditional distributions have the same variance $1 - \rho^2$, which decreases as the correlation $|\rho|$ increases. When $\rho = 0$ (independence), the conditional variance equals the marginal variance.
+:::
+
+We can sample from the two conditionals $f_{X|Y}$ and $f_{Y|X}$ using standard normal sampling methods such as the Box-Muller transform.
+
+::: {.callout-note}
+## Gibbs Algorithm for Bivariate Normal Distribution
+
+1. Start with some initial values $X_0$ and $Y_0$.
+2. For $i = 1, 2, \ldots, N$:
+   a. Sample $X_i \sim \mathcal{N}(\rho Y_{i-1}, 1 - \rho^2)$.
+   b. Sample $Y_i \sim \mathcal{N}(\rho X_i, 1 - \rho^2)$.
+3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
+:::
+
+```{ojs}
+//| output: false
+g2Rho = 0.5
+
+// Standard bivariate normal density with correlation g2Rho.
+function g2NormalDensity(x, y) {
+  return bivariateNormalDensity(x, y, g2Rho)
+}
+```
+
+```{ojs}
+g2Contour(g2NormContourPlot, g2Grid(g2NormalDensity, -3, 3, 120), "Bivariate normal: contour plot")
+```
+
+```{ojs}
+g2Surface(g2NormSurfacePlot, g2Grid(g2NormalDensity, -3, 3, 60), "Bivariate normal density")
+```
+
+```{ojs}
+//| output: false
+// X_i ~ N(rho Y_{i-1}, 1 - rho²), then Y_i ~ N(rho X_i, 1 - rho²), from (0, 0).
+g2NormChain = VM.mcmc.gibbsBivariateNormal({
+  rho: g2Rho,
+  n: g2N,
+  start: [0, 0],
+  gaussian: VM.sampling.gaussianRandom(VM.sampling.seededRandom(0))
+})
+```
+
+```{ojs}
+g2Scatter(g2NormScatterPlot, g2NormChain, "Gibbs sampler for the bivariate normal")
+```
+
+```{ojs}
+g2Path(g2NormPathPlot, g2NormChain, 20, "Gibbs sampler trajectory for the bivariate normal")
+```
+
+The app below runs the sampler from $(2.5, -2.5)$. Drag $\rho$ toward $\pm 1$: the ellipses of the target narrow, each conditional step shrinks to a standard deviation of $\sqrt{1 - \rho^2}$, and the chain's axis-parallel staircase can only creep along the diagonal. At $\rho = 0$ the two coordinates are independent and every sweep is an exact, independent draw.
+
+```{ojs}
+//| output: false
+// VM is the mathviz library, loaded on every page by the mathviz extension.
+// This page uses VM.mcmc.gibbsBivariateNormal, VM.mcmc.autocorrelation,
+// VM.mcmc.effectiveSampleSize, VM.sampling.seededRandom,
+// VM.sampling.gaussianRandom, VM.plotting.persistentPlot, VM.ui.statRow,
+// VM.ui.urlParam and VM.ui.syncUrlParams.
+VM = window.VM
+
+// vmTheme re-runs every cell that bakes a palette color into a trace when
+// the reader toggles dark mode; chartColors is that palette.
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+```
+
+```{ojs}
+//| output: false
+gibbsMaxN = 1000
+gibbsStart = [2.5, -2.5]
+gibbsDefaults = ({seed: 1, n: 30, rho: 0.9})
+
+gibbsTraceOptions = ["Target contours", "Staircase path", "Samples", "Current state"]
+gibbsTraceColors = new Map([
+  ["Target contours", chartColors.muted],
+  ["Staircase path", chartColors.warn],
+  ["Samples", chartColors.fn],
+  ["Current state", chartColors.alt]
+])
+```
+
+<div class="vm-app" id="gibbs-app">
+
+<div class="ojs-panel">
+
+```{ojs}
+viewof gibbsRedraw = {
+  const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-auto")
+  return button
+}
+```
+
+</div>
+
+```{ojs}
+//| output: false
+gibbsSeed = {
+  if (gibbsRedraw === 0) return VM.ui.urlParam("gibbs_seed", gibbsDefaults.seed)
+  return Math.floor(Math.random() * 1e9)
+}
+```
+
+```{ojs}
+//| output: false
+// gibbsChain: gibbsMaxN sweeps, rerun when rho or the seed changes. The
+// same seed reuses the same normal draws, so dragging rho deforms one
+// chain rather than drawing a new one.
+gibbsChain = VM.mcmc.gibbsBivariateNormal({
+  rho: gibbsRho,
+  n: gibbsMaxN,
+  start: gibbsStart,
+  gaussian: VM.sampling.gaussianRandom(VM.sampling.seededRandom(gibbsSeed))
+})
+```
+
+```{ojs}
+//| output: false
+// The samples after sweeps 1..n (the start is not a sample).
+gibbsView = chainSummary(gibbsChain, gibbsN)
+```
+
+```{ojs}
+{
+  let corrText = "—"
+  if (Number.isFinite(gibbsView.corr)) corrText = gibbsView.corr.toFixed(3)
+  return VM.ui.statRow([
+    {label: "Sweeps N", value: gibbsView.n.toLocaleString()},
+    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(gibbsView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(gibbsView.ys).toFixed(1)},
+    {label: "Sample correlation", value: corrText, title: `Target correlation ρ = ${gibbsRho}`},
+    {label: "Mean (target 0, 0)", value: `${gibbsView.mx.toFixed(2)}, ${gibbsView.my.toFixed(2)}`}
+  ])
+}
+```
+
+```{ojs}
+//| output: false
+gibbsPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+gibbsShow = new Set(gibbsTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const n = gibbsView.n
+  const rho = gibbsRho
+  const c = gibbsChain
+
+  // Contours of the target at Mahalanobis radius 1, 2, 3.
+  const contour = normalContours(rho)
+  const contourX = contour.x, contourY = contour.y
+
+  // start -> half step -> end of each sweep, for sweeps 1..n.
+  const path = staircasePath(c, n)
+  const pathX = path.x, pathY = path.y
+
+  const data = []
+  if (gibbsShow.has("Target contours")) {
+    data.push({x: contourX, y: contourY, type: "scatter", mode: "lines", name: "Target contours", showlegend: false,
+      line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"})
+  }
+  if (gibbsShow.has("Staircase path")) {
+    data.push({x: pathX, y: pathY, type: "scatter", mode: "lines", name: "Staircase path", showlegend: false,
+      line: {color: VM.plotting.alpha("warn", 0.8), width: 1.5}, hoverinfo: "skip"})
+  }
+  if (gibbsShow.has("Samples")) {
+    data.push({x: gibbsView.xs, y: gibbsView.ys, type: "scattergl", mode: "markers", name: "Samples", showlegend: false,
+      marker: {color: chartColors.fn, size: 5},
+      hovertemplate: "(%{x:.3f}, %{y:.3f})<extra></extra>"})
+  }
+  if (gibbsShow.has("Current state")) {
+    data.push({x: [c.x[n]], y: [c.y[n]], type: "scatter", mode: "markers", name: "Current state", showlegend: false,
+      marker: {color: chartColors.alt, size: 11, line: {color: chartColors.halo, width: 1.5}},
+      hovertemplate: `(X<sub>${n}</sub>, Y<sub>${n}</sub>) = (%{x:.3f}, %{y:.3f})<extra></extra>`})
+  }
+
+  return gibbsPlot(data, {
+    xaxis: {range: [-4, 4], title: "x", constrain: "domain"},
+    yaxis: {range: [-4, 4], title: "y", scaleanchor: "x", constrain: "domain"},
+    hovermode: "closest",
+    uirevision: "static",
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof gibbsTraces = {
+  const items = []
+  for (const label of gibbsTraceOptions) items.push({label, color: gibbsTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: gibbsTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls ojs-grid">
+
+```{ojs}
+viewof gibbsRho = {
+  const initial = Math.min(0.99, Math.max(-0.99, VM.ui.urlParam("gibbs_rho", gibbsDefaults.rho)))
+  const slider = Inputs.range([-0.99, 0.99], {step: 0.01, value: initial, label: "Correlation ρ"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+```{ojs}
+viewof gibbsN = {
+  const initial = Math.min(gibbsMaxN, Math.max(1, Math.round(VM.ui.urlParam("gibbs_n", gibbsDefaults.n))))
+  const slider = Inputs.range([1, gibbsMaxN], {step: 1, value: initial, label: "Sweeps N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+gibbsUrlSync = VM.ui.syncUrlParams({
+  gibbs_seed: [gibbsSeed, gibbsDefaults.seed],
+  gibbs_rho: [gibbsRho, gibbsDefaults.rho],
+  gibbs_n: [gibbsN, gibbsDefaults.n]
+})
+```
+
+:::: {.callout-note collapse="false" title="Diagnostics for the chain above"}
+
+Trace plots of the two coordinates and their autocorrelation functions. For $\rho$ near $\pm 1$ the traces wander slowly and the ACF decays like $\rho^{2k}$, so the effective sample size is a small fraction of the number of sweeps.
+
+```{ojs}
+//| output: false
+gibbsTracePlot = VM.plotting.persistentPlot({height: "320px"})
+gibbsAcfPlot = VM.plotting.persistentPlot({height: "320px"})
+```
+
+::: {layout-ncol=2}
+
+```{ojs}
+{
+  const steps = []
+  for (let t = 1; t <= gibbsView.n; t++) steps.push(t)
+  return gibbsTracePlot([
+    {x: steps, y: gibbsView.xs, type: "scatter", mode: "lines", name: "x", line: {color: chartColors.accent2, width: 1.5}},
+    {x: steps, y: gibbsView.ys, type: "scatter", mode: "lines", name: "y", line: {color: chartColors.accent3, width: 1.5}}
+  ], {
+    title: {text: "Trace plots", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "sweep"},
+    yaxis: {title: "value", range: [-4, 4]},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+```{ojs}
+{
+  const maxLag = Math.min(40, gibbsView.n - 1)
+  const acfX = VM.mcmc.autocorrelation(gibbsView.xs, maxLag)
+  const acfY = VM.mcmc.autocorrelation(gibbsView.ys, maxLag)
+  const lags = []
+  for (let k = 0; k < acfX.length; k++) lags.push(k)
+  const theory = gibbsAcfTheory(gibbsRho, acfX.length - 1)
+  return gibbsAcfPlot([
+    {x: lags, y: acfX, type: "scatter", mode: "lines+markers", name: "x", line: {color: chartColors.accent2, width: 2}, marker: {size: 4}},
+    {x: lags, y: acfY, type: "scatter", mode: "lines+markers", name: "y", line: {color: chartColors.accent3, width: 2}, marker: {size: 4}},
+    {x: lags, y: theory, type: "scatter", mode: "lines", name: "ρ²ᵏ", line: {color: chartColors.ink, width: 1, dash: "dash"}}
+  ], {
+    title: {text: "Autocorrelation", font: {size: 14}},
+    margin: {t: 40},
+    xaxis: {title: "lag", range: [0, 40]},
+    yaxis: {title: "ACF", range: [-0.3, 1.05]},
+    showlegend: true,
+    legend: {orientation: "h", y: -0.25},
+    uirevision: "static"
+  })
+}
+```
+
+:::
+
+::::
+
+## Markov Chain {#sec-gibbs-markov-chain}
+
+The Gibbs sampling algorithm generates a Markov Chain whose state space is the product space of the state spaces of the individual variables $\Omega = \Omega_X \times \Omega_Y$. In the above examples, the state space is $[0, D_1] \times [0, D_2]$ for the exponential distribution and $\mathbb{R}^2$ for the bivariate normal distribution.
+
+The transition matrix of the Markov Chain in the discrete case is given by:
+
+$$
+P \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right) = \mathbb{P}(X_{i+1} = x' \mid Y_i = y) \mathbb{P}(Y_{i+1} = y' \mid X_{i+1} = x').
+$$
+
+In the continuous case, the transition *kernel* is given by:
+
+$$
+K \left( \begin{bmatrix} x \\ y \end{bmatrix}, \begin{bmatrix} x' \\ y' \end{bmatrix} \right)
+= f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x').
+$$
+
+::: {.callout-warning}
+## Important Detail
+Note that in the transition kernel, we condition $Y_{i+1}$ on the *newly sampled* value $X_{i+1} = x'$, not on the previous value $X_i = x$. This reflects the sequential nature of the Gibbs sampler.
+:::
+
+::: {#thm-Gibbs-Markov-Chain}
+## Theorem: Gibbs Chain Stationarity
+
+The Gibbs sampling algorithm generates a Markov Chain with the transition kernel $K$ as described above. The joint distribution $f_{X, Y}$ is a stationary distribution of the Markov Chain. Hence, if the Markov Chain converges to the stationary distribution, the samples generated by the Gibbs algorithm will be distributed according to $f_{X, Y}$.
+:::
+
+<!--
+::: {.proof}
+To show that $f_{X,Y}$ is a stationary distribution, we need to verify that if $(X_i, Y_i) \sim f_{X,Y}$, then $(X_{i+1}, Y_{i+1}) \sim f_{X,Y}$ as well.
+
+Let $(X_i, Y_i)$ be distributed according to $f_{X,Y}$. We want to show that $(X_{i+1}, Y_{i+1})$ obtained through one step of the Gibbs sampler also follows $f_{X,Y}$.
+
+The Gibbs sampler performs the following operations:
+
+1. Sample $X_{i+1} \sim f_{X|Y}(\cdot \mid Y_i).$
+2. Sample $Y_{i+1} \sim f_{Y|X}(\cdot \mid X_{i+1}).$
+
+We need to compute the joint density of $(X_{i+1}, Y_{i+1})$. Using the law of total probability and the conditional sampling steps:
+
+$$
+f_{X_{i+1}, Y_{i+1}}(x', y') = \int_{\Omega_Y} f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) f_{Y_i}(y) \, dy
+$$
+
+Given $Y_i = y$, the Gibbs steps give us:
+
+- $X_{i+1} \mid Y_i = y \sim f_{X|Y}(\cdot \mid y).$
+- $Y_{i+1} \mid X_{i+1} = x', Y_i = y \sim f_{Y|X}(\cdot \mid x').$
+
+Note that $Y_{i+1}$ depends only on $X_{i+1}$, not directly on $Y_i$. Therefore:
+
+$$
+f_{X_{i+1}, Y_{i+1} \mid Y_i}(x', y' \mid y) = f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x')
+$$
+
+Substituting back:
+
+$$
+\begin{aligned}
+f_{X_{i+1}, Y_{i+1}}(x', y') &= \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y|X}(y' \mid x') f_{Y}(y) \, dy \\
+&= f_{Y|X}(y' \mid x') \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_{Y}(y) \, dy
+\end{aligned}
+$$
+
+Using the definition of marginal density:
+$$
+f_X(x') = \int_{\Omega_Y} f_{X,Y}(x', y) \, dy = \int_{\Omega_Y} f_{X|Y}(x' \mid y) f_Y(y) \, dy
+$$
+
+Therefore:
+$$
+f_{X_{i+1}, Y_{i+1}}(x', y') = f_{Y|X}(y' \mid x') f_X(x') = f_{X,Y}(x', y')
+$$
+
+where the last equality follows from the fundamental relationship $f_{X,Y}(x,y) = f_{Y|X}(y \mid x) f_X(x)$.
+
+Thus, $(X_{i+1}, Y_{i+1}) \sim f_{X,Y}$, proving that $f_{X,Y}$ is a stationary distribution of the Gibbs Markov Chain.
+$\blacksquare$
+:::
+-->
+
+::: {.proof}
+For simplicity, we assume $f$ represents a discrete distribution, though the proof extends naturally to the continuous case.
+
+We establish stationarity by verifying detailed balance for each component of the Gibbs sampler separately.
+
+**Part I: Detailed Balance for the Odd Step (Update $X$)**
+
+The odd step updates only the $X$ component, keeping $Y$ fixed. The transition probabilities are:
+$$P_{\text{odd}}[(x',y') , (x,y)] = \begin{cases} 
+f_{X|Y}(x \mid y') & \text{if } y' = y \\
+0 & \text{if } y' \neq y
+\end{cases}$$
+
+For states with $y' = y$, we verify:
+$$f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y) = f_{X,Y}(x,y) \cdot f_{X|Y}(x' \mid y)$$
+
+Using $f_{X,Y}(a,b) = f_{X|Y}(a \mid b) f_Y(b)$:
+\begin{align}
+\text{LHS} &= f_{X|Y}(x' \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x \mid y) \\
+\text{RHS} &= f_{X|Y}(x \mid y) \cdot f_Y(y) \cdot f_{X|Y}(x' \mid y)
+\end{align}
+
+Clearly, LHS = RHS. For states with $y' \neq y$, both sides equal zero since the transition probability is zero.
+
+**Part II: Detailed Balance for the Even Step (Update $Y$)**
+
+The even step updates only the $Y$ component, keeping $X$ fixed. The transition probabilities are:
+$$P_{\text{even}}[(x',y') , (x,y)] = \begin{cases} 
+f_{Y|X}(y \mid x') & \text{if } x' = x \\
+0 & \text{if } x' \neq x
+\end{cases}$$
+
+For states with $x' = x$, we verify:
+$$f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x) = f_{X,Y}(x,y) \cdot f_{Y|X}(y' \mid x)$$
+
+Using $f_{X,Y}(a,b) = f_{Y|X}(b \mid a) f_X(a)$:
+\begin{align}
+\text{LHS} &= f_{Y|X}(y' \mid x) \cdot f_X(x) \cdot f_{Y|X}(y \mid x) \\
+\text{RHS} &= f_{Y|X}(y \mid x) \cdot f_X(x) \cdot f_{Y|X}(y' \mid x)
+\end{align}
+
+Again, LHS = RHS. For states with $x' \neq x$, both sides equal zero.
+
+**Conclusion**
+
+Since both $P_{\text{odd}}$ and $P_{\text{even}}$ satisfy detailed balance with $f_{X,Y}$, and the complete Gibbs transition is $P = P_{\text{even}} P_{\text{odd}}$, the distribution $f_{X,Y}$ is stationary under the full Gibbs sampler.
+:::
+
+
+## Concluding Remarks
+
+We have introduced the Gibbs sampling algorithm as a powerful MCMC method for sampling from joint distributions when the conditional distributions are known and easy to sample from. The key insights from our analysis are:
+
+1. **Algorithmic Simplicity**: Gibbs sampling reduces the complex problem of sampling from a joint distribution to the simpler task of iteratively sampling from conditional distributions.
+
+2. **Theoretical Foundation**: We proved that the joint distribution $f_{X,Y}$ is a stationary distribution of the Markov Chain generated by the Gibbs sampler, ensuring that our samples will asymptotically follow the target distribution.
+
+3. **Practical Examples**: Through the joint exponential and bivariate normal distributions, we demonstrated how the algorithm adapts to different types of conditional distributions—from truncated exponentials to Gaussians.
+
+The examples we studied involved continuous random variables with relatively simple conditional forms. However, the true power of Gibbs sampling becomes apparent when dealing with high-dimensional discrete systems where direct sampling from the joint distribution is computationally intractable.
+
+::: {.callout-note}
+## Looking Ahead: The Ising Model
+In our next topic, we will apply Gibbs sampling to the **Ising model**—a fundamental model in statistical physics that describes magnetic systems. The Ising model presents several new challenges:
+
+- **Discrete state space**: Each site takes values in $\{-1, +1\}$ rather than continuous values
+- **High dimensionality**: We'll work with lattices containing hundreds or thousands of sites
+- **Complex dependencies**: Each site's conditional distribution depends on all its neighbors
+- **Phase transitions**: The model exhibits different behavior at different temperatures
+
+The Ising model will demonstrate how Gibbs sampling can tackle problems where the joint distribution is known up to a normalization constant, but direct sampling is impossible due to the combinatorial explosion of possible configurations.
+:::
+
+The techniques we've developed here—understanding the Markov chain structure, working with conditional distributions, and ensuring proper convergence—will be essential tools as we move to this more complex and practically important application.

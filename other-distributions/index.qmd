@@ -1,0 +1,129 @@
+---
+title: "Other Distributions"
+toc: true  
+
+execute:
+  echo: false
+---
+
+## Beta Distribution
+
+The Beta distribution is a continuous distribution defined on the interval $[0, 1]$. Let $X$ be a random variable with Beta distribution with parameters $\alpha > 0$ and $\beta > 0$. The probability density function of $X$ is given by
+
+\begin{align*}
+f(x) = cx^{\alpha-1} (1-x)^{\beta-1}, \quad 0 \leq x \leq 1,
+\end{align*}
+
+where $c= \frac{(\alpha + \beta - 1)!}{(\alpha-1)!(\beta-1)!}$ is the normalizing constant. (Note that when $\alpha$ and $\beta$ are not integers, we use the $\Gamma$ function as a generalization of the factorial function.)
+
+This is a simple function supported over the interval $[0, 1]$. The Beta distribution is used as a prior distribution in Bayesian statistics. When $\alpha$ and $\beta$ are non-integers, the CDF of the Beta distribution does not have a closed-form expression, making inverse transform sampling impractical. Instead, we can use the Beta-Order Statistics connection to sample from the Beta distribution.
+
+::: {#def-order-statistics}
+
+**(Order Statistics)**: Let $X_1, X_2, \ldots, X_n$ be independent and identically distributed random variables. The $k$-th order statistic, denoted $X_{(k)}$, is the $k$-th smallest value among $X_1, X_2, \ldots, X_n$.
+
+:::
+
+::: {#thm-beta-order-statistics}
+
+**(Beta-Order Statistics)**: Let $U_1, U_2, \ldots, U_n$ be independent random variables with uniform distribution $U(0, 1)$. Then the random variable $X = U_{(k)}$ has Beta distribution with parameters $\alpha = k$ and $\beta = n - k + 1$.
+
+:::
+
+::: {.proof}
+
+We'll work out a partial proof of the theorem. Let $X = U_{(k)}$. The cumulative distribution function of $X$ is given by
+
+\begin{align*}
+F(x) 
+&= \mathbb{P}(U_{(k)} \leq x) \\
+&= \mathbb{P}(\text{at least } k \text{ variables among } U_1, U_2, \ldots, U_n \text{ are less than } x)  \\
+&= \sum_{i=k}^{n} \binom{n}{i} x^i (1-x)^{n-i}.
+\end{align*}
+
+We differentiate both sides to get the probability density function of $X$:
+
+\begin{align*}
+f(x) &= \frac{d}{dx} F(x) \\
+&= \sum_{i=k}^{n} \binom{n}{i} \frac{d}{dx}x^i (1-x)^{n-i} \\
+&= \sum_{i=k}^{n} \binom{n}{i} i x^{i-1} (1-x)^{n-i} - \binom{n}{i} (n-i) x^i (1-x)^{n-i-1}.
+\end{align*}
+
+The rest of the proof involves checking that the higher terms in the alternating sum cancel out and only the first term with $i = k$ remains. $\blacksquare$
+
+::: 
+
+This theorem gives us a simple algorithm to sample from the Beta distribution:
+
+::: {.callout-note}
+## Algorithm
+
+1. Generate $n$ random numbers $u_1, u_2, \ldots, u_n$ from the uniform distribution $U(0, 1)$.
+2. Sort the numbers in increasing order $u_{(1)} \leq u_{(2)} \leq \ldots \leq u_{(n)}$.
+3. Return $u_{(k)}$.
+
+:::
+
+## Mixture Distributions
+
+A mixture distribution is a probability distribution that is formed by taking a weighted sum of two or more probability distributions. Let $X$ be a random variable that is a mixture of distributions $f_1(x), f_2(x), \ldots, f_n(x)$ with weights $w_1, w_2, \ldots, w_n$. The probability density function of $X$ is given by
+
+\begin{align*}
+f(x) = w_1 f_1(x) + w_2 f_2(x) + \ldots + w_n f_n(x).
+\end{align*}
+
+Mixture distributions are used to model complex distributions that cannot be modeled by a single distribution. We can sample from a mixture distribution by first selecting which component distribution to sample from (with probabilities given by the weights), then sampling from that selected distribution.
+
+To sample from a mixture distribution, we can use the following algorithm:
+
+::: {.callout-note}
+## Algorithm
+
+1. Sample from the discrete distribution with probabilities $[w_1, w_2, \ldots, w_n]$ to select a component distribution.
+2. Sample from the selected component distribution.
+3. Return the sample.
+
+:::
+
+::: {.callout-warning}
+## Mixture vs Linear Combination
+Note that this is not the same as constructing a linear combination of the component distributions. For example, if $X_1 \sim N(\mu_1, \sigma_1^2)$ and $X_2 \sim N(\mu_2, \sigma_2^2)$ are independent, then $w_1 X_1 + w_2 X_2$ is a normal distribution with mean $w_1 \mu_1 + w_2 \mu_2$ and variance $w_1^2 \sigma_1^2 + w_2^2 \sigma_2^2$. This is not the same as a mixture of two normal distributions, which would be bimodal if $\mu_1$ and $\mu_2$ are sufficiently different.
+:::
+
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+
+mixPlot = VM.plotting.persistentPlot({height: "320px"})
+combPlot = VM.plotting.persistentPlot({height: "320px"})
+
+// The curves are computed in method.js, tested in
+// method.test.js.
+import {mixtureCurves} from "./method.js"
+
+// X ~ N(-2, 1) and Y ~ N(2, 0.5²), weights 0.7 and 0.3.
+mixCurves = mixtureCurves(0.7, 0.3, -2, 1, 2, 0.5, -5, 5, 400)
+
+function densityTrace(xs, ys) {
+  return {x: xs, y: ys, type: "scatter", mode: "lines", fill: "tozeroy",
+    fillcolor: VM.plotting.alpha(chartColors.fn, 0.25), line: {color: chartColors.fn, width: 2}}
+}
+```
+
+```{ojs}
+mixPlot([densityTrace(mixCurves.xs, mixCurves.mixture)], {
+  title: {text: "Mixture of N(−2, 1) and N(2, 0.5²) with weights 0.7 and 0.3"},
+  margin: {t: 40}, showlegend: false,
+  xaxis: {title: "x"}, yaxis: {title: "f(x)", rangemode: "tozero"}
+})
+```
+
+```{ojs}
+combPlot([densityTrace(mixCurves.xs, mixCurves.combination)], {
+  title: {text: "0.7X + 0.3Y with X ~ N(−2, 1) and Y ~ N(2, 0.5²)"},
+  margin: {t: 40}, showlegend: false,
+  xaxis: {title: "x"}, yaxis: {title: "f(x)", rangemode: "tozero"}
+})
+```

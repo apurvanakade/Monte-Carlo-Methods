@@ -1,0 +1,71 @@
+---
+title: "M/M/n Queue"
+date: 2025-06-18
+toc: true
+
+draft: true
+
+execute:
+  echo: false
+---
+
+The M/M/n queue is a discrete stochastic process that models a queue with n servers. There are three parameters: 
+
+- $n$: the number of servers
+- $\lambda$: the arrival rate of customers
+- $\mu$: the service rate of each server
+
+The "M" in M/M/n stands for "memoryless" or Markovian. The M/M/n queue models the following process:
+- customers arrive at the queue according to a Poisson process with rate $\lambda$.
+- Each customer is served by one of the n servers, and the service times are exponentially distributed with rate $\mu$.
+- If all servers are busy, the customer waits in line until a server becomes available. 
+
+We are interested in testing the performance of the queue as function of the three parameters. There are various performance measures we can compute, including:
+- The average number of customers in the waiting line
+- The average time a customer spends waiting in line 
+- The usage of the servers
+- The probability that a customer has to wait in line
+
+There are two approaches we can take to simulate an M/M/n queue
+
+1. Process driven
+1. Event driven
+
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+
+// The simulation lives in method.js, where method.test.js checks it
+// against queueing theory.
+import {mmnSimulate, waitAndSojourn} from "./method.js"
+
+mmnQueuePlot = VM.plotting.persistentPlot({height: "340px"})
+```
+
+```{ojs}
+//| output: false
+mmnSim = mmnSimulate({arrivalRate: 2.0, serviceRate: 1.5, servers: 2, maxCustomers: 1000, seed: 42})
+```
+
+```{ojs}
+{
+  const sim = mmnSim
+  const {waits, sojourns} = waitAndSojourn(sim)
+  const utilization = Math.min(1, sim.arrivalRate / (sim.servers * sim.serviceRate))
+  return VM.ui.statRow([
+    {label: "Customers simulated", value: String(waits.length)},
+    {label: "Average wait time", value: VM.distributions.sampleStats(waits).mean.toFixed(4)},
+    {label: "Average sojourn time", value: VM.distributions.sampleStats(sojourns).mean.toFixed(4)},
+    {label: "Server utilization (theoretical)", value: utilization.toFixed(4)}
+  ])
+}
+```
+
+```{ojs}
+mmnQueuePlot([{x: mmnSim.log.times, y: mmnSim.log.lengths, type: "scatter", mode: "lines", line: {shape: "hv", color: chartColors.fn, width: 1.5}}], {
+  title: {text: "Queue length over time"}, margin: {t: 40}, showlegend: false,
+  xaxis: {title: "Simulation time"}, yaxis: {title: "Queue length"}
+})
+```

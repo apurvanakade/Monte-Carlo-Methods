@@ -1,0 +1,510 @@
+---
+title: "Variance Reduction Techniques"
+date: 2025-04-01
+toc: true
+
+execute:
+  echo: false
+---
+
+
+We have seen various techniques to sample from a target distribution.
+One of the main uses of sampling is to estimate some quantity $\mathbb{E}[f(X)]$. Many applications rely on the sample mean estimator:
+
+$$
+\hat{\ell} = \frac{1}{N}\sum_{i=1}^{N}f(X_i).
+$$
+
+Many sampling techniques do not guarantee independence of samples. As such, the variance is given by:
+
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
+$$
+
+One way to reduce the variance is to "thin the samples" by choosing samples. In this chapter, we'll look at other techniques that allow us to change how we sample to reduce estimator variance. 
+
+::: {.exm-estimating-rare-events}
+
+**Estimation of Rare-Event Probabilities.** Let's start with an example. Consider estimation of the tail probability $\ell = P(X > \gamma)$ of some random variable $X$ for a large number $\gamma$. 
+We can use the following estimator:
+
+$$
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}_{> \gamma}(X_i),
+$$
+
+where $\mathbb{I}_{> \gamma}(X_i)$ is an indicator function that is 1 if $X_i > \gamma$ and 0 otherwise. The variance of this estimator is:
+
+$$
+\text{Var}(\hat{\ell}) = \frac{1}{N} \ell (1 - \ell).
+$$
+
+The relative width of the confidence interval is:
+
+$$
+\text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
+$$
+
+When $\ell$ is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of $\ell$.
+:::
+
+## Importance Sampling
+
+Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The key insight is that we can sample from regions that contribute more to our estimate, then correct for this bias by weighting the samples appropriately.
+
+For example, when estimating the tail probability $\ell = P(X > \gamma)$, if $\ell$ is small, then most samples from the original distribution fall in the region $X \leq \gamma$, contributing nothing to the estimate. Importance sampling allows us to sample more frequently from the tail region while maintaining an unbiased estimate through proper weighting.
+
+::: {.def-importance-sampling}
+**Definition: Importance Sampling.** Let $X$ be a random variable with probability density function (pdf) $p(x)$, and let $q(x)$ be a proposal pdf such that $q(x) > 0$ for all $x$ where $p(x)f(x) \neq 0$. The importance sampling estimator of $\ell = \mathbb{E}_p[f(X)]$ is:
+
+$$
+\hat{\ell}_{\text{IS}} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
+$$
+
+where $X_1, X_2, \ldots, X_N$ are i.i.d. samples from the distribution with pdf $q(x)$. 
+
+For clarity, we denote:
+- $\hat{\ell}_{\text{crude}}$: the standard sample mean estimator using samples from $p(x)$
+- $\hat{\ell}_{\text{IS}}$: the importance sampling estimator using samples from $q(x)$
+:::
+
+### Unbiasedness of the Importance Sampling Estimator
+
+Consider the case where $N = 1$:
+
+$$
+\hat{\ell}_{\text{IS}} = f(X) \frac{p(X)}{q(X)}, \quad \text{where } X \sim q(x).
+$$
+
+We can verify that this estimator is unbiased:
+
+$$
+\begin{aligned}
+\mathbb{E}_q[\hat{\ell}_{\text{IS}}] &= \mathbb{E}_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
+&= \int f(x) \frac{p(x)}{q(x)} q(x) \, dx \\
+&= \int f(x) p(x) \, dx \\
+&= \mathbb{E}_p[f(X)] \\
+&= \ell.
+\end{aligned}
+$$
+
+### Optimal Proposal Distribution
+
+The variance of the importance sampling estimator depends on the choice of $q(x)$:
+
+$$
+\text{Var}_q(\hat{\ell}_{\text{IS}}) \neq \text{Var}_p(\hat{\ell}_{\text{crude}}).
+$$
+
+For non-negative functions $f(x) \geq 0$, the optimal proposal distribution that minimizes variance is:
+
+$$
+q^*(x) \propto p(x) f(x).
+$$
+
+With this choice, the importance sampling estimator becomes a constant (zero variance!). For general functions, the optimal proposal is:
+
+$$
+q^*(x) \propto p(x) |f(x)|.
+$$
+
+However, these optimal choices require knowing the very quantity we're trying to estimate, making them impractical. In practice, we choose $q(x)$ to:
+1. Be easy to sample from
+2. Have heavier tails than $p(x)$ in regions where $|f(x)|$ is large
+3. Have a known normalizing constant
+
+::: {.exm-importance-sampling}
+**Importance Sampling for Rare Events.** Consider estimating the tail probability $\ell = P(X > 2)$ for $X \sim \mathcal{N}(0, 1)$. We use an exponential distribution shifted to start at 2 as our proposal:
+
+$$
+q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
+$$
+
+This proposal concentrates samples in the tail region where the indicator function is non-zero.
+:::
+
+```{ojs}
+//| output: false
+VM = window.VM
+vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
+chartColors = VM.plotting.colors(vmTheme)
+
+// The simulations themselves live in method.js, where
+// method.test.js checks them against theory.
+import {runningAverage, importanceTailEstimate, controlVariateStudy, antitheticStudy, crnStudy, crnDemoStudy} from "./method.js"
+
+// Indices 1..n, for x-axes counting samples.
+function vrCounts(n) {
+  const out = []
+  for (let i = 1; i <= n; i++) out.push(i)
+  return out
+}
+
+// A running-average chart: one line per estimator plus the true value.
+function vrConvergenceFigure(plot, series, trueValue, xTitle, title, yRange) {
+  const n = series[0].values.length
+  const traces = []
+  for (const s of series) {
+    traces.push({x: vrCounts(n), y: s.values, type: "scatter", mode: "lines", name: s.name, line: {color: chartColors[s.color], width: 2}})
+  }
+  traces.push({x: [1, n], y: [trueValue, trueValue], type: "scatter", mode: "lines",
+    name: `True value: ${trueValue.toFixed(6)}`, line: {color: chartColors.ink, dash: "dash", width: 2}})
+  const yaxis = {title: "Running average"}
+  if (yRange) yaxis.range = yRange
+  return VM.plotting.plotWithLegend(plot, traces, {title: {text: title}, margin: {t: 40}, xaxis: {title: xTitle}, yaxis})
+}
+
+vrIsPlot = VM.plotting.persistentPlot({height: "420px"})
+
+// Estimate P(X > 2) for X ~ N(0, 1), with N = 4000 samples each way.
+vrImportance = importanceTailEstimate(VM.sampling.seededRandom(42), 4000)
+```
+
+```{ojs}
+{
+  const r = vrImportance
+  return vrConvergenceFigure(vrIsPlot, [
+    {name: "Crude MC", values: runningAverage(r.crude), color: "fn"},
+    {name: "Importance sampling", values: runningAverage(r.weighted), color: "warn"}
+  ], r.trueValue, "Number of samples", "Importance sampling vs. crude Monte Carlo", [0, 0.04])
+}
+```
+
+```{ojs}
+{
+  const r = vrImportance
+  const rows = []
+  for (const [name, stats] of [["Importance sampling", r.isStats], ["Crude Monte Carlo", r.crudeStats]]) {
+    // Variance of the estimator (the sample mean), and its relative error.
+    const variance = stats.variance / r.N
+    rows.push([name, stats.mean.toFixed(5), variance.toExponential(2), (Math.sqrt(variance) / stats.mean).toFixed(3)])
+  }
+  const factor = r.crudeStats.variance / r.isStats.variance
+  return html`${VM.ui.renderTable({html, rows, headers: ["Method", "Estimate", "Variance", "Relative error"], filename: "importance-sampling.csv"})}
+    ${VM.ui.statRow([{label: "True value", value: r.trueValue.toFixed(5)}, {label: "Variance reduction factor", value: `${factor.toFixed(1)}×`}])}`
+}
+```
+
+### Key Considerations for Importance Sampling
+
+1. **Proposal Selection**: The optimal proposal $q^*(x) \propto p(x)|f(x)|$ is usually unknown. We must choose proposals that approximate this ideal while remaining tractable to sample from.
+
+2. **Normalizing Constants**: Unlike rejection sampling or MCMC, importance sampling requires knowing the normalizing constant of $q(x)$. This limits us to standard distributions like exponential, normal, uniform, or mixtures thereof.
+
+3. **Support Requirements**: The proposal must have positive density wherever $p(x)f(x) \neq 0$. For rare event estimation, this means ensuring $q(x) > 0$ in the tail regions of interest.
+
+4. **Weight Degeneracy**: Poor choice of $q(x)$ can lead to a few samples having very large weights, effectively reducing the sample size and increasing variance.
+
+## Control Variates
+
+Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to "correct" our estimates.
+
+Given a function $h(x)$ with known expectation $\mathbb{E}[h(X)] = h_0$, the control variate estimator is:
+
+$$
+\hat{\ell}_{\text{CV}} = \frac{1}{N} \sum_{i=1}^{N} \left[f(X_i) - \beta (h(X_i) - h_0)\right],
+$$
+
+where $\beta$ is a parameter we can optimize.
+
+**Variance Analysis**: The variance of this estimator is:
+
+$$
+\text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
+$$
+
+
+Define
+
+$$
+\beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
+$$
+
+Then the control variate estimator improves on crude Monte Carlo, i.e., $\text{Var}(\hat{\ell}_{\text{CV}}) < \text{Var}(\hat{\ell}_{\text{crude}}) = \frac{1}{N}\text{Var}(f(X))$, if and only if:
+
+$$
+\beta^2 \text{Var}(h(X)) < 2\beta \,\text{Cov}(f(X), h(X)),
+$$
+
+or equivalently, $\beta(\beta - 2\beta^*) < 0$, meaning $\beta \in (0,\, 2\beta^*)$ when $\text{Cov}(f(X), h(X)) > 0$, and $\beta \in (2\beta^*,\, 0)$ when $\text{Cov}(f(X), h(X)) < 0$. In particular, any control variate $h$ with nonzero correlation to $f$ admits a $\beta$ that yields variance reduction. In both cases, the optimal $\beta$ is the midpoint $\beta^*$.
+
+In practice, we often estimate $\beta^*$ from pilot samples or use a reasonable approximation.
+
+::: {#exm-control-variates}
+**Control Variates.** We estimate $\ell = \int_0^1 x e^{-x} dx$ using the control function $h(x) = x$. Since $X \sim \text{Uniform}(0,1)$, we know $\mathbb{E}[h(X)] = \frac{1}{2}$.
+:::
+
+```{ojs}
+//| output: false
+vrCvPlot = VM.plotting.persistentPlot({height: "420px"})
+vrCvConvergencePlot = VM.plotting.persistentPlot({height: "420px"})
+
+// Estimate the integral of x e^{-x} over [0, 1] with the control h(x) = x.
+vrControl = controlVariateStudy(VM.sampling.seededRandom(42), 1000, 100)
+```
+
+```{ojs}
+{
+  const r = vrControl
+  const betas = [], variances = [], testedBetas = [], testedVariances = []
+  for (const point of r.curve) {
+    betas.push(point.beta)
+    variances.push(point.variance)
+  }
+  for (const point of r.tested) {
+    testedBetas.push(point.beta)
+    testedVariances.push(point.variance)
+  }
+  return VM.plotting.plotWithLegend(vrCvPlot, [
+    {x: betas, y: variances, type: "scatter", mode: "lines", name: "Variance", line: {color: chartColors.fn, width: 2}},
+    {x: testedBetas, y: testedVariances, type: "scatter", mode: "markers", name: "Tested β", marker: {color: chartColors.alt, size: 9}},
+    {x: [-0.5, 1], y: [r.standard.variance, r.standard.variance], type: "scatter", mode: "lines", name: "Standard MC variance",
+      line: {color: chartColors.warn, dash: "dash", width: 2}},
+    {x: [r.betaEst, r.betaEst], y: [0, Math.max(...variances)], type: "scatter", mode: "lines",
+      name: `Estimated optimal β = ${r.betaEst.toFixed(3)}`, line: {color: chartColors.ok, dash: "dot", width: 2}}
+  ], {title: {text: "Control variate variance as a function of β"}, margin: {t: 40}, xaxis: {title: "β"}, yaxis: {title: "Variance", rangemode: "tozero"}})
+}
+```
+
+```{ojs}
+{
+  const r = vrControl
+  const rows = []
+  for (const point of r.tested) {
+    rows.push([point.beta.toFixed(3), point.estimate.toFixed(6), point.variance.toExponential(6),
+      `${(r.standard.variance / point.variance).toFixed(2)}×`])
+  }
+  return html`${VM.ui.statRow([
+      {label: "True value", value: r.trueValue.toFixed(6)},
+      {label: "Standard MC estimate", value: r.standard.estimate.toFixed(6)},
+      {label: "Standard MC variance", value: r.standard.variance.toExponential(6)}
+    ])}
+    ${VM.ui.renderTable({html, rows, headers: ["β", "Estimate", "Variance", "Reduction"], filename: "control-variates.csv"})}`
+}
+```
+
+```{ojs}
+vrConvergenceFigure(vrCvConvergencePlot, [
+  {name: "Standard Monte Carlo", values: vrControl.runningStandard, color: "fn"},
+  {name: `Control variate (β = ${vrControl.betaEst.toFixed(3)})`, values: vrControl.runningControl, color: "warn"}
+], vrControl.trueValue, "Number of samples", "Convergence: standard MC vs. control variates")
+```
+
+
+## Antithetic Variates
+
+The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.
+
+**Key Result**: For a monotonic function $f$ on $[a, b]$ and $X \sim \text{Uniform}(a, b)$:
+
+$$
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
+$$
+
+This leads to the antithetic variates estimator:
+
+$$
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
+$$
+
+where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
+
+::: {#thm-antithetic-variate}
+**Theorem**: For monotonic functions, $\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})$.
+:::
+
+::: {#exm-antithetic-variables}
+**Antithetic Variates.** We estimate $\ell = \int_0^1 \frac{1}{1 + x^2} dx$ using antithetic variates. Since $f(x) = \frac{1}{1 + x^2}$ is decreasing on $[0, 1]$, the pairs $(f(X), f(1-X))$ are negatively correlated.
+:::
+
+```{ojs}
+//| output: false
+vrAntitheticPlot = VM.plotting.persistentPlot({height: "420px"})
+
+// Estimate the integral of 1 / (1 + x²) over [0, 1] with N = 200 samples.
+vrAntithetic = antitheticStudy(VM.sampling.seededRandom(42), 200)
+```
+
+```{ojs}
+vrConvergenceFigure(vrAntitheticPlot, [
+  {name: "Standard Monte Carlo", values: vrAntithetic.runningStandard, color: "fn"},
+  {name: "Antithetic variates", values: vrAntithetic.runningAntithetic, color: "warn"}
+], vrAntithetic.trueValue, "Number of sample pairs", "Convergence: standard MC vs. antithetic variates")
+```
+
+```{ojs}
+{
+  const r = vrAntithetic
+  const rows = [
+    ["Standard Monte Carlo", r.standard.estimate.toFixed(6), r.standard.variance.toExponential(6)],
+    ["Antithetic variates", r.antithetic.estimate.toFixed(6), r.antithetic.variance.toExponential(6)]
+  ]
+  return html`${VM.ui.renderTable({html, rows, headers: ["Method", "Estimate", "Variance"], filename: "antithetic-variates.csv"})}
+    ${VM.ui.statRow([{label: "True value", value: r.trueValue.toFixed(6)},
+      {label: "Variance reduction factor", value: `${(r.standard.variance / r.antithetic.variance).toFixed(2)}×`}])}`
+}
+```
+
+## Common Random Numbers
+
+When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.
+
+**The Problem**: Suppose we want to estimate the difference $\delta = \mathbb{E}[f(X)] - \mathbb{E}[g(X)]$ where $X$ represents random inputs to two different systems. The naive approach uses independent samples:
+
+$$
+\hat{\delta}_{\text{indep}} = \frac{1}{N}\sum_{i=1}^{N} f(X_i) - \frac{1}{N}\sum_{i=1}^{N} g(Y_i),
+$$
+
+where $X_i$ and $Y_i$ are independent. The variance is:
+
+$$
+\text{Var}(\hat{\delta}_{\text{indep}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(Y))].
+$$
+
+**The CRN Solution**: Use the same random numbers for both systems:
+
+$$
+\hat{\delta}_{\text{CRN}} = \frac{1}{N}\sum_{i=1}^{N} [f(X_i) - g(X_i)],
+$$
+
+where the same $X_i$ is used for both $f$ and $g$. The variance becomes:
+
+$$
+\text{Var}(\hat{\delta}_{\text{CRN}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(X)) - 2\text{Cov}(f(X), g(X))].
+$$
+
+When $f(X)$ and $g(X)$ are positively correlated (which often happens when they represent similar systems), the variance reduction can be substantial.
+
+::: {#exm-common-random-numbers}
+**Comparing Queue Systems.** Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.
+:::
+
+```{ojs}
+//| output: false
+vrArrivalRate = 1
+vrServiceRates = [1.5, 2]
+
+// 100 replications of 1000 customers: the difference in mean waiting time
+// between the two systems, with common random numbers and with independent ones.
+vrCrn = crnStudy(VM.sampling.seededRandom(42), 1000, 100, vrArrivalRate, vrServiceRates[0], vrServiceRates[1])
+```
+
+```{ojs}
+{
+  const r = vrCrn
+  const rows = []
+  for (const [name, stats] of [["Common random numbers", r.crn], ["Independent sampling", r.independent]]) {
+    rows.push([name, stats.mean.toFixed(4), stats.variance.toFixed(6), stats.sd.toFixed(4)])
+  }
+  return html`${VM.ui.statRow([
+      {label: `System 1 (μ = ${vrServiceRates[0]})`, value: r.theory[0].toFixed(4), title: "λ / (μ(μ − λ)), the steady-state mean wait in queue"},
+      {label: `System 2 (μ = ${vrServiceRates[1]})`, value: r.theory[1].toFixed(4), title: "λ / (μ(μ − λ)), the steady-state mean wait in queue"},
+      {label: "Theoretical difference", value: (r.theory[0] - r.theory[1]).toFixed(4)},
+      {label: "Variance reduction factor", value: `${(r.independent.variance / r.crn.variance).toFixed(2)}×`}
+    ])}
+    ${VM.ui.renderTable({html, rows, headers: [`Method (${r.replications} replications)`, "Mean difference", "Variance", "Std deviation"], filename: "common-random-numbers.csv"})}`
+}
+```
+
+```{ojs}
+//| output: false
+vrCorrelationPlot = VM.plotting.persistentPlot({height: "440px"})
+vrPairedPlot = VM.plotting.persistentPlot({height: "440px"})
+
+vrCrnDemo = {
+  const demo = crnDemoStudy(VM.sampling.seededRandom(7), vrServiceRates[0], vrServiceRates[1])
+  return {...demo, highlighted: [10, 25, 40]}
+}
+```
+
+```{ojs}
+{
+  const d = vrCrnDemo
+  const lo = Math.min(...d.demo1), hi = Math.max(...d.demo1)
+  return VM.plotting.plotWithLegend(vrCorrelationPlot, [
+    {x: d.demo1, y: d.demo2, type: "scatter", mode: "markers", name: "Customers", marker: {color: VM.plotting.alpha(chartColors.fn, 0.6), size: 7}},
+    {x: [lo, hi], y: [d.fit.slope * lo + d.fit.intercept, d.fit.slope * hi + d.fit.intercept], type: "scatter", mode: "lines",
+      name: `Linear fit (y = ${d.fit.slope.toFixed(2)}x + ${d.fit.intercept.toFixed(2)})`, line: {color: chartColors.alt, dash: "dash", width: 2}}
+  ], {title: {text: `Correlation between systems (ρ = ${d.correlation.toFixed(3)})`}, margin: {t: 40},
+    xaxis: {title: "Waiting time, system 1"}, yaxis: {title: "Waiting time, system 2"}})
+}
+```
+
+```{ojs}
+{
+  const d = vrCrnDemo
+  const customers = vrCounts(d.wait1.length)
+  const shapes = [], annotations = []
+  for (const c of d.highlighted) {
+    shapes.push({type: "line", x0: c, x1: c, yref: "paper", y0: 0, y1: 1, line: {color: chartColors.muted, dash: "dot", width: 1}})
+    // An arrow spanning the paired difference for this customer.
+    annotations.push({x: c, y: d.wait2[c - 1], ax: c, ay: d.wait1[c - 1], axref: "x", ayref: "y", showarrow: true,
+      arrowhead: 2, arrowside: "end+start", arrowcolor: chartColors.alt, text: ""})
+  }
+  return VM.plotting.plotWithLegend(vrPairedPlot, [
+    {x: customers, y: d.wait1, type: "scatter", mode: "lines+markers", name: `System 1 (μ = ${vrServiceRates[0]})`,
+      line: {color: chartColors.fn, width: 1}, marker: {size: 5}},
+    {x: customers, y: d.wait2, type: "scatter", mode: "lines+markers", name: `System 2 (μ = ${vrServiceRates[1]})`,
+      line: {color: chartColors.warn, width: 1}, marker: {size: 5, symbol: "square"}}
+  ], {title: {text: "Paired wait times with common random numbers"}, margin: {t: 40},
+    xaxis: {title: "Customer number"}, yaxis: {title: "Waiting time"}, shapes, annotations})
+}
+```
+
+```{ojs}
+{
+  const d = vrCrnDemo
+  const rows = []
+  for (const c of d.highlighted) {
+    rows.push([c, d.wait1[c - 1].toFixed(3), d.wait2[c - 1].toFixed(3), (d.wait1[c - 1] - d.wait2[c - 1]).toFixed(3)])
+  }
+  return VM.ui.renderTable({html, rows, headers: ["Customer", "System 1", "System 2", "Difference"], filename: "paired-waits.csv"})
+}
+```
+
+### When to Use Common Random Numbers
+
+CRN is most effective when:
+
+1. **Comparing Similar Systems**: The systems should respond similarly to the same random inputs, creating positive correlation.
+
+2. **Paired Comparisons**: When comparing multiple alternatives, use the same random numbers across all alternatives.
+
+3. **Sensitivity Analysis**: When studying how parameters affect system performance, CRN isolates the effect of parameter changes from random noise.
+
+**Implementation Tips**:
+
+1. **Synchronization**: Ensure random numbers are used for the same purposes in both systems (e.g., the i-th arrival in both systems uses the same random number).
+
+2. **Random Streams**: Use separate random number streams for different sources of randomness (e.g., arrivals vs. service times).
+
+3. **Variance Reduction Magnitude**: The reduction depends on the correlation between $f(X)$ and $g(X)$. Higher correlation yields greater reduction.
+
+**Limitations**:
+
+- CRN may not help (or could hurt) if the systems respond very differently to the same inputs
+- Requires careful implementation to maintain proper synchronization
+- May be complex to implement in large-scale simulations
+
+### Summary of Variance Reduction Methods
+
+1. **Importance Sampling**: 
+   - Best for rare events or when integrand is concentrated in specific regions
+   - Requires careful choice of proposal distribution
+   - Can achieve dramatic variance reduction but may fail catastrophically with poor proposals
+
+2. **Antithetic Variates**:
+   - Simple to implement for monotonic functions
+   - Guaranteed variance reduction (never worse than standard MC)
+   - Limited to specific function types and typically modest improvements
+
+3. **Control Variates**:
+   - Requires finding correlated functions with known expectations
+   - Can be very effective when good control variates are available
+   - Performance depends on correlation strength and optimal β selection
+
+4. **Common Random Numbers**:
+   - Ideal for comparing similar systems or policies
+   - Easy to implement in many simulation contexts
+   - Effectiveness depends on positive correlation between systems
+
+Each method has its strengths and ideal use cases. In practice, these methods can often be combined for even greater variance reduction.
