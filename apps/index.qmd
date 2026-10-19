@@ -6,8 +6,7 @@ comments: false
 # <div class="vm-app" id="...">; the chapter URL with ?embed=<id> shows that
 # app alone (mathviz embed mode). The cards below link to those views, so
 # there is one copy of every app. Add a card here when a chapter gains an app
-# (inline listing items take `path:`, and it must be the .html URL: Quarto
-# drops a .qmd path that carries a query string).
+# (inline listing items take `path:`, written as `../<slug>/?embed=<id>`).
 listing:
   type: grid
   grid-columns: 3
