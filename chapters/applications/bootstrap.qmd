@@ -177,6 +177,10 @@ VM = window.VM
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
 
+// The bootstrap simulations live in bootstrap.method.js, where
+// bootstrap.method.test.js checks them against theory.
+import {bootstrapMeans, bootstrapMeansIndependent, tailBootstrap} from "./bootstrap.method.js"
+
 bsGridPlots = {
   const plots = []
   for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({height: "340px"}))
@@ -186,29 +190,6 @@ bsRidgePlot = VM.plotting.persistentPlot({height: "520px"})
 bsFitPlot = VM.plotting.persistentPlot({height: "380px"})
 bsComparePlot = VM.plotting.persistentPlot({height: "380px"})
 
-function bsNormalSample(n, mean, sd, gaussian) {
-  const out = []
-  for (let i = 0; i < n; i++) out.push(mean + sd * gaussian())
-  return out
-}
-
-// B bootstrap replicates of statistic(resample), each resample drawn from
-// `data` with replacement.
-function bsBootstrap(data, statistic, B, rng) {
-  const out = []
-  const n = data.length
-  for (let b = 0; b < B; b++) {
-    const resample = []
-    for (let i = 0; i < n; i++) resample.push(data[Math.floor(rng() * n)])
-    out.push(statistic(resample))
-  }
-  return out
-}
-
-function bsMean(values) {
-  return VM.distributions.sampleStats(values).mean
-}
-
 function bsLinspace(lo, hi, count) {
   const out = []
   for (let i = 0; i < count; i++) out.push(lo + (hi - lo) * i / (count - 1))
@@ -217,17 +198,7 @@ function bsLinspace(lo, hi, count) {
 
 // Bootstrap distributions of the sample mean, for a N(0, 1) sample of each
 // size, with the normal approximation N(x̄, s² / n) they should approach.
-bsMeans = {
-  const rng = VM.sampling.seededRandom(42)
-  const gaussian = VM.sampling.gaussianRandom(rng)
-  const out = []
-  for (const n of [5, 10, 25, 50]) {
-    const sample = bsNormalSample(n, 0, 1, gaussian)
-    const stats = VM.distributions.sampleStats(sample)
-    out.push({n, boot: bsBootstrap(sample, bsMean, 2000, rng), center: stats.mean, se: stats.sd / Math.sqrt(n)})
-  }
-  return out
-}
+bsMeans = bootstrapMeans([5, 10, 25, 50], 2000, 42)
 
 function bsMeansFigure(plot, run) {
   const bins = VM.distributions.histogramBins(run.boot, 30)
@@ -275,12 +246,12 @@ bsMeansFigure(bsGridPlots[3], bsMeans[3])
   // approximation (black) for n = 3 ... 50, stacked one row per n.
   const sizes = [3, 5, 10, 20, 50]
   const palette = ["alt", "warn", "ok", "fn", "accent2"]
+  const runs = bootstrapMeansIndependent(sizes, 1000, 42)
   const traces = []
   for (let i = 0; i < sizes.length; i++) {
     const n = sizes[i]
-    const rng = VM.sampling.seededRandom(42 + i)
-    const sample = bsNormalSample(n, 0, 1, VM.sampling.gaussianRandom(rng))
-    const boot = bsBootstrap(sample, bsMean, 1000, rng)
+    const run = runs[i]
+    const boot = run.boot
     const bins = VM.distributions.histogramBins(boot, 30)
     const color = chartColors[palette[i]]
     // A filled outline from the baseline y = i up to i + 0.2 · density.
@@ -293,10 +264,8 @@ bsMeansFigure(bsGridPlots[3], bsMeans[3])
     py.push(i)
     traces.push({x: px, y: py, type: "scatter", mode: "lines", fill: "toself", name: `n=${n}`,
       fillcolor: VM.plotting.alpha(color, 0.6), line: {color, width: 1}})
-    const stats = VM.distributions.sampleStats(sample)
-    const se = stats.sd / Math.sqrt(n)
     const xs = bsLinspace(-2, 2, 200), ys = []
-    for (const x of xs) ys.push(i + 0.2 * VM.distributions.normalPdf(x, stats.mean, se * se))
+    for (const x of xs) ys.push(i + 0.2 * VM.distributions.normalPdf(x, run.center, run.se * run.se))
     traces.push({x: xs, y: ys, type: "scatter", mode: "lines", showlegend: false, line: {color: chartColors.ink, width: 2}})
   }
   const labels = []
@@ -377,34 +346,7 @@ When the exponential assumption is correct, this provides exact inference using 
 // A sample of 25 from N(5, 1.5²), and the bootstrap distribution of the
 // estimate of P(X > 8): non-parametric (resample the data) and parametric
 // (draw from the normal fitted to the data).
-bsTail = {
-  const n = 25, mu = 5, sigma = 1.5, threshold = 8, B = 2000
-  const rng = VM.sampling.seededRandom(42)
-  const gaussian = VM.sampling.gaussianRandom(rng)
-  const data = bsNormalSample(n, mu, sigma, gaussian)
-  // The maximum-likelihood fit: the sample mean and the n-denominator sd.
-  const fit = VM.distributions.sampleStats(data, {ddof: 0})
-  function aboveThreshold(values) {
-    let count = 0
-    for (const v of values) {
-      if (v > threshold) count++
-    }
-    return count / values.length
-  }
-  const nonparametric = bsBootstrap(data, aboveThreshold, B, rng)
-  const parametric = []
-  for (let b = 0; b < B; b++) parametric.push(aboveThreshold(bsNormalSample(n, fit.mean, fit.sd, gaussian)))
-  // One resample of each kind, for the comparison plot.
-  const exampleRng = VM.sampling.seededRandom(123)
-  const nonparametricSample = bsBootstrap(data, x => x, 1, exampleRng)[0]
-  const parametricSample = bsNormalSample(n, fit.mean, fit.sd, VM.sampling.gaussianRandom(exampleRng))
-  return {
-    threshold, data, fit, nonparametricSample, parametricSample,
-    trueProb: 1 - VM.distributions.normalCdf(threshold, mu, sigma * sigma),
-    nonparametricMean: bsMean(nonparametric),
-    parametricMean: bsMean(parametric)
-  }
-}
+bsTail = tailBootstrap({n: 25, mu: 5, sigma: 1.5, threshold: 8, B: 2000})
 
 function bsThresholdLine(height) {
   return {x: [bsTail.threshold, bsTail.threshold], y: [0, height], type: "scatter", mode: "lines", name: "Threshold",

@@ -82,7 +82,11 @@ Suppose we start at vertex $A$. This means that the initial distribution is $\pi
 ```{ojs}
 //| output: false
 // The figures and tables for the examples in this appendix. VM and
-// chartColors are defined with the random-walk app further down.
+// chartColors are defined with the random-walk app further down. The chain
+// computations live in markov_chains.method.js, where
+// markov_chains.method.test.js checks them.
+import {transitionMatrix, firstBelowThreshold, cycleWalk, visitFrequencies, thin, acfRuns, acfSimilarity, makeWalkGraphs, symmetrizedWalkMatrix, walkMixing} from "./markov_chains.method.js"
+
 mcGraphPlot = VM.plotting.persistentPlot({height: "340px"})
 mcTvPlot = VM.plotting.persistentPlot({height: "340px"})
 
@@ -91,12 +95,7 @@ mcEdges = [["A", "B", 1], ["B", "C", 1 / 3], ["B", "A", 1 / 3], ["B", "D", 1 / 3
   ["C", "B", 1 / 2], ["C", "D", 1 / 2], ["D", "B", 1 / 2], ["D", "C", 1 / 2]]
 
 // The transition matrix: P[i][j] is the probability of moving from state i to j.
-mcP = {
-  const P = []
-  for (let i = 0; i < mcStates.length; i++) P.push(new Array(mcStates.length).fill(0))
-  for (const [from, to, p] of mcEdges) P[mcStates.indexOf(from)][mcStates.indexOf(to)] = p
-  return P
-}
+mcP = transitionMatrix(mcStates, mcEdges)
 
 mcEvolution = VM.mcmc.evolveDistribution(mcP, [1, 0, 0, 0], 15)
 
@@ -307,14 +306,9 @@ In practice, we either provide a theoretical bound on the mixing time or "visual
   // Total variation distance from the stationary distribution (1/8, 3/8,
   // 2/8, 2/8) over 15 steps; the mixing time is the first step below 1/4.
   const stationary = [1 / 8, 3 / 8, 2 / 8, 2 / 8]
-  const steps = [], tvd = []
-  let mixingTime = null
-  for (let t = 0; t < mcEvolution.length; t++) {
-    const d = VM.mcmc.totalVariation(mcEvolution[t], stationary)
-    steps.push(t)
-    tvd.push(d)
-    if (mixingTime === null && d < 0.25) mixingTime = t
-  }
+  const {tvd, mixingTime} = firstBelowThreshold(mcEvolution, stationary, 0.25)
+  const steps = []
+  for (let t = 0; t < tvd.length; t++) steps.push(t)
   return VM.plotting.plotWithLegend(mcTvPlot, [
     {x: steps, y: tvd, type: "scatter", mode: "lines+markers", name: "TV distance", line: {color: chartColors.fn, width: 2}},
     {x: [0, steps.length - 1], y: [0.25, 0.25], type: "scatter", mode: "lines", name: "Threshold of 0.25",
@@ -367,90 +361,8 @@ walkMaxTime = 200
 walkThreshold = 0.25
 walkDefaults = ({graph: "Barbell (bottleneck)", lazy: true, start: 0, t: 0})
 
-// The graphs, as {nodeCount, edges}. Built by hand rather than with a
-// graph library: each is a few lines of edges.
-walkGraphs = {
-  const complete = (offset, size, edges) => {
-    for (let i = 0; i < size; i++) {
-      for (let j = i + 1; j < size; j++) edges.push([offset + i, offset + j])
-    }
-  }
-  const path = (nodeCount) => {
-    const edges = []
-    for (let i = 0; i + 1 < nodeCount; i++) edges.push([i, i + 1])
-    return {nodeCount, edges}
-  }
-  const cycle = (nodeCount) => {
-    const g = path(nodeCount)
-    g.edges.push([nodeCount - 1, 0])
-    return g
-  }
-  const completeGraph = (nodeCount) => {
-    const edges = []
-    complete(0, nodeCount, edges)
-    return {nodeCount, edges}
-  }
-  const star = (leaves) => {
-    const edges = []
-    for (let i = 1; i <= leaves; i++) edges.push([0, i])
-    return {nodeCount: leaves + 1, edges}
-  }
-  const grid = (rows, cols) => {
-    const edges = []
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const i = r * cols + c
-        if (c + 1 < cols) edges.push([i, i + 1])
-        if (r + 1 < rows) edges.push([i, i + cols])
-      }
-    }
-    return {nodeCount: rows * cols, edges}
-  }
-  const binaryTree = (depth) => {
-    const nodeCount = Math.pow(2, depth + 1) - 1
-    const edges = []
-    for (let i = 1; i < nodeCount; i++) edges.push([Math.floor((i - 1) / 2), i])
-    return {nodeCount, edges}
-  }
-  // Two K_m joined through one middle vertex: m, m + 1, ..., 2m.
-  const barbell = (m) => {
-    const edges = []
-    complete(0, m, edges)
-    complete(m + 1, m, edges)
-    edges.push([m - 1, m], [m, m + 1])
-    return {nodeCount: 2 * m + 1, edges}
-  }
-  // K_m with a path of `tail` vertices hanging off it.
-  const lollipop = (m, tail) => {
-    const edges = []
-    complete(0, m, edges)
-    for (let i = m - 1; i < m + tail - 1; i++) edges.push([i, i + 1])
-    return {nodeCount: m + tail, edges}
-  }
-  // `count` copies of K_size, consecutive ones joined by a single edge
-  // (and the last to the first when cyclic).
-  const cliqueChain = (count, size, cyclic) => {
-    const edges = []
-    for (let k = 0; k < count; k++) complete(k * size, size, edges)
-    for (let k = 0; k + 1 < count; k++) edges.push([(k + 1) * size - 1, (k + 1) * size])
-    if (cyclic) edges.push([count * size - 1, 0])
-    return {nodeCount: count * size, edges}
-  }
-
-  return new Map([
-    ["Barbell (bottleneck)", barbell(8)],
-    ["Complete graph (n = 15)", completeGraph(15)],
-    ["Cycle (n = 21)", cycle(21)],
-    ["Lollipop", lollipop(8, 8)],
-    ["3 cliques (2 bottlenecks)", cliqueChain(3, 9, false)],
-    ["3 cliques (3 bottlenecks, cyclic)", cliqueChain(3, 9, true)],
-    ["4 cliques (3 bottlenecks)", cliqueChain(4, 9, false)],
-    ["Path (n = 31)", path(31)],
-    ["Binary tree (depth 4)", binaryTree(4)],
-    ["Grid 5 × 5", grid(5, 5)],
-    ["Star (n = 15)", star(14)]
-  ])
-}
+// The graphs, as {nodeCount, edges}, are built in markov_chains.method.js.
+walkGraphs = makeWalkGraphs()
 
 // One color per feature, none shared: the vertex scale runs purple ->
 // amber, and no other trace uses either hue.
@@ -510,15 +422,7 @@ walkGraph = {
   const {P, degrees, stationary} = VM.discreteMath.randomWalkMatrix(g.nodeCount, g.edges, {lazy: walkLazy})
   const positions = VM.discreteMath.springLayout(g.nodeCount, g.edges, {seed: 42, iterations: 400})
 
-  // P = D^-1 A is not symmetric, but D^(1/2) P D^(-1/2) is, and has the
-  // same eigenvalues -- which is what lets a symmetric solver find them.
-  const S = []
-  for (let i = 0; i < g.nodeCount; i++) {
-    const row = []
-    for (let j = 0; j < g.nodeCount; j++) row.push(Math.sqrt(degrees[i] / degrees[j]) * P[i][j])
-    S.push(row)
-  }
-  const eigenvalues = VM.numerical.symmetricEigenvalues(S)
+  const eigenvalues = VM.numerical.symmetricEigenvalues(symmetrizedWalkMatrix(P, degrees))
   return {...g, P, stationary, positions, eigenvalues}
 }
 ```
@@ -527,20 +431,7 @@ walkGraph = {
 //| output: false
 // pi_t for t = 0..walkMaxTime from the chosen start, with its distance to
 // stationarity at every step.
-walkRun = {
-  const p0 = new Array(walkGraph.nodeCount).fill(0)
-  p0[walkStart] = 1
-  const distributions = VM.mcmc.evolveDistribution(walkGraph.P, p0, walkMaxTime)
-  const tv = []
-  for (const p of distributions) tv.push(VM.mcmc.totalVariation(p, walkGraph.stationary))
-  // First time the distance drops to the threshold and stays there.
-  let mixingTime = null
-  for (let t = walkMaxTime; t >= 0; t--) {
-    if (tv[t] > walkThreshold) break
-    mixingTime = t
-  }
-  return {distributions, tv, mixingTime}
-}
+walkRun = walkMixing(walkGraph.P, walkGraph.stationary, walkStart, walkMaxTime, walkThreshold)
 ```
 
 ```{ojs}
@@ -765,31 +656,13 @@ mcAcfPlot = VM.plotting.persistentPlot({height: "380px"})
 // A simple random walk on the 15-cycle: 5000 steps from vertex 0, each
 // step to one of the two neighbours with probability 1/2.
 mcCycleN = 15
-mcWalk = {
-  const rng = VM.sampling.seededRandom(3)
-  const walk = [0]
-  for (let i = 0; i < 5000; i++) {
-    let step = 1
-    if (rng() < 0.5) step = -1
-    walk.push((walk[i] + step + mcCycleN) % mcCycleN)
-  }
-  return walk
-}
-
-// Fraction of time spent at each vertex.
-function mcVisitFrequencies(walk) {
-  const counts = new Array(mcCycleN).fill(0)
-  for (const v of walk) counts[v] += 1
-  const out = []
-  for (const c of counts) out.push(c / walk.length)
-  return out
-}
+mcWalk = cycleWalk(VM.sampling.seededRandom(3), mcCycleN, 5000)
 
 function mcFrequencyFigure(plot, walk, title) {
   const vertices = []
   for (let v = 0; v < mcCycleN; v++) vertices.push(v)
   return VM.plotting.plotWithLegend(plot, [
-    {x: vertices, y: mcVisitFrequencies(walk), type: "bar", name: "Frequency", marker: {color: chartColors.fn}},
+    {x: vertices, y: visitFrequencies(walk, mcCycleN), type: "bar", name: "Frequency", marker: {color: chartColors.fn}},
     {x: [-0.5, mcCycleN - 0.5], y: [1 / mcCycleN, 1 / mcCycleN], type: "scatter", mode: "lines", name: "Expected",
       line: {color: chartColors.alt, dash: "dash", width: 2}}
   ], {title: {text: title}, margin: {t: 40}, xaxis: {title: "Nodes"}, yaxis: {title: "Frequency"},
@@ -839,9 +712,7 @@ mcFrequencyFigure(mcBurnInPlot, mcWalk.slice(100), "Discarding first 100 samples
 
 ```{ojs}
 {
-  const thinned = []
-  for (let i = 100; i < mcWalk.length; i += 20) thinned.push(mcWalk[i])
-  return mcFrequencyFigure(mcThinPlot, thinned, "Keeping only every 20th sample")
+  return mcFrequencyFigure(mcThinPlot, thin(mcWalk, 100, 20), "Keeping only every 20th sample")
 }
 ```
 
@@ -1194,11 +1065,7 @@ Below is the autocorrelation analysis for @exm-random-walk-on-graph. Rather than
 // candidate burn-in.
 mcAcfRuns = {
   const n = mcWalk.length
-  const runs = []
-  for (const burnIn of [0, Math.floor(n / 10), Math.floor(n / 5), Math.floor(n / 4)]) {
-    runs.push({burnIn, acf: VM.mcmc.autocorrelation(mcWalk.slice(burnIn), 49)})
-  }
-  return runs
+  return acfRuns(mcWalk, [0, Math.floor(n / 10), Math.floor(n / 5), Math.floor(n / 4)], 49)
 }
 ```
 
@@ -1223,11 +1090,8 @@ Similarity between consecutive autocorrelation functions (the mean absolute diff
 {
   const rows = []
   for (let i = 0; i + 1 < mcAcfRuns.length; i++) {
-    const a = mcAcfRuns[i].acf, b = mcAcfRuns[i + 1].acf
-    const count = Math.min(a.length, b.length)
-    let total = 0
-    for (let lag = 0; lag < count; lag++) total += Math.abs(a[lag] - b[lag])
-    rows.push([`${mcAcfRuns[i].burnIn} vs ${mcAcfRuns[i + 1].burnIn}`, (total / count).toFixed(3)])
+    const similarity = acfSimilarity(mcAcfRuns[i].acf, mcAcfRuns[i + 1].acf)
+    rows.push([`${mcAcfRuns[i].burnIn} vs ${mcAcfRuns[i + 1].burnIn}`, similarity.toFixed(3)])
   }
   return VM.ui.renderTable({html, rows, headers: ["Burn-in", "Similarity"], filename: "acf-similarity.csv"})
 }

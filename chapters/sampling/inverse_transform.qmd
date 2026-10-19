@@ -150,12 +150,9 @@ chartColors = VM.plotting.colors(vmTheme)
 
 triPlot = VM.plotting.persistentPlot({height: "360px"})
 
-// Triangular density on [a, b] with mode c.
-function triangularPdf(x, a, b, c) {
-  if (a <= x && x < c) return 2 * (x - a) / ((b - a) * (c - a))
-  if (c <= x && x <= b) return 2 * (b - x) / ((b - a) * (b - c))
-  return 0
-}
+// The density lives in inverse_transform.method.js, tested in
+// inverse_transform.method.test.js.
+import {triangularPdf} from "./inverse_transform.method.js"
 ```
 
 ```{ojs}

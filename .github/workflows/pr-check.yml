@@ -3,7 +3,7 @@
 # Authors: Apurva Nakade
 
 # Renders the whole book on every pull request to develop, so a red check
-# means some chapter no longer builds. It can't see an OJS cell that throws in
+# means a chapter's method tests fail (`npm test`) or some chapter no longer builds. It can't see an OJS cell that throws in
 # the browser -- that is checked in a preview before the PR. The rendered site is attached to the run as the
 # `site` artifact, for a reviewer to download and open.
 
@@ -29,6 +29,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dev tooling
+        run: npm ci
+
+      - name: Test the methods
+        run: npm test
 
       - name: Render the book
         uses: ./.github/actions/render

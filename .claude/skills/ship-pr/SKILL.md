@@ -32,7 +32,7 @@ maintainer review, in which case skip to step 4).
 ## 1. Branch and worktree
 
 Work happens in a worktree, never by switching branches in the `develop`
-folder (`~/Github/Monte-Carlo-Methods`). `git worktree list` shows which
+folder (`~/Github/teaching/Monte-Carlo-Methods`). `git worktree list` shows which
 folder holds which branch.
 
 - **Already in a feature worktree**: use it.
@@ -51,6 +51,9 @@ folder holds which branch.
 In the worktree:
 
 - `quarto render` finishes with no errors in the output.
+- If a chapter's `method.js` changed (or a method was added), `node --test`
+  passes: each method has its `method.test.js`, and the PR says why each
+  expected number is right.
 - Every chapter the change touches is opened in that worktree's
   `quarto preview`, and its apps exercised: every button, every slider moved,
   dark mode toggled, the `?embed=<id>` view loaded. The browser console shows
@@ -78,7 +81,8 @@ Every PR gets two reviews, and both are a gate for the merge.
 **Maintainer review.** A local review from an agent that has not seen this
 session:
 
-1. Spawn a fresh `general-purpose` agent (the Agent tool, not a fork, so it
+1. Spawn a fresh `general-purpose` agent on Sonnet (the Agent tool with
+   `model: "sonnet"`, to save tokens; not a fork, so it
    starts without this session's context) with the prompt in
    [maintainer-review.md](maintainer-review.md), filling in the PR number and
    the worktree path. Add nothing about the change: the point is a reviewer
@@ -149,7 +153,7 @@ Only when every check is green and every finding has a reply:
 
 ```sh
 gh pr merge <N> --merge
-git -C ~/Github/Monte-Carlo-Methods pull
+git -C ~/Github/teaching/Monte-Carlo-Methods pull
 ```
 
 `--merge`, not `--squash`: it keeps the branch's history on `develop`.

@@ -21,6 +21,10 @@ VM = window.VM
 // the reader toggles dark mode; chartColors is that palette.
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
+
+// The simulations themselves live in estimating_pi.method.js, where
+// estimating_pi.method.test.js checks them against theory.
+import {dropPoints, circleEstimate, circleConvergence, dropNeedles, needleCrossings, buffonEstimate} from "./estimating_pi.method.js"
 ```
 
 ```{ojs}
@@ -67,36 +71,14 @@ piSeed = {
 // only chooses how many of them to show, so moving it never redraws the
 // points already on screen. insideCount[i] counts the hits among the
 // first i points.
-piPoints = {
-  const rng = VM.sampling.seededRandom(piSeed)
-  const xs = [], ys = [], inside = [], insideCount = [0]
-  for (let i = 0; i < piMaxN; i++) {
-    const x = 2 * rng() - 1
-    const y = 2 * rng() - 1
-    const hit = x * x + y * y <= 1
-    xs.push(x)
-    ys.push(y)
-    inside.push(hit)
-    let count = insideCount[i]
-    if (hit) count++
-    insideCount.push(count)
-  }
-  return {xs, ys, inside, insideCount}
-}
+piPoints = dropPoints(VM.sampling.seededRandom(piSeed), piMaxN)
 ```
 
 ```{ojs}
 //| output: false
 // The estimate and its estimated standard error, 4 * sqrt(p(1 - p) / N)
 // with p the observed fraction inside.
-piStats = {
-  const n = piN
-  const inside = piPoints.insideCount[n]
-  const p = inside / n
-  const estimate = 4 * p
-  const stdError = 4 * Math.sqrt(p * (1 - p) / n)
-  return {n, inside, estimate, stdError, error: Math.abs(estimate - Math.PI)}
-}
+piStats = circleEstimate(piPoints.insideCount[piN], piN)
 ```
 
 ```{ojs}
@@ -257,27 +239,7 @@ piWidthPlot = VM.plotting.persistentPlot({height: "400px"})
 // One independent pi estimate per sample size N = 100, 200, ..., 10000,
 // each with its theoretical 95% confidence interval
 // estimate ± z sqrt(pi (4 - pi) / N).
-piConvergence = {
-  const rng = VM.sampling.seededRandom(42)
-  const z = VM.distributions.normalQuantile(0.975)
-  const sizes = [], estimates = [], lower = [], upper = [], widths = []
-  for (let n = 100; n <= 10000; n += 100) {
-    let inside = 0
-    for (let i = 0; i < n; i++) {
-      const x = 2 * rng() - 1
-      const y = 2 * rng() - 1
-      if (x * x + y * y <= 1) inside++
-    }
-    const estimate = 4 * inside / n
-    const margin = z * Math.sqrt(Math.PI * (4 - Math.PI) / n)
-    sizes.push(n)
-    estimates.push(estimate)
-    lower.push(estimate - margin)
-    upper.push(estimate + margin)
-    widths.push(2 * margin)
-  }
-  return {sizes, estimates, lower, upper, widths}
-}
+piConvergence = circleConvergence(VM.sampling.seededRandom(42), 10000, VM.distributions.normalQuantile(0.975))
 ```
 
 ::: {#fig-pi-convergence}
@@ -392,57 +354,19 @@ buffonSeed = {
 // buffonDrops: each needle's center and angle, drawn once per seed. The
 // needle-length slider only rescales the needles about their centers, so
 // changing it shows the same drops with longer or shorter needles.
-buffonDrops = {
-  const rng = VM.sampling.seededRandom(buffonSeed)
-  const cx = [], cy = [], theta = []
-  for (let i = 0; i < buffonMaxN; i++) {
-    cx.push(buffonWidth * rng())
-    cy.push(buffonHeight * rng())
-    theta.push(Math.PI * rng())
-  }
-  return {cx, cy, theta}
-}
+buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
 ```
 
 ```{ojs}
 //| output: false
 // buffonNeedles: endpoints and crossings for the current needle length;
 // crossingCount[i] counts the crossings among the first i needles.
-buffonNeedles = {
-  const half = buffonLength / 2
-  const x1 = [], y1 = [], x2 = [], y2 = [], crosses = [], crossingCount = [0]
-  for (let i = 0; i < buffonMaxN; i++) {
-    const dx = half * Math.cos(buffonDrops.theta[i])
-    const dy = half * Math.sin(buffonDrops.theta[i])
-    const ya = buffonDrops.cy[i] - dy
-    const yb = buffonDrops.cy[i] + dy
-    x1.push(buffonDrops.cx[i] - dx)
-    x2.push(buffonDrops.cx[i] + dx)
-    y1.push(ya)
-    y2.push(yb)
-    // A line y = k*t lies between the ends exactly when they fall in
-    // different strips.
-    const hit = Math.floor(ya / buffonSpacing) !== Math.floor(yb / buffonSpacing)
-    crosses.push(hit)
-    let count = crossingCount[i]
-    if (hit) count++
-    crossingCount.push(count)
-  }
-  return {x1, y1, x2, y2, crosses, crossingCount}
-}
+buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing)
 ```
 
 ```{ojs}
 //| output: false
-buffonStats = {
-  const n = buffonN
-  const crossings = buffonNeedles.crossingCount[n]
-  if (crossings === 0) return {n, crossings, estimate: null, stdError: null, error: null}
-  const p = crossings / n
-  const estimate = (2 * buffonLength * n) / (buffonSpacing * crossings)
-  const stdError = (2 * buffonLength / buffonSpacing) * Math.sqrt((1 - p) / (n * p * p * p))
-  return {n, crossings, estimate, stdError, error: Math.abs(estimate - Math.PI)}
-}
+buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonN, buffonLength, buffonSpacing)
 ```
 
 ```{ojs}

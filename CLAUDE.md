@@ -2,22 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered by GitHub Actions and published to GitHub Pages from the `gh-pages` branch. Chapters are prose plus Observable JS (OJS) cells: every figure, and in a few chapters an interactive app, is drawn in the reader's browser. Nothing executes at render time, and there is no Python. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the pages call, including `VM.mcmc.*`, is in mathviz itself; see the mathviz section below for how this site gets it and how to contribute to it.
+Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), rendered by GitHub Actions and published to GitHub Pages from the `gh-pages` branch. Chapters are prose plus Observable JS (OJS) cells: every figure, and in a few chapters an interactive app, is drawn in the reader's browser. This repo is JavaScript-first: nothing executes at render time. The apps run entirely client-side on the **mathviz** library — `window.VM`, the `ojs-*`/`vm-*` design-system CSS, the Quarto theme and the site chrome — which this repo **consumes** from [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz). Everything the pages call, including `VM.mcmc.*`, is in mathviz itself; see the mathviz section below for how this site gets it and how to contribute to it.
 
 ## Commands
 
+- `npm test` (= `node --test`) — runs every chapter's `*.method.test.js` (see Conventions). Needs `npm install` once.
 - `make build` (= `quarto render`) — render the whole book into `docs/` (untracked; for local checking only).
 - `make preview` (= `quarto preview`) — live-reload preview; the right tool for iterating on one chapter.
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
 - `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). Only run it when asked.
 
-Nothing to install beyond Quarto (and Node, if a local overlay is added: `cd _mathviz && node --test && node scripts/build.mjs`).
+Quarto renders the book; Node (`npm install`, for mathjs) is needed only for `npm test`, and for a local overlay if one is added: `cd _mathviz && node --test && node scripts/build.mjs`.
 
 ## Branches, PRs and releases
 
-Same rules as VisualMathLab. `develop` is where work lands; `main` is a pointer to the last published state.
+Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work lands; `main` is a pointer to the last published state.
 
-- **One worktree per branch.** `~/Github/Monte-Carlo-Methods` is the long-lived `develop` checkout and stays on `develop` — never `git checkout` another branch there (a checkout rewrites `_quarto.yml`/`_extensions/`, and a running `quarto preview` then re-renders the whole book). A feature branch gets a sibling folder: `git worktree add -b <prefix>/<slug> ../Monte-Carlo-Methods-<slug> develop` (prefixes: `app/`, `chapter/`, `fix/`, `ci/`, `docs/`). In it, run its own `quarto preview --port <4201, 4202, ...> --no-browser`.
+- **One worktree per branch.** `~/Github/teaching/Monte-Carlo-Methods` is the long-lived `develop` checkout and stays on `develop` — never `git checkout` another branch there (a checkout rewrites `_quarto.yml`/`_extensions/`, and a running `quarto preview` then re-renders the whole book). A feature branch gets a sibling folder: `git worktree add -b <prefix>/<slug> ../Monte-Carlo-Methods-<slug> develop` (prefixes: `app/`, `chapter/`, `fix/`, `ci/`, `docs/`). In it, run its own `quarto preview --port <4201, 4202, ...> --no-browser`.
 - **Major changes go through a PR into `develop`**, after being verified (`pr-check.yml` re-renders the whole book on the PR as a gate, but it can't see OJS runtime errors): `quarto render` finishes cleanly, and every chapter the change touches is loaded in the preview with its apps exercised (buttons, sliders, dark-mode toggle) and no console errors. Then `gh pr create --base develop`, have a fresh maintainer agent review it (`.claude/skills/ship-pr/maintainer-review.md`), triage its findings and Copilot's, merge with `--merge` (not `--squash`). The `ship-pr` skill (`.claude/skills/ship-pr/SKILL.md`) carries this through end to end; when a rule here changes, update it there too.
 - **Small changes may be pushed straight to `develop`** without a PR: a typo or wording fix in prose, a comment, or repo-only docs and tooling (`CLAUDE.md`, `README.md`, `.claude/**`, `Makefile`). Anything touching a code cell, CSS, `_quarto.yml`, `_extensions/`, `scripts/` or a workflow is not small, however few lines.
 - **Releasing is a fast-forward of `main` to `develop`**: `make release` (`git push origin origin/develop:main`, which the remote refuses unless it is a fast-forward — no checkout needed). Never squash- or merge-commit into `main`, and never force-push it. If the fast-forward is refused, the histories have diverged: reconcile once with `git merge -s ours origin/main` on `develop`, push, and retry.
@@ -41,7 +42,7 @@ chapters/        lecture notes, one folder per part
 appendices/      probability and Markov-chain background
 apps/            the Interactive Apps gallery: a card per app, linking to its ?embed= view
 assets/style.css site CSS (static-image sizing only — see Conventions)
-scripts/         update-mathviz.sh (the pre-render hook)
+scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   bibliography for the whole book
 ```
 
@@ -56,7 +57,7 @@ references.bib   bibliography for the whole book
 
 ### Contributing to mathviz
 
-mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz) itself: it is the hub every site consumes, and a change to it is an ordinary pull request there, carrying its reference docs and a CHANGELOG line (see that repo's CLAUDE.md and CONTRIBUTING.md). Nothing goes through VisualMathLab any more.
+mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz) itself: it is the hub every site consumes, and a change to it is an ordinary pull request there, carrying its reference docs and a CHANGELOG line (see that repo's CLAUDE.md and CONTRIBUTING.md). Nothing goes through VisualMathLab (`~/Github/viz/VisualMath`) any more.
 
 A utility used by exactly one app stays in that chapter's OJS cells. Beyond that:
 
@@ -91,6 +92,7 @@ simulation on every load (no `vm-app`, no controls):
 
 - New chapters must be added to `book.chapters` in `_quarto.yml` — a book doesn't glob-discover pages.
 - Citations use `references.bib` (`[@key]`); `chapters/references.qmd` renders the list.
-- Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells and in any local `_mathviz/src/**` alike — the readers are Python-oriented. Callbacks an API requires (Plotly, `addEventListener`) are fine.
+- Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells and in any local `_mathviz/src/**` alike — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.
 - Keep each app's logic in small named OJS cells (simulate → derive → plot → readouts) rather than one large cell.
+- **Methods are separated from pages and tested** (the VisualMathLab pattern, `~/Github/viz/VisualMath/apps/newton-method/`). A chapter's Monte Carlo method — the sampler, estimator or simulation, as a plain function of numbers and a seeded `rng` that returns plain data — lives in `<chapter>.method.js` beside the `.qmd`, not inline in an OJS cell. The `.qmd` imports it in a setup cell (`import {piEstimate} from "./<chapter>.method.js"`; Quarto copies the file next to the page). The module reads the library only as `globalThis.VM` and touches no DOM, no OJS, no Plotly and no `chartColors`. `<chapter>.method.test.js` runs it under `node --test` against the installed mathviz (`scripts/load-vm.mjs`), with fixed seeds and an assertion that says why the number is right (an estimate within ~4 standard errors of the known value, sample moments against theory, an acceptance rate against 1/M, a chain's stationary distribution). Cells keep only parameters, inputs, trace building and readouts. Keep seeds and the order of `rng` calls unchanged when moving code, so the page draws the same picture. `chapters/estimation/estimating_pi.*` is the reference. Every chapter with OJS logic follows this; a new chapter starts that way. `npm test` (needs `npm install` once) runs all of them, and `pr-check.yml` runs it before the render.
 - CSS used by one chapter stays in that chapter (a `<style>` block); design-system CSS belongs in mathviz, not `assets/style.css`, which only sizes the static images in `chapters/images/`. Any CSS consumes `--vm-*` tokens so it re-themes with the site.

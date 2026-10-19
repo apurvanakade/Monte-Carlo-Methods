@@ -18,6 +18,9 @@ execute:
 // VM.ui.urlParam and VM.ui.syncUrlParams.
 VM = window.VM
 
+// The simulations live in mh.method.js (tested by mh.method.test.js).
+import {makeRegions, regionWalk, lShapeRuns, regionView, rejectedPoints, normalWalk, normalView, rejectedSteps} from "./mh.method.js"
+
 // vmTheme re-runs every cell that bakes a palette color into a trace when
 // the reader toggles dark mode; chartColors is that palette.
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
@@ -106,21 +109,7 @@ The images below show scatter plots for the samples generated using the Metropol
 ```{ojs}
 //| output: false
 // 10,000 Gaussian random-walk steps from (0.05, 0.05) for each step size.
-mhLRuns = {
-  const runs = []
-  for (const sigma of [1, 0.5, 0.2, 0.01]) {
-    const chain = VM.mcmc.randomWalkMetropolis({
-      logDensity: p => (mhLRegion.inside(p[0], p[1]) ? 0 : -Infinity),
-      start: mhLRegion.start,
-      n: 10000,
-      scale: sigma,
-      proposal: "gaussian",
-      rng: VM.sampling.seededRandom(0)
-    })
-    runs.push({sigma, chain})
-  }
-  return runs
-}
+mhLRuns = lShapeRuns(mhLRegion)
 
 function mhLSampleFigure(plot, run) {
   const xs = [], ys = []
@@ -178,41 +167,7 @@ rwDefaults = ({seed: 1, n: 300, sigma: 0.2, region: "L-shape", proposal: "Gaussi
 // Each region: membership test, outline (null-separated polyline), a
 // starting point inside it, fixed axis ranges, and the uniform
 // distribution's mean -- the value the running averages below converge to.
-rwRegions = {
-  const circle = (cx, cy, r) => {
-    const xs = [], ys = []
-    for (let k = 0; k <= 120; k++) {
-      xs.push(cx + r * Math.cos(2 * Math.PI * k / 120))
-      ys.push(cy + r * Math.sin(2 * Math.PI * k / 120))
-    }
-    return {xs, ys}
-  }
-  const left = circle(-1, 0, 1)
-  const right = circle(1, 0, 1)
-  return new Map([
-    ["L-shape", {
-      inside: (x, y) => (x >= 0 && x <= 1 && y >= 0 && y <= 0.1) || (x >= 0 && x <= 0.1 && y >= 0 && y <= 1),
-      outlineX: [0, 1, 1, 0.1, 0.1, 0, 0],
-      outlineY: [0, 0, 0.1, 0.1, 1, 1, 0],
-      start: [0.05, 0.05],
-      // Extra room on the left: the legend floats over the chart's top-left
-      // corner, which is where the L's vertical arm would otherwise be.
-      xRange: [-0.6, 1.1],
-      yRange: [-0.1, 1.1],
-      // Area 0.19: the two arms' means weighted by area.
-      mean: [(0.1 * 0.5 + 0.09 * 0.05) / 0.19, (0.1 * 0.5 + 0.09 * 0.05) / 0.19]
-    }],
-    ["Two discs", {
-      inside: (x, y) => (x + 1) * (x + 1) + y * y <= 1 || (x - 1) * (x - 1) + y * y <= 1,
-      outlineX: [...left.xs, null, ...right.xs],
-      outlineY: [...left.ys, null, ...right.ys],
-      start: [-1, 0],
-      xRange: [-2.2, 2.2],
-      yRange: [-1.3, 1.3],
-      mean: [0, 0]
-    }]
-  ])
-}
+rwRegions = makeRegions()
 
 rwTraceOptions = ["Region", "Path", "Samples", "Rejected proposals", "Proposal", "Current point"]
 rwTraceColors = new Map([
@@ -285,29 +240,16 @@ rwRegion = rwRegions.get(rwRegionName)
 // underlying random numbers, so changing the step size shows the "same"
 // walk taking bigger or smaller steps. The N slider only picks how much of
 // it to show.
-rwChain = VM.mcmc.randomWalkMetropolis({
-  logDensity: p => (rwRegion.inside(p[0], p[1]) ? 0 : -Infinity),
-  start: rwRegion.start,
-  n: rwMaxN,
-  scale: rwSigma,
-  proposal: rwProposal === "Gaussian" ? "gaussian" : "uniform",
-  rng: VM.sampling.seededRandom(rwSeed)
-})
+rwChain = {
+  let proposal = "uniform"
+  if (rwProposal === "Gaussian") proposal = "gaussian"
+  return regionWalk(rwRegion, rwMaxN, rwSigma, proposal, VM.sampling.seededRandom(rwSeed))
+}
 ```
 
 ```{ojs}
 //| output: false
-rwView = {
-  const n = rwN
-  const xs = [], ys = []
-  let acceptedSteps = 0
-  for (let t = 0; t < n; t++) {
-    xs.push(rwChain.samples[t][0])
-    ys.push(rwChain.samples[t][1])
-    if (t > 0 && rwChain.accepted[t]) acceptedSteps++
-  }
-  return {n, xs, ys, acceptedSteps}
-}
+rwView = regionView(rwChain, rwN)
 ```
 
 ```{ojs}
@@ -340,13 +282,8 @@ rwShow = new Set(rwTraces)
 {
   const n = rwView.n
   const current = rwChain.samples[n - 1]
-  const rejectedX = [], rejectedY = []
-  for (let t = 1; t < n; t++) {
-    if (!rwChain.accepted[t]) {
-      rejectedX.push(rwChain.proposals[t][0])
-      rejectedY.push(rwChain.proposals[t][1])
-    }
-  }
+  const rejected = rejectedPoints(rwChain, n)
+  const rejectedX = rejected.xs, rejectedY = rejected.ys
 
   // The proposal around the current point: a 1-sigma disc for the
   // Gaussian, the whole support square for the uniform.
@@ -505,13 +442,13 @@ rwAcfPlot = VM.plotting.persistentPlot({height: "320px"})
 Notice that there is a tradeoff between the acceptance rate and the rate of convergence. In the above example, 
 
 - The proposal distribution with $\sigma = 1$ has the lowest acceptance rate but the samples are well spread out and the underlying markov chain converges quickly.
-- The proposal distribution with $\sigma = 0.01$ has the highest acceptance rate but the samples are clustered and the underlying markov chain converges slowly. In the above simulation, even after $10^5$ samples (most of which are accepted), the samples are still clustered.
+- The proposal distribution with $\sigma = 0.01$ has the highest acceptance rate but the samples are clustered and the underlying markov chain converges slowly. In the above simulation, even after $10^4$ samples (most of which are accepted), the samples are still clustered.
 
 Both of these are undesirable. We need to choose a proposal distribution that has a good balance between the acceptance rate and the rate of convergence. 
 
-We see that for $\sigma = 0.5$, the samples are well spread out and the underlying markov chain converges quickly to the target distribution. This is a good choice for the proposal distribution. However, the acceptance rate is $0.07$ which is lower than the acceptance rate for naive rejection sampling AND the generated samples are correlated. It is better to use rejection sampling than to use this proposal distribution.
+We see that for $\sigma = 0.5$, the samples are well spread out and the underlying markov chain converges quickly to the target distribution. However, the acceptance rate is only about $0.07$, well below the roughly $0.19$ of naive rejection sampling (the L-shape fills about $19\%$ of the unit square), AND the generated samples are correlated. For this region it is better to use rejection sampling than this proposal distribution.
 
-For $\sigma = 0.2$, the acceptance rate is $0.3$ which is better than the acceptance rate for naive rejection sampling. The samples are well spread out and the underlying markov chain converges quickly, although not as quickly as for $\sigma = 0.5.$ For this example, $\sigma = 0.2$ is a good choice for the proposal distribution. We can fine tune this parameter to get a better acceptance rate, if needed.
+For $\sigma = 0.2$, the acceptance rate is about $0.19$, roughly the same as naive rejection sampling, but the samples are correlated, so rejection sampling still wins for this simple region. The samples are well spread out and the underlying markov chain converges quickly, although not as quickly as for $\sigma = 0.5.$ Random walks pay off only when the region is far too awkward to enclose tightly in a box. We can fine tune $\sigma$ to trade acceptance rate against correlation, if needed.
 
 ## Metropolis--Hastings Algorithm
 
@@ -682,37 +619,12 @@ mhSeed = {
 // mhChain: mhMax states of the chain from x0 = 0. The same seed reuses the
 // same random numbers, so dragging d shows the same chain with a wider or
 // narrower proposal.
-mhChain = {
-  const run = VM.mcmc.randomWalkMetropolis({
-    logDensity: p => -0.5 * p[0] * p[0],
-    start: [0],
-    n: mhMax,
-    scale: mhD,
-    proposal: "uniform",
-    rng: VM.sampling.seededRandom(mhSeed)
-  })
-  const samples = []
-  for (const s of run.samples) samples.push(s[0])
-  return {samples, proposals: run.proposals, accepted: run.accepted}
-}
+mhChain = normalWalk(mhMax, mhD, VM.sampling.seededRandom(mhSeed))
 ```
 
 ```{ojs}
 //| output: false
-mhView = {
-  const n = Math.min(mhN, mhMax)
-  const samples = mhChain.samples.slice(0, n)
-  let acceptedSteps = 0
-  let sum = 0
-  for (let t = 0; t < n; t++) {
-    if (t > 0 && mhChain.accepted[t]) acceptedSteps++
-    sum += samples[t]
-  }
-  const mean = sum / n
-  let sumSq = 0
-  for (const x of samples) sumSq += (x - mean) * (x - mean)
-  return {n, samples, acceptedSteps, mean, sd: Math.sqrt(sumSq / n)}
-}
+mhView = normalView(mhChain, mhN, mhMax)
 ```
 
 ```{ojs}
@@ -745,14 +657,10 @@ mhShow = new Set(mhTraces)
 ```{ojs}
 {
   const n = mhView.n
-  const steps = [], rejectedT = [], rejectedY = []
-  for (let t = 0; t < n; t++) {
-    steps.push(t)
-    if (t > 0 && !mhChain.accepted[t]) {
-      rejectedT.push(t)
-      rejectedY.push(mhChain.proposals[t][0])
-    }
-  }
+  const steps = []
+  for (let t = 0; t < n; t++) steps.push(t)
+  const rejected = rejectedSteps(mhChain, n)
+  const rejectedT = rejected.steps, rejectedY = rejected.values
 
   const bins = VM.distributions.histogramBins(mhView.samples, 36, {lo: mhYRange[0], hi: mhYRange[1]})
   const binWidth = (mhYRange[1] - mhYRange[0]) / 36
