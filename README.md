@@ -1,6 +1,6 @@
 # Monte Carlo Methods Lecture Notes
 
-A Quarto book, rendered by GitHub Actions and published to GitHub Pages. Interactive apps are
+A Quarto website, rendered by GitHub Actions and published to GitHub Pages. Interactive apps are
 built with [mathviz](https://github.com/apurvanakade/mathviz).
 
 ## Build
@@ -21,11 +21,10 @@ to install beyond Quarto.
 ## Layout
 
 ```
-_quarto.yml           book config; enables the mathviz filter
+_quarto.yml           site config (sidebar, mathviz options); enables the mathviz filter
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
 index.qmd             preface
-chapters/             lecture notes, one folder per part
-appendices/           probability and Markov chain background
+<slug>/                one folder per page: <slug>/index.qmd (chapters and appendices)
 apps/                 the Interactive Apps gallery (links to each app's ?embed= view)
 assets/               site CSS
 scripts/              build hooks
@@ -41,11 +40,11 @@ has `VM` (including `VM.mcmc.*`, `VM.ui.statRow`, ...), math.js, Plotly and
 the mathviz stylesheet.
 Start from the mathviz [starter pages](https://github.com/apurvanakade/mathviz/tree/main/starter)
 and the [docs](https://apurvanakade.github.io/mathviz/), or copy an existing
-app (`chapters/estimation/estimating_pi.qmd` is the simplest).
+app (`estimating-pi/index.qmd` is the simplest).
 
 - Wrap the app's controls, readouts and main chart in
   `<div class="vm-app" id="<name>-app">`. That block is what
-  `<chapter>.html?embed=<name>-app` shows on its own, and what the Share
+  `<slug>/?embed=<name>-app` shows on its own, and what the Share
   button offers as an `<iframe>`.
 - Several apps can share a chapter: prefix every OJS cell name and URL
   parameter with the app's name (`pi`, `buffon`, ...), since both are

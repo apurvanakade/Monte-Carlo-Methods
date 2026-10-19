@@ -2,7 +2,7 @@
 # Released under Apache 2.0 license as described in the file LICENSE.
 # Authors: Apurva Nakade
 
-# Renders the book on every push to main (a release: `make release`
+# Renders the site on every push to main (a release: `make release`
 # fast-forwards main to develop) and publishes docs/ to the gh-pages branch,
 # which GitHub Pages serves directly (Pages source: gh-pages, /), deployed by
 # GitHub's own pages-build-deployment. There is deliberately no deploy.yml
@@ -33,7 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Render the book
+      - name: Render the site
         uses: ./.github/actions/render
 
       - name: Publish docs/ to gh-pages
