@@ -13,25 +13,14 @@ VM = window.VM
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
 
+// The simulations live in SDE.method.js, where SDE.method.test.js checks
+// them against theory.
+import {wienerPaths, wienerEndpoints, gbmPaths} from "./SDE.method.js"
+
 sdePathsPlot = VM.plotting.persistentPlot({height: "400px"})
 sdeHist1Plot = VM.plotting.persistentPlot({height: "340px"})
 sdeHist4Plot = VM.plotting.persistentPlot({height: "340px"})
 sdeGbmPlot = VM.plotting.persistentPlot({height: "400px"})
-
-// M Brownian paths on [0, T] with N steps each: W_0 = 0 and
-// W_{n+1} = W_n + sqrt(dt) Z_n. Returns the times and one array per path.
-function sdeWienerPaths(T, N, M, gaussian) {
-  const dt = T / N
-  const times = []
-  for (let n = 0; n <= N; n++) times.push(n * dt)
-  const paths = []
-  for (let m = 0; m < M; m++) {
-    const w = [0]
-    for (let n = 0; n < N; n++) w.push(w[n] + Math.sqrt(dt) * gaussian())
-    paths.push(w)
-  }
-  return {times, paths}
-}
 
 // One line per path, cycling through the palette.
 function sdePathTraces(times, paths) {
@@ -109,7 +98,7 @@ This algorithm exploits the fact that Brownian motion has independent increments
 
 ```{ojs}
 {
-  const {times, paths} = sdeWienerPaths(1, 1000, 10, VM.sampling.gaussianRandom(VM.sampling.seededRandom(1)))
+  const {times, paths} = wienerPaths(1, 1000, 10, VM.sampling.gaussianRandom(VM.sampling.seededRandom(1)))
   return sdePathsPlot(sdePathTraces(times, paths), {
     title: {text: "Sample paths of the Wiener process"}, margin: {t: 40}, xaxis: {title: "t"}, yaxis: {title: "W(t)"}
   })
@@ -119,21 +108,7 @@ This algorithm exploits the fact that Brownian motion has independent increments
 ```{ojs}
 //| output: false
 // W(T) at the end of 10,000 simulated paths (1000 steps each), for T = 1 and T = 4.
-sdeEndpoints = {
-  const gaussian = VM.sampling.gaussianRandom(VM.sampling.seededRandom(2))
-  const out = []
-  for (const T of [1, 4]) {
-    const dt = T / 1000
-    const ends = []
-    for (let m = 0; m < 10000; m++) {
-      let w = 0
-      for (let n = 0; n < 1000; n++) w += Math.sqrt(dt) * gaussian()
-      ends.push(w)
-    }
-    out.push({T, ends})
-  }
-  return out
-}
+sdeEndpoints = wienerEndpoints([1, 4], 1000, 10000, VM.sampling.gaussianRandom(VM.sampling.seededRandom(2)))
 
 function sdeEndpointFigure(plot, run) {
   const bins = VM.distributions.histogramBins(run.ends, 300)
@@ -228,19 +203,7 @@ The appearance of the $-\sigma^2/2$ term in @eq-geometric-brownian-motion-soluti
   // 20 paths of geometric Brownian motion with mu = 5, sigma = 1, X(0) = 1,
   // from the exact solution X(t) = exp((mu - sigma²/2) t + sigma W(t)).
   const mu = 5, sigma = 1, M = 20
-  const {times, paths} = sdeWienerPaths(1, 100, M, VM.sampling.gaussianRandom(VM.sampling.seededRandom(3)))
-  const gbm = []
-  for (const w of paths) {
-    const x = []
-    for (let n = 0; n < times.length; n++) x.push(Math.exp((mu - sigma * sigma / 2) * times[n] + sigma * w[n]))
-    gbm.push(x)
-  }
-  const average = []
-  for (let n = 0; n < times.length; n++) {
-    let sum = 0
-    for (const x of gbm) sum += x[n]
-    average.push(sum / M)
-  }
+  const {times, paths: gbm, average} = gbmPaths(mu, sigma, 1, 1, 100, M, VM.sampling.gaussianRandom(VM.sampling.seededRandom(3)))
   const traces = sdePathTraces(times, gbm)
   traces.push({x: times, y: average, type: "scatter", mode: "lines", name: "Average path", line: {color: chartColors.ink, width: 3}})
   return VM.plotting.plotWithLegend(sdeGbmPlot, traces, {

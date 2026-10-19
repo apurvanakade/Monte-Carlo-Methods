@@ -6,12 +6,13 @@ Monte Carlo Methods Lecture Notes is a Quarto **book** (`project.type: book`), r
 
 ## Commands
 
+- `npm test` (= `node --test`) — runs every chapter's `*.method.test.js` (see Conventions). Needs `npm install` once.
 - `make build` (= `quarto render`) — render the whole book into `docs/` (untracked; for local checking only).
 - `make preview` (= `quarto preview`) — live-reload preview; the right tool for iterating on one chapter.
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
 - `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). Only run it when asked.
 
-Nothing to install beyond Quarto (and Node, if a local overlay is added: `cd _mathviz && node --test && node scripts/build.mjs`).
+Quarto renders the book; Node (`npm install`, for mathjs) is needed only for `npm test`, and for a local overlay if one is added: `cd _mathviz && node --test && node scripts/build.mjs`.
 
 ## Branches, PRs and releases
 
@@ -41,7 +42,7 @@ chapters/        lecture notes, one folder per part
 appendices/      probability and Markov-chain background
 apps/            the Interactive Apps gallery: a card per app, linking to its ?embed= view
 assets/style.css site CSS (static-image sizing only — see Conventions)
-scripts/         update-mathviz.sh (the pre-render hook)
+scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   bibliography for the whole book
 ```
 
@@ -93,5 +94,5 @@ simulation on every load (no `vm-app`, no controls):
 - Citations use `references.bib` (`[@key]`); `chapters/references.qmd` renders the list.
 - Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells and in any local `_mathviz/src/**` alike — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.
 - Keep each app's logic in small named OJS cells (simulate → derive → plot → readouts) rather than one large cell.
-- **Methods are separated from pages and tested** (the VisualMathLab pattern, `~/Github/viz/VisualMath/apps/newton-method/`). A chapter's Monte Carlo method — the sampler, estimator or simulation, as a plain function of numbers and a seeded `rng` that returns plain data — lives in a colocated `method.js` ES module, not inline in an OJS cell. The `.qmd` imports it in one cell (`import {piEstimate} from "./method.js"`; Quarto copies the file next to the page), reads the library as `globalThis.VM`, and touches no DOM and no OJS. A colocated `method.test.js` runs each method through `node --test` against the installed mathviz (loaded by `scripts/load-vm.mjs`), with a fixed seed and an assertion that says why the number is right (an estimate within a few standard errors of the known value, a sample mean/variance against the theory, a chain's stationary distribution). Because a chapter is a file rather than a folder, put a chapter's pair in a folder named after it (`chapters/estimation/estimating_pi/`) only when it moves; for now a flat `<chapter>.method.js` / `<chapter>.method.test.js` beside the `.qmd` is fine. Cells keep only parameters, drawing and readouts. **Status:** the existing chapters still hold their methods inline; move each into `method.js` with its test when the chapter is next edited, and do it for every new chapter from the start.
+- **Methods are separated from pages and tested** (the VisualMathLab pattern, `~/Github/viz/VisualMath/apps/newton-method/`). A chapter's Monte Carlo method — the sampler, estimator or simulation, as a plain function of numbers and a seeded `rng` that returns plain data — lives in `<chapter>.method.js` beside the `.qmd`, not inline in an OJS cell. The `.qmd` imports it in its first setup cell (`import {piEstimate} from "./<chapter>.method.js"`; Quarto copies the file next to the page). The module reads the library only as `globalThis.VM` and touches no DOM, no OJS, no Plotly and no `chartColors`. `<chapter>.method.test.js` runs it under `node --test` against the installed mathviz (`scripts/load-vm.mjs`), with fixed seeds and an assertion that says why the number is right (an estimate within ~4 standard errors of the known value, sample moments against theory, an acceptance rate against 1/M, a chain's stationary distribution). Cells keep only parameters, inputs, trace building and readouts. Keep seeds and the order of `rng` calls unchanged when moving code, so the page draws the same picture. `chapters/estimation/estimating_pi.*` is the reference. Every chapter with OJS logic follows this; a new chapter starts that way. `npm test` (needs `npm install` once) runs all of them, and `pr-check.yml` runs it before the render.
 - CSS used by one chapter stays in that chapter (a `<style>` block); design-system CSS belongs in mathviz, not `assets/style.css`, which only sizes the static images in `chapters/images/`. Any CSS consumes `--vm-*` tokens so it re-themes with the site.

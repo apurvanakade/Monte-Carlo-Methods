@@ -128,16 +128,9 @@ VM = window.VM
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
 
-// Running average of an array: out[i] = mean of values[0..i].
-function vrRunningAverage(values) {
-  const out = []
-  let sum = 0
-  for (let i = 0; i < values.length; i++) {
-    sum += values[i]
-    out.push(sum / (i + 1))
-  }
-  return out
-}
+// The simulations themselves live in variance_reduction.method.js, where
+// variance_reduction.method.test.js checks them against theory.
+import {runningAverage, importanceTailEstimate, controlVariateStudy, antitheticStudy, crnStudy, crnDemoStudy} from "./variance_reduction.method.js"
 
 // Indices 1..n, for x-axes counting samples.
 function vrCounts(n) {
@@ -163,37 +156,15 @@ function vrConvergenceFigure(plot, series, trueValue, xTitle, title, yRange) {
 vrIsPlot = VM.plotting.persistentPlot({height: "420px"})
 
 // Estimate P(X > 2) for X ~ N(0, 1), with N = 4000 samples each way.
-vrImportance = {
-  const N = 4000
-  const rng = VM.sampling.seededRandom(42)
-  const proposal = VM.sampling.exponentialRandom(rng, 1)
-  const gaussian = VM.sampling.gaussianRandom(rng)
-  // Importance sampling: Y = 2 + Exp(1), weight phi(Y) / q(Y) with
-  // q(y) = exp(-(y - 2)). Every Y is above 2, so the indicator is always 1.
-  const weighted = [], crude = []
-  for (let i = 0; i < N; i++) {
-    const y = 2 + proposal()
-    weighted.push(VM.distributions.normalPdf(y, 0, 1) / Math.exp(-(y - 2)))
-    let hit = 0
-    if (gaussian() > 2) hit = 1
-    crude.push(hit)
-  }
-  return {
-    N,
-    trueValue: 1 - VM.distributions.normalCdf(2),
-    weighted, crude,
-    isStats: VM.distributions.sampleStats(weighted, {ddof: 0}),
-    crudeStats: VM.distributions.sampleStats(crude, {ddof: 0})
-  }
-}
+vrImportance = importanceTailEstimate(VM.sampling.seededRandom(42), 4000)
 ```
 
 ```{ojs}
 {
   const r = vrImportance
   return vrConvergenceFigure(vrIsPlot, [
-    {name: "Crude MC", values: vrRunningAverage(r.crude), color: "fn"},
-    {name: "Importance sampling", values: vrRunningAverage(r.weighted), color: "warn"}
+    {name: "Crude MC", values: runningAverage(r.crude), color: "fn"},
+    {name: "Importance sampling", values: runningAverage(r.weighted), color: "warn"}
   ], r.trueValue, "Number of samples", "Importance sampling vs. crude Monte Carlo", [0, 0.04])
 }
 ```
@@ -267,46 +238,8 @@ In practice, we often estimate $\beta^*$ from pilot samples or use a reasonable 
 vrCvPlot = VM.plotting.persistentPlot({height: "420px"})
 vrCvConvergencePlot = VM.plotting.persistentPlot({height: "420px"})
 
-// Estimate the integral of f(x) = x e^{-x} over [0, 1] (exactly 1 - 2/e)
-// with the control h(x) = x, E[h(X)] = 1/2.
-vrControl = {
-  const N = 1000
-  const h0 = 0.5
-  const rng = VM.sampling.seededRandom(42)
-  const xs = [], fs = []
-  for (let i = 0; i < N; i++) {
-    const x = rng()
-    xs.push(x)
-    fs.push(x * Math.exp(-x))
-  }
-  // beta* = Cov(f, h) / Var(h), estimated from the first 100 samples.
-  const pilot = 100
-  const fPilot = VM.distributions.sampleStats(fs.slice(0, pilot))
-  const hPilot = VM.distributions.sampleStats(xs.slice(0, pilot))
-  let cov = 0
-  for (let i = 0; i < pilot; i++) cov += (fs[i] - fPilot.mean) * (xs[i] - hPilot.mean)
-  cov /= pilot - 1
-  const betaEst = cov / hPilot.variance
-
-  // The control-variate samples f(X) - beta (h(X) - h0) for one beta.
-  function samplesFor(beta) {
-    const out = []
-    for (let i = 0; i < N; i++) out.push(fs[i] - beta * (xs[i] - h0))
-    return out
-  }
-  function estimatorFor(beta) {
-    const stats = VM.distributions.sampleStats(samplesFor(beta), {ddof: 0})
-    return {beta, estimate: stats.mean, variance: stats.variance / N}
-  }
-
-  const tested = []
-  for (const beta of [0, 0.2, betaEst, 0.5, 0.7]) tested.push(estimatorFor(beta))
-  tested.sort((a, b) => a.beta - b.beta)
-  const curve = []
-  for (let i = 0; i < 100; i++) curve.push(estimatorFor(-0.5 + 1.5 * i / 99))
-  return {N, h0, betaEst, tested, curve, standard: estimatorFor(0), trueValue: 1 - 2 / Math.E,
-    runningStandard: vrRunningAverage(fs), runningControl: vrRunningAverage(samplesFor(betaEst))}
-}
+// Estimate the integral of x e^{-x} over [0, 1] with the control h(x) = x.
+vrControl = controlVariateStudy(VM.sampling.seededRandom(42), 1000, 100)
 ```
 
 ```{ojs}
@@ -387,30 +320,8 @@ where $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$.
 //| output: false
 vrAntitheticPlot = VM.plotting.persistentPlot({height: "420px"})
 
-// Estimate the integral of f(x) = 1 / (1 + x²) over [0, 1] (exactly pi/4):
-// N = 200 independent uniforms, against N/2 antithetic pairs (U, 1 - U).
-vrAntithetic = {
-  const N = 200
-  const f = x => 1 / (1 + x * x)
-  const rng = VM.sampling.seededRandom(42)
-  const standard = []
-  for (let i = 0; i < N; i++) standard.push(f(rng()))
-  const pairs = []
-  for (let i = 0; i < N / 2; i++) {
-    const u = rng()
-    pairs.push((f(u) + f(1 - u)) / 2)
-  }
-  const standardStats = VM.distributions.sampleStats(standard, {ddof: 0})
-  const pairStats = VM.distributions.sampleStats(pairs, {ddof: 0})
-  return {
-    N, trueValue: Math.PI / 4,
-    standard: {estimate: standardStats.mean, variance: standardStats.variance / N},
-    antithetic: {estimate: pairStats.mean, variance: pairStats.variance / (N / 2)},
-    // Running averages over N/2 steps: the first N/2 standard samples, and the pairs.
-    runningStandard: vrRunningAverage(standard.slice(0, N / 2)),
-    runningAntithetic: vrRunningAverage(pairs)
-  }
-}
+// Estimate the integral of 1 / (1 + x²) over [0, 1] with N = 200 samples.
+vrAntithetic = antitheticStudy(VM.sampling.seededRandom(42), 200)
 ```
 
 ```{ojs}
@@ -469,59 +380,12 @@ When $f(X)$ and $g(X)$ are positively correlated (which often happens when they 
 
 ```{ojs}
 //| output: false
-// Waiting times in queue of an M/M/1 queue that starts empty, by the
-// Lindley recursion W_i = max(0, D_{i-1} - A_i). Inter-arrival times and
-// service requirements are given; service time = requirement / rate.
-function vrMm1WaitingTimes(interArrivals, requirements, serviceRate) {
-  const waits = []
-  let arrival = 0
-  let previousDeparture = 0
-  for (let i = 0; i < interArrivals.length; i++) {
-    arrival += interArrivals[i]
-    let wait = 0
-    if (i > 0) wait = Math.max(0, previousDeparture - arrival)
-    waits.push(wait)
-    previousDeparture = arrival + wait + requirements[i] / serviceRate
-  }
-  return waits
-}
-
-function vrExponentials(draw, n) {
-  const out = []
-  for (let i = 0; i < n; i++) out.push(draw())
-  return out
-}
-
-function vrMean(values) {
-  return VM.distributions.sampleStats(values).mean
-}
-
 vrArrivalRate = 1
 vrServiceRates = [1.5, 2]
 
 // 100 replications of 1000 customers: the difference in mean waiting time
-// between the two systems, with common random numbers (both systems see the
-// same arrivals and requirements) and with independent ones.
-vrCrn = {
-  const nCustomers = 1000
-  const replications = 100
-  const [mu1, mu2] = vrServiceRates
-  const draw = VM.sampling.exponentialRandom(VM.sampling.seededRandom(42), 1)
-  const crn = [], independent = []
-  for (let rep = 0; rep < replications; rep++) {
-    const arrivals = vrExponentials(draw, nCustomers)
-    const requirements = vrExponentials(draw, nCustomers)
-    const wait1 = vrMean(vrMm1WaitingTimes(arrivals, requirements, mu1))
-    crn.push(wait1 - vrMean(vrMm1WaitingTimes(arrivals, requirements, mu2)))
-    const arrivals2 = vrExponentials(draw, nCustomers)
-    const requirements2 = vrExponentials(draw, nCustomers)
-    independent.push(wait1 - vrMean(vrMm1WaitingTimes(arrivals2, requirements2, mu2)))
-  }
-  // Steady-state mean wait in queue of an M/M/1 queue: lambda / (mu (mu - lambda)).
-  const lambda = vrArrivalRate
-  const theory = [lambda / (mu1 * (mu1 - lambda)), lambda / (mu2 * (mu2 - lambda))]
-  return {replications, theory, crn: VM.distributions.sampleStats(crn, {ddof: 0}), independent: VM.distributions.sampleStats(independent, {ddof: 0})}
-}
+// between the two systems, with common random numbers and with independent ones.
+vrCrn = crnStudy(VM.sampling.seededRandom(42), 1000, 100, vrArrivalRate, vrServiceRates[0], vrServiceRates[1])
 ```
 
 ```{ojs}
@@ -546,33 +410,9 @@ vrCrn = {
 vrCorrelationPlot = VM.plotting.persistentPlot({height: "440px"})
 vrPairedPlot = VM.plotting.persistentPlot({height: "440px"})
 
-// One run of 50 customers through both systems with common random
-// numbers, and a second run of 100 for the correlation between the two
-// systems' waiting times.
 vrCrnDemo = {
-  const draw = VM.sampling.exponentialRandom(VM.sampling.seededRandom(7), 1)
-  const [mu1, mu2] = vrServiceRates
-  const arrivals = vrExponentials(draw, 50)
-  const requirements = vrExponentials(draw, 50)
-  const arrivalsDemo = vrExponentials(draw, 100)
-  const requirementsDemo = vrExponentials(draw, 100)
-  const demo1 = vrMm1WaitingTimes(arrivalsDemo, requirementsDemo, mu1)
-  const demo2 = vrMm1WaitingTimes(arrivalsDemo, requirementsDemo, mu2)
-  const s1 = VM.distributions.sampleStats(demo1)
-  const s2 = VM.distributions.sampleStats(demo2)
-  let cov = 0
-  for (let i = 0; i < demo1.length; i++) cov += (demo1[i] - s1.mean) * (demo2[i] - s2.mean)
-  cov /= demo1.length - 1
-  const points = []
-  for (let i = 0; i < demo1.length; i++) points.push([demo1[i], demo2[i]])
-  return {
-    wait1: vrMm1WaitingTimes(arrivals, requirements, mu1),
-    wait2: vrMm1WaitingTimes(arrivals, requirements, mu2),
-    demo1, demo2,
-    correlation: cov / (s1.sd * s2.sd),
-    fit: VM.numerical.linearRegression(points),
-    highlighted: [10, 25, 40]
-  }
+  const demo = crnDemoStudy(VM.sampling.seededRandom(7), vrServiceRates[0], vrServiceRates[1])
+  return {...demo, highlighted: [10, 25, 40]}
 }
 ```
 

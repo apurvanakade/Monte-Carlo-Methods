@@ -411,6 +411,8 @@ VM = window.VM
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
 
+import {runParticleFilter, pfEllipse} from "./particle_filters.method.js"
+
 // A constant-velocity model in 2-D: state [x, y, vx, vy], dt = 1. The
 // process noise is a random acceleration a ~ N(0, sigma_a²) per axis, which
 // moves the position by a dt²/2 and the velocity by a dt -- exactly the
@@ -418,94 +420,10 @@ chartColors = VM.plotting.colors(vmTheme)
 // Observations are the position plus N(0, sigma_r² I) noise.
 pfModel = ({dt: 1, T: 30, nParticles: 500, sigmaA: 0.5, sigmaR: 1.0, start: [0, 0, 1, 0.5], initialVariances: [2, 2, 1, 1]})
 
-function pfPropagate(state, dt, sigmaA, gaussian) {
-  const ax = sigmaA * gaussian()
-  const ay = sigmaA * gaussian()
-  return [
-    state[0] + dt * state[2] + ax * dt * dt / 2,
-    state[1] + dt * state[3] + ay * dt * dt / 2,
-    state[2] + ax * dt,
-    state[3] + ay * dt
-  ]
-}
-
-// Simulate the truth and the observations, then run the bootstrap particle
-// filter: propagate, weight by the observation likelihood, resample
-// (systematically) when the effective sample size falls below N/2.
-pfRun = {
-  const m = pfModel
-  const rng = VM.sampling.seededRandom(42)
-  const gaussian = VM.sampling.gaussianRandom(rng)
-
-  const truth = [m.start]
-  const observations = []
-  for (let t = 0; t < m.T; t++) {
-    const next = pfPropagate(truth[t], m.dt, m.sigmaA, gaussian)
-    truth.push(next)
-    observations.push([next[0] + m.sigmaR * gaussian(), next[1] + m.sigmaR * gaussian()])
-  }
-
-  let particles = []
-  for (let i = 0; i < m.nParticles; i++) {
-    const p = []
-    for (let k = 0; k < 4; k++) p.push(m.start[k] + Math.sqrt(m.initialVariances[k]) * gaussian())
-    particles.push(p)
-  }
-  let weights = new Array(m.nParticles).fill(1 / m.nParticles)
-
-  const estimates = [], positionCovs = [], ess = [], resampledSteps = []
-  for (let t = 0; t < m.T; t++) {
-    // Predict.
-    for (let i = 0; i < m.nParticles; i++) particles[i] = pfPropagate(particles[i], m.dt, m.sigmaA, gaussian)
-    // Update: w_i *= p(y_t | x_t^(i)); the Gaussian's constant cancels on normalizing.
-    let total = 0
-    for (let i = 0; i < m.nParticles; i++) {
-      const dx = observations[t][0] - particles[i][0]
-      const dy = observations[t][1] - particles[i][1]
-      weights[i] *= Math.exp(-(dx * dx + dy * dy) / (2 * m.sigmaR * m.sigmaR))
-      total += weights[i]
-    }
-    let sumSquares = 0
-    for (let i = 0; i < m.nParticles; i++) {
-      weights[i] /= total
-      sumSquares += weights[i] * weights[i]
-    }
-    // Weighted mean and position covariance, before any resampling.
-    const mean = [0, 0, 0, 0]
-    for (let i = 0; i < m.nParticles; i++) {
-      for (let k = 0; k < 4; k++) mean[k] += weights[i] * particles[i][k]
-    }
-    let cxx = 0, cxy = 0, cyy = 0
-    for (let i = 0; i < m.nParticles; i++) {
-      const dx = particles[i][0] - mean[0]
-      const dy = particles[i][1] - mean[1]
-      cxx += weights[i] * dx * dx
-      cxy += weights[i] * dx * dy
-      cyy += weights[i] * dy * dy
-    }
-    estimates.push(mean)
-    positionCovs.push([cxx, cxy, cyy])
-    // Resample when the effective sample size 1 / sum w² drops below N/2.
-    const nEff = 1 / sumSquares
-    ess.push(nEff)
-    if (nEff < m.nParticles / 2) {
-      const indices = VM.filters.systematicResample(weights, rng())
-      const resampled = []
-      for (const j of indices) resampled.push(particles[j].slice())
-      particles = resampled
-      weights = new Array(m.nParticles).fill(1 / m.nParticles)
-      resampledSteps.push(t)
-    }
-  }
-
-  const errors = []
-  for (let t = 0; t < m.T; t++) {
-    const dx = estimates[t][0] - truth[t + 1][0]
-    const dy = estimates[t][1] - truth[t + 1][1]
-    errors.push(Math.sqrt(dx * dx + dy * dy))
-  }
-  return {truth, observations, estimates, positionCovs, ess, resampledSteps, errors}
-}
+// The model, the simulation and the filter live in particle_filters.method.js,
+// where particle_filters.method.test.js checks them. The truth, the
+// observations and the filter share one seeded stream.
+pfRun = runParticleFilter(VM.sampling.seededRandom(42), pfModel)
 ```
 
 ```{ojs}
@@ -528,26 +446,6 @@ function pfResampleShapes() {
     shapes.push({type: "line", x0: step, x1: step, yref: "paper", y0: 0, y1: 1, line: {color: chartColors.warn, dash: "dot", width: 1.5}})
   }
   return shapes
-}
-
-// The 95% confidence ellipse of a 2 x 2 covariance [[a, b], [b, c]]: the
-// eigen-decomposition in closed form, scaled by the chi-squared(2) quantile.
-function pfEllipse(center, cov) {
-  const [a, b, c] = cov
-  const scale = VM.distributions.chiSquaredQuantile(0.95, 2)
-  const half = (a + c) / 2
-  const radius = Math.sqrt(((a - c) / 2) * ((a - c) / 2) + b * b)
-  const major = Math.sqrt(scale * (half + radius))
-  const minor = Math.sqrt(scale * Math.max(half - radius, 0))
-  const theta = 0.5 * Math.atan2(2 * b, a - c)
-  const xs = [], ys = []
-  for (let k = 0; k <= 60; k++) {
-    const s = 2 * Math.PI * k / 60
-    const u = major * Math.cos(s), v = minor * Math.sin(s)
-    xs.push(center[0] + u * Math.cos(theta) - v * Math.sin(theta))
-    ys.push(center[1] + u * Math.sin(theta) + v * Math.cos(theta))
-  }
-  return {xs, ys}
 }
 ```
 
