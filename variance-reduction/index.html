@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-04-01">
+
+<title>Variance Reduction Techniques – Monte Carlo Methods Lecture Notes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../sde/index.html" rel="next">
+<link href="../mh/index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b72d44010710761ef2be279569eaa82e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5db7610fca3ea74ceab0226f71e3f166.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-99056308f7a41c28bf90061d44f936a2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-c0296b3dd49e84cb7d0059db0136cd62.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-99056308f7a41c28bf90061d44f936a2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<meta name="referrer" content="same-origin">
+<script src="https://cdn.jsdelivr.net/npm/mathjs@15.2.0/lib/browser/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="../site_libs/quarto-contrib/mathviz-0.7.0/mathviz.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-0.7.0/mathviz.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-sidebar-rail-0.7.0/sidebar-rail.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-sidebar-rail-0.7.0/sidebar-rail.css" rel="stylesheet">
+<meta name="mathviz:sidebar-pin-key" content="mcm-sidebar-pinned">
+<script src="../site_libs/quarto-contrib/mathviz-sidebar-search-0.7.0/sidebar-search.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-sidebar-search-0.7.0/sidebar-search.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-embed-0.7.0/embed.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-embed-0.7.0/embed.css" rel="stylesheet">
+<script src="../site_libs/quarto-contrib/mathviz-chrome-site-0.7.0/site.js"></script>
+<script src="../site_libs/quarto-contrib/mathviz-share-0.7.0/share.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-share-0.7.0/share.css" rel="stylesheet">
+<meta name="mathviz:share-site-url" content="https://apurvanakade.github.io/Monte-Carlo-Methods">
+<script src="../site_libs/quarto-contrib/mathviz-report-bug-0.7.0/report-bug.js"></script>
+<link href="../site_libs/quarto-contrib/mathviz-report-bug-0.7.0/report-bug.css" rel="stylesheet">
+<meta name="mathviz:report-bug-repo" content="apurvanakade/Monte-Carlo-Methods">
+<link href="../site_libs/quarto-contrib/mathviz-fonts-0.7.0/fonts.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="module" src="../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+<style>html.vm-embed .giscus { display: none !important; }</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/style.css">
+<meta property="og:title" content="Variance Reduction Techniques – Monte Carlo Methods Lecture Notes">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Monte Carlo Methods Lecture Notes">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Monte Carlo Methods Lecture Notes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../apps/index.html" aria-current="page"> 
+<span class="menu-text">Interactive Apps</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/apurvanakade/Monte-Carlo-Methods"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Variance Reduction Techniques</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../intro/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction to Monte Carlo Methods</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../estimation/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../estimating-pi/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimating <span class="math inline">\(\pi\)</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../integrals/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimating Integrals</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../sampling/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sampling</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../rng/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Random Number Generators</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../discrete/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discrete Distributions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../inverse-transform/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inverse Transform Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../other-distributions/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Other Distributions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../accept-reject/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rejection Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../gibbs-2d/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gibbs Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../mh/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metropolis–Hastings Algorithm</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../variance-reduction/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Variance Reduction Techniques</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sde/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Stochastic Differential Equations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ising/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ising Model</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bootstrap/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../particle-filters/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Particle Filters</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../probability/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Review of Probability Theory</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../markov-chains/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Markov Chains</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../apps/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Interactive Apps</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#importance-sampling" id="toc-importance-sampling" class="nav-link active" data-scroll-target="#importance-sampling">Importance Sampling</a>
+  <ul class="collapse">
+  <li><a href="#unbiasedness-of-the-importance-sampling-estimator" id="toc-unbiasedness-of-the-importance-sampling-estimator" class="nav-link" data-scroll-target="#unbiasedness-of-the-importance-sampling-estimator">Unbiasedness of the Importance Sampling Estimator</a></li>
+  <li><a href="#optimal-proposal-distribution" id="toc-optimal-proposal-distribution" class="nav-link" data-scroll-target="#optimal-proposal-distribution">Optimal Proposal Distribution</a></li>
+  <li><a href="#key-considerations-for-importance-sampling" id="toc-key-considerations-for-importance-sampling" class="nav-link" data-scroll-target="#key-considerations-for-importance-sampling">Key Considerations for Importance Sampling</a></li>
+  </ul></li>
+  <li><a href="#control-variates" id="toc-control-variates" class="nav-link" data-scroll-target="#control-variates">Control Variates</a></li>
+  <li><a href="#antithetic-variates" id="toc-antithetic-variates" class="nav-link" data-scroll-target="#antithetic-variates">Antithetic Variates</a></li>
+  <li><a href="#common-random-numbers" id="toc-common-random-numbers" class="nav-link" data-scroll-target="#common-random-numbers">Common Random Numbers</a>
+  <ul class="collapse">
+  <li><a href="#when-to-use-common-random-numbers" id="toc-when-to-use-common-random-numbers" class="nav-link" data-scroll-target="#when-to-use-common-random-numbers">When to Use Common Random Numbers</a></li>
+  <li><a href="#summary-of-variance-reduction-methods" id="toc-summary-of-variance-reduction-methods" class="nav-link" data-scroll-target="#summary-of-variance-reduction-methods">Summary of Variance Reduction Methods</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Variance Reduction Techniques</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 1, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>We have seen various techniques to sample from a target distribution. One of the main uses of sampling is to estimate some quantity <span class="math inline">\(\mathbb{E}[f(X)]\)</span>. Many applications rely on the sample mean estimator:</p>
+<p><span class="math display">\[
+\hat{\ell} = \frac{1}{N}\sum_{i=1}^{N}f(X_i).
+\]</span></p>
+<p>Many sampling techniques do not guarantee independence of samples. As such, the variance is given by:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\ell}) = \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}(f(X_i)) + \frac{2}{N^2} \sum_{i=1}^{N} \sum_{j=1, j \neq i}^{N} \text{Cov}(f(X_i), f(X_j)).
+\]</span></p>
+<p>One way to reduce the variance is to “thin the samples” by choosing samples. In this chapter, we’ll look at other techniques that allow us to change how we sample to reduce estimator variance.</p>
+<div class="exm-estimating-rare-events">
+<p><strong>Estimation of Rare-Event Probabilities.</strong> Let’s start with an example. Consider estimation of the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span> of some random variable <span class="math inline">\(X\)</span> for a large number <span class="math inline">\(\gamma\)</span>. We can use the following estimator:</p>
+<p><span class="math display">\[
+\hat{\ell} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}_{&gt; \gamma}(X_i),
+\]</span></p>
+<p>where <span class="math inline">\(\mathbb{I}_{&gt; \gamma}(X_i)\)</span> is an indicator function that is 1 if <span class="math inline">\(X_i &gt; \gamma\)</span> and 0 otherwise. The variance of this estimator is:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\ell}) = \frac{1}{N} \ell (1 - \ell).
+\]</span></p>
+<p>The relative width of the confidence interval is:</p>
+<p><span class="math display">\[
+\text{Relative Width} = \frac{2z_{1-\alpha/2} \sqrt{\ell (1 - \ell)}}{\hat{\ell} \sqrt{N}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N}} \sqrt{\frac{1 - \ell}{\ell}} \approx \frac{2z_{1-\alpha/2}}{\sqrt{N \ell}}
+\]</span></p>
+<p>When <span class="math inline">\(\ell\)</span> is small, the relative width of the confidence interval is large. This means that we need a large number of samples to get a good estimate of <span class="math inline">\(\ell\)</span>.</p>
+</div>
+<section id="importance-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="importance-sampling">Importance Sampling</h2>
+<p>Importance sampling is a method to reduce the variance of an estimator by changing the distribution from which we sample. The key insight is that we can sample from regions that contribute more to our estimate, then correct for this bias by weighting the samples appropriately.</p>
+<p>For example, when estimating the tail probability <span class="math inline">\(\ell = P(X &gt; \gamma)\)</span>, if <span class="math inline">\(\ell\)</span> is small, then most samples from the original distribution fall in the region <span class="math inline">\(X \leq \gamma\)</span>, contributing nothing to the estimate. Importance sampling allows us to sample more frequently from the tail region while maintaining an unbiased estimate through proper weighting.</p>
+<div class="def-importance-sampling">
+<p><strong>Definition: Importance Sampling.</strong> Let <span class="math inline">\(X\)</span> be a random variable with probability density function (pdf) <span class="math inline">\(p(x)\)</span>, and let <span class="math inline">\(q(x)\)</span> be a proposal pdf such that <span class="math inline">\(q(x) &gt; 0\)</span> for all <span class="math inline">\(x\)</span> where <span class="math inline">\(p(x)f(x) \neq 0\)</span>. The importance sampling estimator of <span class="math inline">\(\ell = \mathbb{E}_p[f(X)]\)</span> is:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{IS}} = \frac{1}{N} \sum_{i=1}^{N} f(X_i) \frac{p(X_i)}{q(X_i)},
+\]</span></p>
+<p>where <span class="math inline">\(X_1, X_2, \ldots, X_N\)</span> are i.i.d. samples from the distribution with pdf <span class="math inline">\(q(x)\)</span>.</p>
+<p>For clarity, we denote: - <span class="math inline">\(\hat{\ell}_{\text{crude}}\)</span>: the standard sample mean estimator using samples from <span class="math inline">\(p(x)\)</span> - <span class="math inline">\(\hat{\ell}_{\text{IS}}\)</span>: the importance sampling estimator using samples from <span class="math inline">\(q(x)\)</span></p>
+</div>
+<section id="unbiasedness-of-the-importance-sampling-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="unbiasedness-of-the-importance-sampling-estimator">Unbiasedness of the Importance Sampling Estimator</h3>
+<p>Consider the case where <span class="math inline">\(N = 1\)</span>:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{IS}} = f(X) \frac{p(X)}{q(X)}, \quad \text{where } X \sim q(x).
+\]</span></p>
+<p>We can verify that this estimator is unbiased:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbb{E}_q[\hat{\ell}_{\text{IS}}] &amp;= \mathbb{E}_q\left[f(X) \frac{p(X)}{q(X)}\right] \\
+&amp;= \int f(x) \frac{p(x)}{q(x)} q(x) \, dx \\
+&amp;= \int f(x) p(x) \, dx \\
+&amp;= \mathbb{E}_p[f(X)] \\
+&amp;= \ell.
+\end{aligned}
+\]</span></p>
+</section>
+<section id="optimal-proposal-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="optimal-proposal-distribution">Optimal Proposal Distribution</h3>
+<p>The variance of the importance sampling estimator depends on the choice of <span class="math inline">\(q(x)\)</span>:</p>
+<p><span class="math display">\[
+\text{Var}_q(\hat{\ell}_{\text{IS}}) \neq \text{Var}_p(\hat{\ell}_{\text{crude}}).
+\]</span></p>
+<p>For non-negative functions <span class="math inline">\(f(x) \geq 0\)</span>, the optimal proposal distribution that minimizes variance is:</p>
+<p><span class="math display">\[
+q^*(x) \propto p(x) f(x).
+\]</span></p>
+<p>With this choice, the importance sampling estimator becomes a constant (zero variance!). For general functions, the optimal proposal is:</p>
+<p><span class="math display">\[
+q^*(x) \propto p(x) |f(x)|.
+\]</span></p>
+<p>However, these optimal choices require knowing the very quantity we’re trying to estimate, making them impractical. In practice, we choose <span class="math inline">\(q(x)\)</span> to: 1. Be easy to sample from 2. Have heavier tails than <span class="math inline">\(p(x)\)</span> in regions where <span class="math inline">\(|f(x)|\)</span> is large 3. Have a known normalizing constant</p>
+<div class="exm-importance-sampling">
+<p><strong>Importance Sampling for Rare Events.</strong> Consider estimating the tail probability <span class="math inline">\(\ell = P(X &gt; 2)\)</span> for <span class="math inline">\(X \sim \mathcal{N}(0, 1)\)</span>. We use an exponential distribution shifted to start at 2 as our proposal:</p>
+<p><span class="math display">\[
+q(x) = \lambda e^{-\lambda (x-2)}, \quad x \geq 2.
+\]</span></p>
+<p>This proposal concentrates samples in the tail region where the indicator function is non-zero.</p>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb1" data-startfrom="127" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 126;"><span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>VM <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="at">VM</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>vmTheme <span class="op">=</span> Generators<span class="op">.</span><span class="fu">observe</span>(notify <span class="kw">=&gt;</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">onThemeChange</span>(notify))</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>chartColors <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">colors</span>(vmTheme)</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a><span class="co">// The simulations themselves live in method.js, where</span></span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a><span class="co">// method.test.js checks them against theory.</span></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> {runningAverage<span class="op">,</span> importanceTailEstimate<span class="op">,</span> controlVariateStudy<span class="op">,</span> antitheticStudy<span class="op">,</span> crnStudy<span class="op">,</span> crnDemoStudy} <span class="im">from</span> <span class="st">"./method.js"</span></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="co">// Indices 1..n, for x-axes counting samples.</span></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">vrCounts</span>(n) {</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> out <span class="op">=</span> []</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">let</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> n<span class="op">;</span> i<span class="op">++</span>) out<span class="op">.</span><span class="fu">push</span>(i)</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="co">// A running-average chart: one line per estimator plus the true value.</span></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">vrConvergenceFigure</span>(plot<span class="op">,</span> series<span class="op">,</span> trueValue<span class="op">,</span> xTitle<span class="op">,</span> title<span class="op">,</span> yRange) {</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> n <span class="op">=</span> series[<span class="dv">0</span>]<span class="op">.</span><span class="at">values</span><span class="op">.</span><span class="at">length</span></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> traces <span class="op">=</span> []</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> s <span class="kw">of</span> series) {</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>    traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> <span class="fu">vrCounts</span>(n)<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> s<span class="op">.</span><span class="at">values</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> s<span class="op">.</span><span class="at">name</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors[s<span class="op">.</span><span class="at">color</span>]<span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}})</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>  traces<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> [<span class="dv">1</span><span class="op">,</span> n]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [trueValue<span class="op">,</span> trueValue]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>    <span class="dt">name</span><span class="op">:</span> <span class="vs">`True value: </span><span class="sc">${</span>trueValue<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ink</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}})</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> yaxis <span class="op">=</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Running average"</span>}</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (yRange) yaxis<span class="op">.</span><span class="at">range</span> <span class="op">=</span> yRange</span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(plot<span class="op">,</span> traces<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> title}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> xTitle}<span class="op">,</span> yaxis})</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>vrIsPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"420px"</span>})</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="co">// Estimate P(X &gt; 2) for X ~ N(0, 1), with N = 4000 samples each way.</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>vrImportance <span class="op">=</span> <span class="fu">importanceTailEstimate</span>(VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">42</span>)<span class="op">,</span> <span class="dv">4000</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-1-8" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb2" data-startfrom="162" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 161;"><span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrImportance</span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">vrConvergenceFigure</span>(vrIsPlot<span class="op">,</span> [</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">name</span><span class="op">:</span> <span class="st">"Crude MC"</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> <span class="fu">runningAverage</span>(r<span class="op">.</span><span class="at">crude</span>)<span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"fn"</span>}<span class="op">,</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">name</span><span class="op">:</span> <span class="st">"Importance sampling"</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> <span class="fu">runningAverage</span>(r<span class="op">.</span><span class="at">weighted</span>)<span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"warn"</span>}</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> r<span class="op">.</span><span class="at">trueValue</span><span class="op">,</span> <span class="st">"Number of samples"</span><span class="op">,</span> <span class="st">"Importance sampling vs. crude Monte Carlo"</span><span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="fl">0.04</span>])</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-2" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb3" data-startfrom="172" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 171;"><span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrImportance</span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> []</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [name<span class="op">,</span> stats] <span class="kw">of</span> [[<span class="st">"Importance sampling"</span><span class="op">,</span> r<span class="op">.</span><span class="at">isStats</span>]<span class="op">,</span> [<span class="st">"Crude Monte Carlo"</span><span class="op">,</span> r<span class="op">.</span><span class="at">crudeStats</span>]]) {</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Variance of the estimator (the sample mean), and its relative error.</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> variance <span class="op">=</span> stats<span class="op">.</span><span class="at">variance</span> <span class="op">/</span> r<span class="op">.</span><span class="at">N</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>    rows<span class="op">.</span><span class="fu">push</span>([name<span class="op">,</span> stats<span class="op">.</span><span class="at">mean</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">5</span>)<span class="op">,</span> variance<span class="op">.</span><span class="fu">toExponential</span>(<span class="dv">2</span>)<span class="op">,</span> (<span class="bu">Math</span><span class="op">.</span><span class="fu">sqrt</span>(variance) <span class="op">/</span> stats<span class="op">.</span><span class="at">mean</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)])</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> factor <span class="op">=</span> r<span class="op">.</span><span class="at">crudeStats</span><span class="op">.</span><span class="at">variance</span> <span class="op">/</span> r<span class="op">.</span><span class="at">isStats</span><span class="op">.</span><span class="at">variance</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`</span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">headers</span><span class="op">:</span> [<span class="st">"Method"</span><span class="op">,</span> <span class="st">"Estimate"</span><span class="op">,</span> <span class="st">"Variance"</span><span class="op">,</span> <span class="st">"Relative error"</span>]<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"importance-sampling.csv"</span>})<span class="sc">}</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="vs">    </span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([{<span class="dt">label</span><span class="op">:</span> <span class="st">"True value"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">trueValue</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">5</span>)}<span class="op">,</span> {<span class="dt">label</span><span class="op">:</span> <span class="st">"Variance reduction factor"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>factor<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs">×`</span>}])<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="key-considerations-for-importance-sampling" class="level3">
+<h3 class="anchored" data-anchor-id="key-considerations-for-importance-sampling">Key Considerations for Importance Sampling</h3>
+<ol type="1">
+<li><p><strong>Proposal Selection</strong>: The optimal proposal <span class="math inline">\(q^*(x) \propto p(x)|f(x)|\)</span> is usually unknown. We must choose proposals that approximate this ideal while remaining tractable to sample from.</p></li>
+<li><p><strong>Normalizing Constants</strong>: Unlike rejection sampling or MCMC, importance sampling requires knowing the normalizing constant of <span class="math inline">\(q(x)\)</span>. This limits us to standard distributions like exponential, normal, uniform, or mixtures thereof.</p></li>
+<li><p><strong>Support Requirements</strong>: The proposal must have positive density wherever <span class="math inline">\(p(x)f(x) \neq 0\)</span>. For rare event estimation, this means ensuring <span class="math inline">\(q(x) &gt; 0\)</span> in the tail regions of interest.</p></li>
+<li><p><strong>Weight Degeneracy</strong>: Poor choice of <span class="math inline">\(q(x)\)</span> can lead to a few samples having very large weights, effectively reducing the sample size and increasing variance.</p></li>
+</ol>
+</section>
+</section>
+<section id="control-variates" class="level2">
+<h2 class="anchored" data-anchor-id="control-variates">Control Variates</h2>
+<p>Control variates exploit positive correlation with a random variable whose expectation we know. The idea is to use this known information to “correct” our estimates.</p>
+<p>Given a function <span class="math inline">\(h(x)\)</span> with known expectation <span class="math inline">\(\mathbb{E}[h(X)] = h_0\)</span>, the control variate estimator is:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{CV}} = \frac{1}{N} \sum_{i=1}^{N} \left[f(X_i) - \beta (h(X_i) - h_0)\right],
+\]</span></p>
+<p>where <span class="math inline">\(\beta\)</span> is a parameter we can optimize.</p>
+<p><strong>Variance Analysis</strong>: The variance of this estimator is:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\ell}_{\text{CV}}) = \frac{1}{N} \left[\text{Var}(f(X)) + \beta^2 \text{Var}(h(X)) - 2\beta\text{Cov}(f(X), h(X))\right].
+\]</span></p>
+<p>Define</p>
+<p><span class="math display">\[
+\beta^* = \frac{\text{Cov}(f(X), h(X))}{\text{Var}(h(X))}.
+\]</span></p>
+<p>Then the control variate estimator improves on crude Monte Carlo, i.e., <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{CV}}) &lt; \text{Var}(\hat{\ell}_{\text{crude}}) = \frac{1}{N}\text{Var}(f(X))\)</span>, if and only if:</p>
+<p><span class="math display">\[
+\beta^2 \text{Var}(h(X)) &lt; 2\beta \,\text{Cov}(f(X), h(X)),
+\]</span></p>
+<p>or equivalently, <span class="math inline">\(\beta(\beta - 2\beta^*) &lt; 0\)</span>, meaning <span class="math inline">\(\beta \in (0,\, 2\beta^*)\)</span> when <span class="math inline">\(\text{Cov}(f(X), h(X)) &gt; 0\)</span>, and <span class="math inline">\(\beta \in (2\beta^*,\, 0)\)</span> when <span class="math inline">\(\text{Cov}(f(X), h(X)) &lt; 0\)</span>. In particular, any control variate <span class="math inline">\(h\)</span> with nonzero correlation to <span class="math inline">\(f\)</span> admits a <span class="math inline">\(\beta\)</span> that yields variance reduction. In both cases, the optimal <span class="math inline">\(\beta\)</span> is the midpoint <span class="math inline">\(\beta^*\)</span>.</p>
+<p>In practice, we often estimate <span class="math inline">\(\beta^*\)</span> from pilot samples or use a reasonable approximation.</p>
+<div id="exm-control-variates" class="theorem example">
+<p><span class="theorem-title"><strong>Example 1</strong></span> <strong>Control Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 x e^{-x} dx\)</span> using the control function <span class="math inline">\(h(x) = x\)</span>. Since <span class="math inline">\(X \sim \text{Uniform}(0,1)\)</span>, we know <span class="math inline">\(\mathbb{E}[h(X)] = \frac{1}{2}\)</span>.</p>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb4" data-startfrom="238" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 237;"><span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a>vrCvPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"420px"</span>})</span>
+<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a>vrCvConvergencePlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"420px"</span>})</span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a><span class="co">// Estimate the integral of x e^{-x} over [0, 1] with the control h(x) = x.</span></span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a>vrControl <span class="op">=</span> <span class="fu">controlVariateStudy</span>(VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">42</span>)<span class="op">,</span> <span class="dv">1000</span><span class="op">,</span> <span class="dv">100</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-4-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-4-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-4-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb5" data-startfrom="245" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 244;"><span id="cb5-245"><a href="#cb5-245" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb5-246"><a href="#cb5-246" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrControl</span>
+<span id="cb5-247"><a href="#cb5-247" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> betas <span class="op">=</span> []<span class="op">,</span> variances <span class="op">=</span> []<span class="op">,</span> testedBetas <span class="op">=</span> []<span class="op">,</span> testedVariances <span class="op">=</span> []</span>
+<span id="cb5-248"><a href="#cb5-248" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> point <span class="kw">of</span> r<span class="op">.</span><span class="at">curve</span>) {</span>
+<span id="cb5-249"><a href="#cb5-249" aria-hidden="true" tabindex="-1"></a>    betas<span class="op">.</span><span class="fu">push</span>(point<span class="op">.</span><span class="at">beta</span>)</span>
+<span id="cb5-250"><a href="#cb5-250" aria-hidden="true" tabindex="-1"></a>    variances<span class="op">.</span><span class="fu">push</span>(point<span class="op">.</span><span class="at">variance</span>)</span>
+<span id="cb5-251"><a href="#cb5-251" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-252"><a href="#cb5-252" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> point <span class="kw">of</span> r<span class="op">.</span><span class="at">tested</span>) {</span>
+<span id="cb5-253"><a href="#cb5-253" aria-hidden="true" tabindex="-1"></a>    testedBetas<span class="op">.</span><span class="fu">push</span>(point<span class="op">.</span><span class="at">beta</span>)</span>
+<span id="cb5-254"><a href="#cb5-254" aria-hidden="true" tabindex="-1"></a>    testedVariances<span class="op">.</span><span class="fu">push</span>(point<span class="op">.</span><span class="at">variance</span>)</span>
+<span id="cb5-255"><a href="#cb5-255" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-256"><a href="#cb5-256" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(vrCvPlot<span class="op">,</span> [</span>
+<span id="cb5-257"><a href="#cb5-257" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> betas<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> variances<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Variance"</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb5-258"><a href="#cb5-258" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> testedBetas<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> testedVariances<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Tested β"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">9</span>}}<span class="op">,</span></span>
+<span id="cb5-259"><a href="#cb5-259" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> [<span class="op">-</span><span class="fl">0.5</span><span class="op">,</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span><span class="op">,</span> r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Standard MC variance"</span><span class="op">,</span></span>
+<span id="cb5-260"><a href="#cb5-260" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">warn</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}<span class="op">,</span></span>
+<span id="cb5-261"><a href="#cb5-261" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> [r<span class="op">.</span><span class="at">betaEst</span><span class="op">,</span> r<span class="op">.</span><span class="at">betaEst</span>]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="op">...</span>variances)]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span></span>
+<span id="cb5-262"><a href="#cb5-262" aria-hidden="true" tabindex="-1"></a>      <span class="dt">name</span><span class="op">:</span> <span class="vs">`Estimated optimal β = </span><span class="sc">${</span>r<span class="op">.</span><span class="at">betaEst</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="sc">}</span><span class="vs">`</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">ok</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}</span>
+<span id="cb5-263"><a href="#cb5-263" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Control variate variance as a function of β"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span> <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"β"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Variance"</span><span class="op">,</span> <span class="dt">rangemode</span><span class="op">:</span> <span class="st">"tozero"</span>}})</span>
+<span id="cb5-264"><a href="#cb5-264" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-5" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb6" data-startfrom="268" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 267;"><span id="cb6-268"><a href="#cb6-268" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb6-269"><a href="#cb6-269" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrControl</span>
+<span id="cb6-270"><a href="#cb6-270" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> []</span>
+<span id="cb6-271"><a href="#cb6-271" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> point <span class="kw">of</span> r<span class="op">.</span><span class="at">tested</span>) {</span>
+<span id="cb6-272"><a href="#cb6-272" aria-hidden="true" tabindex="-1"></a>    rows<span class="op">.</span><span class="fu">push</span>([point<span class="op">.</span><span class="at">beta</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="op">,</span> point<span class="op">.</span><span class="at">estimate</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)<span class="op">,</span> point<span class="op">.</span><span class="at">variance</span><span class="op">.</span><span class="fu">toExponential</span>(<span class="dv">6</span>)<span class="op">,</span></span>
+<span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a>      <span class="vs">`</span><span class="sc">${</span>(r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span> <span class="op">/</span> point<span class="op">.</span><span class="at">variance</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">×`</span>])</span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`</span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([</span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"True value"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">trueValue</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)}<span class="op">,</span></span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"Standard MC estimate"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">estimate</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)}<span class="op">,</span></span>
+<span id="cb6-278"><a href="#cb6-278" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"Standard MC variance"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span><span class="op">.</span><span class="fu">toExponential</span>(<span class="dv">6</span>)}</span>
+<span id="cb6-279"><a href="#cb6-279" aria-hidden="true" tabindex="-1"></a>    ])<span class="sc">}</span></span>
+<span id="cb6-280"><a href="#cb6-280" aria-hidden="true" tabindex="-1"></a><span class="vs">    </span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">headers</span><span class="op">:</span> [<span class="st">"β"</span><span class="op">,</span> <span class="st">"Estimate"</span><span class="op">,</span> <span class="st">"Variance"</span><span class="op">,</span> <span class="st">"Reduction"</span>]<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"control-variates.csv"</span>})<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb6-281"><a href="#cb6-281" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-6" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb7" data-startfrom="285" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 284;"><span id="cb7-285"><a href="#cb7-285" aria-hidden="true" tabindex="-1"></a><span class="fu">vrConvergenceFigure</span>(vrCvConvergencePlot<span class="op">,</span> [</span>
+<span id="cb7-286"><a href="#cb7-286" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="st">"Standard Monte Carlo"</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> vrControl<span class="op">.</span><span class="at">runningStandard</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"fn"</span>}<span class="op">,</span></span>
+<span id="cb7-287"><a href="#cb7-287" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="vs">`Control variate (β = </span><span class="sc">${</span>vrControl<span class="op">.</span><span class="at">betaEst</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> vrControl<span class="op">.</span><span class="at">runningControl</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"warn"</span>}</span>
+<span id="cb7-288"><a href="#cb7-288" aria-hidden="true" tabindex="-1"></a>]<span class="op">,</span> vrControl<span class="op">.</span><span class="at">trueValue</span><span class="op">,</span> <span class="st">"Number of samples"</span><span class="op">,</span> <span class="st">"Convergence: standard MC vs. control variates"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-7" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="antithetic-variates" class="level2">
+<h2 class="anchored" data-anchor-id="antithetic-variates">Antithetic Variates</h2>
+<p>The antithetic variates method uses pairs of negatively correlated random variables to reduce variance. The key insight is that if we can generate two estimates that tend to err in opposite directions, their average will be more stable.</p>
+<p><strong>Key Result</strong>: For a monotonic function <span class="math inline">\(f\)</span> on <span class="math inline">\([a, b]\)</span> and <span class="math inline">\(X \sim \text{Uniform}(a, b)\)</span>:</p>
+<p><span class="math display">\[
+\text{Cov}(f(X), f(a + b - X)) \leq 0.
+\]</span></p>
+<p>This leads to the antithetic variates estimator:</p>
+<p><span class="math display">\[
+\hat{\ell}_{\text{anti}} = \frac{b - a}{2N} \sum_{i=1}^{N} \left[f(X_i) + f(a + b - X_i)\right],
+\]</span></p>
+<p>where <span class="math inline">\(X_1, \ldots, X_N \sim \text{Uniform}(a, b)\)</span>.</p>
+<div id="thm-antithetic-variate" class="theorem">
+<p><span class="theorem-title"><strong>Theorem 1</strong></span> <strong>Theorem</strong>: For monotonic functions, <span class="math inline">\(\text{Var}(\hat{\ell}_{\text{anti}}) \leq \text{Var}(\hat{\ell}_{\text{crude}})\)</span>.</p>
+</div>
+<div id="exm-antithetic-variables" class="theorem example">
+<p><span class="theorem-title"><strong>Example 2</strong></span> <strong>Antithetic Variates.</strong> We estimate <span class="math inline">\(\ell = \int_0^1 \frac{1}{1 + x^2} dx\)</span> using antithetic variates. Since <span class="math inline">\(f(x) = \frac{1}{1 + x^2}\)</span> is decreasing on <span class="math inline">\([0, 1]\)</span>, the pairs <span class="math inline">\((f(X), f(1-X))\)</span> are negatively correlated.</p>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb8" data-startfrom="321" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 320;"><span id="cb8-321"><a href="#cb8-321" aria-hidden="true" tabindex="-1"></a>vrAntitheticPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"420px"</span>})</span>
+<span id="cb8-322"><a href="#cb8-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="co">// Estimate the integral of 1 / (1 + x²) over [0, 1] with N = 200 samples.</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a>vrAntithetic <span class="op">=</span> <span class="fu">antitheticStudy</span>(VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">42</span>)<span class="op">,</span> <span class="dv">200</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-8-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-8-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb9" data-startfrom="327" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 326;"><span id="cb9-327"><a href="#cb9-327" aria-hidden="true" tabindex="-1"></a><span class="fu">vrConvergenceFigure</span>(vrAntitheticPlot<span class="op">,</span> [</span>
+<span id="cb9-328"><a href="#cb9-328" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="st">"Standard Monte Carlo"</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> vrAntithetic<span class="op">.</span><span class="at">runningStandard</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"fn"</span>}<span class="op">,</span></span>
+<span id="cb9-329"><a href="#cb9-329" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">name</span><span class="op">:</span> <span class="st">"Antithetic variates"</span><span class="op">,</span> <span class="dt">values</span><span class="op">:</span> vrAntithetic<span class="op">.</span><span class="at">runningAntithetic</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> <span class="st">"warn"</span>}</span>
+<span id="cb9-330"><a href="#cb9-330" aria-hidden="true" tabindex="-1"></a>]<span class="op">,</span> vrAntithetic<span class="op">.</span><span class="at">trueValue</span><span class="op">,</span> <span class="st">"Number of sample pairs"</span><span class="op">,</span> <span class="st">"Convergence: standard MC vs. antithetic variates"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-9" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb10" data-startfrom="334" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 333;"><span id="cb10-334"><a href="#cb10-334" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb10-335"><a href="#cb10-335" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrAntithetic</span>
+<span id="cb10-336"><a href="#cb10-336" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> [</span>
+<span id="cb10-337"><a href="#cb10-337" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Standard Monte Carlo"</span><span class="op">,</span> r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">estimate</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)<span class="op">,</span> r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span><span class="op">.</span><span class="fu">toExponential</span>(<span class="dv">6</span>)]<span class="op">,</span></span>
+<span id="cb10-338"><a href="#cb10-338" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Antithetic variates"</span><span class="op">,</span> r<span class="op">.</span><span class="at">antithetic</span><span class="op">.</span><span class="at">estimate</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)<span class="op">,</span> r<span class="op">.</span><span class="at">antithetic</span><span class="op">.</span><span class="at">variance</span><span class="op">.</span><span class="fu">toExponential</span>(<span class="dv">6</span>)]</span>
+<span id="cb10-339"><a href="#cb10-339" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb10-340"><a href="#cb10-340" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`</span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">headers</span><span class="op">:</span> [<span class="st">"Method"</span><span class="op">,</span> <span class="st">"Estimate"</span><span class="op">,</span> <span class="st">"Variance"</span>]<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"antithetic-variates.csv"</span>})<span class="sc">}</span></span>
+<span id="cb10-341"><a href="#cb10-341" aria-hidden="true" tabindex="-1"></a><span class="vs">    </span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([{<span class="dt">label</span><span class="op">:</span> <span class="st">"True value"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">trueValue</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)}<span class="op">,</span></span>
+<span id="cb10-342"><a href="#cb10-342" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"Variance reduction factor"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>(r<span class="op">.</span><span class="at">standard</span><span class="op">.</span><span class="at">variance</span> <span class="op">/</span> r<span class="op">.</span><span class="at">antithetic</span><span class="op">.</span><span class="at">variance</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">×`</span>}])<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb10-343"><a href="#cb10-343" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-10" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</section>
+<section id="common-random-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="common-random-numbers">Common Random Numbers</h2>
+<p>When comparing two systems or estimating differences between expectations, using common random numbers (CRN) can significantly reduce variance. This technique is particularly valuable in simulation studies where we want to compare different policies, parameters, or system configurations.</p>
+<p><strong>The Problem</strong>: Suppose we want to estimate the difference <span class="math inline">\(\delta = \mathbb{E}[f(X)] - \mathbb{E}[g(X)]\)</span> where <span class="math inline">\(X\)</span> represents random inputs to two different systems. The naive approach uses independent samples:</p>
+<p><span class="math display">\[
+\hat{\delta}_{\text{indep}} = \frac{1}{N}\sum_{i=1}^{N} f(X_i) - \frac{1}{N}\sum_{i=1}^{N} g(Y_i),
+\]</span></p>
+<p>where <span class="math inline">\(X_i\)</span> and <span class="math inline">\(Y_i\)</span> are independent. The variance is:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\delta}_{\text{indep}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(Y))].
+\]</span></p>
+<p><strong>The CRN Solution</strong>: Use the same random numbers for both systems:</p>
+<p><span class="math display">\[
+\hat{\delta}_{\text{CRN}} = \frac{1}{N}\sum_{i=1}^{N} [f(X_i) - g(X_i)],
+\]</span></p>
+<p>where the same <span class="math inline">\(X_i\)</span> is used for both <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span>. The variance becomes:</p>
+<p><span class="math display">\[
+\text{Var}(\hat{\delta}_{\text{CRN}}) = \frac{1}{N}[\text{Var}(f(X)) + \text{Var}(g(X)) - 2\text{Cov}(f(X), g(X))].
+\]</span></p>
+<p>When <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(g(X)\)</span> are positively correlated (which often happens when they represent similar systems), the variance reduction can be substantial.</p>
+<div id="exm-common-random-numbers" class="theorem example">
+<p><span class="theorem-title"><strong>Example 3</strong></span> <strong>Comparing Queue Systems.</strong> Consider comparing average waiting times in two queueing systems with different service rates. We simulate both systems using the same arrival times and service requirements.</p>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb11" data-startfrom="383" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 382;"><span id="cb11-383"><a href="#cb11-383" aria-hidden="true" tabindex="-1"></a>vrArrivalRate <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb11-384"><a href="#cb11-384" aria-hidden="true" tabindex="-1"></a>vrServiceRates <span class="op">=</span> [<span class="fl">1.5</span><span class="op">,</span> <span class="dv">2</span>]</span>
+<span id="cb11-385"><a href="#cb11-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-386"><a href="#cb11-386" aria-hidden="true" tabindex="-1"></a><span class="co">// 100 replications of 1000 customers: the difference in mean waiting time</span></span>
+<span id="cb11-387"><a href="#cb11-387" aria-hidden="true" tabindex="-1"></a><span class="co">// between the two systems, with common random numbers and with independent ones.</span></span>
+<span id="cb11-388"><a href="#cb11-388" aria-hidden="true" tabindex="-1"></a>vrCrn <span class="op">=</span> <span class="fu">crnStudy</span>(VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">42</span>)<span class="op">,</span> <span class="dv">1000</span><span class="op">,</span> <span class="dv">100</span><span class="op">,</span> vrArrivalRate<span class="op">,</span> vrServiceRates[<span class="dv">0</span>]<span class="op">,</span> vrServiceRates[<span class="dv">1</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-11-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-11-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-11-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb12" data-startfrom="391" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 390;"><span id="cb12-391"><a href="#cb12-391" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb12-392"><a href="#cb12-392" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> r <span class="op">=</span> vrCrn</span>
+<span id="cb12-393"><a href="#cb12-393" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> []</span>
+<span id="cb12-394"><a href="#cb12-394" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [name<span class="op">,</span> stats] <span class="kw">of</span> [[<span class="st">"Common random numbers"</span><span class="op">,</span> r<span class="op">.</span><span class="at">crn</span>]<span class="op">,</span> [<span class="st">"Independent sampling"</span><span class="op">,</span> r<span class="op">.</span><span class="at">independent</span>]]) {</span>
+<span id="cb12-395"><a href="#cb12-395" aria-hidden="true" tabindex="-1"></a>    rows<span class="op">.</span><span class="fu">push</span>([name<span class="op">,</span> stats<span class="op">.</span><span class="at">mean</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> stats<span class="op">.</span><span class="at">variance</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">6</span>)<span class="op">,</span> stats<span class="op">.</span><span class="at">sd</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)])</span>
+<span id="cb12-396"><a href="#cb12-396" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb12-397"><a href="#cb12-397" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">html</span><span class="vs">`</span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">statRow</span>([</span>
+<span id="cb12-398"><a href="#cb12-398" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="vs">`System 1 (μ = </span><span class="sc">${</span>vrServiceRates[<span class="dv">0</span>]<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">theory</span>[<span class="dv">0</span>]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"λ / (μ(μ − λ)), the steady-state mean wait in queue"</span>}<span class="op">,</span></span>
+<span id="cb12-399"><a href="#cb12-399" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="vs">`System 2 (μ = </span><span class="sc">${</span>vrServiceRates[<span class="dv">1</span>]<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> r<span class="op">.</span><span class="at">theory</span>[<span class="dv">1</span>]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)<span class="op">,</span> <span class="dt">title</span><span class="op">:</span> <span class="st">"λ / (μ(μ − λ)), the steady-state mean wait in queue"</span>}<span class="op">,</span></span>
+<span id="cb12-400"><a href="#cb12-400" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"Theoretical difference"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> (r<span class="op">.</span><span class="at">theory</span>[<span class="dv">0</span>] <span class="op">-</span> r<span class="op">.</span><span class="at">theory</span>[<span class="dv">1</span>])<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">4</span>)}<span class="op">,</span></span>
+<span id="cb12-401"><a href="#cb12-401" aria-hidden="true" tabindex="-1"></a>      {<span class="dt">label</span><span class="op">:</span> <span class="st">"Variance reduction factor"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="vs">`</span><span class="sc">${</span>(r<span class="op">.</span><span class="at">independent</span><span class="op">.</span><span class="at">variance</span> <span class="op">/</span> r<span class="op">.</span><span class="at">crn</span><span class="op">.</span><span class="at">variance</span>)<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">×`</span>}</span>
+<span id="cb12-402"><a href="#cb12-402" aria-hidden="true" tabindex="-1"></a>    ])<span class="sc">}</span></span>
+<span id="cb12-403"><a href="#cb12-403" aria-hidden="true" tabindex="-1"></a><span class="vs">    </span><span class="sc">${</span>VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">headers</span><span class="op">:</span> [<span class="vs">`Method (</span><span class="sc">${</span>r<span class="op">.</span><span class="at">replications</span><span class="sc">}</span><span class="vs"> replications)`</span><span class="op">,</span> <span class="st">"Mean difference"</span><span class="op">,</span> <span class="st">"Variance"</span><span class="op">,</span> <span class="st">"Std deviation"</span>]<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"common-random-numbers.csv"</span>})<span class="sc">}</span><span class="vs">`</span></span>
+<span id="cb12-404"><a href="#cb12-404" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-12" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell hidden">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb13" data-startfrom="410" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 409;"><span id="cb13-410"><a href="#cb13-410" aria-hidden="true" tabindex="-1"></a>vrCorrelationPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"440px"</span>})</span>
+<span id="cb13-411"><a href="#cb13-411" aria-hidden="true" tabindex="-1"></a>vrPairedPlot <span class="op">=</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">persistentPlot</span>({<span class="dt">height</span><span class="op">:</span> <span class="st">"440px"</span>})</span>
+<span id="cb13-412"><a href="#cb13-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-413"><a href="#cb13-413" aria-hidden="true" tabindex="-1"></a>vrCrnDemo <span class="op">=</span> {</span>
+<span id="cb13-414"><a href="#cb13-414" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> demo <span class="op">=</span> <span class="fu">crnDemoStudy</span>(VM<span class="op">.</span><span class="at">sampling</span><span class="op">.</span><span class="fu">seededRandom</span>(<span class="dv">7</span>)<span class="op">,</span> vrServiceRates[<span class="dv">0</span>]<span class="op">,</span> vrServiceRates[<span class="dv">1</span>])</span>
+<span id="cb13-415"><a href="#cb13-415" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> {<span class="op">...</span>demo<span class="op">,</span> <span class="dt">highlighted</span><span class="op">:</span> [<span class="dv">10</span><span class="op">,</span> <span class="dv">25</span><span class="op">,</span> <span class="dv">40</span>]}</span>
+<span id="cb13-416"><a href="#cb13-416" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-13-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-13-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display hidden">
+<div>
+<div id="ojs-cell-13-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb14" data-startfrom="419" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 418;"><span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> d <span class="op">=</span> vrCrnDemo</span>
+<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> lo <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">min</span>(<span class="op">...</span>d<span class="op">.</span><span class="at">demo1</span>)<span class="op">,</span> hi <span class="op">=</span> <span class="bu">Math</span><span class="op">.</span><span class="fu">max</span>(<span class="op">...</span>d<span class="op">.</span><span class="at">demo1</span>)</span>
+<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(vrCorrelationPlot<span class="op">,</span> [</span>
+<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> d<span class="op">.</span><span class="at">demo1</span><span class="op">,</span> <span class="dt">y</span><span class="op">:</span> d<span class="op">.</span><span class="at">demo2</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="st">"Customers"</span><span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">alpha</span>(chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="fl">0.6</span>)<span class="op">,</span> <span class="dt">size</span><span class="op">:</span> <span class="dv">7</span>}}<span class="op">,</span></span>
+<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> [lo<span class="op">,</span> hi]<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> [d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">slope</span> <span class="op">*</span> lo <span class="op">+</span> d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">intercept</span><span class="op">,</span> d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">slope</span> <span class="op">*</span> hi <span class="op">+</span> d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">intercept</span>]<span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines"</span><span class="op">,</span></span>
+<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a>      <span class="dt">name</span><span class="op">:</span> <span class="vs">`Linear fit (y = </span><span class="sc">${</span>d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">slope</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">x + </span><span class="sc">${</span>d<span class="op">.</span><span class="at">fit</span><span class="op">.</span><span class="at">intercept</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">2</span>)<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dash"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">2</span>}}</span>
+<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="vs">`Correlation between systems (ρ = </span><span class="sc">${</span>d<span class="op">.</span><span class="at">correlation</span><span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="sc">}</span><span class="vs">)`</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Waiting time, system 1"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Waiting time, system 2"</span>}})</span>
+<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-14" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb15" data-startfrom="432" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 431;"><span id="cb15-432"><a href="#cb15-432" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb15-433"><a href="#cb15-433" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> d <span class="op">=</span> vrCrnDemo</span>
+<span id="cb15-434"><a href="#cb15-434" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> customers <span class="op">=</span> <span class="fu">vrCounts</span>(d<span class="op">.</span><span class="at">wait1</span><span class="op">.</span><span class="at">length</span>)</span>
+<span id="cb15-435"><a href="#cb15-435" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> shapes <span class="op">=</span> []<span class="op">,</span> annotations <span class="op">=</span> []</span>
+<span id="cb15-436"><a href="#cb15-436" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> c <span class="kw">of</span> d<span class="op">.</span><span class="at">highlighted</span>) {</span>
+<span id="cb15-437"><a href="#cb15-437" aria-hidden="true" tabindex="-1"></a>    shapes<span class="op">.</span><span class="fu">push</span>({<span class="dt">type</span><span class="op">:</span> <span class="st">"line"</span><span class="op">,</span> <span class="dt">x0</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">x1</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">yref</span><span class="op">:</span> <span class="st">"paper"</span><span class="op">,</span> <span class="dt">y0</span><span class="op">:</span> <span class="dv">0</span><span class="op">,</span> <span class="dt">y1</span><span class="op">:</span> <span class="dv">1</span><span class="op">,</span> <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">muted</span><span class="op">,</span> <span class="dt">dash</span><span class="op">:</span> <span class="st">"dot"</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span>}})</span>
+<span id="cb15-438"><a href="#cb15-438" aria-hidden="true" tabindex="-1"></a>    <span class="co">// An arrow spanning the paired difference for this customer.</span></span>
+<span id="cb15-439"><a href="#cb15-439" aria-hidden="true" tabindex="-1"></a>    annotations<span class="op">.</span><span class="fu">push</span>({<span class="dt">x</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> d<span class="op">.</span><span class="at">wait2</span>[c <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">ax</span><span class="op">:</span> c<span class="op">,</span> <span class="dt">ay</span><span class="op">:</span> d<span class="op">.</span><span class="at">wait1</span>[c <span class="op">-</span> <span class="dv">1</span>]<span class="op">,</span> <span class="dt">axref</span><span class="op">:</span> <span class="st">"x"</span><span class="op">,</span> <span class="dt">ayref</span><span class="op">:</span> <span class="st">"y"</span><span class="op">,</span> <span class="dt">showarrow</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb15-440"><a href="#cb15-440" aria-hidden="true" tabindex="-1"></a>      <span class="dt">arrowhead</span><span class="op">:</span> <span class="dv">2</span><span class="op">,</span> <span class="dt">arrowside</span><span class="op">:</span> <span class="st">"end+start"</span><span class="op">,</span> <span class="dt">arrowcolor</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">alt</span><span class="op">,</span> <span class="dt">text</span><span class="op">:</span> <span class="st">""</span>})</span>
+<span id="cb15-441"><a href="#cb15-441" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-442"><a href="#cb15-442" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">plotting</span><span class="op">.</span><span class="fu">plotWithLegend</span>(vrPairedPlot<span class="op">,</span> [</span>
+<span id="cb15-443"><a href="#cb15-443" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> customers<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> d<span class="op">.</span><span class="at">wait1</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="vs">`System 1 (μ = </span><span class="sc">${</span>vrServiceRates[<span class="dv">0</span>]<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span></span>
+<span id="cb15-444"><a href="#cb15-444" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">fn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">5</span>}}<span class="op">,</span></span>
+<span id="cb15-445"><a href="#cb15-445" aria-hidden="true" tabindex="-1"></a>    {<span class="dt">x</span><span class="op">:</span> customers<span class="op">,</span> <span class="dt">y</span><span class="op">:</span> d<span class="op">.</span><span class="at">wait2</span><span class="op">,</span> <span class="dt">type</span><span class="op">:</span> <span class="st">"scatter"</span><span class="op">,</span> <span class="dt">mode</span><span class="op">:</span> <span class="st">"lines+markers"</span><span class="op">,</span> <span class="dt">name</span><span class="op">:</span> <span class="vs">`System 2 (μ = </span><span class="sc">${</span>vrServiceRates[<span class="dv">1</span>]<span class="sc">}</span><span class="vs">)`</span><span class="op">,</span></span>
+<span id="cb15-446"><a href="#cb15-446" aria-hidden="true" tabindex="-1"></a>      <span class="dt">line</span><span class="op">:</span> {<span class="dt">color</span><span class="op">:</span> chartColors<span class="op">.</span><span class="at">warn</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">1</span>}<span class="op">,</span> <span class="dt">marker</span><span class="op">:</span> {<span class="dt">size</span><span class="op">:</span> <span class="dv">5</span><span class="op">,</span> <span class="dt">symbol</span><span class="op">:</span> <span class="st">"square"</span>}}</span>
+<span id="cb15-447"><a href="#cb15-447" aria-hidden="true" tabindex="-1"></a>  ]<span class="op">,</span> {<span class="dt">title</span><span class="op">:</span> {<span class="dt">text</span><span class="op">:</span> <span class="st">"Paired wait times with common random numbers"</span>}<span class="op">,</span> <span class="dt">margin</span><span class="op">:</span> {<span class="dt">t</span><span class="op">:</span> <span class="dv">40</span>}<span class="op">,</span></span>
+<span id="cb15-448"><a href="#cb15-448" aria-hidden="true" tabindex="-1"></a>    <span class="dt">xaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Customer number"</span>}<span class="op">,</span> <span class="dt">yaxis</span><span class="op">:</span> {<span class="dt">title</span><span class="op">:</span> <span class="st">"Waiting time"</span>}<span class="op">,</span> shapes<span class="op">,</span> annotations})</span>
+<span id="cb15-449"><a href="#cb15-449" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-15" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb16" data-startfrom="453" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 452;"><span id="cb16-453"><a href="#cb16-453" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb16-454"><a href="#cb16-454" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> d <span class="op">=</span> vrCrnDemo</span>
+<span id="cb16-455"><a href="#cb16-455" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> []</span>
+<span id="cb16-456"><a href="#cb16-456" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> c <span class="kw">of</span> d<span class="op">.</span><span class="at">highlighted</span>) {</span>
+<span id="cb16-457"><a href="#cb16-457" aria-hidden="true" tabindex="-1"></a>    rows<span class="op">.</span><span class="fu">push</span>([c<span class="op">,</span> d<span class="op">.</span><span class="at">wait1</span>[c <span class="op">-</span> <span class="dv">1</span>]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="op">,</span> d<span class="op">.</span><span class="at">wait2</span>[c <span class="op">-</span> <span class="dv">1</span>]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)<span class="op">,</span> (d<span class="op">.</span><span class="at">wait1</span>[c <span class="op">-</span> <span class="dv">1</span>] <span class="op">-</span> d<span class="op">.</span><span class="at">wait2</span>[c <span class="op">-</span> <span class="dv">1</span>])<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">3</span>)])</span>
+<span id="cb16-458"><a href="#cb16-458" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-459"><a href="#cb16-459" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> VM<span class="op">.</span><span class="at">ui</span><span class="op">.</span><span class="fu">renderTable</span>({html<span class="op">,</span> rows<span class="op">,</span> <span class="dt">headers</span><span class="op">:</span> [<span class="st">"Customer"</span><span class="op">,</span> <span class="st">"System 1"</span><span class="op">,</span> <span class="st">"System 2"</span><span class="op">,</span> <span class="st">"Difference"</span>]<span class="op">,</span> <span class="dt">filename</span><span class="op">:</span> <span class="st">"paired-waits.csv"</span>})</span>
+<span id="cb16-460"><a href="#cb16-460" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div id="ojs-cell-16" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+<section id="when-to-use-common-random-numbers" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-common-random-numbers">When to Use Common Random Numbers</h3>
+<p>CRN is most effective when:</p>
+<ol type="1">
+<li><p><strong>Comparing Similar Systems</strong>: The systems should respond similarly to the same random inputs, creating positive correlation.</p></li>
+<li><p><strong>Paired Comparisons</strong>: When comparing multiple alternatives, use the same random numbers across all alternatives.</p></li>
+<li><p><strong>Sensitivity Analysis</strong>: When studying how parameters affect system performance, CRN isolates the effect of parameter changes from random noise.</p></li>
+</ol>
+<p><strong>Implementation Tips</strong>:</p>
+<ol type="1">
+<li><p><strong>Synchronization</strong>: Ensure random numbers are used for the same purposes in both systems (e.g., the i-th arrival in both systems uses the same random number).</p></li>
+<li><p><strong>Random Streams</strong>: Use separate random number streams for different sources of randomness (e.g., arrivals vs.&nbsp;service times).</p></li>
+<li><p><strong>Variance Reduction Magnitude</strong>: The reduction depends on the correlation between <span class="math inline">\(f(X)\)</span> and <span class="math inline">\(g(X)\)</span>. Higher correlation yields greater reduction.</p></li>
+</ol>
+<p><strong>Limitations</strong>:</p>
+<ul>
+<li>CRN may not help (or could hurt) if the systems respond very differently to the same inputs</li>
+<li>Requires careful implementation to maintain proper synchronization</li>
+<li>May be complex to implement in large-scale simulations</li>
+</ul>
+</section>
+<section id="summary-of-variance-reduction-methods" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-variance-reduction-methods">Summary of Variance Reduction Methods</h3>
+<ol type="1">
+<li><strong>Importance Sampling</strong>:
+<ul>
+<li>Best for rare events or when integrand is concentrated in specific regions</li>
+<li>Requires careful choice of proposal distribution</li>
+<li>Can achieve dramatic variance reduction but may fail catastrophically with poor proposals</li>
+</ul></li>
+<li><strong>Antithetic Variates</strong>:
+<ul>
+<li>Simple to implement for monotonic functions</li>
+<li>Guaranteed variance reduction (never worse than standard MC)</li>
+<li>Limited to specific function types and typically modest improvements</li>
+</ul></li>
+<li><strong>Control Variates</strong>:
+<ul>
+<li>Requires finding correlated functions with known expectations</li>
+<li>Can be very effective when good control variates are available</li>
+<li>Performance depends on correlation strength and optimal β selection</li>
+</ul></li>
+<li><strong>Common Random Numbers</strong>:
+<ul>
+<li>Ideal for comparing similar systems or policies</li>
+<li>Easy to implement in many simulation contexts</li>
+<li>Effectiveness depends on positive correlation between systems</li>
+</ul></li>
+</ol>
+<p>Each method has its strengths and ideal use cases. In practice, these methods can often be combined for even greater variance reduction.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlZNID0gd2luZG93LlZNXG52bVRoZW1lID0gR2VuZXJhdG9ycy5vYnNlcnZlKG5vdGlmeSA9PiBWTS5wbG90dGluZy5vblRoZW1lQ2hhbmdlKG5vdGlmeSkpXG5jaGFydENvbG9ycyA9IFZNLnBsb3R0aW5nLmNvbG9ycyh2bVRoZW1lKVxuXG4vLyBUaGUgc2ltdWxhdGlvbnMgdGhlbXNlbHZlcyBsaXZlIGluIG1ldGhvZC5qcywgd2hlcmVcbi8vIG1ldGhvZC50ZXN0LmpzIGNoZWNrcyB0aGVtIGFnYWluc3QgdGhlb3J5LlxuaW1wb3J0IHtydW5uaW5nQXZlcmFnZSwgaW1wb3J0YW5jZVRhaWxFc3RpbWF0ZSwgY29udHJvbFZhcmlhdGVTdHVkeSwgYW50aXRoZXRpY1N0dWR5LCBjcm5TdHVkeSwgY3JuRGVtb1N0dWR5fSBmcm9tIFwiLi9tZXRob2QuanNcIlxuXG4vLyBJbmRpY2VzIDEuLm4sIGZvciB4LWF4ZXMgY291bnRpbmcgc2FtcGxlcy5cbmZ1bmN0aW9uIHZyQ291bnRzKG4pIHtcbiAgY29uc3Qgb3V0ID0gW11cbiAgZm9yIChsZXQgaSA9IDE7IGkgPD0gbjsgaSsrKSBvdXQucHVzaChpKVxuICByZXR1cm4gb3V0XG59XG5cbi8vIEEgcnVubmluZy1hdmVyYWdlIGNoYXJ0OiBvbmUgbGluZSBwZXIgZXN0aW1hdG9yIHBsdXMgdGhlIHRydWUgdmFsdWUuXG5mdW5jdGlvbiB2ckNvbnZlcmdlbmNlRmlndXJlKHBsb3QsIHNlcmllcywgdHJ1ZVZhbHVlLCB4VGl0bGUsIHRpdGxlLCB5UmFuZ2UpIHtcbiAgY29uc3QgbiA9IHNlcmllc1swXS52YWx1ZXMubGVuZ3RoXG4gIGNvbnN0IHRyYWNlcyA9IFtdXG4gIGZvciAoY29uc3QgcyBvZiBzZXJpZXMpIHtcbiAgICB0cmFjZXMucHVzaCh7eDogdnJDb3VudHMobiksIHk6IHMudmFsdWVzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBzLm5hbWUsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnNbcy5jb2xvcl0sIHdpZHRoOiAyfX0pXG4gIH1cbiAgdHJhY2VzLnB1c2goe3g6IFsxLCBuXSwgeTogW3RydWVWYWx1ZSwgdHJ1ZVZhbHVlXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIixcbiAgICBuYW1lOiBgVHJ1ZSB2YWx1ZTogJHt0cnVlVmFsdWUudG9GaXhlZCg2KX1gLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmluaywgZGFzaDogXCJkYXNoXCIsIHdpZHRoOiAyfX0pXG4gIGNvbnN0IHlheGlzID0ge3RpdGxlOiBcIlJ1bm5pbmcgYXZlcmFnZVwifVxuICBpZiAoeVJhbmdlKSB5YXhpcy5yYW5nZSA9IHlSYW5nZVxuICByZXR1cm4gVk0ucGxvdHRpbmcucGxvdFdpdGhMZWdlbmQocGxvdCwgdHJhY2VzLCB7dGl0bGU6IHt0ZXh0OiB0aXRsZX0sIG1hcmdpbjoge3Q6IDQwfSwgeGF4aXM6IHt0aXRsZTogeFRpdGxlfSwgeWF4aXN9KVxufVxuXG52cklzUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiNDIwcHhcIn0pXG5cbi8vIEVzdGltYXRlIFAoWCA+IDIpIGZvciBYIH4gTigwLCAxKSwgd2l0aCBOID0gNDAwMCBzYW1wbGVzIGVhY2ggd2F5LlxudnJJbXBvcnRhbmNlID0gaW1wb3J0YW5jZVRhaWxFc3RpbWF0ZShWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oNDIpLCA0MDAwKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCByID0gdnJJbXBvcnRhbmNlXG4gIHJldHVybiB2ckNvbnZlcmdlbmNlRmlndXJlKHZySXNQbG90LCBbXG4gICAge25hbWU6IFwiQ3J1ZGUgTUNcIiwgdmFsdWVzOiBydW5uaW5nQXZlcmFnZShyLmNydWRlKSwgY29sb3I6IFwiZm5cIn0sXG4gICAge25hbWU6IFwiSW1wb3J0YW5jZSBzYW1wbGluZ1wiLCB2YWx1ZXM6IHJ1bm5pbmdBdmVyYWdlKHIud2VpZ2h0ZWQpLCBjb2xvcjogXCJ3YXJuXCJ9XG4gIF0sIHIudHJ1ZVZhbHVlLCBcIk51bWJlciBvZiBzYW1wbGVzXCIsIFwiSW1wb3J0YW5jZSBzYW1wbGluZyB2cy4gY3J1ZGUgTW9udGUgQ2FybG9cIiwgWzAsIDAuMDRdKVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCByID0gdnJJbXBvcnRhbmNlXG4gIGNvbnN0IHJvd3MgPSBbXVxuICBmb3IgKGNvbnN0IFtuYW1lLCBzdGF0c10gb2YgW1tcIkltcG9ydGFuY2Ugc2FtcGxpbmdcIiwgci5pc1N0YXRzXSwgW1wiQ3J1ZGUgTW9udGUgQ2FybG9cIiwgci5jcnVkZVN0YXRzXV0pIHtcbiAgICAvLyBWYXJpYW5jZSBvZiB0aGUgZXN0aW1hdG9yICh0aGUgc2FtcGxlIG1lYW4pLCBhbmQgaXRzIHJlbGF0aXZlIGVycm9yLlxuICAgIGNvbnN0IHZhcmlhbmNlID0gc3RhdHMudmFyaWFuY2UgLyByLk5cbiAgICByb3dzLnB1c2goW25hbWUsIHN0YXRzLm1lYW4udG9GaXhlZCg1KSwgdmFyaWFuY2UudG9FeHBvbmVudGlhbCgyKSwgKE1hdGguc3FydCh2YXJpYW5jZSkgLyBzdGF0cy5tZWFuKS50b0ZpeGVkKDMpXSlcbiAgfVxuICBjb25zdCBmYWN0b3IgPSByLmNydWRlU3RhdHMudmFyaWFuY2UgLyByLmlzU3RhdHMudmFyaWFuY2VcbiAgcmV0dXJuIGh0bWxgJHtWTS51aS5yZW5kZXJUYWJsZSh7aHRtbCwgcm93cywgaGVhZGVyczogW1wiTWV0aG9kXCIsIFwiRXN0aW1hdGVcIiwgXCJWYXJpYW5jZVwiLCBcIlJlbGF0aXZlIGVycm9yXCJdLCBmaWxlbmFtZTogXCJpbXBvcnRhbmNlLXNhbXBsaW5nLmNzdlwifSl9XG4gICAgJHtWTS51aS5zdGF0Um93KFt7bGFiZWw6IFwiVHJ1ZSB2YWx1ZVwiLCB2YWx1ZTogci50cnVlVmFsdWUudG9GaXhlZCg1KX0sIHtsYWJlbDogXCJWYXJpYW5jZSByZWR1Y3Rpb24gZmFjdG9yXCIsIHZhbHVlOiBgJHtmYWN0b3IudG9GaXhlZCgxKX3Dl2B9XSl9YFxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC00IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidnJDdlBsb3QgPSBWTS5wbG90dGluZy5wZXJzaXN0ZW50UGxvdCh7aGVpZ2h0OiBcIjQyMHB4XCJ9KVxudnJDdkNvbnZlcmdlbmNlUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiNDIwcHhcIn0pXG5cbi8vIEVzdGltYXRlIHRoZSBpbnRlZ3JhbCBvZiB4IGVeey14fSBvdmVyIFswLCAxXSB3aXRoIHRoZSBjb250cm9sIGgoeCkgPSB4LlxudnJDb250cm9sID0gY29udHJvbFZhcmlhdGVTdHVkeShWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oNDIpLCAxMDAwLCAxMDApXG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTUiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ7XG4gIGNvbnN0IHIgPSB2ckNvbnRyb2xcbiAgY29uc3QgYmV0YXMgPSBbXSwgdmFyaWFuY2VzID0gW10sIHRlc3RlZEJldGFzID0gW10sIHRlc3RlZFZhcmlhbmNlcyA9IFtdXG4gIGZvciAoY29uc3QgcG9pbnQgb2Ygci5jdXJ2ZSkge1xuICAgIGJldGFzLnB1c2gocG9pbnQuYmV0YSlcbiAgICB2YXJpYW5jZXMucHVzaChwb2ludC52YXJpYW5jZSlcbiAgfVxuICBmb3IgKGNvbnN0IHBvaW50IG9mIHIudGVzdGVkKSB7XG4gICAgdGVzdGVkQmV0YXMucHVzaChwb2ludC5iZXRhKVxuICAgIHRlc3RlZFZhcmlhbmNlcy5wdXNoKHBvaW50LnZhcmlhbmNlKVxuICB9XG4gIHJldHVybiBWTS5wbG90dGluZy5wbG90V2l0aExlZ2VuZCh2ckN2UGxvdCwgW1xuICAgIHt4OiBiZXRhcywgeTogdmFyaWFuY2VzLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLCBuYW1lOiBcIlZhcmlhbmNlXCIsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMuZm4sIHdpZHRoOiAyfX0sXG4gICAge3g6IHRlc3RlZEJldGFzLCB5OiB0ZXN0ZWRWYXJpYW5jZXMsIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcIm1hcmtlcnNcIiwgbmFtZTogXCJUZXN0ZWQgzrJcIiwgbWFya2VyOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmFsdCwgc2l6ZTogOX19LFxuICAgIHt4OiBbLTAuNSwgMV0sIHk6IFtyLnN0YW5kYXJkLnZhcmlhbmNlLCByLnN0YW5kYXJkLnZhcmlhbmNlXSwgdHlwZTogXCJzY2F0dGVyXCIsIG1vZGU6IFwibGluZXNcIiwgbmFtZTogXCJTdGFuZGFyZCBNQyB2YXJpYW5jZVwiLFxuICAgICAgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy53YXJuLCBkYXNoOiBcImRhc2hcIiwgd2lkdGg6IDJ9fSxcbiAgICB7eDogW3IuYmV0YUVzdCwgci5iZXRhRXN0XSwgeTogWzAsIE1hdGgubWF4KC4uLnZhcmlhbmNlcyldLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lc1wiLFxuICAgICAgbmFtZTogYEVzdGltYXRlZCBvcHRpbWFsIM6yID0gJHtyLmJldGFFc3QudG9GaXhlZCgzKX1gLCBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLm9rLCBkYXNoOiBcImRvdFwiLCB3aWR0aDogMn19XG4gIF0sIHt0aXRsZToge3RleHQ6IFwiQ29udHJvbCB2YXJpYXRlIHZhcmlhbmNlIGFzIGEgZnVuY3Rpb24gb2YgzrJcIn0sIG1hcmdpbjoge3Q6IDQwfSwgeGF4aXM6IHt0aXRsZTogXCLOslwifSwgeWF4aXM6IHt0aXRsZTogXCJWYXJpYW5jZVwiLCByYW5nZW1vZGU6IFwidG96ZXJvXCJ9fSlcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtNiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgciA9IHZyQ29udHJvbFxuICBjb25zdCByb3dzID0gW11cbiAgZm9yIChjb25zdCBwb2ludCBvZiByLnRlc3RlZCkge1xuICAgIHJvd3MucHVzaChbcG9pbnQuYmV0YS50b0ZpeGVkKDMpLCBwb2ludC5lc3RpbWF0ZS50b0ZpeGVkKDYpLCBwb2ludC52YXJpYW5jZS50b0V4cG9uZW50aWFsKDYpLFxuICAgICAgYCR7KHIuc3RhbmRhcmQudmFyaWFuY2UgLyBwb2ludC52YXJpYW5jZSkudG9GaXhlZCgyKX3Dl2BdKVxuICB9XG4gIHJldHVybiBodG1sYCR7Vk0udWkuc3RhdFJvdyhbXG4gICAgICB7bGFiZWw6IFwiVHJ1ZSB2YWx1ZVwiLCB2YWx1ZTogci50cnVlVmFsdWUudG9GaXhlZCg2KX0sXG4gICAgICB7bGFiZWw6IFwiU3RhbmRhcmQgTUMgZXN0aW1hdGVcIiwgdmFsdWU6IHIuc3RhbmRhcmQuZXN0aW1hdGUudG9GaXhlZCg2KX0sXG4gICAgICB7bGFiZWw6IFwiU3RhbmRhcmQgTUMgdmFyaWFuY2VcIiwgdmFsdWU6IHIuc3RhbmRhcmQudmFyaWFuY2UudG9FeHBvbmVudGlhbCg2KX1cbiAgICBdKX1cbiAgICAke1ZNLnVpLnJlbmRlclRhYmxlKHtodG1sLCByb3dzLCBoZWFkZXJzOiBbXCLOslwiLCBcIkVzdGltYXRlXCIsIFwiVmFyaWFuY2VcIiwgXCJSZWR1Y3Rpb25cIl0sIGZpbGVuYW1lOiBcImNvbnRyb2wtdmFyaWF0ZXMuY3N2XCJ9KX1gXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTciLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ2ckNvbnZlcmdlbmNlRmlndXJlKHZyQ3ZDb252ZXJnZW5jZVBsb3QsIFtcbiAge25hbWU6IFwiU3RhbmRhcmQgTW9udGUgQ2FybG9cIiwgdmFsdWVzOiB2ckNvbnRyb2wucnVubmluZ1N0YW5kYXJkLCBjb2xvcjogXCJmblwifSxcbiAge25hbWU6IGBDb250cm9sIHZhcmlhdGUgKM6yID0gJHt2ckNvbnRyb2wuYmV0YUVzdC50b0ZpeGVkKDMpfSlgLCB2YWx1ZXM6IHZyQ29udHJvbC5ydW5uaW5nQ29udHJvbCwgY29sb3I6IFwid2FyblwifVxuXSwgdnJDb250cm9sLnRydWVWYWx1ZSwgXCJOdW1iZXIgb2Ygc2FtcGxlc1wiLCBcIkNvbnZlcmdlbmNlOiBzdGFuZGFyZCBNQyB2cy4gY29udHJvbCB2YXJpYXRlc1wiKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC04IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidnJBbnRpdGhldGljUGxvdCA9IFZNLnBsb3R0aW5nLnBlcnNpc3RlbnRQbG90KHtoZWlnaHQ6IFwiNDIwcHhcIn0pXG5cbi8vIEVzdGltYXRlIHRoZSBpbnRlZ3JhbCBvZiAxIC8gKDEgKyB4wrIpIG92ZXIgWzAsIDFdIHdpdGggTiA9IDIwMCBzYW1wbGVzLlxudnJBbnRpdGhldGljID0gYW50aXRoZXRpY1N0dWR5KFZNLnNhbXBsaW5nLnNlZWRlZFJhbmRvbSg0MiksIDIwMClcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtOSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InZyQ29udmVyZ2VuY2VGaWd1cmUodnJBbnRpdGhldGljUGxvdCwgW1xuICB7bmFtZTogXCJTdGFuZGFyZCBNb250ZSBDYXJsb1wiLCB2YWx1ZXM6IHZyQW50aXRoZXRpYy5ydW5uaW5nU3RhbmRhcmQsIGNvbG9yOiBcImZuXCJ9LFxuICB7bmFtZTogXCJBbnRpdGhldGljIHZhcmlhdGVzXCIsIHZhbHVlczogdnJBbnRpdGhldGljLnJ1bm5pbmdBbnRpdGhldGljLCBjb2xvcjogXCJ3YXJuXCJ9XG5dLCB2ckFudGl0aGV0aWMudHJ1ZVZhbHVlLCBcIk51bWJlciBvZiBzYW1wbGUgcGFpcnNcIiwgXCJDb252ZXJnZW5jZTogc3RhbmRhcmQgTUMgdnMuIGFudGl0aGV0aWMgdmFyaWF0ZXNcIilcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTAiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ7XG4gIGNvbnN0IHIgPSB2ckFudGl0aGV0aWNcbiAgY29uc3Qgcm93cyA9IFtcbiAgICBbXCJTdGFuZGFyZCBNb250ZSBDYXJsb1wiLCByLnN0YW5kYXJkLmVzdGltYXRlLnRvRml4ZWQoNiksIHIuc3RhbmRhcmQudmFyaWFuY2UudG9FeHBvbmVudGlhbCg2KV0sXG4gICAgW1wiQW50aXRoZXRpYyB2YXJpYXRlc1wiLCByLmFudGl0aGV0aWMuZXN0aW1hdGUudG9GaXhlZCg2KSwgci5hbnRpdGhldGljLnZhcmlhbmNlLnRvRXhwb25lbnRpYWwoNildXG4gIF1cbiAgcmV0dXJuIGh0bWxgJHtWTS51aS5yZW5kZXJUYWJsZSh7aHRtbCwgcm93cywgaGVhZGVyczogW1wiTWV0aG9kXCIsIFwiRXN0aW1hdGVcIiwgXCJWYXJpYW5jZVwiXSwgZmlsZW5hbWU6IFwiYW50aXRoZXRpYy12YXJpYXRlcy5jc3ZcIn0pfVxuICAgICR7Vk0udWkuc3RhdFJvdyhbe2xhYmVsOiBcIlRydWUgdmFsdWVcIiwgdmFsdWU6IHIudHJ1ZVZhbHVlLnRvRml4ZWQoNil9LFxuICAgICAge2xhYmVsOiBcIlZhcmlhbmNlIHJlZHVjdGlvbiBmYWN0b3JcIiwgdmFsdWU6IGAkeyhyLnN0YW5kYXJkLnZhcmlhbmNlIC8gci5hbnRpdGhldGljLnZhcmlhbmNlKS50b0ZpeGVkKDIpfcOXYH1dKX1gXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTExIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidnJBcnJpdmFsUmF0ZSA9IDFcbnZyU2VydmljZVJhdGVzID0gWzEuNSwgMl1cblxuLy8gMTAwIHJlcGxpY2F0aW9ucyBvZiAxMDAwIGN1c3RvbWVyczogdGhlIGRpZmZlcmVuY2UgaW4gbWVhbiB3YWl0aW5nIHRpbWVcbi8vIGJldHdlZW4gdGhlIHR3byBzeXN0ZW1zLCB3aXRoIGNvbW1vbiByYW5kb20gbnVtYmVycyBhbmQgd2l0aCBpbmRlcGVuZGVudCBvbmVzLlxudnJDcm4gPSBjcm5TdHVkeShWTS5zYW1wbGluZy5zZWVkZWRSYW5kb20oNDIpLCAxMDAwLCAxMDAsIHZyQXJyaXZhbFJhdGUsIHZyU2VydmljZVJhdGVzWzBdLCB2clNlcnZpY2VSYXRlc1sxXSlcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMTIiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJ7XG4gIGNvbnN0IHIgPSB2ckNyblxuICBjb25zdCByb3dzID0gW11cbiAgZm9yIChjb25zdCBbbmFtZSwgc3RhdHNdIG9mIFtbXCJDb21tb24gcmFuZG9tIG51bWJlcnNcIiwgci5jcm5dLCBbXCJJbmRlcGVuZGVudCBzYW1wbGluZ1wiLCByLmluZGVwZW5kZW50XV0pIHtcbiAgICByb3dzLnB1c2goW25hbWUsIHN0YXRzLm1lYW4udG9GaXhlZCg0KSwgc3RhdHMudmFyaWFuY2UudG9GaXhlZCg2KSwgc3RhdHMuc2QudG9GaXhlZCg0KV0pXG4gIH1cbiAgcmV0dXJuIGh0bWxgJHtWTS51aS5zdGF0Um93KFtcbiAgICAgIHtsYWJlbDogYFN5c3RlbSAxICjOvCA9ICR7dnJTZXJ2aWNlUmF0ZXNbMF19KWAsIHZhbHVlOiByLnRoZW9yeVswXS50b0ZpeGVkKDQpLCB0aXRsZTogXCLOuyAvICjOvCjOvCDiiJIgzrspKSwgdGhlIHN0ZWFkeS1zdGF0ZSBtZWFuIHdhaXQgaW4gcXVldWVcIn0sXG4gICAgICB7bGFiZWw6IGBTeXN0ZW0gMiAozrwgPSAke3ZyU2VydmljZVJhdGVzWzFdfSlgLCB2YWx1ZTogci50aGVvcnlbMV0udG9GaXhlZCg0KSwgdGl0bGU6IFwizrsgLyAozrwozrwg4oiSIM67KSksIHRoZSBzdGVhZHktc3RhdGUgbWVhbiB3YWl0IGluIHF1ZXVlXCJ9LFxuICAgICAge2xhYmVsOiBcIlRoZW9yZXRpY2FsIGRpZmZlcmVuY2VcIiwgdmFsdWU6IChyLnRoZW9yeVswXSAtIHIudGhlb3J5WzFdKS50b0ZpeGVkKDQpfSxcbiAgICAgIHtsYWJlbDogXCJWYXJpYW5jZSByZWR1Y3Rpb24gZmFjdG9yXCIsIHZhbHVlOiBgJHsoci5pbmRlcGVuZGVudC52YXJpYW5jZSAvIHIuY3JuLnZhcmlhbmNlKS50b0ZpeGVkKDIpfcOXYH1cbiAgICBdKX1cbiAgICAke1ZNLnVpLnJlbmRlclRhYmxlKHtodG1sLCByb3dzLCBoZWFkZXJzOiBbYE1ldGhvZCAoJHtyLnJlcGxpY2F0aW9uc30gcmVwbGljYXRpb25zKWAsIFwiTWVhbiBkaWZmZXJlbmNlXCIsIFwiVmFyaWFuY2VcIiwgXCJTdGQgZGV2aWF0aW9uXCJdLCBmaWxlbmFtZTogXCJjb21tb24tcmFuZG9tLW51bWJlcnMuY3N2XCJ9KX1gXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTEzIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidnJDb3JyZWxhdGlvblBsb3QgPSBWTS5wbG90dGluZy5wZXJzaXN0ZW50UGxvdCh7aGVpZ2h0OiBcIjQ0MHB4XCJ9KVxudnJQYWlyZWRQbG90ID0gVk0ucGxvdHRpbmcucGVyc2lzdGVudFBsb3Qoe2hlaWdodDogXCI0NDBweFwifSlcblxudnJDcm5EZW1vID0ge1xuICBjb25zdCBkZW1vID0gY3JuRGVtb1N0dWR5KFZNLnNhbXBsaW5nLnNlZWRlZFJhbmRvbSg3KSwgdnJTZXJ2aWNlUmF0ZXNbMF0sIHZyU2VydmljZVJhdGVzWzFdKVxuICByZXR1cm4gey4uLmRlbW8sIGhpZ2hsaWdodGVkOiBbMTAsIDI1LCA0MF19XG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTE0IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoie1xuICBjb25zdCBkID0gdnJDcm5EZW1vXG4gIGNvbnN0IGxvID0gTWF0aC5taW4oLi4uZC5kZW1vMSksIGhpID0gTWF0aC5tYXgoLi4uZC5kZW1vMSlcbiAgcmV0dXJuIFZNLnBsb3R0aW5nLnBsb3RXaXRoTGVnZW5kKHZyQ29ycmVsYXRpb25QbG90LCBbXG4gICAge3g6IGQuZGVtbzEsIHk6IGQuZGVtbzIsIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcIm1hcmtlcnNcIiwgbmFtZTogXCJDdXN0b21lcnNcIiwgbWFya2VyOiB7Y29sb3I6IFZNLnBsb3R0aW5nLmFscGhhKGNoYXJ0Q29sb3JzLmZuLCAwLjYpLCBzaXplOiA3fX0sXG4gICAge3g6IFtsbywgaGldLCB5OiBbZC5maXQuc2xvcGUgKiBsbyArIGQuZml0LmludGVyY2VwdCwgZC5maXQuc2xvcGUgKiBoaSArIGQuZml0LmludGVyY2VwdF0sIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzXCIsXG4gICAgICBuYW1lOiBgTGluZWFyIGZpdCAoeSA9ICR7ZC5maXQuc2xvcGUudG9GaXhlZCgyKX14ICsgJHtkLmZpdC5pbnRlcmNlcHQudG9GaXhlZCgyKX0pYCwgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy5hbHQsIGRhc2g6IFwiZGFzaFwiLCB3aWR0aDogMn19XG4gIF0sIHt0aXRsZToge3RleHQ6IGBDb3JyZWxhdGlvbiBiZXR3ZWVuIHN5c3RlbXMgKM+BID0gJHtkLmNvcnJlbGF0aW9uLnRvRml4ZWQoMyl9KWB9LCBtYXJnaW46IHt0OiA0MH0sXG4gICAgeGF4aXM6IHt0aXRsZTogXCJXYWl0aW5nIHRpbWUsIHN5c3RlbSAxXCJ9LCB5YXhpczoge3RpdGxlOiBcIldhaXRpbmcgdGltZSwgc3lzdGVtIDJcIn19KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0xNSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgZCA9IHZyQ3JuRGVtb1xuICBjb25zdCBjdXN0b21lcnMgPSB2ckNvdW50cyhkLndhaXQxLmxlbmd0aClcbiAgY29uc3Qgc2hhcGVzID0gW10sIGFubm90YXRpb25zID0gW11cbiAgZm9yIChjb25zdCBjIG9mIGQuaGlnaGxpZ2h0ZWQpIHtcbiAgICBzaGFwZXMucHVzaCh7dHlwZTogXCJsaW5lXCIsIHgwOiBjLCB4MTogYywgeXJlZjogXCJwYXBlclwiLCB5MDogMCwgeTE6IDEsIGxpbmU6IHtjb2xvcjogY2hhcnRDb2xvcnMubXV0ZWQsIGRhc2g6IFwiZG90XCIsIHdpZHRoOiAxfX0pXG4gICAgLy8gQW4gYXJyb3cgc3Bhbm5pbmcgdGhlIHBhaXJlZCBkaWZmZXJlbmNlIGZvciB0aGlzIGN1c3RvbWVyLlxuICAgIGFubm90YXRpb25zLnB1c2goe3g6IGMsIHk6IGQud2FpdDJbYyAtIDFdLCBheDogYywgYXk6IGQud2FpdDFbYyAtIDFdLCBheHJlZjogXCJ4XCIsIGF5cmVmOiBcInlcIiwgc2hvd2Fycm93OiB0cnVlLFxuICAgICAgYXJyb3doZWFkOiAyLCBhcnJvd3NpZGU6IFwiZW5kK3N0YXJ0XCIsIGFycm93Y29sb3I6IGNoYXJ0Q29sb3JzLmFsdCwgdGV4dDogXCJcIn0pXG4gIH1cbiAgcmV0dXJuIFZNLnBsb3R0aW5nLnBsb3RXaXRoTGVnZW5kKHZyUGFpcmVkUGxvdCwgW1xuICAgIHt4OiBjdXN0b21lcnMsIHk6IGQud2FpdDEsIHR5cGU6IFwic2NhdHRlclwiLCBtb2RlOiBcImxpbmVzK21hcmtlcnNcIiwgbmFtZTogYFN5c3RlbSAxICjOvCA9ICR7dnJTZXJ2aWNlUmF0ZXNbMF19KWAsXG4gICAgICBsaW5lOiB7Y29sb3I6IGNoYXJ0Q29sb3JzLmZuLCB3aWR0aDogMX0sIG1hcmtlcjoge3NpemU6IDV9fSxcbiAgICB7eDogY3VzdG9tZXJzLCB5OiBkLndhaXQyLCB0eXBlOiBcInNjYXR0ZXJcIiwgbW9kZTogXCJsaW5lcyttYXJrZXJzXCIsIG5hbWU6IGBTeXN0ZW0gMiAozrwgPSAke3ZyU2VydmljZVJhdGVzWzFdfSlgLFxuICAgICAgbGluZToge2NvbG9yOiBjaGFydENvbG9ycy53YXJuLCB3aWR0aDogMX0sIG1hcmtlcjoge3NpemU6IDUsIHN5bWJvbDogXCJzcXVhcmVcIn19XG4gIF0sIHt0aXRsZToge3RleHQ6IFwiUGFpcmVkIHdhaXQgdGltZXMgd2l0aCBjb21tb24gcmFuZG9tIG51bWJlcnNcIn0sIG1hcmdpbjoge3Q6IDQwfSxcbiAgICB4YXhpczoge3RpdGxlOiBcIkN1c3RvbWVyIG51bWJlclwifSwgeWF4aXM6IHt0aXRsZTogXCJXYWl0aW5nIHRpbWVcIn0sIHNoYXBlcywgYW5ub3RhdGlvbnN9KVxufVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0xNiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IntcbiAgY29uc3QgZCA9IHZyQ3JuRGVtb1xuICBjb25zdCByb3dzID0gW11cbiAgZm9yIChjb25zdCBjIG9mIGQuaGlnaGxpZ2h0ZWQpIHtcbiAgICByb3dzLnB1c2goW2MsIGQud2FpdDFbYyAtIDFdLnRvRml4ZWQoMyksIGQud2FpdDJbYyAtIDFdLnRvRml4ZWQoMyksIChkLndhaXQxW2MgLSAxXSAtIGQud2FpdDJbYyAtIDFdKS50b0ZpeGVkKDMpXSlcbiAgfVxuICByZXR1cm4gVk0udWkucmVuZGVyVGFibGUoe2h0bWwsIHJvd3MsIGhlYWRlcnM6IFtcIkN1c3RvbWVyXCIsIFwiU3lzdGVtIDFcIiwgXCJTeXN0ZW0gMlwiLCBcIkRpZmZlcmVuY2VcIl0sIGZpbGVuYW1lOiBcInBhaXJlZC13YWl0cy5jc3ZcIn0pXG59XG4ifV19
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../variance-reduction";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/apurvanakade\.github\.io\/Monte-Carlo-Methods");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="dark">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      if (authorPrefersDark) {
+          [baseTheme, altTheme] = [altTheme, baseTheme];
+      }
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "apurvanakade/Monte-Carlo-Methods";
+    script.dataset.repoId = "R_kgDOPX0lZg";
+    script.dataset.category = "General";
+    script.dataset.categoryId = "DIC_kwDOPX0lZs4DIeN8";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "top";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../mh/index.html" class="pagination-link" aria-label="Metropolis--Hastings Algorithm">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Metropolis–Hastings Algorithm</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../sde/index.html" class="pagination-link" aria-label="Stochastic Differential Equations">
+        <span class="nav-page-text">Stochastic Differential Equations</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2025 Apurva Nakade. All rights reserved.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
