@@ -1,6 +1,6 @@
 # Maintainer review prompt
 
-The prompt `ship-pr` step 3 gives a fresh `general-purpose` agent to review
+The prompt `ship-pr` step 3 gives a fresh `general-purpose` agent (on Sonnet) to review
 every PR. Fill in `<N>` and `<worktree>`, then pass the whole block below the
 line as the agent's prompt, unchanged otherwise. Don't add any background
 about the change: the reviewer should come to the PR the way a maintainer
@@ -21,7 +21,7 @@ diff, its description and the code around it.
 1. `<worktree>/CLAUDE.md`, all of it. It is the conventions document; most
    real problems in this book are a convention broken.
 2. The owner's recorded preferences: every file in
-   `/Users/apurvanakade/.claude/projects/-Users-apurvanakade-Github-Monte-Carlo-Methods/memory/`
+   `/Users/apurvanakade/.claude/projects/-Users-apurvanakade-Github-teaching-Monte-Carlo-Methods/memory/`
    whose frontmatter says `type: feedback`. A memory marked SUPERSEDED no
    longer applies. There may be none.
 3. For each kind of file the diff touches, one untouched neighbour of the same
