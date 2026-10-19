@@ -45,11 +45,14 @@ test('lShapeRuns: chains stay in the region, acceptance falls as sigma grows pas
     rates.push(run.chain.acceptedCount / 9999)
   }
   // A tiny step is almost always accepted; a step far larger than the arm
-  // width (0.1) is almost always rejected (the page quotes ~0.3 for 0.2).
+  // width (0.1) is almost always rejected. The prose quotes about 0.07 for
+  // sigma 0.5 and about 0.19 for 0.2, the area of the L-shape, which is
+  // the acceptance rate of rejection sampling in the unit square.
   assert.ok(rates[3] > 0.9, `sigma 0.01 rate ${rates[3]}`)
   assert.ok(rates[0] < 0.1, `sigma 1 rate ${rates[0]}`)
   assert.ok(rates[0] < rates[1] && rates[1] < rates[2] && rates[2] < rates[3], rates.join(','))
-  assert.ok(rates[2] > 0.15 && rates[2] < 0.45, `sigma 0.2 rate ${rates[2]}`)
+  assert.ok(Math.abs(rates[1] - 0.07) < 0.01, `sigma 0.5 rate ${rates[1]}`)
+  assert.ok(Math.abs(rates[2] - 0.19) < 0.01, `sigma 0.2 rate ${rates[2]}`)
 })
 
 test('regionWalk: uniform target, running mean approaches the region mean; deterministic per seed', () => {

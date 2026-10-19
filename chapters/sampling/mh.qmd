@@ -442,13 +442,13 @@ rwAcfPlot = VM.plotting.persistentPlot({height: "320px"})
 Notice that there is a tradeoff between the acceptance rate and the rate of convergence. In the above example, 
 
 - The proposal distribution with $\sigma = 1$ has the lowest acceptance rate but the samples are well spread out and the underlying markov chain converges quickly.
-- The proposal distribution with $\sigma = 0.01$ has the highest acceptance rate but the samples are clustered and the underlying markov chain converges slowly. In the above simulation, even after $10^5$ samples (most of which are accepted), the samples are still clustered.
+- The proposal distribution with $\sigma = 0.01$ has the highest acceptance rate but the samples are clustered and the underlying markov chain converges slowly. In the above simulation, even after $10^4$ samples (most of which are accepted), the samples are still clustered.
 
 Both of these are undesirable. We need to choose a proposal distribution that has a good balance between the acceptance rate and the rate of convergence. 
 
-We see that for $\sigma = 0.5$, the samples are well spread out and the underlying markov chain converges quickly to the target distribution. This is a good choice for the proposal distribution. However, the acceptance rate is $0.07$ which is lower than the acceptance rate for naive rejection sampling AND the generated samples are correlated. It is better to use rejection sampling than to use this proposal distribution.
+We see that for $\sigma = 0.5$, the samples are well spread out and the underlying markov chain converges quickly to the target distribution. However, the acceptance rate is only about $0.07$, well below the roughly $0.19$ of naive rejection sampling (the L-shape fills about $19\%$ of the unit square), AND the generated samples are correlated. For this region it is better to use rejection sampling than this proposal distribution.
 
-For $\sigma = 0.2$, the acceptance rate is $0.3$ which is better than the acceptance rate for naive rejection sampling. The samples are well spread out and the underlying markov chain converges quickly, although not as quickly as for $\sigma = 0.5.$ For this example, $\sigma = 0.2$ is a good choice for the proposal distribution. We can fine tune this parameter to get a better acceptance rate, if needed.
+For $\sigma = 0.2$, the acceptance rate is about $0.19$, roughly the same as naive rejection sampling, but the samples are correlated, so rejection sampling still wins for this simple region. The samples are well spread out and the underlying markov chain converges quickly, although not as quickly as for $\sigma = 0.5.$ Random walks pay off only when the region is far too awkward to enclose tightly in a box. We can fine tune $\sigma$ to trade acceptance rate against correlation, if needed.
 
 ## Metropolis--Hastings Algorithm
 
