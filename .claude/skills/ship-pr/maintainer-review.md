@@ -1,7 +1,7 @@
 # Maintainer review prompt
 
-The prompt `ship-pr` step 3 gives a fresh `general-purpose` agent (on Sonnet) to review
-every PR. Fill in `<N>` and `<worktree>`, then pass the whole block below the
+The prompt `ship-pr` step 2b gives a fresh `general-purpose` agent (on Sonnet)
+when Copilot can't review a PR. Fill in `<N>` and `<worktree>`, then pass the whole block below the
 line as the agent's prompt, unchanged otherwise. Don't add any background
 about the change: the reviewer should come to the PR the way a maintainer
 would, knowing the codebase but not the session that wrote it. The PR's own
