@@ -41,7 +41,6 @@ index.qmd        preface
 <slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js): the chapters
                  and appendices, e.g. estimating-pi/, mh/, probability/; served at <site>/<slug>/
 images/          static figures
-apps/            the Interactive Apps gallery: a card per app, linking to its ?embed= view
 assets/style.css site CSS (static-image sizing only — see Conventions)
 scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   the bibliography; each page prints its own cited entries under a `## References` heading
@@ -54,7 +53,7 @@ references.bib   the bibliography; each page prints its own cited entries under 
 - `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
 - `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.js` and `mathviz.css` into `<head>`. A local overlay, if one is added (below), goes *after* it: `filters: [mathviz, mathviz-local]`.
 - The `mathviz:` block turns on `referrer`, self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS. Site-only overrides go in a second SCSS file listed *after* those, setting `$vm-*` tokens.
-- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter, as `apps/index.qmd` does. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to the overlay rule below. Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
+- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to the overlay rule below. Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
 
 ### Contributing to mathviz
 
@@ -78,7 +77,6 @@ Apps live in the chapter that explains them (`estimating-pi/index.qmd` is the si
 - Layout uses mathviz's classes: `ojs-panel`, `ojs-row`/`ojs-grid`, `ojs-chart-block`, `ojs-chart-controls`; size inputs with `el.classList.add("ojs-fill" | "ojs-auto")` rather than inline styles.
 - Shareable state: read defaults with `VM.ui.urlParam("<prefix>_x", default)` and write back with `VM.ui.syncUrlParams({...})`.
 - Randomness is seeded (`VM.sampling.seededRandom(seed)`), with a "draw again" button bumping the seed, so a shared URL reproduces the same picture.
-- Add a card to `apps/index.qmd`: `path:` must be the page's folder URL with `?embed=<id>`, e.g. `../estimating-pi/?embed=pi-app` (Quarto drops a `.qmd` path that carries a query string), plus a thumbnail SVG in `apps/images/`.
 
 ## Figures
 

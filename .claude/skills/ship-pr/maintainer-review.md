@@ -51,8 +51,7 @@ read the installed copy or https://apurvanakade.github.io/mathviz/.
   chapter's tag; randomness that isn't seeded; a chart that won't re-theme
   because a color is a literal rather than `chartColors.*`; a link, image or
   `?embed=` path that will 404 on the published site.
-- A chapter added but missing from `website.sidebar` in `_quarto.yml`, or an app
-  without its card in `apps/index.qmd`.
+- A chapter added but missing from `website.sidebar` in `_quarto.yml`.
 - A CLAUDE.md convention broken, quoting the rule: `.map()/.filter()` chains
   or nested ternaries where loops are asked for, Plotly's legend instead of
   mathviz's, CSS in `assets/style.css` that isn't image sizing, a hand edit to

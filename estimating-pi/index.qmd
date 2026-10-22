@@ -7,7 +7,7 @@ execute:
   echo: false
 ---
 
-Drag the slider below to add points to the square; the fraction landing inside the circle, times 4, estimates $\pi$. The slider's play button adds them for you.
+Drag the slider below to add points to the square; the fraction landing inside the circle, times 4, estimates $\pi$. 
 
 
 ```{ojs}
@@ -24,7 +24,8 @@ chartColors = VM.plotting.colors(vmTheme)
 
 // The simulations themselves live in method.js, where
 // method.test.js checks them against theory.
-import {dropPoints, circleEstimate, circleConvergence, dropNeedles, needleCrossings, buffonEstimate} from "./method.js"
+import {dropPoints, circleEstimate, circleConvergence, dropNeedles, needleCrossings, buffonEstimate, latticeEstimate, haltonPoints,
+  checkpoints, randomCircleErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder} from "./method.js"
 ```
 
 ```{ojs}
@@ -308,12 +309,17 @@ $$
 
 Unlike $\hat\pi_N$ from the circle, this estimator is a *ratio*: it is biased for finite $N$, undefined until the first crossing, and its standard error, estimated from $\hat p = C/N$ by the delta method as $\frac{2\ell}{t}\sqrt{\frac{1 - \hat p}{N \hat p^3}}$, is larger for short needles, which cross less often.
 
+The app never uses $\pi$ to draw the angle, which would be circular. It picks a point uniformly in the unit disk, by rejection from the square exactly as in the circle method, and points the needle at it: that direction is uniform.
+
+Bend the needle and nothing changes on average. Cut any curve of length $L$ into short straight pieces; each piece of length $d\ell$ crosses a line with probability $2\,d\ell/(\pi t)$ wherever it sits in the curve, and expectations add, so the expected number of crossings is $2L/(\pi t)$ whatever the curve's shape (Barbier, 1860). With $C$ the *total* number of crossings, a curve crossing the same line twice counting twice, the estimator $\hat\pi_N = 2\ell N / (t\,C)$ is unchanged. Switch the app to **Noodle**, a zigzag of three straight pieces with the same total length $\ell$: the crossings per drop are no longer 0 or 1, so the standard error comes from their sample mean $m$ and standard deviation $s$ instead, $\frac{2\ell}{t}\frac{s}{\sqrt{N}\, m^2}$.
+
 ```{ojs}
 //| output: false
 buffonMaxN = 2000
 buffonDefaultSeed = 1
 buffonDefaultN = 100
 buffonDefaultLength = 0.8
+buffonShapeOptions = ["Needle", "Noodle"]
 // Lines y = 0, 1, ..., 6 (spacing t = 1) across a board 8 wide.
 buffonSpacing = 1
 buffonWidth = 8
@@ -329,7 +335,14 @@ buffonTraceColors = new Map([
 
 <div class="vm-app" id="buffon-app">
 
-<div class="ojs-panel">
+<div class="ojs-panel ojs-row">
+
+```{ojs}
+viewof buffonShape = {
+  const initial = VM.ui.urlParam("buffon_shape", "needle") === "noodle" ? "Noodle" : "Needle"
+  return Inputs.radio(buffonShapeOptions, {value: initial, label: "Shape"})
+}
+```
 
 ```{ojs}
 viewof buffonRedraw = {
@@ -351,22 +364,23 @@ buffonSeed = {
 
 ```{ojs}
 //| output: false
-// buffonDrops: each needle's center and angle, drawn once per seed. The
-// needle-length slider only rescales the needles about their centers, so
-// changing it shows the same drops with longer or shorter needles.
+// buffonDrops: each drop's center and direction, drawn once per seed. The
+// length slider and the needle/noodle switch only redraw the shape about
+// those centers, so changing them shows the same drops.
 buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
 ```
 
 ```{ojs}
 //| output: false
-// buffonNeedles: endpoints and crossings for the current needle length;
-// crossingCount[i] counts the crossings among the first i needles.
-buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing)
+// buffonNeedles: polylines and crossings for the current shape and length;
+// crossingCount[i] and crossingSquares[i] sum the crossings and their
+// squares over the first i drops.
+buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing, buffonShape.toLowerCase())
 ```
 
 ```{ojs}
 //| output: false
-buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonN, buffonLength, buffonSpacing)
+buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles.crossingSquares[buffonN], buffonN, buffonLength, buffonSpacing)
 ```
 
 ```{ojs}
@@ -379,7 +393,7 @@ buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonN, buff
     {label: "Needles N", value: buffonStats.n.toLocaleString()},
     {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
     {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
-    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · sqrt((1 − p) / (N p³)), p = C / N"},
+    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
     {label: "|estimate − π|", value: format(buffonStats.error)}
   ])
 }
@@ -399,19 +413,17 @@ buffonShow = new Set(buffonTraces)
 
 ```{ojs}
 {
-  // Needles as one trace per color, segments separated by nulls -- a
+  // Drops as one trace per color, polylines separated by nulls -- a
   // single trace draws thousands of segments far faster than one trace each.
   const crossX = [], crossY = [], otherX = [], otherY = []
   for (let i = 0; i < buffonN; i++) {
-    const xs = [buffonNeedles.x1[i], buffonNeedles.x2[i], null]
-    const ys = [buffonNeedles.y1[i], buffonNeedles.y2[i], null]
-    if (buffonNeedles.crosses[i]) {
-      crossX.push(...xs)
-      crossY.push(...ys)
-    } else {
-      otherX.push(...xs)
-      otherY.push(...ys)
+    let xs = otherX, ys = otherY
+    if (buffonNeedles.crossings[i] > 0) {
+      xs = crossX
+      ys = crossY
     }
+    xs.push(...buffonNeedles.xs[i], null)
+    ys.push(...buffonNeedles.ys[i], null)
   }
 
   const lineX = [], lineY = []
@@ -466,7 +478,7 @@ viewof buffonN = {
 ```{ojs}
 viewof buffonLength = {
   const initial = Math.min(1, Math.max(0.1, VM.ui.urlParam("buffon_len", buffonDefaultLength)))
-  const slider = Inputs.range([0.1, 1], {step: 0.05, value: initial, label: "Needle length ℓ (line spacing t = 1)"})
+  const slider = Inputs.range([0.1, 1], {step: 0.05, value: initial, label: "Length ℓ (line spacing t = 1)"})
   slider.classList.add("ojs-fill")
   return slider
 }
@@ -483,8 +495,396 @@ viewof buffonLength = {
 buffonUrlSync = VM.ui.syncUrlParams({
   buffon_seed: [buffonSeed, buffonDefaultSeed],
   buffon_n: [buffonN, buffonDefaultN],
-  buffon_len: [buffonLength, buffonDefaultLength]
+  buffon_len: [buffonLength, buffonDefaultLength],
+  buffon_shape: [buffonShape.toLowerCase(), "needle"]
 })
 ```
 
 Try a short needle: the crossings become rare, and the estimate jumps around far more for the same $N$ -- the standard error grows like $\ell^{-1/2}$ as $\ell \to 0$.
+
+
+## Non-random methods for estimating $\pi$
+
+Both methods above converge at the Monte Carlo rate $O(N^{-1/2})$: each extra decimal digit costs a hundred times more samples. Dropping the randomness does better. This section counts points on a grid instead, then fills the square with points that are spread out on purpose, which sit in between the two.
+
+```{ojs}
+//| output: false
+gaussMaxR = 40
+gaussDefaultR = 8
+gaussTraceOptions = ["Inside", "Outside", "Circle"]
+gaussTraceColors = new Map([
+  ["Inside", chartColors.fn],
+  ["Outside", chartColors.muted],
+  ["Circle", chartColors.ink]
+])
+
+haltonMaxN = 10000
+haltonDefaultN = 1000
+haltonTraceOptions = ["Inside", "Outside", "Circle and square"]
+haltonTraceColors = new Map([
+  ["Inside", chartColors.fn],
+  ["Outside", chartColors.warn],
+  ["Circle and square", chartColors.ink]
+])
+
+// The circle x² + y² = r², for drawing only.
+function circlePath(r) {
+  const xs = [], ys = []
+  for (let k = 0; k <= 200; k++) {
+    xs.push(r * Math.cos(2 * Math.PI * k / 200))
+    ys.push(r * Math.sin(2 * Math.PI * k / 200))
+  }
+  return {xs, ys}
+}
+```
+
+### The Gauss circle method
+
+Count the integer points $(x, y)$ with $x^2 + y^2 \le r^2$. Each counted point is the center of a unit square, and together those squares cover the disk of radius $r$ up to a ragged edge, so the count $L(r)$ is about the disk's area $\pi r^2$ and
+
+$$
+\hat\pi_r = \frac{L(r)}{r^2} \to \pi.
+$$
+
+Gauss bounded the error: every square that sticks out of the disk, or every piece of the disk no square covers, lies within $\sqrt 2/2$ of the circle, so $|L(r) - \pi r^2| \le 2\sqrt2\,\pi r + 2\pi$ and $|\hat\pi_r - \pi| = O(1/r)$. How fast that is depends on what you count. Per grid point, it is not much faster than Monte Carlo. Against the $N = (2r+1)^2$ points of the square, $O(1/r)$ is $O(N^{-1/2})$, the Monte Carlo rate, though now a guaranteed bound rather than a standard error. The true error is smaller, because the errors along the edge mostly cancel. Finding how small $L(r) - \pi r^2$ really is, is the *Gauss circle problem*: it is known to be $O(r^{0.63})$ and conjectured to be $O(r^{1/2 + \varepsilon})$, which would make the error of $\hat\pi_r$ about $O(N^{-3/4})$.
+
+The real gain is that nobody has to look at every point. Column $x$ of the disk holds exactly $2\lfloor\sqrt{r^2 - x^2}\rfloor + 1$ points, so $L(r)$ takes $2r + 1$ integer square roots. Measured against that work, $W \approx 2r$, the error is $O(W^{-1})$ for certain and about $O(W^{-3/2})$ by the conjecture, against $W^{-1/2}$ for any random method. Ten times the work gives one more digit at least, instead of a hundred times the work.
+
+<div class="vm-app" id="gauss-app">
+
+```{ojs}
+//| output: false
+gaussStats = latticeEstimate(gaussR)
+```
+
+```{ojs}
+VM.ui.statRow([
+  {label: "Radius r", value: String(gaussStats.r)},
+  {label: "Grid points N", value: gaussStats.n.toLocaleString(), title: "(2r + 1)²"},
+  {label: "In the disk", value: gaussStats.count.toLocaleString()},
+  {label: "Estimate of π", value: gaussStats.estimate.toFixed(4), title: "count / r²"},
+  {label: "|estimate − π|", value: gaussStats.error.toFixed(4)}
+])
+```
+
+```{ojs}
+//| output: false
+gaussPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+gaussShow = new Set(gaussTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const r = gaussR
+  const inX = [], inY = [], outX = [], outY = []
+  for (let x = -r; x <= r; x++) {
+    for (let y = -r; y <= r; y++) {
+      if (x * x + y * y <= r * r) {
+        inX.push(x)
+        inY.push(y)
+      } else {
+        outX.push(x)
+        outY.push(y)
+      }
+    }
+  }
+  const size = Math.max(2, Math.min(9, 240 / (2 * r + 1)))
+
+  const data = []
+  if (gaussShow.has("Outside")) {
+    data.push({x: outX, y: outY, type: "scatter", mode: "markers", name: "Outside", showlegend: false,
+      marker: {color: chartColors.muted, size: size * 0.7}, hoverinfo: "skip"})
+  }
+  if (gaussShow.has("Inside")) {
+    data.push({x: inX, y: inY, type: "scatter", mode: "markers", name: "Inside", showlegend: false,
+      marker: {color: chartColors.fn, size}, hoverinfo: "skip"})
+  }
+  if (gaussShow.has("Circle")) {
+    const circle = circlePath(r)
+    data.push({x: circle.xs, y: circle.ys, type: "scatter", mode: "lines", name: "Circle", showlegend: false,
+      line: {color: chartColors.ink, width: 2}, hoverinfo: "skip"})
+  }
+
+  // The axes follow r, which is the point: the circle stays the same size
+  // on screen while the grid under it gets finer.
+  const view = r + 0.8
+  return gaussPlot(data, {
+    xaxis: {range: [-view, view], showgrid: false, zeroline: false, constrain: "domain"},
+    yaxis: {range: [-view, view], showgrid: false, zeroline: false, scaleanchor: "x", constrain: "domain"},
+    hovermode: false,
+    uirevision: `r${r}`,
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof gaussTraces = {
+  const items = []
+  for (const label of gaussTraceOptions) items.push({label, color: gaussTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: gaussTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls">
+
+```{ojs}
+viewof gaussR = {
+  const initial = Math.min(gaussMaxR, Math.max(1, Math.round(VM.ui.urlParam("gauss_r", gaussDefaultR))))
+  const slider = Inputs.range([1, gaussMaxR], {step: 1, value: initial, label: "Radius r"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+gaussUrlSync = VM.ui.syncUrlParams({gauss_r: [gaussR, gaussDefaultR]})
+```
+
+### Halton points: in between
+
+The grid is rigid: to refine it you must start over with a finer one, and its points line up in rows that meet the circle all at once. Random points can be added one at a time, but they clump and leave gaps, and that unevenness is where the $N^{-1/2}$ comes from. A *low-discrepancy* sequence has the best of both: it can be extended one point at a time, like random sampling, but each new point goes where the earlier ones left the biggest gap, so the first $N$ points always cover the square evenly.
+
+The Halton sequence builds one from the van der Corput sequence: write $i$ in base $b$ and mirror its digits about the radix point, so in base 2, $1, 2, 3, 4, \ldots = 1_2, 10_2, 11_2, 100_2, \ldots$ become $0.1_2, 0.01_2, 0.11_2, 0.001_2, \ldots = \tfrac12, \tfrac14, \tfrac34, \tfrac18, \ldots$, each point halving a gap left by the last. The $i$-th Halton point uses base 2 for $x$ and base 3 for $y$, mapped from $[0,1]^2$ to $[-1,1]^2$. Feeding these points to the circle method's estimator $4 \cdot (\text{inside})/N$ is *quasi-Monte Carlo*. For smooth integrands its error is $O((\log N)^2/N)$ (the Koksma–Hlawka inequality); the disk's sharp edge costs some of that, and here the error falls roughly like $N^{-3/4}$. At $N = 10{,}000$ it is typically a tenth of the random method's standard error. Compare the two apps at the same $N$.
+
+<div class="vm-app" id="halton-app">
+
+```{ojs}
+//| output: false
+// All haltonMaxN points, computed once; the slider shows the first haltonN.
+haltonAll = haltonPoints(haltonMaxN)
+```
+
+```{ojs}
+//| output: false
+haltonStats = circleEstimate(haltonAll.insideCount[haltonN], haltonN)
+```
+
+```{ojs}
+VM.ui.statRow([
+  {label: "Points N", value: haltonStats.n.toLocaleString()},
+  {label: "Inside", value: haltonStats.inside.toLocaleString()},
+  {label: "Estimate of π", value: haltonStats.estimate.toFixed(4), title: "4 · inside / N"},
+  {label: "|estimate − π|", value: haltonStats.error.toFixed(4)},
+  {label: "Random SE at this N", value: Math.sqrt(Math.PI * (4 - Math.PI) / haltonN).toFixed(4),
+    title: "sqrt(π(4 − π) / N), the circle method's standard error, for comparison"}
+])
+```
+
+```{ojs}
+//| output: false
+haltonPlot = VM.plotting.persistentPlot()
+```
+
+```{ojs}
+//| output: false
+haltonShow = new Set(haltonTraces)
+```
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const insideX = [], insideY = [], outsideX = [], outsideY = []
+  for (let i = 0; i < haltonN; i++) {
+    if (haltonAll.inside[i]) {
+      insideX.push(haltonAll.xs[i])
+      insideY.push(haltonAll.ys[i])
+    } else {
+      outsideX.push(haltonAll.xs[i])
+      outsideY.push(haltonAll.ys[i])
+    }
+  }
+
+  const data = []
+  if (haltonShow.has("Inside")) {
+    data.push({x: insideX, y: insideY, type: "scattergl", mode: "markers", name: "Inside", showlegend: false,
+      marker: {color: chartColors.fn, size: 4}, hoverinfo: "skip"})
+  }
+  if (haltonShow.has("Outside")) {
+    data.push({x: outsideX, y: outsideY, type: "scattergl", mode: "markers", name: "Outside", showlegend: false,
+      marker: {color: chartColors.warn, size: 4}, hoverinfo: "skip"})
+  }
+  if (haltonShow.has("Circle and square")) {
+    const circle = circlePath(1)
+    data.push({x: circle.xs, y: circle.ys, type: "scatter", mode: "lines", name: "Circle", showlegend: false,
+      line: {color: chartColors.ink, width: 2}, hoverinfo: "skip"})
+    data.push({x: [-1, 1, 1, -1, -1], y: [-1, -1, 1, 1, -1], type: "scatter", mode: "lines", name: "Square", showlegend: false,
+      line: {color: chartColors.ink, width: 1.5}, hoverinfo: "skip"})
+  }
+
+  return haltonPlot(data, {
+    xaxis: {range: [-1.05, 1.05], zeroline: false, title: "x", constrain: "domain"},
+    yaxis: {range: [-1.05, 1.05], zeroline: false, title: "y", scaleanchor: "x", constrain: "domain"},
+    hovermode: false,
+    uirevision: "static",
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof haltonTraces = {
+  const items = []
+  for (const label of haltonTraceOptions) items.push({label, color: haltonTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: haltonTraceOptions})
+}
+```
+
+<div class="ojs-chart-controls">
+
+```{ojs}
+viewof haltonN = {
+  const initial = Math.min(haltonMaxN, Math.max(10, Math.round(VM.ui.urlParam("halton_n", haltonDefaultN))))
+  const slider = Inputs.range([10, haltonMaxN], {step: 10, value: initial, label: "Points N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+</div>
+
+</div>
+
+```{ojs}
+//| output: false
+haltonUrlSync = VM.ui.syncUrlParams({halton_n: [haltonN, haltonDefaultN]})
+```
+
+### The three side by side
+
+The figure plots each circle method's error against the number of points it uses, on log-log axes, where a rate $N^{-a}$ is a straight line of slope $-a$. Random points give the RMS error over 40 runs, with a band holding the middle 80% of runs. The Gauss circle method's points are the $(2r+1)^2$ grid points of the square, for every radius $r$; counted by work instead, its curve would shift left to $N \approx 2r$ and fall faster than every other one.
+
+```{ojs}
+//| output: false
+cmpMaxN = 1e5
+cmpCounts = checkpoints(cmpMaxN)
+cmpSeries = [
+  {label: "Random points", token: "fn", points: randomCircleErrors(VM.sampling.seededRandom(7), cmpCounts, 40), scatter: false},
+  {label: "Gauss circle", token: "warn", points: latticeErrors(cmpMaxN), scatter: true},
+  {label: "Halton points", token: "ok", points: haltonCircleErrors(checkpoints(cmpMaxN, 24)), scatter: true}
+]
+cmpPlot = VM.plotting.persistentPlot({height: "480px"})
+```
+
+::: {#fig-pi-methods}
+
+```{ojs}
+{
+  const data = []
+  for (const s of cmpSeries) {
+    const color = chartColors[s.token]
+    const xs = [], ys = [], lo = [], hi = []
+    for (const p of s.points) {
+      xs.push(p.n)
+      ys.push(p.error)
+      if (p.lo !== undefined) {
+        lo.push(Math.max(p.lo, 1e-9))
+        hi.push(p.hi)
+      }
+    }
+    // The curve comes first: VM.plotting.plotWithLegend colors a legend row
+    // after the first trace of that name.
+    let mode = "lines+markers"
+    let size = 5
+    if (s.scatter) {
+      mode = "markers"
+      size = 3
+    }
+    data.push({
+      type: "scatter", mode, name: s.label,
+      x: xs, y: ys, line: {color, width: 2}, marker: {color, size},
+      hovertemplate: `<b>${s.label}</b><br>N = %{x}<br>error = %{y:.2e}<extra></extra>`
+    })
+    if (s.scatter) {
+      // The deterministic errors swing from one N to the next, crossing zero
+      // now and then, so their points stay unjoined and their rate is drawn
+      // as the fitted line instead. Same name as the markers, so the legend
+      // row hides the line too.
+      // Solid over the fitted range N ≥ 100, dashed where it is extended
+      // back to the first point.
+      const fit = convergenceFit(s.points)
+      const fitLine = n => 10 ** fit.intercept * n ** -fit.order
+      const first = xs[0]
+      const last = xs[xs.length - 1]
+      data.push({type: "scatter", mode: "lines", name: s.label, hoverinfo: "skip",
+        x: [100, last], y: [fitLine(100), fitLine(last)], line: {color, width: 2}})
+      data.push({type: "scatter", mode: "lines", name: s.label, hoverinfo: "skip",
+        x: [first, 100], y: [fitLine(first), fitLine(100)], line: {color, width: 2, dash: "dash"}})
+    }
+    if (lo.length > 0) {
+      // The 10%-90% band: the upper edge, then the lower edge filled up to
+      // it. Same name as the curve, so its legend row hides the band too.
+      data.push({type: "scatter", mode: "lines", name: s.label, hoverinfo: "skip",
+        x: xs, y: hi, line: {width: 0, color}})
+      data.push({type: "scatter", mode: "lines", name: s.label, hoverinfo: "skip",
+        x: xs, y: lo, line: {width: 0, color}, fill: "tonexty", fillcolor: VM.plotting.alpha(s.token, 0.15)})
+    }
+  }
+  // Reference slopes, unnamed so the legend leaves them on.
+  data.push({type: "scatter", mode: "lines", showlegend: false, hoverinfo: "skip",
+    x: [10, cmpMaxN], y: [1, Math.sqrt(10 / cmpMaxN)], line: {color: chartColors.muted, width: 1, dash: "dash"}})
+  data.push({type: "scatter", mode: "lines", showlegend: false, hoverinfo: "skip",
+    x: [10, cmpMaxN], y: [0.3, 0.3 * 10 / cmpMaxN], line: {color: chartColors.muted, width: 1, dash: "dot"}})
+  return VM.plotting.plotWithLegend(cmpPlot, data, {
+    xaxis: {type: "log", title: "N (points used)"},
+    yaxis: {type: "log", title: "|estimate − π|", exponentformat: "power"},
+    annotations: [
+      {x: Math.log10(cmpMaxN), y: Math.log10(Math.sqrt(10 / cmpMaxN)), text: "N⁻¹ᐟ²", showarrow: false, xanchor: "left"},
+      {x: Math.log10(cmpMaxN), y: Math.log10(0.3 * 10 / cmpMaxN), text: "N⁻¹", showarrow: false, xanchor: "left"}
+    ],
+    hovermode: "closest", uirevision: "static", autosize: true
+  })
+}
+```
+
+```{ojs}
+{
+  const stats = []
+  for (const s of cmpSeries) {
+    stats.push({label: s.label, value: `order ≈ ${convergenceOrder(s.points).toFixed(2)}`,
+      title: "minus the slope of the least-squares line through the log-log points with N ≥ 100"})
+  }
+  return VM.ui.statRow(stats)
+}
+```
+
+Error of the three points-in-a-circle estimates of π against the number of points N. The two deterministic errors swing widely from one N to the next, dipping wherever the estimate crosses π, so they are shown as points (Gauss: one per radius; Halton: 24 per decade) with their least-squares lines, fitted over N ≥ 100 and extended (dashed) below it. Dashed and dotted lines: the rates N⁻¹ᐟ² and N⁻¹.
+
+:::
+
+### For fun: $\pi$ from other numerical methods
+
+The methods on this page against some deterministic ones. Several apps on [VisualMathLab](https://www.visualmathlab.com) compute $\pi$ when given the right inputs; each link opens that app on its own with those inputs filled in. In the error column, $N$ is the number of samples, grid points or function evaluations, and $e_k$ the error after $k$ steps. The random methods' rates are standard errors; the rest are worst-case.
+
+| Method | π is | Error | App |
+|---|---|---|---|
+| Circle method (random points) | 4 × P(a uniform point of the square lands in the disk) | $O(N^{-1/2})$ | [above](#pi-app) |
+| Buffon's needle / Barbier's noodle | 2ℓ / (t × mean crossings per drop) | $O(N^{-1/2})$ | [above](#buffon-app) |
+| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(N^{-1})$ proven, about $O(N^{-3/2})$ conjectured, with N = 2r + 1 column counts | [above](#gauss-app) |
+| Circle method (Halton points) | 4 × fraction of Halton points in the disk | about $O(N^{-3/4})$ | [above](#halton-app) |
+| Newton's method | the root of sin x near 3 | $e_{k+1} = O(e_k^3)$ | [Newton on sin x](https://www.visualmathlab.com/apps/newton-method/index.html?embed=1&f=sin(x)&x0=3&max=8){target="_blank"} |
+| Fixed-point iteration | the fixed point of x + sin x near 3 | $e_{k+1} = O(e_k^3)$ | [Iterating x + sin x](https://www.visualmathlab.com/apps/fixed-point-iteration/index.html?embed=1&g=x%2Bsin(x)&x0=3&max=8){target="_blank"} |
+| Adaptive Simpson | ∫₀¹ 4/(1 + x²) dx | $O(N^{-6})$ | [Adaptive integration of 4/(1 + x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4%2F(1%2Bx%5E2)&a=0&b=1){target="_blank"} |
+| Adaptive Simpson | ∫₀¹ 4√(1 − x²) dx, four quarter disks | $O(N^{-6})$ | [Adaptive integration of 4√(1 − x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4*sqrt(1-x%5E2)&a=0&b=1){target="_blank"} |
+| Adaptive Simpson | (∫₋₆⁶ e^−x²^ dx)² | $O(N^{-6})$ | [Adaptive integration of e^−x²^](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=exp(-x%5E2)&a=-6&b=6){target="_blank"} |
+| Trapezoid rule | (∫₋₆⁶ e^−x²^ dx)² | $O(e^{-cN^2})$ | [Trapezoid on e^−x²^](https://www.visualmathlab.com/apps/numerical-integration/index.html?embed=1&f=exp(-x%5E2)&a=-6&b=6&max=40&n=12&show=f,trapezoidal){target="_blank"} |
+| Linear interpolation | the length of y = √(1 − x²) over [−1, 1], a semicircle | $O(N^{-3/2})$ | [Linear interpolation of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,linear,nodes){target="_blank"} |
+| Cubic spline | the length of y = √(1 − x²) over [−1, 1] | $O(N^{-3/2})$ | [Cubic spline of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,cubic,nodes){target="_blank"} |
+
+Newton's method gains three digits per step, and the trapezoid rule on $e^{-x^2}$ reaches full double precision in about 22 evaluations; the circle method would need around $10^{30}$ samples for the same accuracy.
