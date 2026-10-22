@@ -870,21 +870,21 @@ Error of the three points-in-a-circle estimates of π against the number of poin
 
 ### For fun: $\pi$ from other numerical methods
 
-The methods on this page against some deterministic ones. Several apps on [VisualMathLab](https://www.visualmathlab.com) compute $\pi$ when given the right inputs; each link opens that app on its own with those inputs filled in. In the error column, $N$ is the number of samples, grid points or function evaluations, and $e_k$ the error after $k$ steps. The random methods' rates are standard errors; the rest are worst-case.
+The methods on this page against some deterministic ones. Several apps on [VisualMathLab](https://www.visualmathlab.com) compute $\pi$ when given the right inputs; each link opens that app on its own with those inputs filled in. The rows run from slowest to fastest. To make them comparable, the error column measures every method by its work $N$: samples drawn, grid columns counted (the Gauss circle method counts each of its $2r+1$ columns in one step), or function evaluations (Newton's method evaluates sin and cos at each step, three digits gained per step, so its error after $N$ evaluations is about $e^{-c\,3^{N/2}}$; iterating $x + \sin x$ needs only sin). The random methods' rates are standard errors, Halton's is the fitted rate from the figure above, and the rest are worst-case bounds.
 
 | Method | π is | Error | App |
 |---|---|---|---|
 | Circle method (random points) | 4 × P(a uniform point of the square lands in the disk) | $O(N^{-1/2})$ | [above](#pi-app) |
 | Buffon's needle / Barbier's noodle | 2ℓ / (t × mean crossings per drop) | $O(N^{-1/2})$ | [above](#buffon-app) |
-| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(N^{-1})$ proven, about $O(N^{-3/2})$ conjectured, with N = 2r + 1 column counts | [above](#gauss-app) |
 | Circle method (Halton points) | 4 × fraction of Halton points in the disk | about $O(N^{-3/4})$ | [above](#halton-app) |
-| Newton's method | the root of sin x near 3 | $e_{k+1} = O(e_k^3)$ | [Newton on sin x](https://www.visualmathlab.com/apps/newton-method/index.html?embed=1&f=sin(x)&x0=3&max=8){target="_blank"} |
-| Fixed-point iteration | the fixed point of x + sin x near 3 | $e_{k+1} = O(e_k^3)$ | [Iterating x + sin x](https://www.visualmathlab.com/apps/fixed-point-iteration/index.html?embed=1&g=x%2Bsin(x)&x0=3&max=8){target="_blank"} |
+| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(N^{-1})$ proven, about $O(N^{-3/2})$ conjectured | [above](#gauss-app) |
+| Linear interpolation | the length of y = √(1 − x²) over [−1, 1], a semicircle | $O(N^{-3/2})$ | [Linear interpolation of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,linear,nodes){target="_blank"} |
+| Cubic spline | the length of y = √(1 − x²) over [−1, 1] | $O(N^{-3/2})$ | [Cubic spline of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,cubic,nodes){target="_blank"} |
 | Adaptive Simpson | ∫₀¹ 4/(1 + x²) dx | $O(N^{-6})$ | [Adaptive integration of 4/(1 + x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4%2F(1%2Bx%5E2)&a=0&b=1){target="_blank"} |
 | Adaptive Simpson | ∫₀¹ 4√(1 − x²) dx, four quarter disks | $O(N^{-6})$ | [Adaptive integration of 4√(1 − x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4*sqrt(1-x%5E2)&a=0&b=1){target="_blank"} |
 | Adaptive Simpson | (∫₋₆⁶ e^−x²^ dx)² | $O(N^{-6})$ | [Adaptive integration of e^−x²^](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=exp(-x%5E2)&a=-6&b=6){target="_blank"} |
 | Trapezoid rule | (∫₋₆⁶ e^−x²^ dx)² | $O(e^{-cN^2})$ | [Trapezoid on e^−x²^](https://www.visualmathlab.com/apps/numerical-integration/index.html?embed=1&f=exp(-x%5E2)&a=-6&b=6&max=40&n=12&show=f,trapezoidal){target="_blank"} |
-| Linear interpolation | the length of y = √(1 − x²) over [−1, 1], a semicircle | $O(N^{-3/2})$ | [Linear interpolation of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,linear,nodes){target="_blank"} |
-| Cubic spline | the length of y = √(1 − x²) over [−1, 1] | $O(N^{-3/2})$ | [Cubic spline of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,cubic,nodes){target="_blank"} |
+| Newton's method | the root of sin x, starting from 1.98 | $O(e^{-c\,3^{N/2}})$ | [Newton on sin x](https://www.visualmathlab.com/apps/newton-method/index.html?embed=1&f=sin(x)&x0=1.98&max=12){target="_blank"} |
+| Fixed-point iteration | the fixed point of x + sin x, starting from 0.1 | $O(e^{-c\,3^N})$ | [Iterating x + sin x](https://www.visualmathlab.com/apps/fixed-point-iteration/index.html?embed=1&g=x%2Bsin(x)&x0=0.1&max=12){target="_blank"} |
 
 Newton's method gains three digits per step, and the trapezoid rule on $e^{-x^2}$ reaches full double precision in about 22 evaluations; the circle method would need around $10^{30}$ samples for the same accuracy.
