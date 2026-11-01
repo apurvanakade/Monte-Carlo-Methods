@@ -55,7 +55,7 @@ read the installed copy or https://apurvanakade.github.io/mathviz/.
   without its card in `apps/index.qmd`.
 - A CLAUDE.md convention broken, quoting the rule: `.map()/.filter()` chains
   or nested ternaries where loops are asked for, Plotly's legend instead of
-  mathviz's, CSS in `assets/style.css` that isn't image sizing, a hand edit to
+  mathviz's, anything in `_theme/site.scss` beyond `$vm-*` tokens, a hand edit to
   `_extensions/`, D3 or precomputed JSON, and so on.
 - CLAUDE.md, a skill or a doc that the change makes untrue, or a change that
   should have updated CLAUDE.md and did not.

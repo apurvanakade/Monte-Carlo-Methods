@@ -1,7 +1,6 @@
 ---
 title: "Variance Reduction Techniques"
 date: 2025-04-01
-toc: true
 
 execute:
   echo: false

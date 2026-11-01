@@ -1,6 +1,5 @@
 ---
 title: "Other Distributions"
-toc: true  
 
 execute:
   echo: false

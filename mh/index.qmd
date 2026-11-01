@@ -1,7 +1,6 @@
 ---
 title: "Metropolis--Hastings Algorithm"
 date: 2025-03-24
-toc: true
 
 execute:
   echo: false
