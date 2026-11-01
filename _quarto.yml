@@ -111,10 +111,10 @@ format:
     # mathviz panels. Site overrides go in a second file listed after each
     # (set $vm-* variables under /*-- scss:defaults --*/).
     theme:
-      light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
-      dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    css:
-      - assets/style.css
+      light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss, _theme/site.scss]
+      dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss, _theme/site.scss]
+    # No table of contents: the sidebar already lists every page.
+    toc: false
     # No comment thread in mathviz embed mode (?embed=), which shows the app
     # alone. Drop this once mathviz's chrome/embed.css lists .giscus.
     include-in-header:

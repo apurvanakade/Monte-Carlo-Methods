@@ -1,7 +1,6 @@
 ---
 title: "M/M/n Queue"
 date: 2025-06-18
-toc: true
 
 draft: true
 

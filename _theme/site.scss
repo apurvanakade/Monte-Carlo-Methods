@@ -1,0 +1,6 @@
+/* Site overrides of mathviz's theme, listed after it in _quarto.yml. */
+
+/*-- scss:defaults --*/
+
+// About 70 characters a line; apps, figures and tables keep the full column.
+$vm-prose-width: 40rem;

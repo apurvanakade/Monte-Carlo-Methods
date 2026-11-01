@@ -39,7 +39,6 @@ listing:
       path: ../markov-chains/?embed=graph-walk-app
       image: images/random-walks-on-graphs.svg
 page-layout: full
-toc: false
 ---
 
 Each app opens on its own. You'll find every one of them, with the explanation around it, in the chapter it belongs to -- and the **Share** button on any app gives a link or an `<iframe>` snippet for embedding it elsewhere.

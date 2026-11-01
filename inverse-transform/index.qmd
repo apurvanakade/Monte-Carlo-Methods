@@ -1,6 +1,5 @@
 ---
 title: "Inverse Transform Sampling"
-toc: true  
 
 execute:
   echo: false
