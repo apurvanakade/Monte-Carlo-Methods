@@ -1,0 +1,31 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9B59B6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E74C3C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bgGrad4)"/>
+  
+  <!-- Grid -->
+  <g opacity="0.2">
+    <line x1="100" y1="50" x2="100" y2="250" stroke="white" stroke-width="1"/>
+    <line x1="150" y1="50" x2="150" y2="250" stroke="white" stroke-width="1"/>
+    <line x1="200" y1="50" x2="200" y2="250" stroke="white" stroke-width="1"/>
+    <line x1="250" y1="50" x2="250" y2="250" stroke="white" stroke-width="1"/>
+    <line x1="300" y1="50" x2="300" y2="250" stroke="white" stroke-width="1"/>
+    <line x1="50" y1="100" x2="350" y2="100" stroke="white" stroke-width="1"/>
+    <line x1="50" y1="150" x2="350" y2="150" stroke="white" stroke-width="1"/>
+    <line x1="50" y1="200" x2="350" y2="200" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- Random walk path -->
+  <polyline points="100,150 150,150 150,100 200,100 200,150 250,150 250,200 250,150 300,150" 
+            fill="none" stroke="#FFD700" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Start and end points -->
+  <circle cx="100" cy="150" r="6" fill="#4ECDC4"/>
+  <circle cx="300" cy="150" r="6" fill="#FF6B6B"/>
+  
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="20" fill="white" text-anchor="middle" font-weight="bold">Metropolis Random Walk</text>
+</svg>
