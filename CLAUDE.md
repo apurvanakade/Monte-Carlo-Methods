@@ -12,7 +12,7 @@ Monte Carlo Methods Lecture Notes is a Quarto **website** (`project.type: websit
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
 - `make release` — fast-forwards `main` to `origin/develop` and pushes it, which publishes the site (see "Branches, PRs and releases"). The `ship-pr` skill runs it after the merge; otherwise only run it when asked.
 
-Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `npm test`, and for a local overlay if one is added: `cd _mathviz && node --test && node scripts/build.mjs`.
+Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `npm test`.
 
 ## Branches, PRs and releases
 
@@ -29,7 +29,7 @@ Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work
 
 - `docs/` is local build output and is **not tracked** (`.gitignore`). Never commit it.
 - Publishing: a push to `main` runs `.github/workflows/publish.yml`, which renders the site (via the shared `.github/actions/render` composite: pinned Quarto, then `quarto render`) and force-pushes `docs/` to the orphan `gh-pages` branch, which Pages serves directly (Pages source: branch `gh-pages`, `/`). Don't add a workflow triggered by the `gh-pages` push: a push made with `GITHUB_TOKEN` never triggers another workflow. `pr-check.yml` runs the same render on every PR into `develop` and attaches the site as a downloadable `site` artifact. When bumping Quarto locally, bump the `version:` pin in the composite too.
-- `_extensions/apurvanakade/mathviz/` is the installed upstream release, managed by `scripts/update-mathviz.sh`. **Never edit it** — the next update overwrites it. A bug in it is fixed in mathviz, or hot-patched from a local overlay meanwhile (see "Contributing to mathviz").
+- `_extensions/apurvanakade/mathviz/` is the installed upstream release, managed by `scripts/update-mathviz.sh`. **Never edit it** — the next update overwrites it. A bug in it is fixed in mathviz (see "Contributing to mathviz").
 - `_legacy/` and the old per-chapter `app/` folders are gone; the apps now live in the chapters as OJS. Don't reintroduce D3/precomputed-JSON apps.
 
 ## Layout
@@ -42,7 +42,6 @@ index.qmd        preface
                  and appendices, e.g. estimating-pi/, mh/, probability/; served at <site>/<slug>/
 images/          static figures
 apps/            the Interactive Apps gallery: a card per app, linking to its ?embed= view
-_theme/site.scss site overrides of mathviz's theme ($vm-* tokens only — see Conventions)
 scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   the bibliography; each page prints its own cited entries under a `## References` heading
 ```
@@ -52,20 +51,18 @@ references.bib   the bibliography; each page prints its own cited entries under 
 ### How the site gets it
 
 - `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
-- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.js` and `mathviz.css` into `<head>`. A local overlay, if one is added (below), goes *after* it: `filters: [mathviz, mathviz-local]`.
-- The `mathviz:` block turns on `referrer`, self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS. Site-only overrides go in `_theme/site.scss`, listed *after* those, setting `$vm-*` tokens. Pages have no table of contents (`toc: false`); don't add `toc:` to a page's front matter.
-- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter, as `apps/index.qmd` does. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to the overlay rule below. Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
+- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.js` and `mathviz.css` into `<head>`.
+- The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). It does not turn on `sidebar-rail`: the rail forces a 1000px body column regardless of Quarto's `grid:`, which made prose lines ~120 characters once mathviz v0.10.0 dropped its prose cap. The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. The page grid is Quarto's default (800px body, 250px sidebar and margin; no `grid:` block), and every content page has a table of contents in the right margin (`toc: true`). The apps gallery turns it off (`toc: false` in `apps/index.qmd`) to keep the full width for its cards; other pages don't set `toc:`.
+- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter, as `apps/index.qmd` does. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to "design-system CSS belongs in mathviz". Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
 
 ### Contributing to mathviz
 
 mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/mathviz) itself: it is the hub every site consumes, and a change to it is an ordinary pull request there, carrying its reference docs and a CHANGELOG line (see that repo's CLAUDE.md and CONTRIBUTING.md). Nothing goes through VisualMathLab (`~/Github/viz/VisualMath`) any more.
 
-A utility used by exactly one app stays in that chapter's OJS cells. Beyond that:
+A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. To try it here first, build mathviz and `quarto add ../mathviz --no-prompt` from this repo; restore the release with `make update-mathviz` before committing.
-- **This site needs it before a release carries it, or only this site ever will** → a local overlay. Copy it in from mathviz's [`kit/`](https://github.com/apurvanakade/mathviz/tree/main/kit) (`_mathviz/` + `_extensions/mathviz-local/`, with `mathviz-local` listed *after* `mathviz` under `filters:`); `kit/_mathviz/README.md` has the steps. It is laid out path for path like mathviz's `src/`, so a file at the same path as an upstream one replaces that member (a hot patch), and `node scripts/port.mjs <this repo>/_mathviz` in mathviz moves files upstream. Once a mathviz release carries them, delete them here, otherwise they silently shadow later upstream changes. When the overlay is empty, remove it again.
-
-There is no overlay today: mathviz v0.1.12 carries everything the last one held.
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. There is no local overlay (mathviz v0.10.0 removed the kit for one).
 
 ## Writing an app
 
@@ -94,7 +91,7 @@ simulation on every load (no `vm-app`, no controls):
 - A new page is a folder `<slug>/index.qmd` (lowercase, hyphenated, so the URL is `<site>/<slug>/`). Add it to `website.sidebar` in `_quarto.yml` by hand; leave `draft: true` pages out. There are no old-URL redirects.
 - Cross-page references are plain links (`[text](../<slug>/#sec-id)`); `@sec-` works only within a page.
 - Citations use `references.bib` (`[@key]`). There is no global References page: a page that cites ends with `## References` and `::: {#refs}` `:::`.
-- Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells and in any local `_mathviz/src/**` alike — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.
+- Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.
 - Keep each app's logic in small named OJS cells (simulate → derive → plot → readouts) rather than one large cell.
 - **Methods are separated from pages and tested** (the VisualMathLab pattern, `~/Github/viz/VisualMath/apps/newton-method/`). A chapter's Monte Carlo method — the sampler, estimator or simulation, as a plain function of numbers and a seeded `rng` that returns plain data — lives in `method.js` beside the page's `index.qmd`, not inline in an OJS cell. The `.qmd` imports it in a setup cell (`import {piEstimate} from "./method.js"`; Quarto copies the file next to the page). The module reads the library only as `globalThis.VM` and touches no DOM, no OJS, no Plotly and no `chartColors`. `method.test.js` runs it under `node --test` against the installed mathviz (`scripts/load-vm.mjs`), with fixed seeds and an assertion that says why the number is right (an estimate within ~4 standard errors of the known value, sample moments against theory, an acceptance rate against 1/M, a chain's stationary distribution). Cells keep only parameters, inputs, trace building and readouts. Keep seeds and the order of `rng` calls unchanged when moving code, so the page draws the same picture. `estimating-pi/` is the reference. Every chapter with OJS logic follows this; a new chapter starts that way. `npm test` (needs `npm install` once) runs all of them, and `pr-check.yml` runs it before the render.
-- CSS used by one chapter stays in that chapter (a `<style>` block); design-system CSS belongs in mathviz. `_theme/site.scss` (listed after mathviz's theme) only sets `$vm-*` tokens, such as `$vm-prose-width`. Any CSS consumes `--vm-*` tokens so it re-themes with the site.
+- CSS used by one chapter stays in that chapter (a `<style>` block); design-system CSS belongs in mathviz. A site theme file, if one is added (see the mathviz section), only sets `$vm-*` tokens. Any CSS consumes `--vm-*` tokens so it re-themes with the site.
