@@ -11,9 +11,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadVM } from '../scripts/load-vm.mjs'
 import {
-  dropPoints, circleEstimate, circleConvergence, randomDirection, dropNeedles, needleCrossings, buffonEstimate,
+  dropPoints, circleEstimate, runningCircleEstimates, randomDirection, dropNeedles, needleCrossings, buffonEstimate,
   latticeCount, latticeEstimate, vanDerCorput, haltonPoints,
-  checkpoints, randomCircleErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder
+  checkpoints, randomCircleErrors, runningBuffonEstimates, randomBuffonErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder
 } from './method.js'
 
 const VM = loadVM()
@@ -37,17 +37,60 @@ test('circleEstimate: pi hat is within 4 standard errors at N = 10000', () => {
   assert.ok(Math.abs(s.stdError - 4 * Math.sqrt(Math.PI / 4 * (1 - Math.PI / 4) / 10000)) < 0.002)
 })
 
-test('circleConvergence: interval width is 2 z sqrt(pi (4 - pi) / n)', () => {
-  const z = VM.distributions.normalQuantile(0.975)
-  const c = circleConvergence(VM.sampling.seededRandom(42), 10000, z)
-  assert.equal(c.sizes.length, 100)
-  assert.ok(Math.abs(c.widths[99] - 2 * z * Math.sqrt(Math.PI * (4 - Math.PI) / 10000)) < 1e-12)
-  // The 95% interval should cover pi at most of the 100 sizes.
-  let covered = 0
-  for (let i = 0; i < 100; i++) {
-    if (c.lower[i] <= Math.PI && Math.PI <= c.upper[i]) covered++
+test('runningCircleEstimates: final estimates have mean pi and SD sqrt(pi (4 - pi) / n)', () => {
+  const counts = [100, 1000]
+  const runs = runningCircleEstimates(VM.sampling.seededRandom(42), counts, 200)
+  assert.equal(runs.length, 200)
+  let sum = 0
+  for (const run of runs) {
+    assert.equal(run.length, counts.length)
+    sum += run[1]
   }
-  assert.ok(covered >= 85, `covered ${covered}`)
+  const mean = sum / 200
+  let squares = 0
+  for (const run of runs) squares += (run[1] - mean) ** 2
+  const sd = Math.sqrt(squares / 199)
+  const theorySd = Math.sqrt(Math.PI * (4 - Math.PI) / 1000)
+  // The mean of 200 runs within 4 standard errors; the sample SD of 200 runs
+  // has relative error about 1 / sqrt(2 * 199) = 5%, so within 4 of those.
+  assert.ok(Math.abs(mean - Math.PI) < 4 * theorySd / Math.sqrt(200), `mean ${mean}`)
+  assert.ok(Math.abs(sd / theorySd - 1) < 0.2, `sd ${sd}`)
+})
+
+test('runningBuffonEstimates: final estimates have mean near pi and the delta-method SD', () => {
+  const runs = runningBuffonEstimates(VM.sampling.seededRandom(44), [100, 1000], 200, 1, 1)
+  assert.equal(runs.length, 200)
+  let sum = 0
+  for (const run of runs) sum += run[1]
+  const mean = sum / 200
+  let squares = 0
+  for (const run of runs) squares += (run[1] - mean) ** 2
+  const sd = Math.sqrt(squares / 199)
+  const p = 2 / Math.PI
+  const theorySd = Math.PI * Math.sqrt((1 - p) / (1000 * p))
+  // The bias at n = 1000 is about 0.002, well inside 4 standard errors of the
+  // mean of 200 runs; the sample SD of 200 runs has relative error about 5%.
+  assert.ok(Math.abs(mean - Math.PI) < 4 * theorySd / Math.sqrt(200), `mean ${mean}`)
+  assert.ok(Math.abs(sd / theorySd - 1) < 0.2, `sd ${sd}`)
+})
+
+test('runningBuffonEstimates: null before the first crossing', () => {
+  // A needle this short almost never crosses, so 2 drops usually give no estimate.
+  const runs = runningBuffonEstimates(VM.sampling.seededRandom(1), [2], 50, 0.001, 1)
+  let nulls = 0
+  for (const run of runs) {
+    if (run[0] === null) nulls++
+  }
+  assert.ok(nulls >= 45, `nulls ${nulls}`)
+})
+
+test('randomBuffonErrors: the RMS error falls like 1 / sqrt(n)', () => {
+  const points = randomBuffonErrors(VM.sampling.seededRandom(45), [100, 1000], 200, 1, 1)
+  const p = 2 / Math.PI
+  const theory = Math.PI * Math.sqrt((1 - p) / (1000 * p))
+  assert.ok(Math.abs(points[1].error / theory - 1) < 0.2, `rms ${points[1].error}`)
+  const ratio = points[0].error / points[1].error
+  assert.ok(ratio > Math.sqrt(10) * 0.7 && ratio < Math.sqrt(10) * 1.3, `ratio ${ratio}`)
 })
 
 test('randomDirection: unit vectors with a uniform angle', () => {

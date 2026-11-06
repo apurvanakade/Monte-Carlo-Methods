@@ -7,7 +7,7 @@
 // The methods behind estimating-pi/index.qmd: the hit-or-miss estimate of pi,
 // Buffon's needle and Barbier's noodle, and the non-random Gauss circle and
 // Halton estimates. None of the samplers uses pi; it appears only in the
-// reported errors and the theoretical intervals. Imported by the page's OJS
+// reported errors. Imported by the page's OJS
 // cells and by method.test.js. Pure functions of numbers and a random source
 // `rng` (a function returning uniforms on [0, 1), e.g. from
 // VM.sampling.seededRandom); no DOM, no OJS.
@@ -39,26 +39,27 @@ export function circleEstimate(inside, n) {
   return {n, inside, estimate, stdError, error: Math.abs(estimate - Math.PI)}
 }
 
-// One independent estimate per sample size 100, 200, ..., maxN, each with its
-// theoretical 95% interval estimate +- z sqrt(pi (4 - pi) / n).
-export function circleConvergence(rng, maxN, z) {
-  const sizes = [], estimates = [], lower = [], upper = [], widths = []
-  for (let n = 100; n <= maxN; n += 100) {
+// `runs` independent runs of the estimate, each adding points one at a time.
+// runs[r][k] is run r's estimate 4 * inside / n at n = counts[k]; counts must
+// be increasing.
+export function runningCircleEstimates(rng, counts, runs) {
+  const out = []
+  for (let run = 0; run < runs; run++) {
+    const estimates = []
     let inside = 0
-    for (let i = 0; i < n; i++) {
+    let next = 0
+    for (let i = 1; i <= counts[counts.length - 1]; i++) {
       const x = 2 * rng() - 1
       const y = 2 * rng() - 1
       if (x * x + y * y <= 1) inside++
+      if (i === counts[next]) {
+        estimates.push(4 * inside / i)
+        next++
+      }
     }
-    const estimate = 4 * inside / n
-    const margin = z * Math.sqrt(Math.PI * (4 - Math.PI) / n)
-    sizes.push(n)
-    estimates.push(estimate)
-    lower.push(estimate - margin)
-    upper.push(estimate + margin)
-    widths.push(2 * margin)
+    out.push(estimates)
   }
-  return {sizes, estimates, lower, upper, widths}
+  return out
 }
 
 // A uniformly random direction as a unit vector [c, s], without using pi:
@@ -236,14 +237,66 @@ export function randomCircleErrors(rng, counts, runs) {
       }
     }
   }
+  return errorSummary(counts, errors)
+}
+
+// The RMS and the 10% and 90% quantiles (lo, hi) of each list in errors, where
+// errors[k] holds the errors at n = counts[k].
+function errorSummary(counts, errors) {
   const points = []
   for (let k = 0; k < counts.length; k++) {
     const sorted = errors[k].slice().sort((a, b) => a - b)
     let sumSquares = 0
     for (const e of sorted) sumSquares += e * e
-    points.push({n: counts[k], error: Math.sqrt(sumSquares / runs), lo: quantile(sorted, 0.1), hi: quantile(sorted, 0.9)})
+    points.push({n: counts[k], error: Math.sqrt(sumSquares / sorted.length), lo: quantile(sorted, 0.1), hi: quantile(sorted, 0.9)})
   }
   return points
+}
+
+// One run of Buffon's estimator 2 l n / (t C), dropping needles one at a time:
+// its value at each n in counts (increasing), or null before the first
+// crossing. Only each needle's height and direction matter, so this skips the
+// polylines that needleCrossings builds for drawing.
+function buffonRun(rng, counts, length, spacing) {
+  const estimates = []
+  let crossings = 0
+  let next = 0
+  for (let i = 1; i <= counts[counts.length - 1]; i++) {
+    const y = spacing * rng()
+    const [, s] = randomDirection(rng)
+    const low = y - (length / 2) * s
+    const high = y + (length / 2) * s
+    if (Math.floor(low / spacing) !== Math.floor(high / spacing)) crossings++
+    if (i === counts[next]) {
+      if (crossings === 0) estimates.push(null)
+      else estimates.push((2 * length * i) / (spacing * crossings))
+      next++
+    }
+  }
+  return estimates
+}
+
+// `runs` independent runs of Buffon's estimator. runs[r][k] is run r's estimate
+// at n = counts[k], or null before its first crossing.
+export function runningBuffonEstimates(rng, counts, runs, length, spacing) {
+  const out = []
+  for (let run = 0; run < runs; run++) out.push(buffonRun(rng, counts, length, spacing))
+  return out
+}
+
+// Buffon's error at each n in counts over `runs` independent runs, as in
+// randomCircleErrors. A run with no crossing yet has no estimate and is left
+// out at that n, so these describe the estimator given C >= 1.
+export function randomBuffonErrors(rng, counts, runs, length, spacing) {
+  const errors = []
+  for (let k = 0; k < counts.length; k++) errors.push([])
+  for (let run = 0; run < runs; run++) {
+    const estimates = buffonRun(rng, counts, length, spacing)
+    for (let k = 0; k < counts.length; k++) {
+      if (estimates[k] !== null) errors[k].push(Math.abs(estimates[k] - Math.PI))
+    }
+  }
+  return errorSummary(counts, errors)
 }
 
 // The Halton circle estimate's error at each n in counts.
