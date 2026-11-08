@@ -188,9 +188,14 @@ make release    # git fetch origin && git push origin origin/develop:main
 ```
 
 Never squash-merge into `main` or force-push it. If the push is refused as
-non-fast-forward, the histories have diverged: on `develop`,
-`git merge -s ours origin/main`, push, and retry. Then confirm the publish
-run started: `gh run list --branch main -L 1`.
+non-fast-forward, `main` has commits `develop` lacks. List them with
+`git log --oneline origin/develop..origin/main` and look at what they change
+(`git diff origin/develop origin/main --stat`). Then, on `develop`, merge them
+in with a normal `git merge origin/main`, push, and retry. Never
+`git merge -s ours`: it keeps `develop`'s tree and silently reverts whatever
+landed only on `main` at the next release. If the merge conflicts, stop and
+ask the user. Then confirm the publish run started:
+`gh run list --branch main -L 1`.
 
 ## 8. Clean up
 

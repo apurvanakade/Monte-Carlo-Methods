@@ -4,15 +4,13 @@
  * Authors: Apurva Nakade
  */
 
-/* The collapsible sidebar rail's stylesheet -- shipped, with
- * sidebar-rail.js, only when a site sets `mathviz: {sidebar-rail: ...}`.
- * Site chrome for a Quarto website or book with a `style: floating`
- * sidebar, not part of the ojs-* design system, which is why it is not in
- * mathviz.css. Consumes --vm-* tokens only, so it re-themes with them.
- *
- * Loaded as an html dependency, i.e. after Bootstrap's and Quarto's own CSS
- * and before the site's css: files -- the same place in the cascade these
- * rules held when they lived in a site's styles.css. */
+/* The sidebar drawer's stylesheet, listed under format.html.css in
+ * _quarto.yml; its script is _chrome/sidebar-rail.html. A copy of
+ * VisualMathLab's _chrome/sidebar-rail.css (mathviz's `sidebar-rail` option
+ * until mathviz dropped it), unchanged below this comment; with a second
+ * site using it, it belongs back in mathviz. Assumes a `style: floating`
+ * sidebar and a 1000px body column. Consumes --vm-* tokens only, so it
+ * re-themes with them. */
 
 /* ── Page grid / collapsible sidebar ─────────────────────────────── */
 /* Quarto only makes #quarto-sidebar an off-canvas overlay below 992px
@@ -73,24 +71,27 @@
   }
 }
 
-/* 66px matches #quarto-header's measured rendered height -- the sidebar's
+/* --vm-header-height is #quarto-header's rendered height less the
+ * breadcrumb bar inside it, measured by sidebar-rail.js (66px, the old
+ * fixed value, until it runs) -- the sidebar's
  * own box starts below the navbar rather than under it (padding-top alone
  * would still paint the sidebar's background/shadow over the navbar's
  * brand text, since both are position: fixed and the sidebar's z-index
  * has to be above the navbar's for the off-canvas panel to show at all). */
 #quarto-sidebar.sidebar-navigation {
   position: fixed !important;
-  top: 66px !important;
+  top: var(--vm-header-height, 66px) !important;
   left: 0 !important;
   bottom: 0 !important;
   width: min(280px, 85vw) !important;
   max-width: min(280px, 85vw) !important;
-  height: calc(100vh - 66px) !important;
+  height: calc(100vh - var(--vm-header-height, 66px)) !important;
   z-index: 1055;
   display: flex !important;
   flex-direction: column;
   background: var(--vm-bg);
-  border-right: 1px solid var(--vm-border);
+  /* No border-right: the navbar above has none, and a hairline down the
+   * panel's edge stood out against it. The shadow alone separates it. */
   box-shadow: var(--vm-shadow);
   transform: translateX(-100%);
   transition: transform 0.22s ease;
@@ -125,16 +126,16 @@ body.vm-sidebar-open #quarto-sidebar.sidebar-navigation {
  * can wrap on a narrow phone), so it's measured live by sidebar-rail.js
  * rather than guessed as a constant -- it sets --vm-secondary-nav-height
  * on <html>. Below 992px that bar sits between the navbar and where the
- * sidebar/rail's own top:66px would otherwise place them, so both need to
+ * sidebar/rail's own top would otherwise place them, so both need to
  * shift down by its height or they overlap it. */
 @media (max-width: 991.98px) {
   #quarto-sidebar.sidebar-navigation,
   #vm-sidebar-rail {
-    top: calc(66px + var(--vm-secondary-nav-height, 0px)) !important;
+    top: calc(var(--vm-header-height, 66px) + var(--vm-secondary-nav-height, 0px)) !important;
   }
 
   #quarto-sidebar.sidebar-navigation {
-    height: calc(100vh - 66px - var(--vm-secondary-nav-height, 0px)) !important;
+    height: calc(100vh - var(--vm-header-height, 66px) - var(--vm-secondary-nav-height, 0px)) !important;
   }
 }
 
@@ -150,7 +151,7 @@ body.vm-sidebar-open #quarto-sidebar.sidebar-navigation {
  * page's own text and swallowed clicks meant for it. */
 #vm-sidebar-rail {
   position: fixed;
-  top: 66px;
+  top: var(--vm-header-height, 66px);
   left: 0;
   width: 2.75rem;
   z-index: 1056;
@@ -163,9 +164,12 @@ body.vm-sidebar-open #quarto-sidebar.sidebar-navigation {
 /* The buttons' own surface. Without it the two icons sit in open space with
  * nothing behind them, and the rail reads as an unfinished fragment rather
  * than a control that was cut off. Shaped as a tab hanging off the left
- * edge -- no left border, rounded on the right only -- so it looks attached
- * to the edge it is anchored to, and equally to the sidebar's own edge once
- * the sidebar is open and the rail has moved out to x:280. */
+ * edge -- rounded on the right only -- so it looks attached to the edge it
+ * is anchored to, and equally to the sidebar's own edge once the sidebar is
+ * open and the rail has moved out to x:280. Painted like the navbar and the
+ * sidebar panel (page background, no border, the shadow alone separating
+ * it): a --vm-surface fill and a --vm-border outline made it the one tinted,
+ * outlined box in otherwise borderless chrome. */
 .vm-rail-cluster {
   display: flex;
   flex-direction: column;
@@ -173,9 +177,7 @@ body.vm-sidebar-open #quarto-sidebar.sidebar-navigation {
   gap: 0.25rem;
   padding: 0.4rem 0.3rem;
   margin-top: 0.5rem;
-  background: var(--vm-surface);
-  border: 1px solid var(--vm-border);
-  border-left: none;
+  background: var(--vm-bg);
   border-radius: 0 var(--vm-radius) var(--vm-radius) 0;
   box-shadow: var(--vm-shadow);
 }
@@ -193,7 +195,7 @@ body.vm-sidebar-open #vm-sidebar-rail {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid transparent;
+  border: none;
   border-radius: var(--vm-radius-sm);
   background: transparent;
   color: var(--vm-text-soft);
@@ -202,14 +204,12 @@ body.vm-sidebar-open #vm-sidebar-rail {
 
 #vm-sidebar-rail button:hover,
 body.vm-sidebar-open #vm-sidebar-rail button[data-vm-toggle] {
-  background: var(--vm-surface);
-  border-color: var(--vm-border);
+  background: var(--vm-surface-hover);
   color: var(--vm-text);
 }
 
 body.vm-sidebar-pinned #vm-sidebar-rail button[data-vm-pin] {
   color: var(--vm-accent);
-  border-color: var(--vm-border);
 }
 
 @media (prefers-reduced-motion: reduce) {

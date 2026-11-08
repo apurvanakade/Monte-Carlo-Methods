@@ -1,6 +1,5 @@
 ---
 title: "Discrete Distributions"
-toc: true  
 
 execute:
   echo: false

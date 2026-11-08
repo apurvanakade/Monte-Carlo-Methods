@@ -1,7 +1,6 @@
 ---
 title: "Bootstrap"
 date: 2025-06-18
-toc: true
 
 execute:
   echo: false

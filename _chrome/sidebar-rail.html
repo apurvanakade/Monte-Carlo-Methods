@@ -1,3 +1,4 @@
+<script>
 /**
  * Copyright (c) 2026 Apurva Nakade. All rights reserved.
  * Released under Apache 2.0 license as described in the file LICENSE.
@@ -24,10 +25,13 @@
  * an invisible 21px strip lying over the content column below 768px, where the
  * body's own left margin is narrower than the rail.
  *
- * Shipped, with sidebar-rail.css, only when a site sets
- * `mathviz: {sidebar-rail: true}` (or a string: the pin's localStorage key).
- * Loaded in <head>, so it waits for DOMContentLoaded; it does nothing on a
- * page with no Quarto sidebar navigation, or in embed mode (html.vm-embed).
+ * A copy of VisualMathLab's _chrome/sidebar-rail.js (mathviz's
+ * `sidebar-rail` option until mathviz dropped it), unchanged below this
+ * comment; with a second site using it, it belongs back in mathviz. Inlined
+ * into every page's <head> by include-in-header (this file); its stylesheet
+ * is _chrome/sidebar-rail.css. Loaded in <head>, so it waits for DOMContentLoaded;
+ * it does nothing on a page with no Quarto sidebar navigation, or in embed
+ * mode (html.vm-embed).
  */
 (function () {
   function init() {
@@ -36,10 +40,8 @@
     var sidebar = document.getElementById("quarto-sidebar")
     if (!sidebar || !sidebar.classList.contains("sidebar-navigation")) return
 
-    // The localStorage key the pin is kept under. A site names its own via
-    // `mathviz: {sidebar-rail: <key>}`, which the filter emits as this meta;
-    // two sites on one origin (say, two GitHub Pages project sites) would
-    // otherwise share one pin, and a site's privacy page may name the key.
+    // The localStorage key the pin is kept under, from this meta, which
+    // _quarto.yml's include-in-header sets.
     var keyMeta = document.querySelector('meta[name="mathviz:sidebar-pin-key"]')
     var PIN_KEY = keyMeta ? keyMeta.getAttribute("content") : "vm-sidebar-pinned"
     var body = document.body
@@ -49,15 +51,34 @@
     // varies with breadcrumb depth/length and can wrap on a narrow phone,
     // so it's measured here rather than hardcoded, and exposed as a CSS
     // variable the top-offset media query in sidebar-rail.css reads.
+    // The navbar's own height is measured the same way: it depends on the
+    // theme's padding and font size and on the brand wrapping, and the
+    // sidebar and rail start just under it (--vm-header-height).
     var secondaryNav = document.querySelector(".quarto-secondary-nav")
-    function updateSecondaryNavHeight() {
+    var header = document.getElementById("quarto-header")
+    function updateNavHeights() {
+      var root = document.documentElement.style
       var h = secondaryNav ? secondaryNav.getBoundingClientRect().height : 0
-      document.documentElement.style.setProperty("--vm-secondary-nav-height", h + "px")
+      root.setProperty("--vm-secondary-nav-height", h + "px")
+      // The breadcrumb bar sits inside #quarto-header, and the CSS adds its
+      // height separately, so it is left out of the header's.
+      if (header) {
+        var inside = secondaryNav && header.contains(secondaryNav) ? h : 0
+        root.setProperty("--vm-header-height", header.getBoundingClientRect().height - inside + "px")
+      }
     }
-    if (secondaryNav) {
-      updateSecondaryNavHeight()
-      window.addEventListener("resize", updateSecondaryNavHeight)
+    updateNavHeights()
+    // A resize of either bar, not just of the window: the collapsed navbar
+    // menu opening and closing changes the header's height on its own.
+    if (window.ResizeObserver) {
+      var observer = new ResizeObserver(updateNavHeights)
+      if (header) observer.observe(header)
+      if (secondaryNav) observer.observe(secondaryNav)
+    } else {
+      window.addEventListener("resize", updateNavHeights)
     }
+    // Web fonts arriving late can change the navbar's height.
+    if (document.fonts) document.fonts.ready.then(updateNavHeights)
 
     var rail = document.createElement("div")
     rail.id = "vm-sidebar-rail"
@@ -141,3 +162,4 @@
     init()
   }
 })()
+</script>

@@ -81,9 +81,7 @@ filters:
   - mathviz
 mathviz:
   referrer: same-origin
-  # Pin/unpin the sidebar (state kept in localStorage under this key), and
-  # a title search box at the top of it.
-  sidebar-rail: mcm-sidebar-pinned
+  # A title search box at the top of the sidebar.
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
   fonts: true
@@ -98,23 +96,25 @@ mathviz:
 
 format:
   html:
-    # The sidebar rail's layout assumes these widths.
-    grid:
-      body-width: 1000px
-      sidebar-width: 260px
-      margin-width: 200px
     # mathviz's Quarto theme: Bootstrap chrome in the same palette as the
-    # mathviz panels. Site overrides go in a second file listed after each
-    # (set $vm-* variables under /*-- scss:defaults --*/).
+    # mathviz panels. Site overrides would go in a second file listed after
+    # each (set $vm-* variables under /*-- scss:defaults --*/).
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
+    # No per-page table of contents: the sidebar is the only navigation.
+    toc: false
+    # The sidebar drawer: the sidebar is off-canvas at every width, behind a
+    # slim rail with open and pin buttons (_chrome/, copied from
+    # VisualMathLab). The meta is the localStorage key the pin is kept under.
     css:
-      - assets/style.css
-    # No comment thread in mathviz embed mode (?embed=), which shows the app
-    # alone. Drop this once mathviz's chrome/embed.css lists .giscus.
+      - _chrome/sidebar-rail.css
     include-in-header:
-      text: "<style>html.vm-embed .giscus { display: none !important; }</style>"
+      - text: '<meta name="mathviz:sidebar-pin-key" content="mcm-sidebar-pinned">'
+      - _chrome/sidebar-rail.html
+      # No comment thread in mathviz embed mode (?embed=), which shows the
+      # app alone. Drop this once mathviz's chrome/embed.css lists .giscus.
+      - text: "<style>html.vm-embed .giscus { display: none !important; }</style>"
 
 # Every code cell is OJS, run in the reader's browser; nothing executes at
 # render time.

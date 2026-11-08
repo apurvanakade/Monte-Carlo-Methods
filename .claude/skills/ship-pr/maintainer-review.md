@@ -54,8 +54,8 @@ read the installed copy or https://apurvanakade.github.io/mathviz/.
 - A chapter added but missing from `website.sidebar` in `_quarto.yml`.
 - A CLAUDE.md convention broken, quoting the rule: `.map()/.filter()` chains
   or nested ternaries where loops are asked for, Plotly's legend instead of
-  mathviz's, CSS in `assets/style.css` that isn't image sizing, a hand edit to
-  `_extensions/`, D3 or precomputed JSON, and so on.
+  mathviz's, a site theme file setting anything beyond `$vm-*` tokens, a hand
+  edit to `_extensions/`, D3 or precomputed JSON, and so on.
 - CLAUDE.md, a skill or a doc that the change makes untrue, or a change that
   should have updated CLAUDE.md and did not.
 - Anything a reader of the live page would see go wrong: layout, dark mode,

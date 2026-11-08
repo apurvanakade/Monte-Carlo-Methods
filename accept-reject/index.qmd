@@ -2,7 +2,6 @@
 title: Rejection Sampling
 date: 2025-02-09 13:52:08
 author: Apurva Nakade
-toc: true  
 execute:
   echo: false
 ---
