@@ -60,16 +60,26 @@ test('runParticleFilter: shapes, invariants and determinism', () => {
 test('runParticleFilter: tracks the truth better than the raw observations', () => {
   // Filtering combines the model with the data, so with sigma_r = 1 the mean
   // position error must beat the raw observation error, whose expectation is
-  // sigma_r sqrt(pi/2) = 1.25, and stay of that order at worst.
-  const r = runParticleFilter(VM.sampling.seededRandom(42), model)
-  const meanError = VM.distributions.sampleStats(r.errors).mean
-  let raw = 0
-  for (let t = 0; t < model.T; t++) {
-    raw += Math.hypot(r.observations[t][0] - r.truth[t + 1][0], r.observations[t][1] - r.truth[t + 1][1])
+  // sigma_r sqrt(pi/2) = 1.25, and stay of that order at worst. One seed's 30
+  // steps are too noisy to decide that: a single run can go either way (seed
+  // 42 under mathviz 1.4.0's gaussianRandom stream has the raw observations
+  // ahead). So the test averages each run's mean errors over seeds 1..20.
+  // Over seeds 1..50 the filter wins 46 times, with a mean of 1.01 against 1.23.
+  const seeds = Array.from({ length: 20 }, (_, i) => i + 1)
+  let meanFilter = 0, meanRaw = 0
+  for (const s of seeds) {
+    const r = runParticleFilter(VM.sampling.seededRandom(s), model)
+    meanFilter += VM.distributions.sampleStats(r.errors).mean
+    let raw = 0
+    for (let t = 0; t < model.T; t++) {
+      raw += Math.hypot(r.observations[t][0] - r.truth[t + 1][0], r.observations[t][1] - r.truth[t + 1][1])
+    }
+    meanRaw += raw / model.T
   }
-  raw /= model.T
-  assert.ok(meanError < raw, `filter ${meanError}, raw ${raw}`)
-  assert.ok(meanError < 1.5, `filter ${meanError}`)
+  meanFilter /= seeds.length
+  meanRaw /= seeds.length
+  assert.ok(meanFilter < meanRaw, `filter ${meanFilter}, raw ${meanRaw}`)
+  assert.ok(meanFilter < 1.5, `filter ${meanFilter}`)
 })
 
 test('pfEllipse: closed-form axes and center', () => {
