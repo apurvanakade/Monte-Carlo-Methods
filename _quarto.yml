@@ -109,6 +109,7 @@ format:
     # VisualMathLab). The meta is the localStorage key the pin is kept under.
     css:
       - _chrome/sidebar-rail.css
+      - _chrome/reading-measure.css
     include-in-header:
       - text: '<meta name="mathviz:sidebar-pin-key" content="mcm-sidebar-pinned">'
       - _chrome/sidebar-rail.html

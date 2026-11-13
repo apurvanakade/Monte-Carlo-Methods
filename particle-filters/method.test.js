@@ -13,6 +13,8 @@ import { loadVM } from '../scripts/load-vm.mjs'
 import { pfPropagate, runParticleFilter, pfEllipse } from './method.js'
 
 const VM = loadVM()
+// The page's seed (particle-filters/index.qmd).
+const pageSeed = 18
 const model = {dt: 1, T: 30, nParticles: 500, sigmaA: 0.5, sigmaR: 1.0, start: [0, 0, 1, 0.5], initialVariances: [2, 2, 1, 1]}
 
 test('pfPropagate: moments of the random-acceleration step', () => {
@@ -35,7 +37,7 @@ test('pfPropagate: moments of the random-acceleration step', () => {
 })
 
 test('runParticleFilter: shapes, invariants and determinism', () => {
-  const r = runParticleFilter(VM.sampling.seededRandom(42), model)
+  const r = runParticleFilter(VM.sampling.seededRandom(pageSeed), model)
   assert.equal(r.truth.length, model.T + 1)
   assert.equal(r.observations.length, model.T)
   assert.equal(r.estimates.length, model.T)
@@ -53,23 +55,37 @@ test('runParticleFilter: shapes, invariants and determinism', () => {
     if (r.ess[t] < model.nParticles / 2) expected.push(t)
   }
   assert.deepEqual(r.resampledSteps, expected)
-  const again = runParticleFilter(VM.sampling.seededRandom(42), model)
+  const again = runParticleFilter(VM.sampling.seededRandom(pageSeed), model)
   assert.deepEqual(again.errors, r.errors)
 })
 
-test('runParticleFilter: tracks the truth better than the raw observations', () => {
-  // Filtering combines the model with the data, so with sigma_r = 1 the mean
-  // position error must beat the raw observation error, whose expectation is
-  // sigma_r sqrt(pi/2) = 1.25, and stay of that order at worst.
-  const r = runParticleFilter(VM.sampling.seededRandom(42), model)
-  const meanError = VM.distributions.sampleStats(r.errors).mean
+function meanErrors(seed) {
+  const r = runParticleFilter(VM.sampling.seededRandom(seed), model)
+  const filter = VM.distributions.sampleStats(r.errors).mean
   let raw = 0
   for (let t = 0; t < model.T; t++) {
     raw += Math.hypot(r.observations[t][0] - r.truth[t + 1][0], r.observations[t][1] - r.truth[t + 1][1])
   }
-  raw /= model.T
-  assert.ok(meanError < raw, `filter ${meanError}, raw ${raw}`)
-  assert.ok(meanError < 1.5, `filter ${meanError}`)
+  return {filter, raw: raw / model.T}
+}
+
+test('runParticleFilter: tracks the truth better than the raw observations', () => {
+  // Filtering combines the model with the data, so with sigma_r = 1 the
+  // filter's mean position error must beat the raw observation error, whose
+  // expectation is sigma_r sqrt(pi/2) = 1.25. One run of T = 30 steps can lose
+  // by chance, so compare averages over many seeds.
+  const seeds = 50
+  let filter = 0, raw = 0
+  for (let seed = 1; seed <= seeds; seed++) {
+    const e = meanErrors(seed)
+    filter += e.filter / seeds
+    raw += e.raw / seeds
+  }
+  assert.ok(Math.abs(raw - Math.sqrt(Math.PI / 2)) < 0.1, `raw ${raw}`)
+  assert.ok(filter < 0.9 * raw, `filter ${filter}, raw ${raw}`)
+  // The page's own run should show the typical picture, not an unlucky one.
+  const page = meanErrors(pageSeed)
+  assert.ok(page.filter < page.raw, `page: filter ${page.filter}, raw ${page.raw}`)
 })
 
 test('pfEllipse: closed-form axes and center', () => {

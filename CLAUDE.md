@@ -36,7 +36,7 @@ Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work
 
 ```
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme
-_chrome/         this site's own chrome: the sidebar drawer (see mathviz below)
+_chrome/         this site's own chrome: the sidebar drawer (see mathviz below) and reading-measure.css (caps prose at 40rem inside the 1000px column)
 _extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
 <slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js): the chapters
@@ -51,7 +51,7 @@ references.bib   the bibliography; each page prints its own cited entries under 
 ### How the site gets it
 
 - `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
-- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.js` and `mathviz.css` into `<head>`.
+- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.min.js` and `mathviz.min.css` into `<head>`.
 - The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. No page has a table of contents (`toc: false` in `_quarto.yml`): the sidebar is the only navigation.
 - **The sidebar is a drawer** (`_chrome/`, this site's own chrome): off-canvas at every width, behind a slim rail at the left edge with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open, in `localStorage` under `mcm-sidebar-pinned`, the `mathviz:sidebar-pin-key` meta). `_chrome/sidebar-rail.css` is listed under `format.html.css`; `_chrome/sidebar-rail.html` is the script, inlined into every page by `include-in-header` (not a `<script src>`: the site lives under `/Monte-Carlo-Methods/`, so a root-relative URL breaks and a relative one differs per page depth). Both are copies of VisualMathLab's `_chrome/sidebar-rail.*` (mathviz's `sidebar-rail` option until mathviz dropped it), changed only in their header comments; with two sites using it, it belongs back in mathviz. Above 992px its CSS replaces Quarto's page grid with a centered 1000px body column; it assumes `style: floating` and skips embed mode.
 - `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to "design-system CSS belongs in mathviz". Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
@@ -63,7 +63,7 @@ mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/ma
 A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. To try it here first, build mathviz and `quarto add ../mathviz --no-prompt` from this repo; restore the release with `make update-mathviz` before committing.
-- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today only the sidebar drawer). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the sidebar drawer and the prose reading measure). There is no local overlay (mathviz v0.10.0 removed the kit for one).
 
 ## Writing an app
 

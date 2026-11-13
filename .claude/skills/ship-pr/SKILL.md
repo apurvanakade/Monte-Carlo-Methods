@@ -4,6 +4,14 @@ description: Take a finished Monte Carlo Methods change all the way to the live 
 argument-hint: "[PR number]  (default: open a PR for the current worktree's changes)"
 ---
 
+## Run in a fresh Haiku agent
+
+Don't run the steps below in this session. Spawn one `general-purpose` agent
+with the Agent tool, `model: "haiku"`, not a fork, so it starts without this
+session's context. Its prompt: the arguments given to this skill, then the
+text of this file after the frontmatter, with this section removed and the
+arguments substituted. Wait for it, then relay its final report to the user.
+
 # Ship a change
 
 A change reaches `develop` through a pull request, and `main` only by

@@ -270,7 +270,7 @@ gibbsTraceColors = new Map([
 ```{ojs}
 viewof gibbsRedraw = {
   const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-auto")
+  button.classList.add("ojs-end")
   return button
 }
 ```
