@@ -85,6 +85,9 @@ filters:
   - mathviz
 mathviz:
   referrer: same-origin
+  # The sidebar is off-canvas behind a slim rail (open, pin); the string is
+  # the localStorage key the pin is kept under, so readers' pins survive.
+  sidebar-rail: mcm-sidebar-pinned
   # A title search box at the top of the sidebar.
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
@@ -108,14 +111,11 @@ format:
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
     # No per-page table of contents: the sidebar is the only navigation.
     toc: false
-    # The sidebar drawer: the sidebar is off-canvas at every width, behind a
-    # slim rail with open and pin buttons (_chrome/, copied from
-    # VisualMathLab). The meta is the localStorage key the pin is kept under.
-    css:
-      - _chrome/sidebar-rail.css
+    # Body column width on wide screens (the sidebar rail centres it); the
+    # Quarto default is 800px.
+    grid:
+      body-width: 1000px
     include-in-header:
-      - text: '<meta name="mathviz:sidebar-pin-key" content="mcm-sidebar-pinned">'
-      - _chrome/sidebar-rail.html
       # No comment thread in mathviz embed mode (?embed=), which shows the
       # app alone. Drop this once mathviz's chrome/embed.css lists .giscus.
       - text: "<style>html.vm-embed .giscus { display: none !important; }</style>"

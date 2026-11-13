@@ -16,7 +16,7 @@
 // clearing the query restores each section's open/closed state as it was
 // when the query started. Enter opens the first entry, in menu order, whose
 // own title matches. Escape clears a non-empty box and stops there, so a
-// site's own Escape-to-close (say, for an off-canvas sidebar) waits for a
+// site's own Escape-to-close (the sidebar rail's, say) waits for a
 // second press. Nothing is stored.
 (function attachSidebarSearch(globalThis) {
   // Lower case, no accents, no apostrophes (straight or curly, so
@@ -159,6 +159,5 @@
     }
   }
 
-  const VM = globalThis.VM || (globalThis.VM = {})
-  VM.chrome = { ...VM.chrome, sidebarSearch: { normalize, matches } }
+  Object.assign((globalThis.VM ??= {}).chrome ??= {}, { sidebarSearch: { normalize, matches } })
 })(window)
