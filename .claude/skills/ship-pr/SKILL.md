@@ -89,14 +89,15 @@ merged PR, so a missed review can't be had afterwards.
 
 ### 2b. Copilot out of credits: a local maintainer review instead
 
-When Copilot's quota runs out it still posts a review, with no findings and
-this body: *"Copilot was unable to review this pull request because the user
-who requested the review has reached their quota limit."* Check for it:
+When Copilot's quota runs out it still posts a review, with no findings and a
+body saying so: *"Copilot was unable to review this pull request because the
+user who requested the review has reached their quota limit"*, or wording with
+"insufficient remaining quota". Check for either:
 
 ```sh
 gh pr view <N> --json reviews \
   -q '.reviews[] | select(.author.login | startswith("copilot")) | .body' \
-  | grep -i "unable to review"
+  | grep -iE "unable to review|quota"
 ```
 
 If it matches, Copilot's review isn't coming. Don't wait out the 30 minutes
