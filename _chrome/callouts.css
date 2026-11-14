@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* Callouts: no box, no fill, no icon (callout-icon: false in _quarto.yml),
+ * just an accent rule down the left and the title in the rule's colour above
+ * the body. The exercises (_chrome/exercises.css) have no rule, so a callout is
+ * the one ruled block on a page. Every type takes
+ * the accent except warnings, which take the warn colour. mathviz's theme
+ * draws callouts as bordered panels; these rules sit after it and replace
+ * that box. Listed under format.html.css in _quarto.yml. */
+
+main .callout.callout-style-default {
+  --mcm-callout-rule: var(--vm-accent);
+  margin-block: 1.75rem;
+  padding: 0.15rem 0 0.15rem 1rem;
+  border: 0;
+  border-left: 3px solid var(--mcm-callout-rule);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+main .callout.callout-style-default.callout-warning {
+  --mcm-callout-rule: var(--vm-color-warn);
+}
+main .callout.callout-style-default .callout-header {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+}
+main .callout.callout-style-default .callout-title-container {
+  color: var(--mcm-callout-rule);
+  font-weight: 650;
+}
+/* Quarto sets the body in a smaller type and pads its first and last
+ * paragraphs; here it is ordinary text, a line under the title. */
+main .callout.callout-style-default .callout-body-container,
+main .callout.callout-style-default .callout-body {
+  padding: 0;
+  font-size: inherit;
+  background: none;
+}
+main .callout.callout-style-default .callout-body > :first-child {
+  margin-top: 0.25rem;
+  padding-top: 0;
+}
+main .callout.callout-style-default .callout-body > :last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}

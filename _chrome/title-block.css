@@ -1,0 +1,15 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* A page opens with its title alone, as the blog's posts do: Quarto's
+ * AUTHOR / PUBLISHED columns are hidden (the author is on every page and a
+ * chapter's date says nothing to a reader). Listed under format.html.css in
+ * _quarto.yml. */
+
+/* Outranks Quarto's `#title-block-header.quarto-title-block.default
+ * .quarto-title-meta { display: grid }`. */
+body #title-block-header.quarto-title-block.default .quarto-title-meta { display: none; }
+#title-block-header { margin-bottom: 1.5rem; }

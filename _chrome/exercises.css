@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* Exercises, textbook style: a bold run-in "Exercise n (Name)." heading in
+ * the text colour, no box or rule, and parts lettered (a), (b), ... in a
+ * hanging column. Quieter than callouts (_chrome/callouts.css), whose accent
+ * rule marks the page's key facts.
+ * Quarto renders #exr- divs as
+ * <div class="theorem exercise">, with the heading in .theorem-title.
+ * Listed under format.html.css in _quarto.yml; the "Next exercise" buttons
+ * and "Previous exercise" links come from _chrome/exercises.html. */
+
+.theorem.exercise {
+  position: relative; /* for .exr-next */
+  margin-block: 2.75rem;
+  padding-inline: 1.5rem;
+  scroll-margin-top: 1.5rem;
+}
+.theorem.exercise > p:first-child { margin-top: 0; }
+.theorem.exercise > :last-child { margin-bottom: 0; }
+.theorem.exercise .theorem-title strong {
+  color: var(--vm-text);
+  font-weight: 650;
+}
+.theorem.exercise .theorem-title strong::after { content: "."; }
+.theorem.exercise ol[type="a"] {
+  list-style: none;
+  counter-reset: exr-part;
+  margin: 0.5rem 0 0;
+  padding-left: 2.25rem;
+}
+.theorem.exercise ol[type="a"] > li {
+  counter-increment: exr-part;
+  margin-top: 0.35rem;
+}
+/* An inline box pulled into the hanging column, not an absolutely
+ * positioned one: inline, it sits on the first line's baseline even when
+ * math makes that line taller. */
+.theorem.exercise ol[type="a"] > li::before {
+  content: "(" counter(exr-part, lower-alpha) ")";
+  display: inline-block;
+  width: 1.75rem;
+  margin-left: -2.25rem;
+  margin-right: 0.5rem;
+  text-align: right;
+  font-size: inherit;
+  color: var(--vm-text-soft);
+  font-weight: 600;
+}
+
+/* "Previous exercise" (bottom left, every exercise but a page's first) and
+ * "Next exercise" (bottom right, every exercise but its last) links. They
+ * appear while the pointer is over the exercise (or a link has focus), so a
+ * page of exercises isn't a column of repeated buttons; on a touch screen,
+ * with no hover, they stay visible. */
+.theorem.exercise > .exr-next {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+.exr-next .exr-next-button { margin-left: auto; }
+.exr-next button {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0;
+  color: var(--vm-text-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.exr-next button:hover { color: var(--vm-accent); }
+@media (hover: hover) {
+  /* Out of the flow, in the gap under the exercise, so the hidden button
+   * leaves no blank line inside it. */
+  .theorem.exercise > .exr-next {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 0.2rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .theorem.exercise:hover > .exr-next,
+  .theorem.exercise > .exr-next:focus-within { opacity: 1; }
+}
