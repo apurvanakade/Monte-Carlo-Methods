@@ -4,7 +4,7 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 
 ## The model chapter
 
-- `estimating-pi/index.qmd` is the reference. Read it in full before starting, and match its tone, structure and density.
+- `chapters/estimating-pi/index.qmd` is the reference. Read it in full before starting, and match its tone, structure and density.
 - It is the only chapter in the new style so far; every other chapter is to be rewritten toward it.
 
 ## Readers
@@ -32,7 +32,7 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 ## Mathematical tricks
 
 - Mathematical tricks are highly valued teaching material. Look for them and give them room.
-- Example: in `estimating-pi/`, Buffon's estimator divides by a random count, so it is biased. The chapter spends a whole section on this: why $\mathbb{E}[1/\hat p] \ne 1/\mathbb{E}[\hat p]$, a second-order Taylor expansion for the bias, the delta method for the variance, convexity to get the sign of the bias, and MSE = Var + Bias² to show the bias is negligible. That is the kind of depth wanted.
+- Example: in `chapters/estimating-pi/`, Buffon's estimator divides by a random count, so it is biased. The chapter spends a whole section on this: why $\mathbb{E}[1/\hat p] \ne 1/\mathbb{E}[\hat p]$, a second-order Taylor expansion for the bias, the delta method for the variance, convexity to get the sign of the bias, and MSE = Var + Bias² to show the bias is negligible. That is the kind of depth wanted.
 - The first, linear analysis (an unbiased average, its variance) alone does not teach enough. Where a chapter's method has a natural non-linear or subtle twist, follow it.
 - Other examples of the kind of thing to look for: the one-loop lattice-point count (`@exr-gauss-count`), Barbier's noodle via linearity of expectation over dependent pieces.
 - Don't force it. Some chapters have no trick worth teaching; then don't invent one.

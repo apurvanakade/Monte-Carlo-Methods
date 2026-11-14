@@ -6,7 +6,7 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { loadVM } from '../scripts/load-vm.mjs'
+import { loadVM } from '../../scripts/load-vm.mjs'
 import { arTarget, arBeta, drawBoxProposals, drawBetaProposals, arEfficiency } from './method.js'
 
 const VM = loadVM()

@@ -4,7 +4,7 @@
  * Authors: Apurva Nakade
  */
 
-// The methods behind estimating-pi/index.qmd: the hit-or-miss estimate of pi,
+// The methods behind chapters/estimating-pi/index.qmd: the hit-or-miss estimate of pi,
 // Buffon's needle and Barbier's noodle, and the non-random Gauss circle and
 // Halton estimates. None of the samplers uses pi; it appears only in the
 // reported errors. Imported by the page's OJS
