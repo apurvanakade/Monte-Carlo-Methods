@@ -52,9 +52,10 @@
 }
 
 /* "Previous exercise" (bottom left, every exercise but a page's first) and
- * "Next exercise" (bottom right, every exercise but its last) links. It appears while the pointer is over the exercise (or the button has
- * focus), so a page of exercises isn't a column of repeated buttons; on a
- * touch screen, with no hover, it stays visible. */
+ * "Next exercise" (bottom right, every exercise but its last) links. They
+ * appear while the pointer is over the exercise (or a link has focus), so a
+ * page of exercises isn't a column of repeated buttons; on a touch screen,
+ * with no hover, they stay visible. */
 .theorem.exercise > .exr-next {
   display: flex;
   gap: 1rem;
