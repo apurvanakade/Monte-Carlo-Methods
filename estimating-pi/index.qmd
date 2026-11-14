@@ -690,11 +690,7 @@ buffonUrlSync = VM.ui.syncUrlParams({
 
 ### Estimating the probability
 
-Up to sliding along the lines, a drop is determined by two numbers:
-
-- the angle $\theta \in [0, \pi)$ the needle makes with the lines, and
-- the distance $d \in [0, t/2]$ from its center to the *nearest* line.
-
+Up to sliding along the lines, a drop is determined by two numbers: the angle $\theta \in [0, \pi)$ the needle makes with the lines, and the distance $d \in [0, t/2]$ from its center to the *nearest* line.
 
 ::: {#exr-buffon-uniform}
 ## The model

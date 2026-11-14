@@ -11,11 +11,12 @@
  * Quarto renders #exr- divs as
  * <div class="theorem exercise">, with the heading in .theorem-title.
  * Listed under format.html.css in _quarto.yml; the "Next exercise" buttons
- * come from _chrome/exercises.html. */
+ * and "Previous exercise" links come from _chrome/exercises.html. */
 
 .theorem.exercise {
   position: relative; /* for .exr-next */
-  margin-block: 1.75rem;
+  margin-block: 2.75rem;
+  padding-inline: 1.5rem;
   scroll-margin-top: 1.5rem;
 }
 .theorem.exercise > p:first-child { margin-top: 0; }
@@ -50,15 +51,17 @@
   font-weight: 600;
 }
 
-/* "Next exercise" button at the bottom right of every exercise but a page's
- * last. It appears while the pointer is over the exercise (or the button has
- * focus), so a page of exercises isn't a column of repeated buttons; on a
- * touch screen, with no hover, it stays visible. */
+/* "Previous exercise" (bottom left, every exercise but a page's first) and
+ * "Next exercise" (bottom right, every exercise but its last) links. They
+ * appear while the pointer is over the exercise (or a link has focus), so a
+ * page of exercises isn't a column of repeated buttons; on a touch screen,
+ * with no hover, they stay visible. */
 .theorem.exercise > .exr-next {
   display: flex;
-  justify-content: flex-end;
+  gap: 1rem;
   margin-top: 0.25rem;
 }
+.exr-next .exr-next-button { margin-left: auto; }
 .exr-next button {
   font: inherit;
   font-size: 0.75rem;
@@ -74,6 +77,7 @@
    * leaves no blank line inside it. */
   .theorem.exercise > .exr-next {
     position: absolute;
+    left: 0;
     right: 0;
     top: 100%;
     margin-top: 0.2rem;
