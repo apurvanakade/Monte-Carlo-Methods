@@ -15,12 +15,22 @@
 
 .theorem.exercise {
   position: relative; /* for .exr-next */
-  margin-block: 2.75rem;
-  padding-inline: 1.5rem;
+  /* No margin here: mathviz's theme spaces every block set apart from the
+   * prose (exercises, callouts, theorems, apps) by $vm-block-gap. */
+  /* A light box: a hairline border, the page's radius and a faint fill,
+   * quieter than a callout's accent rule. */
+  padding: 0.9rem 1.25rem;
+  border: 1px solid var(--vm-border);
+  border-radius: var(--vm-radius);
+  background: color-mix(in srgb, var(--vm-surface) 60%, transparent);
   scroll-margin-top: 1.5rem;
 }
 .theorem.exercise > p:first-child { margin-top: 0; }
-.theorem.exercise > :last-child { margin-bottom: 0; }
+/* The last block before the box's bottom edge: the last child, or the one
+ * before the "Next exercise" links, which sit out of the flow on a hover
+ * screen and would otherwise leave that block's margin inside the box. */
+.theorem.exercise > :last-child,
+.theorem.exercise > :has(+ .exr-next:last-child) { margin-bottom: 0; }
 .theorem.exercise .theorem-title strong {
   color: var(--vm-text);
   font-weight: 650;
