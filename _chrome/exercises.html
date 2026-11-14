@@ -3,25 +3,38 @@
   Released under Apache 2.0 license as described in the file LICENSE.
   Authors: Apurva Nakade
 
-  "Next exercise" buttons: appends one to every exercise (#exr- div) but a
-  page's last, scrolling to the next. Styled in _chrome/exercises.css.
+  "Previous exercise" / "Next exercise" links: appends them to every
+  exercise (#exr- div), skipping "Previous" on a page's first and "Next" on
+  its last, each scrolling to that exercise. Styled in _chrome/exercises.css.
   Listed under format.html.include-after-body in _quarto.yml.
 -->
 <script>
 (() => {
   const exercises = document.querySelectorAll(".theorem.exercise");
   const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  for (let i = 0; i + 1 < exercises.length; i++) {
-    const next = exercises[i + 1];
-    const wrap = document.createElement("div");
-    wrap.className = "exr-next";
+  const link = (label, target) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Next exercise ↓";
+    button.textContent = label;
     button.addEventListener("click", () => {
-      next.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+      target.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
     });
-    wrap.appendChild(button);
+    return button;
+  };
+  for (let i = 0; i < exercises.length; i++) {
+    if (exercises.length < 2) break;
+    const wrap = document.createElement("div");
+    wrap.className = "exr-next";
+    if (i > 0) {
+      const prev = link("↑ Previous exercise", exercises[i - 1]);
+      prev.className = "exr-prev-button";
+      wrap.appendChild(prev);
+    }
+    if (i + 1 < exercises.length) {
+      const next = link("Next exercise ↓", exercises[i + 1]);
+      next.className = "exr-next-button";
+      wrap.appendChild(next);
+    }
     exercises[i].appendChild(wrap);
   }
 })();
