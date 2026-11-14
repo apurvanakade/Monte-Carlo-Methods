@@ -113,8 +113,8 @@ format:
     # Callouts are drawn without icons (_chrome/callouts.css styles them).
     callout-icon: false
     # Body column width on wide screens (the sidebar rail centres it); the
-    # Quarto default is 800px. Prose is capped at 40rem (680px) inside it and
-    # centred, so apps and figures stand out by the same margin on each side.
+    # Quarto default is 800px. Prose is capped at 40rem (640px) inside it, so
+    # the cap barely narrows anything; prose and apps share the column.
     grid:
       body-width: 680px
     # Prose measure: caps paragraphs and headings at 40rem inside the column.
