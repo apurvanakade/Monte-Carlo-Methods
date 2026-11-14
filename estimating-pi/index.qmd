@@ -295,7 +295,8 @@ piErrors = randomCircleErrors(VM.sampling.seededRandom(43), checkpoints(10000), 
 //| output: false
 // The analysis figures (convergence and error plots) are static Observable
 // Plot charts with a key under them, the way Visual Math Lab draws its
-// convergence plots: nothing to zoom, so no modebar and no fullscreen.
+// convergence plots: nothing to zoom, so no modebar (the figure with a
+// statRow gets mathviz's fullscreen button from its ojs-svg-block).
 // These functions read chartColors, so every figure built with them
 // redraws on a dark-mode toggle.
 
