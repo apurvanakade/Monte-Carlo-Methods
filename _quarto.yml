@@ -113,16 +113,14 @@ format:
     # Callouts are drawn without icons (_chrome/callouts.css styles them).
     callout-icon: false
     # Body column width on wide screens (the sidebar rail centres it); the
-    # Quarto default is 800px. Prose is capped at 40rem (640px) inside it, so
-    # the cap barely narrows anything; prose and apps share the column.
+    # Quarto default is 800px. 680px (40rem at the theme's 17px root) is about
+    # 70 characters of text, and prose, apps and figures share it.
     grid:
       body-width: 680px
-    # Prose measure: caps paragraphs and headings at 40rem inside the column.
     # Exercises: textbook-style #exr- blocks, with "Next exercise" buttons
     # from the script in _chrome/exercises.html.
     # Callouts and the title block: quiet, like the blog's.
     css:
-      - _chrome/reading-measure.css
       - _chrome/exercises.css
       - _chrome/callouts.css
       - _chrome/title-block.css

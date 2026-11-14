@@ -15,7 +15,7 @@
 
 .theorem.exercise {
   position: relative; /* for .exr-next */
-  margin-block: 1.75rem; /* inline margins: reading-measure.css */
+  margin-block: 1.75rem;
   scroll-margin-top: 1.5rem;
 }
 .theorem.exercise > p:first-child { margin-top: 0; }
