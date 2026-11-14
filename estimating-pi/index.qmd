@@ -42,6 +42,15 @@ import {dropPoints, circleEstimate, runningCircleEstimates, dropNeedles, needleC
   checkpoints, randomCircleErrors, runningBuffonEstimates, randomBuffonErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder} from "./method.js"
 ```
 
+```{=html}
+<style>
+/* The analysis figures (piFigure): an Observable Plot chart with its title
+   above and its key under, centered in the column. */
+.pi-figure { width: fit-content; max-width: 100%; margin-inline: auto; }
+.pi-figure-title { font-weight: 600; text-align: center; color: var(--vm-text); }
+</style>
+```
+
 
 ## The circle estimator
 
@@ -290,26 +299,22 @@ piErrors = randomCircleErrors(VM.sampling.seededRandom(43), checkpoints(10000), 
 // These functions read chartColors, so every figure built with them
 // redraws on a dark-mode toggle.
 
-// A chart with a Plot.legend key under it, and an optional title above.
-// `key` is [{label, color}], in order. The title is a plain div rather than
-// Plot's own `title` option, which renders an <h2> and so takes the page's
-// section-heading style.
+// A chart with a key under it (VM.ui.staticKey, whose swatches are drawn
+// like their marks: a dashed line dashed, a band shaded), and an optional
+// title above. `key` is staticKey's items, in order. The title is a plain div
+// rather than Plot's own `title` option, which renders an <h2> and so takes
+// the page's section-heading style. Its look is the .pi-figure rules in this
+// page's <style> block.
 function piFigure(chart, key, title) {
-  const domain = [], range = []
-  for (const row of key) {
-    domain.push(row.label)
-    range.push(row.color)
-  }
   const figure = document.createElement("div")
-  // Plot charts have a fixed width; center the chart and its key in the column.
-  figure.style.cssText = "width: fit-content; max-width: 100%; margin-inline: auto"
+  figure.className = "pi-figure"
   if (title) {
     const heading = document.createElement("div")
+    heading.className = "pi-figure-title"
     heading.textContent = title
-    heading.style.cssText = "font-weight: 600; text-align: center; color: var(--vm-text)"
     figure.append(heading)
   }
-  figure.append(chart, Plot.legend({color: {domain, range}}))
+  figure.append(chart, VM.ui.staticKey(key))
   return figure
 }
 
@@ -371,7 +376,10 @@ function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidt
       Plot.ruleY([Math.PI], {stroke: chartColors.alt, strokeWidth: 2, strokeDasharray: "6,4"})
     ]
   }))
-  return piFigure(chart, [{label: "Independent runs", color: runColor}, {label: "π", color: chartColors.alt}], title)
+  return piFigure(chart, [
+    {label: "Independent runs", stroke: runColor, strokeWidth: 1.5},
+    {label: "π", stroke: chartColors.alt, strokeWidth: 2, strokeDasharray: "6,4"}
+  ], title)
 }
 
 // Error decay: the RMS error over many runs, the band holding the middle 80%
@@ -402,9 +410,12 @@ function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = w
     ]
   }))
   return piFigure(chart, [
-    {label: "RMS error", color: chartColors.fn},
-    {label: "Middle 80% of runs", color: bandColor},
-    {label: "Slope −1/2", color: chartColors.ink}
+    {label: "RMS error", marks: [
+      {mark: "line", stroke: chartColors.fn, strokeWidth: 2},
+      {mark: "dot", fill: chartColors.fn, r: 2}
+    ]},
+    {label: "Middle 80% of runs", mark: "area", fill: bandColor},
+    {label: "Slope −1/2", stroke: chartColors.ink, strokeWidth: 1.5, strokeDasharray: "6,4"}
   ], title)
 }
 ```
@@ -714,14 +725,24 @@ buffonFigNeedlePlot = VM.plotting.persistentPlot({height: "420px"})
 buffonFigRegionPlot = VM.plotting.persistentPlot({height: "420px"})
 // The axes are fixed, so the zoom and pan toolbar would do nothing here.
 buffonFigConfig = ({...VM.plotting.config(), displayModeBar: false})
+// Label sizes, scaled from the chart theme's own font size so they follow it:
+// the needle's labels (θ, d, h, ℓ/2, t) a size up, "drag me" a step up.
+buffonFigFontSize = VM.plotting.layout().font.size
+buffonFigLabelSize = Math.round(buffonFigFontSize * 1.25)
+buffonFigHintSize = buffonFigFontSize + 1
 // The drop the dot in "All needle drops" sets, by name.
 buffonFigDrop = ({theta: buffonFigPoint.x, d: buffonFigPoint.y})
 ```
 
 
+<!-- One chart block per panel, which lets the chart shrink with its
+layout-ncol column. -->
+
 :::: {#fig-buffon-setup}
 
 ::: {layout-ncol=2}
+
+<div class="ojs-chart-block">
 
 ```{ojs}
 // buffonFigPoint: the dragged point, x = theta and y = d. The chart itself is
@@ -735,6 +756,10 @@ viewof buffonFigPoint = VM.plotting.draggablePoints(buffonFigRegionPlot, {
   format: p => `θ ${Math.round(p.x * 180 / Math.PI)}°, d ${p.y.toFixed(2)}`
 })
 ```
+
+</div>
+
+<div class="ojs-chart-block">
 
 ```{ojs}
 {
@@ -781,7 +806,7 @@ viewof buffonFigPoint = VM.plotting.draggablePoints(buffonFigRegionPlot, {
       marker: {color: chartColors.fn, size: 10}}
   ]
 
-  const label = (x, y, text, color) => ({x, y, text, showarrow: false, font: {color, size: 15}})
+  const label = (x, y, text, color) => ({x, y, text, showarrow: false, font: {color, size: buffonFigLabelSize}})
   const thetaLabelAngle = Math.PI + theta / 2
   return buffonFigNeedlePlot(data, {
     title: {text: "One needle drop"}, margin: {t: 40, l: 10, r: 10, b: 10},
@@ -794,10 +819,12 @@ viewof buffonFigPoint = VM.plotting.draggablePoints(buffonFigRegionPlot, {
       label(upperX / 2 + side * 0.09 * Math.sin(theta), (d + upperY) / 2 - 0.09 * Math.abs(Math.cos(theta)), "ℓ/2", chartColors.fn),
       label(0.85, 0.5, "t", chartColors.muted)
     ],
-    hovermode: false, uirevision: "static", autosize: true
+    dragmode: false, hovermode: false, uirevision: "static", autosize: true
   }, buffonFigConfig)
 }
 ```
+
+</div>
 
 :::
 
@@ -830,7 +857,7 @@ Drag the dot in *All needle drops* to move the needle in *One needle drop*.
     yaxis: {title: "d", range: buffonFigDRange, fixedrange: true, zeroline: false, showgrid: false,
       tickmode: "array", tickvals: [0, 0.5], ticktext: ["0", "t/2"]},
     annotations: [{x: theta, y: d, text: "drag me", xanchor: labelAnchor, xshift: labelShift,
-      showarrow: false, font: {color: chartColors.fn, size: 13}}],
+      showarrow: false, font: {color: chartColors.fn, size: buffonFigHintSize}}],
     dragmode: false, hovermode: false, uirevision: "static", autosize: true
   }, buffonFigConfig)
 }
@@ -1305,8 +1332,12 @@ cmpSeries = [
 ```
 
 
+<!-- The readouts sit in the chart block after the chart, where mathviz places
+a statRow under its chart (and keeps it there in fullscreen). -->
+
 ::: {#fig-pi-methods}
 
+<div class="ojs-chart-block ojs-svg-block">
 
 ```{ojs}
 {
@@ -1316,7 +1347,6 @@ cmpSeries = [
   for (const s of cmpSeries) {
     const color = chartColors[s.token]
     xLo = Math.min(xLo, s.points[0].n)
-    key.push({label: s.label, color})
     // A deterministic error can land exactly on π, which a log axis can't show.
     const rows = []
     for (const p of s.points) {
@@ -1338,6 +1368,10 @@ cmpSeries = [
       marks.push(Plot.dot(rows, {x: "n", y: "error", fill: color, r: 1.5}))
       marks.push(Plot.line([{n: 100, error: fitLine(100)}, {n: last, error: fitLine(last)}], {x: "n", y: "error", stroke: color, strokeWidth: 2}))
       marks.push(Plot.line([{n: first, error: fitLine(first)}, {n: 100, error: fitLine(100)}], {x: "n", y: "error", stroke: color, strokeWidth: 2, strokeDasharray: "6,4"}))
+      key.push({label: s.label, marks: [
+        {mark: "line", stroke: color, strokeWidth: 2},
+        {mark: "dot", fill: color, r: 1.5}
+      ]})
     } else {
       // The 10%-90% band, clamped above zero for the log axis.
       const band = []
@@ -1345,6 +1379,11 @@ cmpSeries = [
       marks.push(Plot.areaY(band, {x: "n", y1: "lo", y2: "hi", fill: VM.plotting.alpha(color, 0.15), clip: true}))
       marks.push(Plot.line(rows, {x: "n", y: "error", stroke: color, strokeWidth: 2}))
       marks.push(Plot.dot(rows, {x: "n", y: "error", fill: color, r: 2.5}))
+      key.push({label: s.label, marks: [
+        {mark: "area", fill: VM.plotting.alpha(color, 0.15)},
+        {mark: "line", stroke: color, strokeWidth: 2},
+        {mark: "dot", fill: color, r: 2.5}
+      ]})
     }
   }
   // Reference slopes N⁻¹ᐟ² (dashed) and N⁻¹ (dotted), labelled at their right end.
@@ -1380,6 +1419,8 @@ cmpSeries = [
   return VM.ui.statRow(stats)
 }
 ```
+
+</div>
 
 
 Error of the three estimates of π against the number of points $N$, or the radius $r$ for the Gauss circle method.
