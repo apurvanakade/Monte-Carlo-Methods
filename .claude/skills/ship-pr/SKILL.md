@@ -4,10 +4,10 @@ description: Take a finished Monte Carlo Methods change all the way to the live 
 argument-hint: "[PR number]  (default: open a PR for the current worktree's changes)"
 ---
 
-## Run in a fresh Haiku agent
+## Run in a fresh Sonnet agent
 
 Don't run the steps below in this session. Spawn one `general-purpose` agent
-with the Agent tool, `model: "haiku"`, not a fork, so it starts without this
+with the Agent tool, `model: "sonnet"`, not a fork, so it starts without this
 session's context. Its prompt: the arguments given to this skill, then the
 text of this file after the frontmatter, with this section removed and the
 arguments substituted. Wait for it, then relay its final report to the user.
@@ -62,10 +62,6 @@ Before committing, in the worktree:
 - If a page's `method.js` changed (or a method was added), `npm test` passes:
   each method has its `method.test.js`, and the PR says why each expected
   number is right.
-- Every page the change touches is opened in that worktree's
-  `quarto preview --port <4201, 4202, ...> --no-browser`, and its apps
-  exercised: every button, every slider moved, dark mode toggled, the
-  `?embed=<id>` view loaded. The browser console shows no errors.
 - `_extensions/apurvanakade/mathviz/` changed only if it is a release
   (`make update-mathviz`), never a local build or a hand edit; library changes
   are pull requests to apurvanakade/mathviz.
@@ -207,7 +203,7 @@ ask the user. Then confirm the publish run started:
 
 ## 8. Clean up
 
-Stop the worktree's preview if one is running, then check
+Check
 `git -C ../Monte-Carlo-Methods-<slug> status --short` and stop if it lists a
 modified tracked file -- that is unmerged work. Otherwise:
 
