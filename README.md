@@ -25,7 +25,7 @@ _quarto.yml           site config (sidebar, mathviz options); enables the mathvi
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
 index.qmd             preface
 <slug>/                one folder per page: <slug>/index.qmd (chapters and appendices)
-_chrome/              site chrome: prose reading measure, exercise styling
+_chrome/              site chrome: prose reading measure, exercise and callout styling, title block
 scripts/              build hooks
 references.bib
 .github/              render on PRs (pr-check), publish main to gh-pages (publish)

@@ -4,8 +4,8 @@
  * Authors: Apurva Nakade
  */
 
-/* Reading measure. The body column is 1000px wide (format.html.grid in
- * _quarto.yml) so apps and figures get room; prose at that width runs ~130 characters a
+/* Reading measure. The body column is 850px wide (format.html.grid in
+ * _quarto.yml) so apps and figures get room; prose at that width runs ~110 characters a
  * line, far past a comfortable ~70. Prose blocks that are direct children of
  * the page or of a section are capped at --mcm-measure and centered in the
  * column; apps (.vm-app), figures, layout panels, tables and code keep the
