@@ -5,9 +5,9 @@
  */
 
 /* Exercises, textbook style: a bold run-in "Exercise n (Name)." heading in
- * the text colour, no box or rule, and parts lettered (a), (b), ... in a
- * hanging column. Quieter than callouts (_chrome/callouts.css), whose accent
- * rule marks the page's key facts.
+ * the text colour inside a light box (hairline border, faint fill), and parts
+ * lettered (a), (b), ... in a hanging column. Quieter than callouts
+ * (_chrome/callouts.css), whose accent rule marks the page's key facts.
  * Quarto renders #exr- divs as
  * <div class="theorem exercise">, with the heading in .theorem-title.
  * Listed under format.html.css in _quarto.yml; the "Next exercise" buttons
