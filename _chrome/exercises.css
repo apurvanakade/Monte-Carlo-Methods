@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* Exercises, textbook style: a run-in "Exercise n (Name)." heading in the
+ * accent color, a rule down the left instead of a box, and parts lettered
+ * (a), (b), ... in a hanging column. Quarto renders #exr- divs as
+ * <div class="theorem exercise">, with the heading in .theorem-title.
+ * Listed under format.html.css in _quarto.yml; the "Next exercise" buttons
+ * come from _chrome/exercises.html. */
+
+.theorem.exercise {
+  margin-block: 1.75rem; /* inline margins: reading-measure.css */
+  padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 3px solid var(--vm-accent);
+  scroll-margin-top: 1.5rem;
+}
+.theorem.exercise > p:first-child { margin-top: 0; }
+.theorem.exercise > :last-child { margin-bottom: 0; }
+.theorem.exercise .theorem-title strong {
+  color: var(--vm-accent);
+  font-weight: 650;
+}
+.theorem.exercise .theorem-title strong::after { content: "."; }
+.theorem.exercise ol[type="a"] {
+  list-style: none;
+  counter-reset: exr-part;
+  margin: 0.5rem 0 0;
+  padding-left: 2.25rem;
+}
+.theorem.exercise ol[type="a"] > li {
+  counter-increment: exr-part;
+  position: relative;
+  margin-top: 0.35rem;
+}
+.theorem.exercise ol[type="a"] > li::before {
+  content: "(" counter(exr-part, lower-alpha) ")";
+  position: absolute;
+  right: calc(100% + 0.5rem);
+  color: var(--vm-text-soft);
+  font-weight: 600;
+}
+
+/* "Next exercise" button at the bottom right of every exercise but a page's
+ * last. */
+.theorem.exercise > .exr-next {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+.exr-next button {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0;
+  color: var(--vm-text-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.exr-next button:hover { color: var(--vm-accent); }

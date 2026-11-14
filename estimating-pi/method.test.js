@@ -180,13 +180,14 @@ test('convergenceFit recovers an exact power law', () => {
   assert.equal(convergenceFit([{n: 100, error: 1}]), null)
 })
 
-test('convergence orders: random 1/2, Gauss about 0.6, Halton about 3/4', () => {
-  // The page's figure: N up to 10^5, 40 random runs, seed 7. The random RMS
-  // error is sqrt(pi (4 - pi) / N) exactly, so its fit is 1/2 up to the noise
-  // of 40 runs. The Gauss circle error is proven N^(-1/2) or better and
-  // conjectured N^(-3/4 + eps); its fit climbs slowly with N and is about 0.6
-  // here. Halton's is near (log N)^2 / N, which over 10^2..10^5 fits as about
-  // N^(-3/4), not N^(-1), at the 24 samples per decade the page uses.
+test('convergence orders: random 1/2 and Halton about 3/4 in N, Gauss about 3/2 in r', () => {
+  // The page's figure: N (and r) up to 10^5, 40 random runs, seed 7. The
+  // random RMS error is sqrt(pi (4 - pi) / N) exactly, so its fit is 1/2 up
+  // to the noise of 40 runs. Halton's is near (log N)^2 / N, which over
+  // 10^2..10^5 fits as about N^(-3/4), not N^(-1), at the 24 samples per
+  // decade the page uses. The Gauss circle error is r^(-1) or better by
+  // Gauss's own argument (r^(-1.37) by Huxley) and conjectured
+  // r^(-3/2 + eps); its fit over 10^2..10^5 is about 1.44.
   const counts = checkpoints(1e5)
   assert.equal(counts[0], 10)
   assert.equal(counts[counts.length - 1], 1e5)
@@ -196,7 +197,7 @@ test('convergence orders: random 1/2, Gauss about 0.6, Halton about 3/4', () => 
   assert.ok(last.lo <= last.error && last.error <= last.hi)
   const orders = [
     ["random", convergenceOrder(random), 0.5, 0.06],
-    ["Gauss", convergenceOrder(latticeErrors(1e5)), 0.6, 0.08],
+    ["Gauss", convergenceOrder(latticeErrors(1e5)), 1.45, 0.08],
     ["Halton", convergenceOrder(haltonCircleErrors(checkpoints(1e5, 24))), 0.75, 0.08]
   ]
   for (const [label, order, want, tolerance] of orders) {

@@ -17,11 +17,10 @@
  * wider box than the paragraphs and stop lining up with them. 40rem is about
  * 70 characters of body text. */
 :root { --mcm-measure: 40rem; }
-
 :is(main.content, main.content section) > :is(
   p, ul, ol, dl, blockquote,
   h1, h2, h3, h4, h5, h6,
-  .theorem, .proof, .callout, .footnotes
+  .theorem, .proof, .callout, .footnotes, .references
 ),
 #title-block-header {
   max-width: var(--mcm-measure);

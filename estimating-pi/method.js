@@ -156,12 +156,11 @@ export function latticeCount(r) {
   return count
 }
 
-// The Gauss circle estimate latticeCount(r) / r^2, with n = (2r + 1)^2, the
-// number of points of the square [-r, r]^2 examined.
+// The Gauss circle estimate latticeCount(r) / r^2.
 export function latticeEstimate(r) {
   const count = latticeCount(r)
   const estimate = count / (r * r)
-  return {r, n: (2 * r + 1) ** 2, count, estimate, error: Math.abs(estimate - Math.PI)}
+  return {r, count, estimate, error: Math.abs(estimate - Math.PI)}
 }
 
 // The i-th term of the van der Corput sequence in the given base: i's digits
@@ -307,19 +306,25 @@ export function haltonCircleErrors(counts) {
   return points
 }
 
-// The Gauss circle estimate's error at every radius whose (2r + 1)^2 grid
-// points fit in maxN. Every radius, not a sample: the error jumps about from
-// one radius to the next, and a fit through a sample swings with the sample.
-export function latticeErrors(maxN) {
-  const points = []
-  for (let r = 1; (2 * r + 1) ** 2 <= maxN; r++) {
-    const e = latticeEstimate(r)
-    points.push({n: e.n, error: e.error})
+// The Gauss circle estimate's error against the radius, as points {n: r,
+// error}: at every radius up to 1000, then about 400 radii per decade up to
+// maxR. Dense, not a light sample: the error jumps about from one radius to
+// the next, and a fit through a few radii swings with the choice of radii.
+export function latticeErrors(maxR) {
+  const radii = []
+  for (let r = 1; r <= Math.min(1000, maxR); r++) radii.push(r)
+  if (maxR > 1000) {
+    for (const r of checkpoints(maxR, 400)) {
+      if (r > 1000) radii.push(r)
+    }
   }
+  const points = []
+  for (const r of radii) points.push({n: r, error: latticeEstimate(r).error})
   return points
 }
 
-// The least-squares line through (log10 n, log10 error) over n >= 100,
+// The least-squares line through (log10 n, log10 error) over n >= 100 (n is
+// the number of points, or the radius r for the Gauss circle method),
 // skipping errors at rounding level: error ≈ 10^intercept * n^(-order).
 // null with fewer than two points. Uses VM.numerical.linearRegression.
 export function convergenceFit(points) {

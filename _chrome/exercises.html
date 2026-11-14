@@ -1,0 +1,28 @@
+<!--
+  Copyright (c) 2026 Apurva Nakade. All rights reserved.
+  Released under Apache 2.0 license as described in the file LICENSE.
+  Authors: Apurva Nakade
+
+  "Next exercise" buttons: appends one to every exercise (#exr- div) but a
+  page's last, scrolling to the next. Styled in _chrome/exercises.css.
+  Listed under format.html.include-after-body in _quarto.yml.
+-->
+<script>
+(() => {
+  const exercises = document.querySelectorAll(".theorem.exercise");
+  const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  for (let i = 0; i + 1 < exercises.length; i++) {
+    const next = exercises[i + 1];
+    const wrap = document.createElement("div");
+    wrap.className = "exr-next";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Next exercise ↓";
+    button.addEventListener("click", () => {
+      next.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    });
+    wrap.appendChild(button);
+    exercises[i].appendChild(wrap);
+  }
+})();
+</script>

@@ -6,95 +6,29 @@ execute:
   echo: false
 ---
 
-```{=html}
-<style>
-/* Exercises, textbook style: a run-in "Exercise n (Name)." heading in the
-   accent color, a rule down the left instead of a box, and parts lettered
-   (a), (b), ... in a hanging column. Quarto renders #exr- divs as
-   <div class="theorem exercise">, with the heading in .theorem-title. */
-.theorem.exercise {
-  margin-block: 1.75rem; /* inline margins: _chrome/reading-measure.css */
-  padding: 0.15rem 0 0.15rem 1rem;
-  border-left: 3px solid var(--vm-accent);
-}
-.theorem.exercise > p:first-child { margin-top: 0; }
-.theorem.exercise > :last-child { margin-bottom: 0; }
-.theorem.exercise .theorem-title strong {
-  color: var(--vm-accent);
-  font-weight: 650;
-}
-.theorem.exercise .theorem-title strong::after { content: "."; }
-.theorem.exercise ol[type="a"] {
-  list-style: none;
-  counter-reset: exr-part;
-  margin: 0.5rem 0 0;
-  padding-left: 2.25rem;
-}
-.theorem.exercise ol[type="a"] > li {
-  counter-increment: exr-part;
-  position: relative;
-  margin-top: 0.35rem;
-}
-.theorem.exercise ol[type="a"] > li::before {
-  content: "(" counter(exr-part, lower-alpha) ")";
-  position: absolute;
-  right: calc(100% + 0.5rem);
-  color: var(--vm-text-soft);
-  font-weight: 600;
-}
-/* "Next exercise" button at the bottom right of every exercise but the last
-   (added by the script below). */
-.theorem.exercise { scroll-margin-top: 1.5rem; }
-.theorem.exercise > .exr-next {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.25rem;
-}
-.exr-next button {
-  font: inherit;
-  font-size: 0.75rem;
-  padding: 0;
-  color: var(--vm-text-soft);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.exr-next button:hover { color: var(--vm-accent); }
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const exercises = document.querySelectorAll(".theorem.exercise");
-  const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  for (let i = 0; i + 1 < exercises.length; i++) {
-    const next = exercises[i + 1];
-    const wrap = document.createElement("div");
-    wrap.className = "exr-next";
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = "Next exercise ↓";
-    button.addEventListener("click", () => {
-      next.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
-    });
-    wrap.appendChild(button);
-    exercises[i].appendChild(wrap);
-  }
-});
-</script>
-```
+How can coin flips compute $\pi$? The answer is a quintessential example of the *Monte Carlo principle*:
 
-The number $\pi$ is not random, yet we can estimate it by throwing darts. This is the *Monte Carlo principle* in its simplest form: write the quantity we want as the expectation of a random variable, then estimate that expectation by an average of independent samples. This chapter works through three questions, with $\pi$ as the running example.
+::: {.callout-important title="The Monte Carlo principle"}
+Write the quantity we want as the expectation of a random variable, then estimate that expectation by an average of many samples.
+:::
+
+This chapter works through three questions, with $\pi$ as the running example.
 
 1. How do we write $\pi$ as an expectation? We give two ways: points in a circle, and needles on a floor.
 2. How accurate is the resulting estimate, and how fast does it improve as we add samples?
-3. Can we do better by giving up randomness?
+3. Are randomness-based methods faster or slower than non-random methods?
 
-Most of the analysis is done in exercises, placed where the text needs them. Sections end with problems that practise and extend the material.
+Along the way, we review the basics of probability that we'll need throughout the course.
+
 
 ```{ojs}
 //| output: false
 // VM is the mathviz library, loaded on every page by the mathviz extension.
-// This page uses VM.sampling.seededRandom, VM.plotting.persistentPlot, VM.plotting.plotOptions,
-// VM.ui.statRow, VM.ui.urlParam and VM.ui.syncUrlParams.
+// This page uses VM.sampling.seededRandom, VM.plotting.onThemeChange,
+// VM.plotting.colors, VM.plotting.alpha, VM.plotting.paddedRange,
+// VM.plotting.persistentPlot, VM.plotting.draggablePoints, VM.plotting.config,
+// VM.plotting.plotOptions, VM.ui.statRow, VM.ui.legendOverlay, VM.ui.urlParam,
+// VM.ui.syncUrlParams and VM.expressions.makeNumber.
 VM = window.VM
 
 // vmTheme re-runs every cell that bakes a palette color into a trace when
@@ -108,15 +42,18 @@ import {dropPoints, circleEstimate, runningCircleEstimates, dropNeedles, needleC
   checkpoints, randomCircleErrors, runningBuffonEstimates, randomBuffonErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder} from "./method.js"
 ```
 
+
 ## The circle estimator
 
 Inscribe the unit circle in the square $[-1, 1] \times [-1, 1]$. A point chosen uniformly from the square lands inside the circle with probability equal to the ratio of the two areas,
 $$P(X^2 + Y^2 \leq 1) = \frac{\pi}{4}.$$
 So $\pi$ is four times a probability, and a probability is the expectation of an indicator. Let $(X, Y)$ be uniformly distributed on the square and define
-$$I(X, Y) = \mathbf{1}_{\{X^2 + Y^2 \leq 1\}} = \begin{cases}
+$$
+I(X, Y) = \mathbf{1}_{\{X^2 + Y^2 \leq 1\}} = \begin{cases}
 1 & \text{if } X^2 + Y^2 \leq 1 \text{ (inside the circle)}, \\
 0 & \text{if } X^2 + Y^2 > 1 \text{ (outside the circle)}.
-\end{cases}$$
+\end{cases}
+$$
 Then $I \sim \text{Bernoulli}(\pi/4)$ and $\pi = 4\,\mathbb{E}[I]$. Replacing the expectation by a sample average gives our first estimator.
 
 ::: {#def-circle-estimator}
@@ -125,37 +62,10 @@ Given $N$ independent uniform points $(X_1, Y_1), \ldots, (X_N, Y_N)$ in the squ
 $$\hat{\pi}_N = \frac{4}{N}\sum_{i=1}^{N} I_i = \frac{4 \cdot (\text{number of points inside the circle})}{N}.$$
 :::
 
-By linearity of expectation, $\mathbb{E}[\hat\pi_N] = 4\,\mathbb{E}[I] = \pi$ for every $N$: the estimator is *unbiased*. Unbiasedness says the estimator is right on average. It says nothing about how far a single estimate lands from $\pi$, which is what we care about when we run the experiment once.
+By linearity of expectation, $\mathbb{E}[\hat\pi_N] = 4\,\mathbb{E}[I] = \pi$ for every $N$: the estimator is *unbiased*.
 
-### How accurate is it?
+The app below draws $N$ uniformly random points in the square and computes $\hat\pi_N$.
 
-The typical distance between $\hat\pi_N$ and its mean is its *standard error*, $\text{SE}(\hat\pi_N) = \sqrt{\text{Var}(\hat\pi_N)}$.
-
-::: {#exr-pi-variance}
-## Standard error
-Let $I_1, \ldots, I_N$ be as in @def-circle-estimator.
-
-a. Compute $\text{Var}(I)$.
-b. Compute $\text{Var}(\hat{\pi}_N)$ and $\text{SE}(\hat{\pi}_N)$. Where do you use independence?
-c. How does $\text{SE}(\hat{\pi}_N)$ change with $N$?
-d. How many times more points does one more correct decimal place cost?
-e. About how many points does it take to bring $\text{SE}(\hat{\pi}_N)$ down to $0.001$?
-:::
-
-Part (c) is the central fact of Monte Carlo: the standard error of an average of $N$ independent samples falls like $N^{-1/2}$, whatever the problem. One more digit always costs a hundred times more samples.
-
-A standard error describes a typical error. A confidence interval turns it into a statement that holds with a stated probability.
-
-::: {#exr-pi-clt}
-## A confidence interval
-a. Use the central limit theorem to find the limiting distribution of $\sqrt{N}(\hat{\pi}_N - \pi)$ as $N \to \infty$.
-b. Write an approximate 95% confidence interval for $\pi$ centered at $\hat{\pi}_N$.
-c. Use your formula from @exr-pi-variance to compute the half-width $1.96\,\text{SE}(\hat\pi_N)$ of this interval at $N = 1000$.
-:::
-
-### Checking by simulation
-
-The app draws $N$ uniform points in the square and reports $\hat\pi_N$. Its *Standard error* readout is the formula from @exr-pi-variance with the observed fraction $\hat p = \text{inside}/N$ in place of the unknown $\pi/4$.
 
 ```{ojs}
 //| output: false
@@ -171,9 +81,11 @@ piTraceColors = new Map([
 ])
 ```
 
+
 <div class="vm-app" id="pi-app">
 
 <div class="ojs-panel">
+
 
 ```{ojs}
 // Draws a fresh set of points. The first draw (on page load) uses the seed
@@ -185,7 +97,9 @@ viewof piRedraw = {
 }
 ```
 
+
 </div>
+
 
 ```{ojs}
 //| output: false
@@ -194,6 +108,8 @@ piSeed = {
   return Math.floor(Math.random() * 1e9)
 }
 ```
+
+
 
 ```{ojs}
 //| output: false
@@ -204,12 +120,16 @@ piSeed = {
 piPoints = dropPoints(VM.sampling.seededRandom(piSeed), piMaxN)
 ```
 
+
+
 ```{ojs}
 //| output: false
 // The estimate and its estimated standard error, 4 * sqrt(p(1 - p) / N)
 // with p the observed fraction inside.
 piStats = circleEstimate(piPoints.insideCount[piN], piN)
 ```
+
+
 
 ```{ojs}
 VM.ui.statRow([
@@ -221,17 +141,23 @@ VM.ui.statRow([
 ])
 ```
 
+
+
 ```{ojs}
 //| output: false
 piPlot = VM.plotting.persistentPlot()
 ```
+
+
 
 ```{ojs}
 //| output: false
 piShow = new Set(piTraces)
 ```
 
+
 <div class="ojs-chart-block">
+
 
 ```{ojs}
 {
@@ -280,6 +206,8 @@ piShow = new Set(piTraces)
 }
 ```
 
+
+
 ```{ojs}
 viewof piTraces = {
   const items = []
@@ -288,7 +216,9 @@ viewof piTraces = {
 }
 ```
 
+
 <div class="ojs-chart-controls">
+
 
 ```{ojs}
 viewof piN = {
@@ -299,18 +229,49 @@ viewof piN = {
 }
 ```
 
-</div>
 
 </div>
 
 </div>
+
+</div>
+
 
 ```{ojs}
 //| output: false
 piUrlSync = VM.ui.syncUrlParams({pi_seed: [piSeed, piDefaultSeed], pi_n: [piN, piDefaultN]})
 ```
 
-@fig-pi-convergence repeats the experiment many times. *Running estimates* follows 8 independent runs as points are added one at a time. *Error decay* repeats the experiment 200 times and plots the root-mean-square error at each $N$ on log-log axes, where a rate $N^{-a}$ is a straight line of slope $-a$.
+
+### Quantifying uncertainty
+
+One way to quantify uncertainty in an unbiased estimator is via the *standard error*, $$\text{SE}(\hat\pi_N) = \sqrt{\text{Var}(\hat\pi_N)}.$$
+
+::: {#exr-pi-variance}
+## Standard error
+Let $I_1, \ldots, I_N$ be as in @def-circle-estimator.
+
+a. Compute $\text{Var}(I)$.
+b. Compute $\text{Var}(\hat{\pi}_N)$ and $\text{SE}(\hat{\pi}_N)$. Where do you use independence?
+c. How does $\text{SE}(\hat{\pi}_N)$ change with $N$?
+d. How many times more points does one more correct decimal place cost?
+e. Find the smallest $N$ for which $\text{SE}(\hat{\pi}_N) \le 0.001$.
+:::
+
+
+::: {#exr-pi-decimal}
+## Checking the rate
+Compare the *Standard error* in [the app](#pi-app) at $N = 100$ and at $N = 10{,}000$. Does the ratio match your answer to @exr-pi-variance (c)?
+:::
+
+Part (c) is the central fact of Monte Carlo:
+
+::: {.callout-important title="The $N^{-1/2}$ rate"}
+The standard error of an average of $N$ i.i.d. samples with finite variance falls like $N^{-1/2}$, whatever the problem. Only the constant depends on the problem.
+:::
+
+You should find that each extra correct digit costs 100 times as many samples. @fig-pi-convergence repeats the experiment many times. The first chart shows that the estimates do converge to $\pi$, and the second confirms that the error falls like $N^{-1/2}$, as @exr-pi-variance predicts.
+
 
 ```{ojs}
 //| output: false
@@ -319,6 +280,8 @@ piRunCounts = checkpoints(10000, 24)
 piRuns = runningCircleEstimates(VM.sampling.seededRandom(42), piRunCounts, 8)
 piErrors = randomCircleErrors(VM.sampling.seededRandom(43), checkpoints(10000), 200)
 ```
+
+
 
 ```{ojs}
 //| output: false
@@ -414,8 +377,9 @@ function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidt
 
 // Error decay: the RMS error over many runs, the band holding the middle 80%
 // of runs, and a slope −1/2 reference raised above the band to compare with,
-// over N ≥ `from`.
-function piErrorFigure({errors, title, xLabel, from = 0, chartWidth = piPanelWidth}) {
+// over N ≥ `from`. Without a `yDomain`, the y axis fits the plotted values;
+// with one, it stays put and anything outside is clipped.
+function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = piPanelWidth}) {
   const last = errors[errors.length - 1]
   const rows = []
   for (const p of errors) {
@@ -430,12 +394,12 @@ function piErrorFigure({errors, title, xLabel, from = 0, chartWidth = piPanelWid
   const chart = Plot.plot(VM.plotting.plotOptions({
     width: chartWidth, height: 300, marginLeft: 46, marginBottom: 40,
     x: piLogAxis(Math.max(from, errors[0].n), last.n, {label: xLabel, labelAnchor: "center", tickFormat: "~s"}),
-    y: piLogAxis(lo, hi, {label: "|estimate − π|"}, 1.25),
+    y: yDomain ? piLogAxis(yDomain[0], yDomain[1], {label: "|estimate − π|"}) : piLogAxis(lo, hi, {label: "|estimate − π|"}, 1.25),
     marks: [
       Plot.areaY(rows, {x: "n", y1: "lo", y2: "hi", fill: bandColor, clip: true}),
-      Plot.line(rows, {x: "n", y: "reference", stroke: chartColors.ink, strokeWidth: 1.5, strokeDasharray: "6,4"}),
-      Plot.line(rows, {x: "n", y: "error", stroke: chartColors.fn, strokeWidth: 2}),
-      Plot.dot(rows, {x: "n", y: "error", fill: chartColors.fn, r: 2})
+      Plot.line(rows, {x: "n", y: "reference", stroke: chartColors.ink, strokeWidth: 1.5, strokeDasharray: "6,4", clip: true}),
+      Plot.line(rows, {x: "n", y: "error", stroke: chartColors.fn, strokeWidth: 2, clip: true}),
+      Plot.dot(rows, {x: "n", y: "error", fill: chartColors.fn, r: 2, clip: true})
     ]
   }))
   return piFigure(chart, [
@@ -445,6 +409,7 @@ function piErrorFigure({errors, title, xLabel, from = 0, chartWidth = piPanelWid
   ], title)
 }
 ```
+
 
 :::: {#fig-pi-convergence}
 
@@ -464,32 +429,284 @@ Running estimates from 8 runs, and the error over 200 runs.
 
 ::::
 
-The runs settle on $\pi$, and the error falls parallel to the reference line of slope $-1/2$, as @exr-pi-variance predicts.
+Confidence intervals put a probability on the size of the error. By the central limit theorem, for large $N$ the estimate $\hat\pi_N$ is approximately normal, with mean $\pi$ and standard deviation $\text{SE}(\hat\pi_N)$.
 
-### Problems
-
-::: {#exr-pi-decimal}
-## Checking the rate
-Compare the *Standard error* readout at $N = 100$ and at $N = 10{,}000$. Does the ratio match your answer to @exr-pi-variance (d)?
-:::
-
-::: {#exr-pi-coverage}
-## Coverage
-Set the app to $N = 1000$ and click *Draw new points* 20 times. Each time, record whether $|\text{estimate} - \pi|$ is below your half-width from @exr-pi-clt (c). How many misses do you expect? How many did you get?
+::: {#exr-pi-clt}
+## Confidence intervals
+a. Write an approximate 95% confidence interval for $\pi$ centered at $\hat{\pi}_N$, for large $N$. The standard error depends on $\pi$ itself, which we don't know: what can you use in its place?
+b. Use your formula from @exr-pi-variance to compute the half-width $1.96\,\text{SE}(\hat\pi_N)$ of this interval at $N = 1000$.
+c. Set [the app](#pi-app) to $N = 1000$ and click *Draw new points* 20 times. Each time, record whether $|\text{estimate} - \pi|$ is below your half-width from (b). How many misses do you expect? How many did you get?
 :::
 
 ## Buffon's needle
 
-A second, much older way to estimate $\pi$ by random sampling goes back to Buffon in 1777. Take a floor made of parallel strips of wood, each of width $t$, and drop a needle of length $\ell \le t$ onto it at random. What is the probability that the needle lies across a line between two strips? The answer involves $\pi$, so counting the needles that cross estimates $\pi$.
+A second method to estimate $\pi$ by random sampling goes back to Buffon in 1777. Take a floor made of parallel strips of wood, each of width $t$, and drop a needle of length $\ell \le t$ onto it at random. What is the probability that the needle lies across a line between two strips? The answer involves $\pi$, so counting the needles that cross gives us a way to estimate $\pi$.
 
-### Describing a drop
+
+The app below drops $N$ needles of length $\ell$ on lines spaced $t = 1$ apart and colors the ones that cross a line. Leave the *Shape* switch on *Needle* for now; the noodle is the subject of @rem-noodle.
+
+
+```{ojs}
+//| output: false
+buffonMaxN = 10000
+buffonDefaultSeed = 1
+buffonDefaultN = 100
+buffonDefaultLength = 0.8
+buffonShapeOptions = ["Needle", "Noodle"]
+// Lines y = 0, 1, ..., 6 (spacing t = 1) across a board 8 wide.
+buffonSpacing = 1
+buffonWidth = 8
+buffonHeight = 6
+
+buffonTraceOptions = ["Crossing a line", "Not crossing", "Lines"]
+buffonTraceColors = new Map([
+  ["Crossing a line", chartColors.alt],
+  ["Not crossing", chartColors.fn],
+  ["Lines", chartColors.muted]
+])
+```
+
+
+<div class="vm-app" id="buffon-app">
+
+<div class="ojs-panel ojs-grid">
+
+
+```{ojs}
+viewof buffonShape = {
+  const initial = VM.ui.urlParam("buffon_shape", "needle") === "noodle" ? "Noodle" : "Needle"
+  return Inputs.radio(buffonShapeOptions, {value: initial, label: "Shape"})
+}
+```
+
+
+
+```{ojs}
+// A typed value rather than a slider: the length is a setting to compare a
+// few chosen values of, not something to scrub through. The field turns red
+// while its text isn't a usable length.
+viewof buffonLengthInput = {
+  const view = Inputs.text({label: "Length ℓ (spacing t = 1)", value: String(VM.ui.urlParam("buffon_len", buffonDefaultLength)), placeholder: "Between 0 and 1, e.g. 0.8"})
+  const input = view.querySelector("input")
+  const check = () => input.classList.toggle("vm-invalid", buffonParseLength(input.value) === null)
+  view.addEventListener("input", check)
+  check()
+  return view
+}
+```
+
+
+
+```{ojs}
+viewof buffonRedraw = {
+  const button = Inputs.button("Drop new needles", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-end")
+  return button
+}
+```
+
+
+</div>
+
+
+```{ojs}
+//| output: false
+// buffonParseLength: the length a field's text names, or null when it isn't
+// one -- empty, mid-typing, not positive, or longer than the line spacing,
+// where the formula 2ℓ/(πt) stops holding.
+function buffonParseLength(text) {
+  const parsed = VM.expressions.makeNumber(window.math, text)
+  if (parsed === null || !Number.isFinite(parsed) || parsed <= 0 || parsed > buffonSpacing) return null
+  return parsed
+}
+```
+
+
+
+```{ojs}
+//| output: false
+// buffonLength: the typed length, or the default while the field is invalid.
+buffonLength = {
+  const parsed = buffonParseLength(buffonLengthInput)
+  if (parsed === null) return buffonDefaultLength
+  return parsed
+}
+```
+
+
+
+```{ojs}
+//| output: false
+buffonSeed = {
+  if (buffonRedraw === 0) return VM.ui.urlParam("buffon_seed", buffonDefaultSeed)
+  return Math.floor(Math.random() * 1e9)
+}
+```
+
+
+
+```{ojs}
+//| output: false
+// buffonDrops: each drop's center and direction, drawn once per seed. The
+// length input and the needle/noodle switch only redraw the shape about
+// those centers, so changing them shows the same drops.
+buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
+```
+
+
+
+```{ojs}
+//| output: false
+// buffonNeedles: polylines and crossings for the current shape and length;
+// crossingCount[i] and crossingSquares[i] sum the crossings and their
+// squares over the first i drops.
+buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing, buffonShape.toLowerCase())
+```
+
+
+
+```{ojs}
+//| output: false
+buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles.crossingSquares[buffonN], buffonN, buffonLength, buffonSpacing)
+```
+
+
+
+```{ojs}
+{
+  const format = value => {
+    if (value === null) return "—"
+    return value.toFixed(4)
+  }
+  return VM.ui.statRow([
+    {label: "Needles N", value: buffonStats.n.toLocaleString()},
+    {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
+    {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
+    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
+    {label: "|estimate − π|", value: format(buffonStats.error)}
+  ])
+}
+```
+
+
+
+```{ojs}
+//| output: false
+buffonPlot = VM.plotting.persistentPlot()
+```
+
+
+
+```{ojs}
+//| output: false
+buffonShow = new Set(buffonTraces)
+```
+
+
+<div class="ojs-chart-block">
+
+
+```{ojs}
+{
+  // Drops as one trace per color, polylines separated by nulls -- a
+  // single trace draws thousands of segments far faster than one trace each.
+  const crossX = [], crossY = [], otherX = [], otherY = []
+  for (let i = 0; i < buffonN; i++) {
+    let xs = otherX, ys = otherY
+    if (buffonNeedles.crossings[i] > 0) {
+      xs = crossX
+      ys = crossY
+    }
+    xs.push(...buffonNeedles.xs[i], null)
+    ys.push(...buffonNeedles.ys[i], null)
+  }
+
+  const lineX = [], lineY = []
+  for (let k = 0; k * buffonSpacing <= buffonHeight; k++) {
+    lineX.push(-0.5, buffonWidth + 0.5, null)
+    lineY.push(k * buffonSpacing, k * buffonSpacing, null)
+  }
+
+  const data = []
+  if (buffonShow.has("Lines")) {
+    data.push({x: lineX, y: lineY, type: "scatter", mode: "lines", name: "Lines", showlegend: false,
+      line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"})
+  }
+  if (buffonShow.has("Not crossing")) {
+    data.push({x: otherX, y: otherY, type: "scatter", mode: "lines", name: "Not crossing", showlegend: false,
+      line: {color: chartColors.fn, width: 2}, hoverinfo: "skip"})
+  }
+  if (buffonShow.has("Crossing a line")) {
+    data.push({x: crossX, y: crossY, type: "scatter", mode: "lines", name: "Crossing a line", showlegend: false,
+      line: {color: chartColors.alt, width: 2}, hoverinfo: "skip"})
+  }
+
+  return buffonPlot(data, {
+    xaxis: {range: [-0.5, buffonWidth + 0.5], zeroline: false, showgrid: false, showticklabels: false, ticks: "", constrain: "domain"},
+    yaxis: {range: [-0.6, buffonHeight + 0.6], zeroline: false, showgrid: false, showticklabels: false, ticks: "", scaleanchor: "x", constrain: "domain"},
+    hovermode: false,
+    uirevision: "static",
+    autosize: true
+  })
+}
+```
+
+
+
+```{ojs}
+viewof buffonTraces = {
+  const items = []
+  for (const label of buffonTraceOptions) items.push({label, color: buffonTraceColors.get(label)})
+  return VM.ui.legendOverlay(items, {value: buffonTraceOptions})
+}
+```
+
+
+<div class="ojs-chart-controls ojs-grid">
+
+
+```{ojs}
+viewof buffonN = {
+  const initial = Math.min(buffonMaxN, Math.max(1, Math.round(VM.ui.urlParam("buffon_n", buffonDefaultN))))
+  const slider = Inputs.range([1, buffonMaxN], {step: 1, value: initial, label: "Needles N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+
+</div>
+
+</div>
+
+</div>
+
+
+```{ojs}
+//| output: false
+buffonUrlSync = VM.ui.syncUrlParams({
+  buffon_seed: [buffonSeed, buffonDefaultSeed],
+  buffon_n: [buffonN, buffonDefaultN],
+  buffon_len: [buffonLength, buffonDefaultLength],
+  buffon_shape: [buffonShape.toLowerCase(), "needle"]
+})
+```
+
+
+
+### Estimating the probability
 
 Up to sliding along the lines, a drop is determined by two numbers:
 
 - the angle $\theta \in [0, \pi)$ the needle makes with the lines, and
 - the distance $d \in [0, t/2]$ from its center to the *nearest* line.
 
-Dropping the needle "at random" means that its center lands uniformly between two lines and that its angle is uniform, independently of the center. @fig-buffon-setup shows both descriptions of a drop: drag the dot in *All drops*, a point of the $(\theta, d)$ rectangle, to move the needle in *One drop*.
+
+::: {#exr-buffon-uniform}
+## The model
+a. There is no uniform distribution on the plane. What should dropping the needle "at random" mean, and why is that enough?
+b. Under your answer to (a), why is $(\theta, d)$ uniformly distributed on the rectangle $[0, \pi) \times [0, t/2]$ (the *All needle drops* panel of @fig-buffon-setup)?
+:::
 
 ```{ojs}
 //| output: false
@@ -503,9 +720,10 @@ buffonFigNeedlePlot = VM.plotting.persistentPlot({height: "420px"})
 buffonFigRegionPlot = VM.plotting.persistentPlot({height: "420px"})
 // The axes are fixed, so the zoom and pan toolbar would do nothing here.
 buffonFigConfig = ({...VM.plotting.config(), displayModeBar: false})
-// The drop the dot in "All drops" sets, by name.
+// The drop the dot in "All needle drops" sets, by name.
 buffonFigDrop = ({theta: buffonFigPoint.x, d: buffonFigPoint.y})
 ```
+
 
 :::: {#fig-buffon-setup}
 
@@ -572,7 +790,7 @@ viewof buffonFigPoint = VM.plotting.draggablePoints(buffonFigRegionPlot, {
   const label = (x, y, text, color) => ({x, y, text, showarrow: false, font: {color, size: 15}})
   const thetaLabelAngle = Math.PI + theta / 2
   return buffonFigNeedlePlot(data, {
-    title: {text: "One drop"}, margin: {t: 40, l: 10, r: 10, b: 10},
+    title: {text: "One needle drop"}, margin: {t: 40, l: 10, r: 10, b: 10},
     xaxis: {range: [-1, 1], visible: false, fixedrange: true, constrain: "domain"},
     yaxis: {range: [-1.05, 1.05], visible: false, fixedrange: true, scaleanchor: "x", constrain: "domain"},
     annotations: [
@@ -589,9 +807,10 @@ viewof buffonFigPoint = VM.plotting.draggablePoints(buffonFigRegionPlot, {
 
 :::
 
-Drag the dot in *All drops* to move the needle in *One drop*.
+Drag the dot in *All needle drops* to move the needle in *One needle drop*.
 
 ::::
+
 
 ```{ojs}
 //| output: false
@@ -611,7 +830,7 @@ Drag the dot in *All drops* to move the needle in *One drop*.
       line: {color: chartColors.ink, width: 1.5}}
   ]
   return buffonFigRegionPlot(data, {
-    title: {text: "All drops"}, margin: {t: 40},
+    title: {text: "All needle drops"}, margin: {t: 40},
     xaxis: {title: "θ", range: buffonFigThetaRange, fixedrange: true, zeroline: false, showgrid: false,
       tickmode: "array", tickvals: [0, Math.PI / 2, Math.PI], ticktext: ["0", "π/2", "π"]},
     yaxis: {title: "d", range: buffonFigDRange, fixedrange: true, zeroline: false, showgrid: false,
@@ -623,15 +842,11 @@ Drag the dot in *All drops* to move the needle in *One drop*.
 }
 ```
 
-::: {#exr-buffon-uniform}
-## The model
-a. Why is $(\theta, d)$ uniformly distributed on the rectangle $[0, \pi) \times [0, t/2]$ in the *All drops* panel?
-b. There is no uniform distribution on the plane. What exactly are we assuming about a random drop, and why is that enough?
-:::
+
 
 ::: {#exr-buffon-region}
 ## The crossing probability
-a. In the *One drop* panel, express $h$ in terms of $\ell$ and $\theta$. Does your formula still hold when $\theta > \pi/2$?
+a. In the *One needle drop* panel, express $h$ in terms of $\ell$ and $\theta$. Does your formula still hold when $\theta > \pi/2$?
 b. For which values of $d$ does the needle cross a line? Where do you use $\ell \le t$?
 c. Sketch the region of the $(\theta, d)$ rectangle where the needle crosses a line, and use it to compute $P(\text{cross})$.
 :::
@@ -650,37 +865,33 @@ Drop $N$ needles independently, and let $C$ be the number that cross a line. Est
 $$\hat{\pi}_N = \frac{2 \ell N}{t\, C} = \frac{2\ell}{t}\cdot\frac{1}{\hat p}.$$
 :::
 
-::: {#rem-ratio-estimator}
-## A ratio estimator
-The circle estimator is an average. Buffon's estimator *divides* by a random count, and since $x \mapsto 1/x$ is not linear, $\mathbb{E}[1/\hat p] \neq 1/\mathbb{E}[\hat p]$. None of the circle estimator's exact calculations carry over. Instead we need three things: a way to handle $C = 0$, an approximation of the bias, and an approximation of the variance.
-:::
-
-### When no needle crosses
-
-If $C = 0$, the estimator divides by zero.
+#### Bias
 
 ::: {#exr-buffon-zero}
 ## An undefined estimator
-a. What is the distribution of $C$? Find the mean and variance of $\hat p$.
-b. Find $P(C = 0)$. What does the possibility of $C = 0$ say about $\mathbb{E}[\hat\pi_N]$?
-c. Evaluate $P(C = 0)$ for $\ell = t = 1$ and $N = 100$.
+If $C = 0$, the estimator is undefined: it divides by zero. Find $P(C = 0)$ in terms of $N$.
 :::
 
-Part (c) shows that $C = 0$ is negligible in practice. From here on, the *bias* of $\hat\pi_N$ means its mean given $C \ge 1$, minus $\pi$, and the approximations below ignore the event $C = 0$.
+You should find that this probability shrinks geometrically in $N$, so $C = 0$ is negligible in practice. **From here on, we assume that $C \ge 1$.**
 
-### Bias
-
-To approximate the mean of $1/\hat p$, expand $1/x$ in a Taylor series about $p$. The first-order term has mean zero, because $\mathbb{E}[\hat p - p] = 0$, so the second-order term is the first one that contributes.
+The *bias* of an estimator $\hat\pi_N$ is
+$$
+\text{Bias}(\hat\pi_N) = \mathbb{E}[\hat\pi_N] - \pi.
+$$
+The circle estimator (@def-circle-estimator) is an average, so linearity gives it bias zero. Buffon's estimator instead *divides* by a random count, and since $x \mapsto 1/x$ is not linear, in general
+$$
+\mathbb{E}[1/\hat p] \neq 1/\mathbb{E}[\hat p].
+$$
+So linearity no longer computes $\mathbb{E}[\hat\pi_N]$, and Buffon's estimator is biased.
 
 ::: {#exr-buffon-bias}
 ## Bias
 a. Expand $1/\hat p$ to second order about $p$ and take expectations to approximate $\mathbb{E}[\hat\pi_N]$ and the bias of $\hat\pi_N$, in terms of $p$ and $N$.
 b. How fast does the bias shrink with $N$?
-c. Use Jensen's inequality to explain the sign of the bias.
-d. Is $t\hat p/(2\ell)$, the matching estimate of $1/\pi$, biased?
+c. The second-order term in (a) comes from the convexity of $x \mapsto 1/x$. Use its sign to decide whether, for large $N$, $\hat\pi_N$ overestimates or underestimates $\pi$. Can you interpret this directly?
 :::
 
-### Variance
+#### Variance
 
 For the variance, the linear term of the expansion is enough. This is the *delta method*: for a smooth function $g$, $g(\hat p) \approx g(p) + g'(p)(\hat p - p)$, so
 $$
@@ -689,222 +900,39 @@ $$
 
 ::: {#exr-buffon-variance}
 ## Standard error
-a. Apply the delta method with $g(x) = \frac{2\ell}{t}\cdot\frac{1}{x}$ to approximate $\text{Var}(\hat\pi_N)$ and $\text{SE}(\hat\pi_N)$, in terms of $p$ and $N$.
-b. With the shape set to *Needle*, the app below reports the standard error $\frac{2\ell}{t}\sqrt{\frac{1 - \hat p}{N \hat p^3}}$. Show that this is your formula from (a) with $\hat p$ in place of $p$.
-c. How does $\text{SE}(\hat\pi_N)$ grow as $\ell \to 0$?
-d. Take the longest needle, $\ell = t$. How many needles does it take to match the accuracy of $N$ random points in the circle method (@exr-pi-variance)?
+a. Using the delta method approximate $\text{Var}(\hat\pi_N)$ and $\text{SE}(\hat\pi_N)$, in terms of $p$ and $N$.
+b. How does $\text{SE}(\hat\pi_N)$ grow as $\ell \to 0$?
+c. Take the longest needle, $\ell = t$. How many needles does it take to match the accuracy of $N$ random points in the circle method (@exr-pi-variance)?
 :::
 
-### Mean squared error
+#### Mean squared error
 
-The bias and the standard error are two different kinds of error: one is systematic, the other random. The *mean squared error* $\text{MSE}(\hat\pi_N) = \mathbb{E}[(\hat\pi_N - \pi)^2]$ combines them.
+Because the estimator is biased, standard error is no longer a good measure of uncertainty. The *mean squared error* is the more appropriate measure in this case:
+$$
+\text{MSE}(\hat\pi_N) = \mathbb{E}[(\hat\pi_N - \pi)^2].
+$$
+In general, the MSE equals the variance plus the squared bias:
+$$
+\text{MSE}(\hat\pi_N) = \text{Var}(\hat\pi_N) + \text{Bias}(\hat\pi_N)^2.
+$$
+For an unbiased estimator the MSE is just the variance.
 
 ::: {#exr-buffon-mse}
 ## Mean squared error
-a. Show that the MSE of any estimator is its variance plus its bias squared.
-b. Using your approximations from @exr-buffon-bias and @exr-buffon-variance, express the bias of $\hat\pi_N$ in terms of $\text{SE}(\hat\pi_N)$.
-c. What happens to $\text{bias}/\text{SE}$ as $N \to \infty$? Which term dominates the MSE?
-d. Evaluate the bias and the standard error for $\ell = t = 1$ and $N = 100$.
-e. Does dividing by a random count change the rate $O(N^{-1/2})$, or only the constant?
+a. Using your approximations from @exr-buffon-bias and @exr-buffon-variance, find the ratio $\text{Bias}(\hat\pi_N)/\text{SE}(\hat\pi_N)$.
+b. What happens to this ratio as $N \to \infty$? Which term dominates the MSE?
+c. Evaluate the bias and the standard error for $\ell = t = 1$ and $N = 100$.
 :::
 
-### Checking by simulation
+You should find that even though the estimator is biased, the bias becomes negligible compared to the standard error as $N$ grows. The MSE is then essentially the variance, so dividing by a random count changes the constant but not the $O(N^{-1/2})$ rate of the error.
 
-The app drops $N$ needles of length $\ell$ on lines spaced $t = 1$ apart and colors the ones that cross a line. Leave the *Shape* switch on *Needle* for now; the noodle is the subject of @sec-buffon-noodle.
-
-```{ojs}
-//| output: false
-buffonMaxN = 10000
-buffonDefaultSeed = 1
-buffonDefaultN = 100
-buffonDefaultLength = 0.8
-buffonShapeOptions = ["Needle", "Noodle"]
-// Lines y = 0, 1, ..., 6 (spacing t = 1) across a board 8 wide.
-buffonSpacing = 1
-buffonWidth = 8
-buffonHeight = 6
-
-buffonTraceOptions = ["Crossing a line", "Not crossing", "Lines"]
-buffonTraceColors = new Map([
-  ["Crossing a line", chartColors.alt],
-  ["Not crossing", chartColors.fn],
-  ["Lines", chartColors.muted]
-])
-```
-
-<div class="vm-app" id="buffon-app">
+@fig-buffon-convergence repeats the two experiments of @fig-pi-convergence for Buffon's estimator. The plots should look like the circle estimator's: the running estimates settle on $\pi$, and the error falls along a line of slope $-1/2$ on the log-log plot. Only the constant differs, and it depends on $\ell$. Move the slider to change $\ell$ and watch the plots follow.
 
 <div class="ojs-panel ojs-grid">
 
 ```{ojs}
-viewof buffonShape = {
-  const initial = VM.ui.urlParam("buffon_shape", "needle") === "noodle" ? "Noodle" : "Needle"
-  return Inputs.radio(buffonShapeOptions, {value: initial, label: "Shape"})
-}
-```
-
-```{ojs}
-// A typed value rather than a slider: the length is a setting to compare a
-// few chosen values of, not something to scrub through. The field turns red
-// while its text isn't a usable length.
-viewof buffonLengthInput = {
-  const view = Inputs.text({label: "Length ℓ (spacing t = 1)", value: String(VM.ui.urlParam("buffon_len", buffonDefaultLength)), placeholder: "Between 0 and 1, e.g. 0.8"})
-  const input = view.querySelector("input")
-  const check = () => input.classList.toggle("vm-invalid", buffonParseLength(input.value) === null)
-  view.addEventListener("input", check)
-  check()
-  return view
-}
-```
-
-```{ojs}
-viewof buffonRedraw = {
-  const button = Inputs.button("Drop new needles", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-end")
-  return button
-}
-```
-
-</div>
-
-```{ojs}
-//| output: false
-// buffonParseLength: the length a field's text names, or null when it isn't
-// one -- empty, mid-typing, not positive, or longer than the line spacing,
-// where the formula 2ℓ/(πt) stops holding.
-function buffonParseLength(text) {
-  const parsed = VM.expressions.makeNumber(window.math, text)
-  if (parsed === null || !Number.isFinite(parsed) || parsed <= 0 || parsed > buffonSpacing) return null
-  return parsed
-}
-```
-
-```{ojs}
-//| output: false
-// buffonLength: the typed length, or the default while the field is invalid.
-buffonLength = {
-  const parsed = buffonParseLength(buffonLengthInput)
-  if (parsed === null) return buffonDefaultLength
-  return parsed
-}
-```
-
-```{ojs}
-//| output: false
-buffonSeed = {
-  if (buffonRedraw === 0) return VM.ui.urlParam("buffon_seed", buffonDefaultSeed)
-  return Math.floor(Math.random() * 1e9)
-}
-```
-
-```{ojs}
-//| output: false
-// buffonDrops: each drop's center and direction, drawn once per seed. The
-// length input and the needle/noodle switch only redraw the shape about
-// those centers, so changing them shows the same drops.
-buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
-```
-
-```{ojs}
-//| output: false
-// buffonNeedles: polylines and crossings for the current shape and length;
-// crossingCount[i] and crossingSquares[i] sum the crossings and their
-// squares over the first i drops.
-buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing, buffonShape.toLowerCase())
-```
-
-```{ojs}
-//| output: false
-buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles.crossingSquares[buffonN], buffonN, buffonLength, buffonSpacing)
-```
-
-```{ojs}
-{
-  const format = value => {
-    if (value === null) return "—"
-    return value.toFixed(4)
-  }
-  return VM.ui.statRow([
-    {label: "Needles N", value: buffonStats.n.toLocaleString()},
-    {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
-    {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
-    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
-    {label: "|estimate − π|", value: format(buffonStats.error)}
-  ])
-}
-```
-
-```{ojs}
-//| output: false
-buffonPlot = VM.plotting.persistentPlot()
-```
-
-```{ojs}
-//| output: false
-buffonShow = new Set(buffonTraces)
-```
-
-<div class="ojs-chart-block">
-
-```{ojs}
-{
-  // Drops as one trace per color, polylines separated by nulls -- a
-  // single trace draws thousands of segments far faster than one trace each.
-  const crossX = [], crossY = [], otherX = [], otherY = []
-  for (let i = 0; i < buffonN; i++) {
-    let xs = otherX, ys = otherY
-    if (buffonNeedles.crossings[i] > 0) {
-      xs = crossX
-      ys = crossY
-    }
-    xs.push(...buffonNeedles.xs[i], null)
-    ys.push(...buffonNeedles.ys[i], null)
-  }
-
-  const lineX = [], lineY = []
-  for (let k = 0; k * buffonSpacing <= buffonHeight; k++) {
-    lineX.push(-0.5, buffonWidth + 0.5, null)
-    lineY.push(k * buffonSpacing, k * buffonSpacing, null)
-  }
-
-  const data = []
-  if (buffonShow.has("Lines")) {
-    data.push({x: lineX, y: lineY, type: "scatter", mode: "lines", name: "Lines", showlegend: false,
-      line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"})
-  }
-  if (buffonShow.has("Not crossing")) {
-    data.push({x: otherX, y: otherY, type: "scatter", mode: "lines", name: "Not crossing", showlegend: false,
-      line: {color: chartColors.fn, width: 2}, hoverinfo: "skip"})
-  }
-  if (buffonShow.has("Crossing a line")) {
-    data.push({x: crossX, y: crossY, type: "scatter", mode: "lines", name: "Crossing a line", showlegend: false,
-      line: {color: chartColors.alt, width: 2}, hoverinfo: "skip"})
-  }
-
-  return buffonPlot(data, {
-    xaxis: {range: [-0.5, buffonWidth + 0.5], zeroline: false, showgrid: false, showticklabels: false, ticks: "", constrain: "domain"},
-    yaxis: {range: [-0.6, buffonHeight + 0.6], zeroline: false, showgrid: false, showticklabels: false, ticks: "", scaleanchor: "x", constrain: "domain"},
-    hovermode: false,
-    uirevision: "static",
-    autosize: true
-  })
-}
-```
-
-```{ojs}
-viewof buffonTraces = {
-  const items = []
-  for (const label of buffonTraceOptions) items.push({label, color: buffonTraceColors.get(label)})
-  return VM.ui.legendOverlay(items, {value: buffonTraceOptions})
-}
-```
-
-<div class="ojs-chart-controls ojs-grid">
-
-```{ojs}
-viewof buffonN = {
-  const initial = Math.min(buffonMaxN, Math.max(1, Math.round(VM.ui.urlParam("buffon_n", buffonDefaultN))))
-  const slider = Inputs.range([1, buffonMaxN], {step: 1, value: initial, label: "Needles N"})
+viewof buffonSliderLength = {
+  const slider = Inputs.range([0.1, 1], {step: 0.05, value: buffonDefaultLength, label: "Length ℓ (spacing t = 1)"})
   slider.classList.add("ojs-fill")
   return slider
 }
@@ -912,40 +940,18 @@ viewof buffonN = {
 
 </div>
 
-</div>
-
-</div>
-
 ```{ojs}
 //| output: false
-buffonUrlSync = VM.ui.syncUrlParams({
-  buffon_seed: [buffonSeed, buffonDefaultSeed],
-  buffon_n: [buffonN, buffonDefaultN],
-  buffon_len: [buffonLength, buffonDefaultLength],
-  buffon_shape: [buffonShape.toLowerCase(), "needle"]
-})
-```
-
-@fig-buffon-convergence repeats the two experiments of @fig-pi-convergence for the length $\ell$ set in the app. The plots start at the $N$ where about 10 needles are expected to have crossed; before that, an estimate built from one or two crossings is several times $\pi$.
-
-```{ojs}
-//| output: false
-// The app's length, once typing has paused: each redraw simulates 200 runs of
-// 10,000 needles, too much for every keystroke. Text that isn't a usable length
-// leaves the charts as they are.
+// The slider's length, once it has paused: each redraw simulates 200 runs of
+// 10,000 needles, too much for every tick of a drag.
 buffonPlotLength = Generators.observe(notify => {
-  const input = viewof buffonLengthInput
+  const input = viewof buffonSliderLength
   let timer = null
   const onInput = () => {
     clearTimeout(timer)
-    timer = setTimeout(() => {
-      const parsed = buffonParseLength(input.value)
-      if (parsed !== null) notify(parsed)
-    }, 300)
+    timer = setTimeout(() => notify(input.value), 300)
   }
-  const initial = buffonParseLength(input.value)
-  if (initial === null) notify(buffonDefaultLength)
-  else notify(initial)
+  notify(input.value)
   input.addEventListener("input", onInput)
   return () => {
     clearTimeout(timer)
@@ -957,23 +963,23 @@ buffonPlotLength = Generators.observe(notify => {
 buffonRuns = runningBuffonEstimates(VM.sampling.seededRandom(44), piRunCounts, 8, buffonPlotLength, buffonSpacing)
 buffonErrors = randomBuffonErrors(VM.sampling.seededRandom(45), checkpoints(10000), 200, buffonPlotLength, buffonSpacing)
 
-// The figures start once about 10 needles are expected to have crossed
-// (N p = 10, p = 2ℓ / (πt)). Before that, an estimate 2ℓN / (tC) with a
-// crossing count C of 1 or 2 is several times π, and would squash the rest
-// of the plot. π here only places the plot; the estimates never use it.
-buffonPlotFrom = Math.max(10, 10 * Math.PI * buffonSpacing / (2 * buffonPlotLength))
+// The figures start at a fixed N and keep fixed axes, so moving the slider
+// changes only the curves. For short needles, the early estimates are far off
+// and run past the frame, where they are clipped.
+buffonPlotFrom = 100
 ```
+
 
 :::: {#fig-buffon-convergence}
 
 ::: {layout-ncol=2}
 
 ```{ojs}
-piRunsFigure({counts: piRunCounts, runs: buffonRuns, title: `Running estimates, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", from: buffonPlotFrom})
+piRunsFigure({counts: piRunCounts, runs: buffonRuns, title: `Running estimates, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", yDomain: [2, 5], from: buffonPlotFrom})
 ```
 
 ```{ojs}
-piErrorFigure({errors: buffonErrors, title: `Error decay, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", from: buffonPlotFrom})
+piErrorFigure({errors: buffonErrors, title: `Error decay, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", yDomain: [0.001, 10], from: buffonPlotFrom})
 ```
 
 :::
@@ -982,49 +988,16 @@ Running estimates from 8 runs, and the error over 200 runs.
 
 ::::
 
-Despite the bias, the error falls at the same rate $N^{-1/2}$, as @exr-buffon-mse (e) predicts.
-
-### Barbier's noodle {#sec-buffon-noodle}
-
-Now bend the needle. Barbier observed in 1860 that the *expected number* of crossings does not depend on the shape at all. Cut a rigid curve of length $\ell$ into many short straight pieces. Each piece is a short needle, placed uniformly at random, so its expected number of crossings is $2/(\pi t)$ times its length. Expectations add even though the pieces are dependent, so for every curve of length $\ell$,
-$$
-\mathbb{E}[\text{crossings per drop}] = \frac{2\ell}{\pi t},
-$$
-and $2\ell N / (t \cdot \text{total crossings})$ still estimates $\pi$. The app's *Noodle* is a zigzag of three straight pieces with total length $\ell$; switch to it and the estimate still converges to $\pi$. Linearity is a property of expectation alone, though. The variance, and with it the bias, does depend on the shape.
-
-::: {#exr-buffon-noodle}
-## The noodle's error
-A noodle can cross a line more than once. Let $X$ be the number of crossings in one drop, with mean $\mu$ and variance $\sigma^2$, and replace $\hat p$ by $m$, the mean number of crossings per drop over $N$ drops.
-
-a. Why is $\sigma^2$ no longer $\mu(1 - \mu)$?
-b. Redo @exr-buffon-bias and @exr-buffon-variance for the noodle to approximate the bias and $\text{SE}(\hat\pi_N)$ in terms of $\mu$, $\sigma$ and $N$.
-c. Show that among all shapes of a fixed length $\ell \le t$, the straight needle has the smallest $\sigma^2$. (Hint: $X$ is a whole number, so $X^2 \ge X$, with equality exactly when $X \in \{0, 1\}$.)
+::: {#rem-noodle .remark}
+## The shape does not matter
+Bend the needle into any curve of length $\ell$. Cut it into many short straight pieces: each is a short needle placed uniformly at random, so it crosses a line with expected count $2/(\pi t)$ times its length. By linearity of expectation (which holds even though the pieces are dependent), $\mathbb{E}[\text{crossings per drop}] = 2\ell/(\pi t)$ for every shape, and $2\ell N / (t \cdot \text{total crossings})$ still estimates $\pi$. This is Barbier's 1860 observation. Switch the *Shape* in [the app](#buffon-app) to *Noodle*, a zigzag of three straight pieces, to see the estimate still converge to $\pi$. Linearity is a property of expectation alone, though: the variance, and with it the bias, does depend on the shape.
 :::
 
-::: {#exr-buffon-noodle-compare}
-## Needle against noodle
-Set $\ell = 0.8$ and $N = 2000$, and compare the *Standard error* readout for *Needle* and *Noodle*. Which shape is noisier? Does this agree with @exr-buffon-noodle (c)?
-:::
 
-### Problems
+## Randomness is slow
 
-::: {#exr-buffon-readout-check}
-## Checking the standard error
-a. Set $\ell = 1$ and $N = 1000$, and compare the *Standard error* readout with your formula from @exr-buffon-variance (a).
-b. Predict the ratio of the standard errors at $\ell = 0.25$ and $\ell = 1$, then check it with the readout at $N = 2000$.
-:::
+Both random methods converge at the Monte Carlo rate $O(N^{-1/2})$ (@exr-pi-variance, @exr-buffon-mse), so each extra decimal digit costs a hundred times more samples. That is far too slow to compute $\pi$ in practice: the two methods are proofs of concept, not practical algorithms. Non-random methods do much better. We start with two that still count points in the disk, and end with a table of standard numerical methods.
 
-::: {#exr-buffon-interval}
-## An asymmetric interval
-A confidence interval does not have to come from the delta method. Suppose $[p_-, p_+]$ is a confidence interval for $p$.
-
-a. Use it to find a confidence interval for $\pi$.
-b. Is this interval centered at $\hat\pi_N$? If not, which side is longer, and why?
-:::
-
-## Doing better without randomness
-
-Both random methods converge at the Monte Carlo rate $O(N^{-1/2})$ (@exr-pi-variance, @exr-buffon-mse): each extra decimal digit costs a hundred times more samples. The randomness itself is the cause. Independent points clump in some places and leave gaps in others, and those fluctuations are what the standard error measures. This section removes the randomness in two steps: first a rigid grid of points, then a sequence of points spread out on purpose.
 
 ```{ojs}
 //| output: false
@@ -1059,40 +1032,48 @@ function circlePath(r) {
 
 ### The Gauss circle method
 
-Count the integer points $(x, y)$ with $x^2 + y^2 \le r^2$, and call the count $L(r)$. Each counted point is the center of a unit square, and together those squares cover the disk of radius $r$ up to a ragged edge. So $L(r)$ is close to the disk's area $\pi r^2$, and
+Gauss came up with a simple idea to measure the area of a circle: count the integer points $(x, y)$ with $x^2 + y^2 \le r^2$, and call the count $L(r)$. This approximates the disk's area $\pi r^2$, and
 $$
 \hat\pi_r = \frac{L(r)}{r^2}
 $$
-estimates $\pi$. The app draws the grid and the circle at the same size on screen, so as $r$ grows the grid gets finer relative to the circle.
+estimates $\pi$.
 
 <div class="vm-app" id="gauss-app">
+
 
 ```{ojs}
 //| output: false
 gaussStats = latticeEstimate(gaussR)
 ```
 
+
+
 ```{ojs}
 VM.ui.statRow([
   {label: "Radius r", value: String(gaussStats.r)},
-  {label: "Grid points N", value: gaussStats.n.toLocaleString(), title: "(2r + 1)²"},
-  {label: "In the disk", value: gaussStats.count.toLocaleString()},
+  {label: "In the disk L(r)", value: gaussStats.count.toLocaleString()},
   {label: "Estimate of π", value: gaussStats.estimate.toFixed(4), title: "count / r²"},
   {label: "|estimate − π|", value: gaussStats.error.toFixed(4)}
 ])
 ```
+
+
 
 ```{ojs}
 //| output: false
 gaussPlot = VM.plotting.persistentPlot()
 ```
 
+
+
 ```{ojs}
 //| output: false
 gaussShow = new Set(gaussTraces)
 ```
 
+
 <div class="ojs-chart-block">
+
 
 ```{ojs}
 {
@@ -1139,6 +1120,8 @@ gaussShow = new Set(gaussTraces)
 }
 ```
 
+
+
 ```{ojs}
 viewof gaussTraces = {
   const items = []
@@ -1147,7 +1130,9 @@ viewof gaussTraces = {
 }
 ```
 
+
 <div class="ojs-chart-controls">
+
 
 ```{ojs}
 viewof gaussR = {
@@ -1158,52 +1143,41 @@ viewof gaussR = {
 }
 ```
 
-</div>
 
 </div>
 
 </div>
+
+</div>
+
 
 ```{ojs}
 //| output: false
 gaussUrlSync = VM.ui.syncUrlParams({gauss_r: [gaussR, gaussDefaultR]})
 ```
 
+Counting the points one at a time takes a double loop over the $(2r + 1)^2$ points of the grid. Can we do better?
+
 ::: {#exr-gauss-count}
 ## Counting is cheap
-a. Show that for each integer $x$ with $|x| \le r$, the column at $x$ holds exactly $2\lfloor\sqrt{r^2 - x^2}\rfloor + 1$ counted points.
-b. How many square roots does it take to compute $L(r)$? Call this number the *work* $W$, and compare it with the number of grid points, $(2r+1)^2$.
+Show that
+$$
+L(r) = \sum_{x=-r}^{r} \left(2\left\lfloor\sqrt{r^2 - x^2}\right\rfloor + 1\right),
+$$
+so $\hat\pi_r = L(r)/r^2$ needs only one loop over $x$, of $2r + 1$ steps.
 :::
 
-::: {#exr-gauss-error}
-## The error
-a. Show that every point of the disk of radius $r - \sqrt2/2$ lies in a unit square centered at a counted point, and that every such square lies in the disk of radius $r + \sqrt2/2$.
-b. Deduce that $\pi(r - \sqrt2/2)^2 \le L(r) \le \pi(r + \sqrt2/2)^2$, and that $|\hat\pi_r - \pi| = O(1/r)$.
-c. In terms of the work $W$ from @exr-gauss-count, how fast does the error fall? How much more work does one more digit cost?
-:::
 
-The bound in @exr-gauss-error is not sharp. Finding the true size of $L(r) - \pi r^2$ is the *Gauss circle problem*. The argument above gives $O(r)$. Hardy showed that $O(r^{1/2})$ is impossible, and the conjecture is that $L(r) - \pi r^2 = O(r^{1/2 + \varepsilon})$ for every $\varepsilon > 0$; the best exponent proven so far is about $0.63$. If the conjecture holds, the error of $\hat\pi_r$ is $O(W^{-3/2 + \varepsilon})$.
 
 ### Halton points
 
-The grid is rigid. To refine it we must start over with a finer one, and its points line up in rows that meet the circle all at once. Random points can be added one at a time, but they clump. A *low-discrepancy sequence* has the best of both: it is extended one point at a time, like random sampling, but each new point goes into a gap that the earlier ones left, so the first $N$ points cover the square evenly for every $N$.
+Gauss's method is a grid: its points come all at once, $(2r + 1)^2$ of them, and the one-loop trick of @exr-gauss-count relies on the shape of the disk. Can we keep the grid's even coverage, but add points one at a time, as with random points?
 
-The *van der Corput sequence* in base $b$ writes $i$ in base $b$ and mirrors its digits about the radix point. In base 2,
-$$
-1, 2, 3, 4, \ldots = 1_2, 10_2, 11_2, 100_2, \ldots \;\mapsto\; 0.1_2, 0.01_2, 0.11_2, 0.001_2, \ldots = \tfrac12, \tfrac14, \tfrac34, \tfrac18, \ldots
-$$
-The $i$-th *Halton point* uses base 2 for $x$ and base 3 for $y$, mapped from $[0,1]^2$ to $[-1,1]^2$. Feeding these points to the circle estimator $4 \cdot (\text{inside})/N$ is called *quasi-Monte Carlo*.
+The *Halton sequence* does this. Each new point roughly fills the gaps left by the earlier ones, so the first $N$ points cover the square evenly for every $N$. The points are not random at all: they are spread more evenly than random points would be. Such points are called *quasi-random*, and using them in place of random points is called *quasi-Monte Carlo*. The app below uses them in the circle estimator $4 \cdot (\text{inside})/N$.
 
-::: {#exr-halton-digits}
-## By hand
-a. List the first eight terms of the van der Corput sequence in base 2, and mark them on $[0, 1]$ in order. Which gap does each new point fall into?
-b. List the first eight terms in base 3.
-c. Why do the two coordinates use different bases? What goes wrong if both use base 2?
-:::
-
-The app shows the first $N$ Halton points. Its last readout is the circle estimator's standard error at the same $N$, for comparison.
 
 <div class="vm-app" id="halton-app">
+
 
 ```{ojs}
 //| output: false
@@ -1211,10 +1185,14 @@ The app shows the first $N$ Halton points. Its last readout is the circle estima
 haltonAll = haltonPoints(haltonMaxN)
 ```
 
+
+
 ```{ojs}
 //| output: false
 haltonStats = circleEstimate(haltonAll.insideCount[haltonN], haltonN)
 ```
+
+
 
 ```{ojs}
 VM.ui.statRow([
@@ -1227,17 +1205,23 @@ VM.ui.statRow([
 ])
 ```
 
+
+
 ```{ojs}
 //| output: false
 haltonPlot = VM.plotting.persistentPlot()
 ```
+
+
 
 ```{ojs}
 //| output: false
 haltonShow = new Set(haltonTraces)
 ```
 
+
 <div class="ojs-chart-block">
+
 
 ```{ojs}
 {
@@ -1279,6 +1263,8 @@ haltonShow = new Set(haltonTraces)
 }
 ```
 
+
+
 ```{ojs}
 viewof haltonTraces = {
   const items = []
@@ -1287,7 +1273,9 @@ viewof haltonTraces = {
 }
 ```
 
+
 <div class="ojs-chart-controls">
+
 
 ```{ojs}
 viewof haltonN = {
@@ -1298,28 +1286,24 @@ viewof haltonN = {
 }
 ```
 
-</div>
 
 </div>
 
 </div>
+
+</div>
+
 
 ```{ojs}
 //| output: false
 haltonUrlSync = VM.ui.syncUrlParams({halton_n: [haltonN, haltonDefaultN]})
 ```
 
-::: {#exr-halton-rate}
-## Why it works
-The Halton points are not independent, so the standard-error argument of @exr-pi-variance does not apply to them.
-
-a. Explain how clumps and gaps among random points produce errors of size $N^{-1/2}$. (Hint: the number of points inside the circle is binomial.)
-b. Why do evenly spread points avoid this?
-:::
 
 ### Comparing the three
 
-@fig-pi-methods plots each circle method's error against the number of points $N$ it uses, on log-log axes. For random points it shows the root-mean-square error over 40 runs, with a band holding the middle 80% of runs. For the Gauss circle method, $N = (2r+1)^2$ counts every grid point of the square, for every radius $r$. Measured by the work $W \approx 2r$ of @exr-gauss-count instead, its slope would double.
+@fig-pi-methods plots each method's error on log-log axes, against the number of points $N$ for random and Halton points, and against the radius $r$, the length of the loop in @exr-gauss-count, for the Gauss circle method.
+
 
 ```{ojs}
 //| output: false
@@ -1327,12 +1311,14 @@ cmpMaxN = 1e5
 cmpCounts = checkpoints(cmpMaxN)
 cmpSeries = [
   {label: "Random points", token: "fn", points: randomCircleErrors(VM.sampling.seededRandom(7), cmpCounts, 40), scatter: false},
-  {label: "Gauss circle", token: "warn", points: latticeErrors(cmpMaxN), scatter: true},
+  {label: "Gauss circle (against r)", token: "warn", points: latticeErrors(cmpMaxN), scatter: true},
   {label: "Halton points", token: "ok", points: haltonCircleErrors(checkpoints(cmpMaxN, 24)), scatter: true}
 ]
 ```
 
+
 ::: {#fig-pi-methods}
+
 
 ```{ojs}
 {
@@ -1386,7 +1372,7 @@ cmpSeries = [
   }
   const chart = Plot.plot(VM.plotting.plotOptions({
     width, height: 420, marginLeft: 50, marginRight: 40, marginBottom: 40,
-    x: piLogAxis(xLo, cmpMaxN, {label: "N (points used)", labelAnchor: "center", tickFormat: "~s"}),
+    x: piLogAxis(xLo, cmpMaxN, {label: "N (points), or r for Gauss", labelAnchor: "center", tickFormat: "~s"}),
     y: piLogAxis(lo, hi, {label: "|estimate − π|"}, 1.25),
     marks
   }))
@@ -1394,43 +1380,34 @@ cmpSeries = [
 }
 ```
 
+
+
 ```{ojs}
 {
   const stats = []
   for (const s of cmpSeries) {
     stats.push({label: s.label, value: `order ≈ ${convergenceOrder(s.points).toFixed(2)}`,
-      title: "minus the slope of the least-squares line through the log-log points with N ≥ 100"})
+      title: "minus the slope of the least-squares line through the log-log points with N (or r) ≥ 100"})
   }
   return VM.ui.statRow(stats)
 }
 ```
 
-Error of the three points-in-a-circle estimates of π against the number of points N. The two deterministic errors swing widely from one N to the next, dipping wherever the estimate crosses π, so they are shown as points (Gauss: one per radius; Halton: 24 per decade) with their least-squares lines, fitted over N ≥ 100 and extended (dashed) below it. Dashed and dotted lines: the rates N⁻¹ᐟ² and N⁻¹.
 
-:::
+Error of the three estimates of π against the number of points $N$, or the radius $r$ for the Gauss circle method.
 
-### Problems
-
-::: {#exr-halton-compare}
-## Halton against random
-Set the Halton app to $N = 1000$, $2000$ and $5000$. Each time, compare $|\text{estimate} - \pi|$ with the *Random SE at this N* readout. About how many times smaller is the Halton error?
-:::
-
-::: {#exr-pi-methods-dips}
-## Lucky values of N
-In @fig-pi-methods, the errors of the two deterministic methods dip sharply at some values of $N$ and not at their neighbors. Why? Why would it be misleading to report the error at one of those values of $N$ as the method's accuracy?
 :::
 
 ### Other numerical methods for $\pi$
 
-*This subsection is enrichment.* Monte Carlo is rarely the fastest way to compute a single number in low dimensions. The table compares the methods on this page with deterministic ones, from slowest to fastest. Each link opens a [VisualMathLab](https://www.visualmathlab.com) app with the inputs that make it compute $\pi$.
+The table compares the methods on this page with deterministic ones, from slowest to fastest.
 
 | Method | π is | Error | App |
 |---|---|---|---|
 | Circle method (random points) | 4 × P(a uniform point of the square lands in the disk) | $O(N^{-1/2})$ | [above](#pi-app) |
 | Buffon's needle / Barbier's noodle | 2ℓ / (t × mean crossings per drop) | $O(N^{-1/2})$ | [above](#buffon-app) |
 | Circle method (Halton points) | 4 × fraction of Halton points in the disk | about $O(N^{-3/4})$ | [above](#halton-app) |
-| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(N^{-1})$ proven, about $O(N^{-3/2})$ conjectured | [above](#gauss-app) |
+| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(r^{-1})$ proven, about $O(r^{-3/2})$ conjectured | [above](#gauss-app) |
 | Linear interpolation | the length of y = √(1 − x²) over [−1, 1], a semicircle | $O(N^{-3/2})$ | [Linear interpolation of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,linear,nodes){target="_blank"} |
 | Cubic spline | the length of y = √(1 − x²) over [−1, 1] | $O(N^{-3/2})$ | [Cubic spline of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,cubic,nodes){target="_blank"} |
 | Adaptive Simpson | ∫₀¹ 4/(1 + x²) dx | $O(N^{-6})$ | [Adaptive integration of 4/(1 + x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4%2F(1%2Bx%5E2)&a=0&b=1){target="_blank"} |
@@ -1440,13 +1417,10 @@ In @fig-pi-methods, the errors of the two deterministic methods dip sharply at s
 | Newton's method | the root of sin x, starting from 1.98 | $O(e^{-c\,3^{N/2}})$ | [Newton on sin x](https://www.visualmathlab.com/apps/newton-method/index.html?embed=1&f=sin(x)&x0=1.98&max=12){target="_blank"} |
 | Fixed-point iteration | the fixed point of x + sin x, starting from 0.1 | $O(e^{-c\,3^N})$ | [Iterating x + sin x](https://www.visualmathlab.com/apps/fixed-point-iteration/index.html?embed=1&g=x%2Bsin(x)&x0=0.1&max=12){target="_blank"} |
 
-*Notes.* Every error is measured against the work $N$: samples drawn, grid columns counted (for the Gauss circle method) or function evaluations. The random methods' rates are standard errors, Halton's is the rate fitted in @fig-pi-methods, and the rest are worst-case bounds. Newton's method evaluates both $\sin$ and $\cos$ at each step and triples its number of correct digits per step, hence $3^{N/2}$; iterating $x + \sin x$ needs only $\sin$. The trapezoid rule on $e^{-x^2}$ reaches full double precision in about 22 evaluations, where the circle method would need more than $10^{30}$ samples.
 
 ## Summary
 
 - **The Monte Carlo principle.** Write a deterministic quantity as the expectation of a random variable, then estimate it by a sample average.
-- **The Monte Carlo rate.** An average of $N$ independent samples is unbiased, with standard error proportional to $N^{-1/2}$. Each extra digit costs a hundred times more samples, whatever the problem.
-- **Functions of averages.** An estimator such as Buffon's $1/\hat p$ is biased, but its bias is $O(1/N)$, smaller than its $O(N^{-1/2})$ standard error, so it changes only the constant. Taylor expansion and the delta method approximate both.
-- **Beyond randomness.** In two dimensions, a grid or points spread evenly on purpose (quasi-Monte Carlo) beat $N^{-1/2}$.
+- **The Monte Carlo rate.** An average of $N$ i.i.d. samples with finite variance is unbiased, with standard error proportional to $N^{-1/2}$. Each extra digit costs a hundred times more samples, whatever the problem.
 
 The next chapter, [Estimating integrals](../integrals/), applies the same principle to integrals, where the dimension of the problem decides whether randomness pays off.

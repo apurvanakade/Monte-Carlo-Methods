@@ -21,9 +21,11 @@ We're approximating the area under $f(x)$ by averaging function values at random
 ## Statistical Properties
 
 The Monte Carlo integration estimator possesses several important statistical properties. First, it is unbiased:
-$$\begin{aligned}
+$$
+\begin{aligned}
 \mathbb{E}[\hat{\ell}_N] &= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
-\end{aligned}$$
+\end{aligned}
+$$
 
 The variance of our estimator is:
 $$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$

@@ -16,9 +16,6 @@ website:
   bread-crumbs: false
   navbar:
     search: true
-    left:
-      - text: Interactive Apps
-        href: apps/index.qmd
     right:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
@@ -60,7 +57,6 @@ website:
         contents:
           - probability/index.qmd
           - markov-chains/index.qmd
-      - apps/index.qmd
   page-footer: "© 2025 Apurva Nakade. All rights reserved."
 
 bibliography: references.bib
@@ -109,15 +105,23 @@ format:
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    # No per-page table of contents: the sidebar is the only navigation.
-    toc: false
+    # A per-page table of contents, for finding your way around long pages.
+    toc: true
+    # Number sections within each page (1, 1.1, ...). Pages are independent,
+    # so numbering restarts on every page.
+    number-sections: true
     # Body column width on wide screens (the sidebar rail centres it); the
     # Quarto default is 800px.
     grid:
       body-width: 1000px
     # Prose measure: caps paragraphs and headings at 40rem inside the column.
+    # Exercises: textbook-style #exr- blocks, with "Next exercise" buttons
+    # from the script in _chrome/exercises.html.
     css:
       - _chrome/reading-measure.css
+      - _chrome/exercises.css
+    include-after-body:
+      - _chrome/exercises.html
     include-in-header:
       # No comment thread in mathviz embed mode (?embed=), which shows the
       # app alone. Drop this once mathviz's chrome/embed.css lists .giscus.

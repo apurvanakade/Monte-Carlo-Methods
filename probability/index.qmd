@@ -25,10 +25,12 @@ $$F_X(x) = \int_{-\infty}^{x} f_X(t) \, dt \quad \text{and} \quad f_X(x) = \frac
 For a random variable $X$:
 
 **Expected value**:
-$$\mathbb{E}[X] = \begin{cases} 
+$$
+\mathbb{E}[X] = \begin{cases}
 \sum_{i} x_i \cdot P(X = x_i) & \text{if } X \text{ is discrete} \\
 \int_{-\infty}^{\infty} x \cdot f_X(x) \, dx & \text{if } X \text{ is continuous}
-\end{cases}$$
+\end{cases}
+$$
 
 **Variance**:
 $$\text{Var}(X) = \mathbb{E}[(X - \mathbb{E}[X])^2] = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$$
