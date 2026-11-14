@@ -25,8 +25,7 @@ _quarto.yml           site config (sidebar, mathviz options); enables the mathvi
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
 index.qmd             preface
 <slug>/                one folder per page: <slug>/index.qmd (chapters and appendices)
-apps/                 the Interactive Apps gallery (links to each app's ?embed= view)
-assets/               site CSS
+_chrome/              site chrome: prose reading measure, exercise styling
 scripts/              build hooks
 references.bib
 .github/              render on PRs (pr-check), publish main to gh-pages (publish)
@@ -49,7 +48,6 @@ app (`estimating-pi/index.qmd` is the simplest).
 - Several apps can share a chapter: prefix every OJS cell name and URL
   parameter with the app's name (`pi`, `buffon`, ...), since both are
   page-wide.
-- Add a card for it to `apps/index.qmd`, linking to the `?embed=` view.
 - A new reusable function goes into mathviz (see CLAUDE.md, "Contributing to
   mathviz").
 

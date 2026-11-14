@@ -50,10 +50,12 @@ The **accept-reject method** is based on the following fundamental theorem:
 
 Let $p(x)$ be a probability distribution. Let $X, Y$ be two random variables having the joint distribution
 
-$$f_{X,Y}(x,y) = \begin{cases}
+$$
+f_{X,Y}(x,y) = \begin{cases}
 1, & \text{if } 0 \leq y \leq p(x), \\
 0, & \text{otherwise}.
-\end{cases}$$ {#eq-uniform-joint-distribution}
+\end{cases}
+$$ {#eq-uniform-joint-distribution}
 
 Then the marginal distribution of $X$ is given by $p(x)$.
 :::
@@ -99,11 +101,13 @@ The acceptance probability for this basic method is $\frac{\int_a^b p(x) dx}{M(b
 
 Consider the triangular distribution 
 
-$$p(x) = \begin{cases}
+$$
+p(x) = \begin{cases}
 4x, & \text{if } 0 \leq x \leq 0.5, \\
 4(1-x), & \text{if } 0.5 \leq x \leq 1 \\ 
 0, & \text{otherwise}.
-\end{cases}$$ {#eq-triangular-distribution}
+\end{cases}
+$$ {#eq-triangular-distribution}
 
 **Analysis:**
 
@@ -340,17 +344,21 @@ Let $g(x)$ be a probability distribution and let $M$ be a constant. Let $X$ and 
 ::: {.proof}
 The conditional probability of $Y$ given $X$ is given by
 
-$$f_{Y|X}(y|x) = \begin{cases}
+$$
+f_{Y|X}(y|x) = \begin{cases}
 \frac{1}{Mg(x)}, & \text{if } 0 \leq y \leq Mg(x), \\
 0, & \text{otherwise}.
-\end{cases}$$
+\end{cases}
+$$
 
 Hence, the joint distribution of $X$ and $Y$ is given by
 
-$$f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
+$$
+f_{X,Y}(x,y) = f_{Y|X}(y|x) g(x) = \begin{cases}
 \frac{1}{M}, & \text{if } 0 \leq y \leq Mg(x), \\
 0, & \text{otherwise}.
-\end{cases}$$
+\end{cases}
+$$
 
 Hence, the joint distribution is uniform over the region between the graph of $Mg(x)$ and the $x$-axis.
 
@@ -473,10 +481,12 @@ where $c$ is a normalizing constant. We can compute $c$ by integrating $p(x)$ an
 
 Let $p(x)$ be any function with a finite integral $c$. Let $X, Y$ be two random variables having the joint distribution
 
-$$f_{X,Y}(x,y) = \begin{cases}
+$$
+f_{X,Y}(x,y) = \begin{cases}
 \frac{1}{c}, & \text{if } 0 \leq y \leq p(x), \\
 0, & \text{otherwise}.
-\end{cases}$$ {#eq-joint-unnormalized}
+\end{cases}
+$$ {#eq-joint-unnormalized}
 
 Then the marginal distribution of $X$ is given by $p(x)/c$.
 :::

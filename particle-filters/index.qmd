@@ -422,7 +422,7 @@ pfModel = ({dt: 1, T: 30, nParticles: 500, sigmaA: 0.5, sigmaR: 1.0, start: [0, 
 // The model, the simulation and the filter live in method.js,
 // where method.test.js checks them. The truth, the
 // observations and the filter share one seeded stream.
-pfRun = runParticleFilter(VM.sampling.seededRandom(42), pfModel)
+pfRun = runParticleFilter(VM.sampling.seededRandom(18), pfModel)
 ```
 
 ```{ojs}

@@ -35,13 +35,14 @@ Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work
 ## Layout
 
 ```
-_quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid
+_quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
+_chrome/         this site's own chrome: reading-measure.css (caps prose at 40rem inside the 1000px column),
+                 exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
 _extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
 <slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js): the chapters
                  and appendices, e.g. estimating-pi/, mh/, probability/; served at <site>/<slug>/
 images/          static figures
-apps/            the Interactive Apps gallery: a card per app, linking to its ?embed= view
 scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   the bibliography; each page prints its own cited entries under a `## References` heading
 ```
@@ -51,10 +52,10 @@ references.bib   the bibliography; each page prints its own cited entries under 
 ### How the site gets it
 
 - `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
-- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.js` and `mathviz.css` into `<head>`.
-- The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. No page has a table of contents (`toc: false` in `_quarto.yml`): the sidebar is the only navigation.
-- **The sidebar is a drawer**: mathviz's `sidebar-rail` option (mathviz v1.4.0+), set to `mcm-sidebar-pinned` in `_quarto.yml`, which is the localStorage key the pin is kept under (keep it unchanged, or readers lose their pins). The sidebar is off-canvas at every width, behind a slim rail with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open). The body column is 1000px wide above 992px, from `format.html.grid: body-width: 1000px` (the rail centres the column on that width; the Quarto default is 800px). It assumes `style: floating`.
-- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter, as `apps/index.qmd` does. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to "design-system CSS belongs in mathviz". Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
+- `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.min.js` and `mathviz.min.css` into `<head>`.
+- The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. Every page has a table of contents (`toc: true` in `_quarto.yml`), for long chapters.
+- **The sidebar is a drawer**: mathviz's `sidebar-rail` option (mathviz v1.4.0+), set to `mcm-sidebar-pinned` in `_quarto.yml`, which is the localStorage key the pin is kept under (keep it unchanged, or readers lose their pins). The sidebar is off-canvas at every width, behind a slim rail with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open). The body column is 1000px wide above 992px, from `format.html.grid: body-width: 1000px` (the rail centres the column on that width; the Quarto default is 800px). It assumes `style: floating`. `_chrome/reading-measure.css`, listed under `format.html.css`, caps prose (paragraphs, lists, headings, callouts) at 40rem inside that column, so figures and apps keep the full width; it is a site rule, since mathviz has no measure token.
+- `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to "design-system CSS belongs in mathviz". Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
 
 ### Contributing to mathviz
 
@@ -63,7 +64,7 @@ mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/ma
 A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. To try it here first, build mathviz and `quarto add ../mathviz --no-prompt` from this repo; restore the release with `make update-mathviz` before committing.
-- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. This site has no chrome of its own any more (the sidebar drawer is mathviz's `sidebar-rail` option). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the prose reading measure and the exercise styling). There is no local overlay (mathviz v0.10.0 removed the kit for one).
 
 ## Writing an app
 
@@ -76,7 +77,6 @@ Apps live in the chapter that explains them (`estimating-pi/index.qmd` is the si
 - Layout uses mathviz's classes: `ojs-panel`, `ojs-row`/`ojs-grid`, `ojs-chart-block`, `ojs-chart-controls`; size inputs with `el.classList.add("ojs-fill" | "ojs-auto")` rather than inline styles.
 - Shareable state: read defaults with `VM.ui.urlParam("<prefix>_x", default)` and write back with `VM.ui.syncUrlParams({...})`.
 - Randomness is seeded (`VM.sampling.seededRandom(seed)`), with a "draw again" button bumping the seed, so a shared URL reproduces the same picture.
-- Add a card to `apps/index.qmd`: `path:` must be the page's folder URL with `?embed=<id>`, e.g. `../estimating-pi/?embed=pi-app` (Quarto drops a `.qmd` path that carries a query string), plus a thumbnail SVG in `apps/images/`.
 
 ## Figures
 
@@ -84,7 +84,8 @@ A chapter's non-interactive figures are OJS too, drawn from the same seeded
 simulation on every load (no `vm-app`, no controls):
 
 - One setup cell per chapter (`//| output: false`) with the `VM`/`vmTheme`/`chartColors` trio, unless the page's app already defines them — a page-wide name defined twice is an OJS error. Prefix every other cell name with a short chapter tag (`vr`, `ising`, `pf`, ...), as for apps.
-- Simulate in an `output: false` cell with `VM.sampling.seededRandom(<fixed seed>)`, then draw in its own cell through a `VM.plotting.persistentPlot({height: "<px>"})` made once in a setup cell (`height` replaces the 72vh main-chart height; the box keeps its full width). A 3-D chart (`surface`, `scatter3d`, ...) uses `VM.plotting.persistentPlot3d` instead, which makes a drag rotate the scene (turntable) and gives it the 3-D modebar and themed scene axes; don't hand-color scene axes. Colors from `chartColors.*`, fills through `VM.plotting.alpha`. A chart whose traces need a legend is drawn through `VM.plotting.plotWithLegend(plot, traces, layout)` — mathviz's overlay legend, never Plotly's; hiding a trace keeps the axes and grid fixed. A chart without one sets `showlegend: false`. A chart whose traces need a legend is drawn through `VM.plotting.plotWithLegend(plot, traces, layout)` (mathviz's overlay legend, never Plotly's); one without sets `showlegend: false`.
+- Simulate in an `output: false` cell with `VM.sampling.seededRandom(<fixed seed>)`, then draw in its own cell through a `VM.plotting.persistentPlot({height: "<px>"})` made once in a setup cell (`height` replaces the 72vh main-chart height; the box keeps its full width). A 3-D chart (`surface`, `scatter3d`, ...) uses `VM.plotting.persistentPlot3d` instead, which makes a drag rotate the scene (turntable) and gives it the 3-D modebar and themed scene axes; don't hand-color scene axes. Colors from `chartColors.*`, fills through `VM.plotting.alpha`. A chart whose traces need a legend is drawn through `VM.plotting.plotWithLegend(plot, traces, layout)` — mathviz's overlay legend, never Plotly's; hiding a trace keeps the axes and grid fixed. A chart without one sets `showlegend: false`.
+- **Analysis figures** (convergence and error plots: static, nothing to zoom or hide) are Observable Plot charts instead, through `Plot.plot(VM.plotting.plotOptions({...}))`, with a `Plot.legend` key under them; colors still come from `chartColors.*`. `estimating-pi/` is the reference.
 - Printed numbers become `VM.ui.statRow` readouts or `VM.ui.renderTable` tables. Side-by-side panels are separate charts in a `::: {layout-ncol=2}` div; a figure with a cross-reference label is a `::: {#fig-...}` div with the caption as its last paragraph.
 
 ## Conventions

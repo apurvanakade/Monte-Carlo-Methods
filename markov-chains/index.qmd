@@ -66,13 +66,15 @@ $$\pi_n = \pi_0 P^n.$$
 ::: {#exm-random-walk}
 
 Consider a graph $G$ with 4 vertices as shown below. The transition matrix of the random walk on $G$ is given by
-$$P = 
+$$
+P =
 \begin{pmatrix}
 0 & 1 & 0 & 0 \\ 
 1/3 & 0 & 1/3 & 1/3 \\
 0 & 1/2 & 0 & 1/2 \\
 0 & 1/2 & 1/2 & 0
-\end{pmatrix}.$$
+\end{pmatrix}.
+$$
 
 Suppose we start at vertex $A$. This means that the initial distribution is $\pi_0 = [1, 0, 0, 0]$. The $n$-th distribution $\pi_n$ can be obtained by multiplying $\pi_0$ with the transition matrix $P^n$.
 
@@ -232,11 +234,13 @@ For infinite state spaces, ergodicity (irreducibility + aperiodicity) alone is n
 Our main example of a Markov chain is the random walk on a graph. Let $G = (V, E)$ be a graph with vertex set $V$ and edge set $E$. Suppose you want to move from one vertex to another by following the edges of the graph. At each vertex, you choose an edge uniformly at random and move to the adjacent vertex. This process is called a random walk on the graph.
 
 The random walk on $G$ is a Markov chain with state space $\Omega = V$ and transition probabilities given by
-$$P(i, j) = 
+$$
+P(i, j) =
 \begin{cases}
 \frac{1}{\deg(i)} & \text{if } (i, j) \in E, \\
 0 & \text{otherwise},
-\end{cases}$$
+\end{cases}
+$$
 where $\deg(i)$ is the degree of vertex $i$, i.e., the number of edges incident to $i$. 
 
 ::: {.callout-note}
@@ -275,9 +279,11 @@ Assume that the Markov chain is ergodic, and hence has a stationary distribution
 ::: {#def-total-variation-distance}
 
 The **total variation distance** between two probability distributions $\mu$ and $\nu$ on a finite state space $\Omega$ is defined as
-$$\| \mu - \nu \|_{\text{TV}} 
+$$
+\| \mu - \nu \|_{\text{TV}}
 = \frac{1}{2} \sum_{i \in \Omega} |\mu(i) - \nu(i)| 
-= \frac{1}{2} \| \mu - \nu \|_{L^1}.$$
+= \frac{1}{2} \| \mu - \nu \|_{L^1}.
+$$
 
 :::
 
@@ -320,13 +326,15 @@ In practice, we either provide a theoretical bound on the mixing time or "visual
 ### Connection to Spectral Theory
 
 Continuing the example from above, the matrix $I_4 - P$ is called the **normalized Laplacian matrix** of the graph $G$. 
-$$\mathcal{L} = I_4 - P = 
+$$
+\mathcal{L} = I_4 - P =
 \begin{pmatrix}
 1 & -1 & 0 & 0 \\ 
 -1/3 & 1 & -1/3 & -1/3 \\
 0 & -1/2 & 1 & -1/2 \\
 0 & -1/2 & -1/2 & 1
-\end{pmatrix}$$
+\end{pmatrix}
+$$
 
 One can show that 0 is an eigenvalue of $\mathcal{L}$ and all eigenvalues are non-negative. The second smallest eigenvalue of $\mathcal{L}$ is called the **spectral gap** of the graph (which could be 0). 
 
@@ -732,12 +740,14 @@ This is saying that the probability of transitioning from $x$ to $y$ is the same
 
 ::: {.proof}
 Suppose the Markov chain is reversible with respect to $\pi$. Then,
-$$\begin{aligned}
+$$
+\begin{aligned}
 (\pi P)_i &= \sum_j \pi_j P(j, i) \\
 &= \sum_j \pi_i P(i, j) \\
 &= \pi_i \sum_j P(i, j) \\
 &= \pi_i.
-\end{aligned}$$
+\end{aligned}
+$$
 Thus, $\pi$ is the stationary distribution of the Markov chain.
 :::
 
@@ -750,12 +760,14 @@ Note that we did not use any properties of the Markov chain in the proof of the 
 **Random Walks on Graphs.** Consider a graph $G = (V, E)$ with vertices $V$ and edges $E$. Let $P(i, j) = 1/\deg(i)$ if $(i, j) \in E$ and $0$ otherwise, where $\deg(i)$ is the degree of vertex $i$. Then, the stationary distribution of the Markov chain is $\pi_i = \deg(i)/(2|E|)$, where $|E|$ is the number of edges in the graph.
 
 The Markov chain is reversible with respect to $\pi$. Consider two vertices $i$ and $j$. If $(i, j) \in E$, then
-$$\begin{aligned}
+$$
+\begin{aligned}
 \pi_i P(i, j) &= \frac{\deg(i)}{2|E|} \cdot \frac{1}{\deg(i)} \\
 &= \frac{1}{2|E|} \\
 &= \frac{\deg(j)}{2|E|} \cdot \frac{1}{\deg(j)} \\
 &= \pi_j P(j, i).
-\end{aligned}$$
+\end{aligned}
+$$
 If $(i, j) \notin E$, then $\pi_i P(i, j) = \pi_j P(j, i) = 0$.
 :::
 
@@ -773,22 +785,26 @@ is symmetric. In particular, $P$ is similar to the symmetric matrix $Q$ and henc
 
 ::: {.proof}
 This is because 
-$$\begin{aligned}
+$$
+\begin{aligned}
 Q(i, j) 
 &= \sqrt{\pi_i} P(i, j) \sqrt{\pi_j^{-1}} \\
 &= \sqrt{\pi_i} \frac{\pi_j P(j, i)}{\pi_i} \sqrt{\pi_j^{-1}} \\
 &= \sqrt{\pi_j} P(j, i) \sqrt{\pi_i^{-1}} \\
 &= Q(j, i).
-\end{aligned}$$
+\end{aligned}
+$$
 Thus, $Q$ is symmetric.
 :::
 
 Now suppose $\mathbf{v}$ is a left eigenvector of $Q$ with eigenvalue $\lambda$. Then,
-$$\begin{aligned}
+$$
+\begin{aligned}
 \mathbf{v} Q &= \lambda \mathbf{v} \\
 \mathbf{v} \text{diag}(\sqrt{\pi}) \: P \: \text{diag}(\sqrt{\pi^{-1}}) &= \lambda \mathbf{v} \\
 \implies \mathbf{v} \text{diag}(\sqrt{\pi}) \: P &= \lambda \mathbf{v} \: \text{diag}(\sqrt{\pi}).
-\end{aligned}$$
+\end{aligned}
+$$
 
 Hence, $\mathbf{v} \text{diag}(\sqrt{\pi})$ will be an eigenvector of $P$ with the same eigenvalue. As $Q$ is symmetric, it has real eigenvalues and orthogonal eigenvectors. It is easier to do spectral analysis of $Q$ and use that to deduce properties of $P$. For example, we can find the eigenvector corresponding to the largest eigenvalue of $Q$ by solving the optimization problem
 $$\mathbf{v} = \underset{\mathbf{x} \neq 0}{\text{arg max}} \frac{\mathbf{x}^T Q \mathbf{x}}{\mathbf{x}^T \mathbf{x}}.$$

@@ -337,8 +337,10 @@ This probability is carefully chosen to maintain detailed balance and has intuit
 
 #### High temperature ($T \gg T_c$):
 
-$$\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad 
-P_{\text{add}} \approx 2\beta J \approx 0.$$
+$$
+\beta = \frac{1}{T} \text{ small} \quad \Rightarrow \quad
+P_{\text{add}} \approx 2\beta J \approx 0.
+$$
 
 - Clusters remain small, typically containing only 1–2 spins.  
 - Behavior similar to single-spin updates.

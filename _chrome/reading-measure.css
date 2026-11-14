@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* Reading measure. The body column is 1000px wide (format.html.grid in
+ * _quarto.yml) so apps and figures get room; prose at that width runs ~130 characters a
+ * line, far past a comfortable ~70. Prose blocks that are direct children of
+ * the page or of a section are capped at --mcm-measure and centered in the
+ * column; apps (.vm-app), figures, layout panels, tables and code keep the
+ * full width. Blocks nested inside an app or figure are untouched.
+ * Listed under format.html.css in _quarto.yml. A site rule: mathviz has no
+ * measure token. */
+
+/* rem, not ch: ch is the element's own font size, so headings would get a
+ * wider box than the paragraphs and stop lining up with them. 40rem is about
+ * 70 characters of body text. */
+:root { --mcm-measure: 40rem; }
+:is(main.content, main.content section) > :is(
+  p, ul, ol, dl, blockquote,
+  h1, h2, h3, h4, h5, h6,
+  .theorem, .proof, .callout, .footnotes, .references
+),
+#title-block-header {
+  max-width: var(--mcm-measure);
+  margin-inline: auto;
+}

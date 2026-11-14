@@ -270,7 +270,7 @@ gibbsTraceColors = new Map([
 ```{ojs}
 viewof gibbsRedraw = {
   const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-auto")
+  button.classList.add("ojs-end")
   return button
 }
 ```
@@ -566,10 +566,12 @@ We establish stationarity by verifying detailed balance for each component of th
 **Part I: Detailed Balance for the Odd Step (Update $X$)**
 
 The odd step updates only the $X$ component, keeping $Y$ fixed. The transition probabilities are:
-$$P_{\text{odd}}[(x',y') , (x,y)] = \begin{cases} 
+$$
+P_{\text{odd}}[(x',y') , (x,y)] = \begin{cases}
 f_{X|Y}(x \mid y') & \text{if } y' = y \\
 0 & \text{if } y' \neq y
-\end{cases}$$
+\end{cases}
+$$
 
 For states with $y' = y$, we verify:
 $$f_{X,Y}(x',y) \cdot f_{X|Y}(x \mid y) = f_{X,Y}(x,y) \cdot f_{X|Y}(x' \mid y)$$
@@ -585,10 +587,12 @@ Clearly, LHS = RHS. For states with $y' \neq y$, both sides equal zero since the
 **Part II: Detailed Balance for the Even Step (Update $Y$)**
 
 The even step updates only the $Y$ component, keeping $X$ fixed. The transition probabilities are:
-$$P_{\text{even}}[(x',y') , (x,y)] = \begin{cases} 
+$$
+P_{\text{even}}[(x',y') , (x,y)] = \begin{cases}
 f_{Y|X}(y \mid x') & \text{if } x' = x \\
 0 & \text{if } x' \neq x
-\end{cases}$$
+\end{cases}
+$$
 
 For states with $x' = x$, we verify:
 $$f_{X,Y}(x,y') \cdot f_{Y|X}(y \mid x) = f_{X,Y}(x,y) \cdot f_{Y|X}(y' \mid x)$$

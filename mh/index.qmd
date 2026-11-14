@@ -194,14 +194,22 @@ viewof rwProposal = Inputs.select(["Gaussian", "Uniform square"], {label: "Propo
 ```{ojs}
 // A typed value rather than a slider: the step size is a setting to
 // compare a few chosen values of (the chapter's 1, 0.5, 0.2, 0.01), not
-// something to scrub through.
-viewof rwSigmaInput = Inputs.text({label: "Step size σ", value: String(VM.ui.urlParam("rw_sigma", rwDefaults.sigma)), placeholder: "Example: 0.2, 1, 0.01"})
+// something to scrub through. The field turns red while its text isn't a
+// usable step size.
+viewof rwSigmaInput = {
+  const view = Inputs.text({label: "Step size σ", value: String(VM.ui.urlParam("rw_sigma", rwDefaults.sigma)), placeholder: "Example: 0.2, 1, 0.01"})
+  const input = view.querySelector("input")
+  const check = () => input.classList.toggle("vm-invalid", rwParseSigma(input.value) === null)
+  view.addEventListener("input", check)
+  check()
+  return view
+}
 ```
 
 ```{ojs}
 viewof rwRedraw = {
   const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-auto")
+  button.classList.add("ojs-end")
   return button
 }
 ```
@@ -210,12 +218,22 @@ viewof rwRedraw = {
 
 ```{ojs}
 //| output: false
-// rwSigma parses the step-size field; anything unusable (empty, zero,
-// negative, mid-typing) falls back to the default.
+// rwParseSigma: the step size a field's text names, or null when it isn't
+// one -- empty, mid-typing, not positive, or above 5.
+function rwParseSigma(text) {
+  const parsed = VM.expressions.makeNumber(window.math, text)
+  if (parsed === null || !Number.isFinite(parsed) || parsed <= 0 || parsed > 5) return null
+  return parsed
+}
+```
+
+```{ojs}
+//| output: false
+// rwSigma: the typed step size, or the default while the field is invalid.
 rwSigma = {
-  const parsed = VM.expressions.makeNumber(window.math, rwSigmaInput)
-  if (parsed === null || !Number.isFinite(parsed) || parsed <= 0) return rwDefaults.sigma
-  return Math.min(5, parsed)
+  const parsed = rwParseSigma(rwSigmaInput)
+  if (parsed === null) return rwDefaults.sigma
+  return parsed
 }
 ```
 
@@ -578,17 +596,22 @@ mhYRange = [-4.5, 4.5]
 
 ```{ojs}
 // Always-live, like the sliders: it sets the step slider's range and the
-// trace's x-axis, so a long run and a short one each fill the chart.
+// trace's x-axis, so a long run and a short one each fill the chart. The
+// field turns red while its text isn't a usable chain length.
 viewof mhMaxInput = {
-  const input = Inputs.text({label: "Max N", value: String(VM.ui.urlParam("mh_max", mhDefaults.max)), placeholder: "Example: 500, 5000"})
-  return input
+  const view = Inputs.text({label: "Max N", value: String(VM.ui.urlParam("mh_max", mhDefaults.max)), placeholder: "Example: 500, 5000"})
+  const input = view.querySelector("input")
+  const check = () => input.classList.toggle("vm-invalid", mhParseMax(input.value) === null)
+  view.addEventListener("input", check)
+  check()
+  return view
 }
 ```
 
 ```{ojs}
 viewof mhRedraw = {
   const button = Inputs.button("Run a new chain", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-auto")
+  button.classList.add("ojs-end")
   return button
 }
 ```
@@ -597,11 +620,24 @@ viewof mhRedraw = {
 
 ```{ojs}
 //| output: false
-// mhMax parses the Max N field, falling back to 500 on anything unusable.
+// mhParseMax: the chain length a field's text names, rounded, or null when
+// it isn't one -- empty, mid-typing, or outside 20 to 20,000.
+function mhParseMax(text) {
+  const parsed = VM.expressions.makeNumber(window.math, text)
+  if (parsed === null || !Number.isFinite(parsed)) return null
+  const rounded = Math.round(parsed)
+  if (rounded < 20 || rounded > 20000) return null
+  return rounded
+}
+```
+
+```{ojs}
+//| output: false
+// mhMax: the typed Max N, or 500 while the field is invalid.
 mhMax = {
-  const parsed = VM.expressions.makeNumber(window.math, mhMaxInput)
-  if (parsed === null || !Number.isFinite(parsed)) return 500
-  return Math.min(20000, Math.max(20, Math.round(parsed)))
+  const parsed = mhParseMax(mhMaxInput)
+  if (parsed === null) return 500
+  return parsed
 }
 ```
 
