@@ -339,9 +339,13 @@ function piLogAxis(lo, hi, options, pad = 1) {
 }
 
 // The width of one panel of a two-column figure: half the page column, less
-// the gap between the columns. OJS's `width` follows the column, so the
-// charts redraw to fill it when the window resizes.
-piPanelWidth = Math.floor((width - 24) / 2)
+// the gap between the columns. Quarto stacks layout-ncol panels below 768px,
+// and each panel then gets the whole column. OJS's `width` follows the
+// column, so the charts redraw to fill it when the window resizes.
+piPanelWidth = {
+  if (window.innerWidth < 768) return width
+  return Math.floor((width - 24) / 2)
+}
 
 // Running estimates: one line per run against N ≥ `from`, and a dashed line
 // at π. Without a `yDomain`, the y axis fits every plotted estimate, so no
