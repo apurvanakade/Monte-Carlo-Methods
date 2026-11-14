@@ -39,7 +39,7 @@ Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work
 ```
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
 _chrome/         this site's own chrome: exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
-                 callouts.css (callouts as an accent left rule; exercises have none), title-block.css (title only)
+                 callouts.css (callouts as an accent left rule; exercises as a light bordered box; both spaced by mathviz's $vm-block-gap), title-block.css (title only)
 _extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
 chapters/<slug>/ one folder per published page, chapters/<slug>/index.qmd (+ method.js, method.test.js, its static images):

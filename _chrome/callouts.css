@@ -14,7 +14,7 @@
 
 main .callout.callout-style-default {
   --mcm-callout-rule: var(--vm-accent);
-  margin-block: 1.75rem;
+  /* Spacing comes from mathviz's theme ($vm-block-gap), as for exercises. */
   padding: 0.15rem 0 0.15rem 1rem;
   border: 0;
   border-left: 3px solid var(--mcm-callout-rule);
