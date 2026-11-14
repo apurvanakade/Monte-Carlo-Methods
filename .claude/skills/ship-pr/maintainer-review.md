@@ -26,7 +26,7 @@ diff, its description and the code around it.
    longer applies. There may be none.
 3. For each kind of file the diff touches, one untouched neighbour of the same
    kind (another chapter, app, appendix or script), so you know what normal
-   looks like here. `estimating-pi/index.qmd` is the reference
+   looks like here. `chapters/estimating-pi/index.qmd` is the reference
    app.
 
 **Then read the change:**

@@ -24,7 +24,8 @@ to install beyond Quarto.
 _quarto.yml           site config (sidebar, mathviz options); enables the mathviz filter
 _extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
 index.qmd             preface
-<slug>/                one folder per page: <slug>/index.qmd (chapters and appendices)
+chapters/<slug>/       one folder per published page: index.qmd (+ method.js, tests, images)
+drafts/<slug>/         draft pages, same shape
 _chrome/              site chrome: exercise and callout styling, title block
 scripts/              build hooks
 references.bib
@@ -39,11 +40,11 @@ has `VM` (including `VM.mcmc.*`, `VM.ui.statRow`, ...), math.js, Plotly and
 the mathviz stylesheet.
 Start from the mathviz [starter pages](https://github.com/apurvanakade/mathviz/tree/main/starter)
 and the [docs](https://apurvanakade.github.io/mathviz/), or copy an existing
-app (`estimating-pi/index.qmd` is the simplest).
+app (`chapters/estimating-pi/index.qmd` is the simplest).
 
 - Wrap the app's controls, readouts and main chart in
   `<div class="vm-app" id="<name>-app">`. That block is what
-  `<slug>/?embed=<name>-app` shows on its own, and what the Share
+  `chapters/<slug>/?embed=<name>-app` shows on its own, and what the Share
   button offers as an `<iframe>`.
 - Several apps can share a chapter: prefix every OJS cell name and URL
   parameter with the app's name (`pi`, `buffon`, ...), since both are

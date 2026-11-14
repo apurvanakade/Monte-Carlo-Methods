@@ -9,7 +9,7 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { loadVM } from '../scripts/load-vm.mjs'
+import { loadVM } from '../../scripts/load-vm.mjs'
 import { mmnSimulate, waitAndSojourn } from './method.js'
 
 loadVM()

@@ -20,43 +20,42 @@ website:
       - icon: github
         href: https://github.com/apurvanakade/Monte-Carlo-Methods
         aria-label: GitHub
-  # Hand-written. Every page is <slug>/index.qmd; the draft pages (mmn,
-  # kalman-filters, optimization, simulated-annealing, cross-entropy) are
-  # left out until they are ready.
+  # Hand-written. Every published page is chapters/<slug>/index.qmd; draft
+  # pages live in drafts/<slug>/ and are left out until they are ready.
   sidebar:
     style: floating
     contents:
       - text: Preface
         href: index.qmd
-      - intro/index.qmd
+      - chapters/monte-carlo/index.qmd
       - section: Estimation
-        href: estimation/index.qmd
+        href: chapters/estimation-overview/index.qmd
         contents:
-          - estimating-pi/index.qmd
-          - integrals/index.qmd
+          - chapters/estimating-pi/index.qmd
+          - chapters/estimating-integrals/index.qmd
       - section: Sampling
-        href: sampling/index.qmd
+        href: chapters/sampling-overview/index.qmd
         contents:
-          - rng/index.qmd
-          - discrete/index.qmd
-          - inverse-transform/index.qmd
-          - other-distributions/index.qmd
-          - accept-reject/index.qmd
-          - gibbs-2d/index.qmd
-          - mh/index.qmd
-      - variance-reduction/index.qmd
+          - chapters/random-numbers/index.qmd
+          - chapters/discrete-distributions/index.qmd
+          - chapters/inverse-transform/index.qmd
+          - chapters/other-distributions/index.qmd
+          - chapters/rejection-sampling/index.qmd
+          - chapters/gibbs-sampling/index.qmd
+          - chapters/metropolis-hastings/index.qmd
+      - chapters/variance-reduction/index.qmd
       - section: Applications
         contents:
-          - sde/index.qmd
-          - ising/index.qmd
-          - bootstrap/index.qmd
+          - chapters/stochastic-equations/index.qmd
+          - chapters/ising-model/index.qmd
+          - chapters/bootstrap-method/index.qmd
       - section: Advanced Topics
         contents:
-          - particle-filters/index.qmd
+          - chapters/particle-filters/index.qmd
       - section: Appendices
         contents:
-          - probability/index.qmd
-          - markov-chains/index.qmd
+          - chapters/probability-review/index.qmd
+          - chapters/markov-chains/index.qmd
   page-footer: "© 2026 Apurva Nakade"
 
 bibliography: references.bib

@@ -1452,4 +1452,4 @@ The table compares the methods on this page with deterministic ones, from slowes
 - **Bias, variance and MSE.** A nonlinear function of an average, like Buffon's $1/\hat p$, is biased. A Taylor expansion approximates the bias (second order) and the variance (first order, the *delta method*), and $\text{MSE} = \text{Var} + \text{Bias}^2$. The bias shrinks like $1/N$, faster than the standard error, so the rate stays $N^{-1/2}$ and only the constant changes.
 - **Randomness is slow.** Points that cover the square more evenly than random ones do better: Halton points (quasi-Monte Carlo) and the Gauss circle method's grid. Deterministic methods, such as quadrature and Newton's method, are faster still.
 
-The next chapter, [Estimating integrals](../integrals/), applies the same principle to integrals, where the dimension of the problem decides whether randomness pays off.
+The next chapter, [Estimating integrals](../estimating-integrals/), applies the same principle to integrals, where the dimension of the problem decides whether randomness pays off.
