@@ -40,9 +40,8 @@ _chrome/         this site's own chrome: exercises.css + exercises.html (textboo
                  callouts.css (callouts as an accent left rule; exercises have none), title-block.css (title only)
 _extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
-<slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js): the chapters
+<slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js, its static images): the chapters
                  and appendices, e.g. estimating-pi/, mh/, probability/; served at <site>/<slug>/
-images/          static figures
 scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
 references.bib   the bibliography; each page prints its own cited entries under a `## References` heading
 ```
@@ -90,7 +89,7 @@ simulation on every load (no `vm-app`, no controls):
 
 ## Conventions
 
-- A new page is a folder `<slug>/index.qmd` (lowercase, hyphenated, so the URL is `<site>/<slug>/`). Add it to `website.sidebar` in `_quarto.yml` by hand; leave `draft: true` pages out. There are no old-URL redirects.
+- A new page is a folder `<slug>/index.qmd` (lowercase, hyphenated, so the URL is `<site>/<slug>/`). A static image sits in the folder of the page that shows it (`![](lava-lamps.jpg)`); there is no shared `images/`. Add it to `website.sidebar` in `_quarto.yml` by hand; leave `draft: true` pages out. There are no old-URL redirects.
 - Sections are unnumbered (`number-sections: false`), so link to one by its title, `[Title](#sec-id)` within a page or `[text](../<slug>/#sec-id)` across pages, never `@sec-`. Exercises, definitions and figures keep their numbers and `@exr-`/`@def-`/`@fig-` refs.
 - Citations use `references.bib` (`[@key]`). There is no global References page: a page that cites ends with `## References` and `::: {#refs}` `:::`.
 - Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.

@@ -5,7 +5,7 @@ execute:
   echo: false
 ---
 
-<!-- ![](images/flowchart.png) -->
+<!-- ![](flowchart.png) -->
 
 Monte Carlo methods are a powerful class of computational algorithms that harness the power of random sampling to solve complex numerical problems. Named after the famous Monte Carlo Casino in Monaco, these methods transform deterministic problems into probabilistic ones, allowing us to approximate solutions through statistical simulation.
 
@@ -46,5 +46,5 @@ These methods are particularly valuable when dealing with:
 - Situations where analytical solutions are intractable
 
 Throughout these notes, we'll explore how Monte Carlo methods provide both theoretical insights and practical solutions across diverse fields, from finance and physics to machine learning and engineering.
-<!-- ![Topics](images/topics.png) -->
+<!-- ![Topics](topics.png) -->
 
