@@ -133,7 +133,6 @@ piStats = circleEstimate(piPoints.insideCount[piN], piN)
 
 ```{ojs}
 VM.ui.statRow([
-  {label: "Points N", value: piStats.n.toLocaleString()},
   {label: "Inside", value: piStats.inside.toLocaleString()},
   {label: "Estimate of π", value: piStats.estimate.toFixed(4), title: "4 · inside / N"},
   {label: "Standard error", value: piStats.stdError.toFixed(4), title: "4 · sqrt(p(1 − p) / N), p = inside / N"},
@@ -338,19 +337,15 @@ function piLogAxis(lo, hi, options, pad = 1) {
   return {type: "log", domain, ticks: piDecades(domain[0], domain[1]), tickFormat: piPowerOfTen, ...options}
 }
 
-// The width of one panel of a two-column figure: half the page column, less
-// the gap between the columns. Quarto stacks layout-ncol panels below 768px,
-// and each panel then gets the whole column. OJS's `width` follows the
-// column, so the charts redraw to fill it when the window resizes.
-piPanelWidth = {
-  if (window.innerWidth < 768) return width
-  return Math.floor((width - 24) / 2)
-}
+// The analysis figures stack, each the column's full width and a short,
+// wide 240px tall. OJS's `width` follows the column, so the charts redraw to
+// fill it when the window resizes.
+piFigureHeight = 240
 
 // Running estimates: one line per run against N ≥ `from`, and a dashed line
 // at π. Without a `yDomain`, the y axis fits every plotted estimate, so no
 // run leaves the frame.
-function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidth = piPanelWidth}) {
+function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidth = width}) {
   const rows = []
   let lo = Math.PI, hi = Math.PI
   for (let r = 0; r < runs.length; r++) {
@@ -368,7 +363,7 @@ function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidt
   }
   const runColor = VM.plotting.alpha(chartColors.fn, 0.6)
   const chart = Plot.plot(VM.plotting.plotOptions({
-    width: chartWidth, height: 300, marginLeft: 46, marginBottom: 40,
+    width: chartWidth, height: piFigureHeight, marginLeft: 46, marginBottom: 40,
     x: piLogAxis(Math.max(from, counts[0]), counts[counts.length - 1], {label: xLabel, labelAnchor: "center", tickFormat: "~s"}),
     y: {domain, label: "π estimate"},
     marks: [
@@ -383,7 +378,7 @@ function piRunsFigure({counts, runs, title, xLabel, yDomain, from = 0, chartWidt
 // of runs, and a slope −1/2 reference raised above the band to compare with,
 // over N ≥ `from`. Without a `yDomain`, the y axis fits the plotted values;
 // with one, it stays put and anything outside is clipped.
-function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = piPanelWidth}) {
+function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = width}) {
   const last = errors[errors.length - 1]
   const rows = []
   for (const p of errors) {
@@ -396,7 +391,7 @@ function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = p
   }
   const bandColor = VM.plotting.alpha(chartColors.fn, 0.15)
   const chart = Plot.plot(VM.plotting.plotOptions({
-    width: chartWidth, height: 300, marginLeft: 46, marginBottom: 40,
+    width: chartWidth, height: piFigureHeight, marginLeft: 46, marginBottom: 40,
     x: piLogAxis(Math.max(from, errors[0].n), last.n, {label: xLabel, labelAnchor: "center", tickFormat: "~s"}),
     y: yDomain ? piLogAxis(yDomain[0], yDomain[1], {label: "|estimate − π|"}) : piLogAxis(lo, hi, {label: "|estimate − π|"}, 1.25),
     marks: [
@@ -417,8 +412,6 @@ function piErrorFigure({errors, title, xLabel, yDomain, from = 0, chartWidth = p
 
 :::: {#fig-pi-convergence}
 
-::: {layout-ncol=2}
-
 ```{ojs}
 piRunsFigure({counts: piRunCounts, runs: piRuns, title: "Running estimates", xLabel: "Sample size (N)", yDomain: [2.2, 4.2]})
 ```
@@ -426,8 +419,6 @@ piRunsFigure({counts: piRunCounts, runs: piRuns, title: "Running estimates", xLa
 ```{ojs}
 piErrorFigure({errors: piErrors, title: "Error decay", xLabel: "Sample size (N)"})
 ```
-
-:::
 
 Running estimates from 8 runs, and the error over 200 runs.
 
@@ -473,7 +464,7 @@ buffonTraceColors = new Map([
 
 <div class="vm-app" id="buffon-app">
 
-<div class="ojs-panel ojs-grid">
+<div class="ojs-panel ojs-row">
 
 
 ```{ojs}
@@ -583,7 +574,6 @@ buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles
     return value.toFixed(4)
   }
   return VM.ui.statRow([
-    {label: "Needles N", value: buffonStats.n.toLocaleString()},
     {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
     {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
     {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
@@ -976,8 +966,6 @@ buffonPlotFrom = 100
 
 :::: {#fig-buffon-convergence}
 
-::: {layout-ncol=2}
-
 ```{ojs}
 piRunsFigure({counts: piRunCounts, runs: buffonRuns, title: `Running estimates, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", yDomain: [2, 5], from: buffonPlotFrom})
 ```
@@ -986,15 +974,13 @@ piRunsFigure({counts: piRunCounts, runs: buffonRuns, title: `Running estimates, 
 piErrorFigure({errors: buffonErrors, title: `Error decay, ℓ = ${buffonPlotLength}`, xLabel: "Needles (N)", yDomain: [0.001, 10], from: buffonPlotFrom})
 ```
 
-:::
-
 Running estimates from 8 runs, and the error over 200 runs.
 
 ::::
 
 ::: {#rem-noodle .remark}
 ## The shape does not matter
-Bend the needle into any curve of length $\ell$. Cut it into many short straight pieces: each is a short needle placed uniformly at random, so it crosses a line with expected count $2/(\pi t)$ times its length. By linearity of expectation (which holds even though the pieces are dependent), $\mathbb{E}[\text{crossings per drop}] = 2\ell/(\pi t)$ for every shape, and $2\ell N / (t \cdot \text{total crossings})$ still estimates $\pi$. This is Barbier's 1860 observation. Switch the *Shape* in [the app](#buffon-app) to *Noodle*, a zigzag of three straight pieces, to see the estimate still converge to $\pi$. Linearity is a property of expectation alone, though: the variance, and with it the bias, does depend on the shape.
+Bend the needle into any curve of length $\ell$. Each short piece is a small needle, expected to cross $2/(\pi t)$ times per unit length, so by linearity of expectation (dependent pieces are fine) a drop still crosses $2\ell/(\pi t)$ times on average, and Buffon's estimator still estimates $\pi$ (Barbier, 1860). Try *Noodle*, a three-piece zigzag, in [the app](#buffon-app). Only the mean ignores the shape: the variance, and with it the bias, does not.
 :::
 
 
@@ -1054,7 +1040,6 @@ gaussStats = latticeEstimate(gaussR)
 
 ```{ojs}
 VM.ui.statRow([
-  {label: "Radius r", value: String(gaussStats.r)},
   {label: "In the disk L(r)", value: gaussStats.count.toLocaleString()},
   {label: "Estimate of π", value: gaussStats.estimate.toFixed(4), title: "count / r²"},
   {label: "|estimate − π|", value: gaussStats.error.toFixed(4)}
@@ -1200,7 +1185,6 @@ haltonStats = circleEstimate(haltonAll.insideCount[haltonN], haltonN)
 
 ```{ojs}
 VM.ui.statRow([
-  {label: "Points N", value: haltonStats.n.toLocaleString()},
   {label: "Inside", value: haltonStats.inside.toLocaleString()},
   {label: "Estimate of π", value: haltonStats.estimate.toFixed(4), title: "4 · inside / N"},
   {label: "|estimate − π|", value: haltonStats.error.toFixed(4)},
@@ -1425,6 +1409,9 @@ The table compares the methods on this page with deterministic ones, from slowes
 ## Summary
 
 - **The Monte Carlo principle.** Write a deterministic quantity as the expectation of a random variable, then estimate it by a sample average.
-- **The Monte Carlo rate.** An average of $N$ i.i.d. samples with finite variance is unbiased, with standard error proportional to $N^{-1/2}$. Each extra digit costs a hundred times more samples, whatever the problem.
+- **Two estimators of $\pi$.** The circle estimator is 4 times the fraction of uniform points of the square that land in the disk. Buffon's estimator inverts the fraction of needles that cross a line, whose expectation is $2\ell/(\pi t)$; by linearity, a needle of any shape gives the same mean (Barbier).
+- **The Monte Carlo rate.** An average of $N$ i.i.d. samples with finite variance is unbiased, with standard error proportional to $N^{-1/2}$. Each extra digit costs a hundred times more samples, whatever the problem. For large $N$ the average is approximately normal, which gives confidence intervals.
+- **Bias, variance and MSE.** A nonlinear function of an average, like Buffon's $1/\hat p$, is biased. A Taylor expansion approximates the bias (second order) and the variance (first order, the *delta method*), and $\text{MSE} = \text{Var} + \text{Bias}^2$. The bias shrinks like $1/N$, faster than the standard error, so the rate stays $N^{-1/2}$ and only the constant changes.
+- **Randomness is slow.** Points that cover the square more evenly than random ones do better: Halton points (quasi-Monte Carlo) and the Gauss circle method's grid. Deterministic methods, such as quadrature and Newton's method, are faster still.
 
 The next chapter, [Estimating integrals](../integrals/), applies the same principle to integrals, where the dimension of the problem decides whether randomness pays off.

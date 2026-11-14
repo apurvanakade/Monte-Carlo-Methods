@@ -36,8 +36,9 @@ Same rules as VisualMathLab (`~/Github/viz/VisualMath`). `develop` is where work
 
 ```
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
-_chrome/         this site's own chrome: reading-measure.css (caps prose at 40rem inside the 1000px column),
+_chrome/         this site's own chrome: reading-measure.css (caps prose at 40rem, nearly a no-op inside the 680px column),
                  exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
+                 callouts.css (callouts as an accent left rule; exercises have none), title-block.css (title only)
 _extensions/     apurvanakade/mathviz (installed, don't edit)
 index.qmd        preface
 <slug>/          one folder per page, <slug>/index.qmd (+ method.js, method.test.js): the chapters
@@ -53,8 +54,8 @@ references.bib   the bibliography; each page prints its own cited entries under 
 
 - `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
 - `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.min.js` and `mathviz.min.css` into `<head>`.
-- The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. Every page has a table of contents (`toc: true` in `_quarto.yml`), for long chapters.
-- **The sidebar is a drawer**: mathviz's `sidebar-rail` option (mathviz v1.4.0+), set to `mcm-sidebar-pinned` in `_quarto.yml`, which is the localStorage key the pin is kept under (keep it unchanged, or readers lose their pins). The sidebar is off-canvas at every width, behind a slim rail with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open). The body column is 1000px wide above 992px, from `format.html.grid: body-width: 1000px` (the rail centres the column on that width; the Quarto default is 800px). It assumes `style: floating`. `_chrome/reading-measure.css`, listed under `format.html.css`, caps prose (paragraphs, lists, headings, callouts) at 40rem inside that column, so figures and apps keep the full width; it is a site rule, since mathviz has no measure token.
+- The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. Pages have no table of contents (`toc: false` in `_quarto.yml`): one column, like the blog.
+- **The sidebar is a drawer**: mathviz's `sidebar-rail` option (mathviz v1.4.0+), set to `mcm-sidebar-pinned` in `_quarto.yml`, which is the localStorage key the pin is kept under (keep it unchanged, or readers lose their pins). The sidebar is off-canvas at every width, behind a slim rail with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open). The body column is 680px wide above 992px, from `format.html.grid: body-width: 680px` (the rail centres the column on that width; the Quarto default is 800px). It assumes `style: floating`. `_chrome/reading-measure.css`, listed under `format.html.css`, caps prose at 40rem; at 680px (42.5rem) it trims only 40px, so prose and apps effectively share the column width.
 - `comments: giscus` puts a comment thread under every page: a GitHub Discussion in this repo's "General" category, keyed by the page's path (the giscus GitHub app is installed on the repo). A page opts out with `comments: false` in its front matter. mathviz's embed mode doesn't hide Quarto's `.giscus` container yet, so an inline `include-in-header` rule in `_quarto.yml` does. That is a deliberate one-line exception to "design-system CSS belongs in mathviz". Delete it once mathviz's `chrome/embed.css` lists `.giscus`.
 
 ### Contributing to mathviz
@@ -64,7 +65,7 @@ mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/ma
 A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. To try it here first, build mathviz and `quarto add ../mathviz --no-prompt` from this repo; restore the release with `make update-mathviz` before committing.
-- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the prose reading measure and the exercise styling). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the prose reading measure, the exercise and callout styling, and the title block, which hides Quarto's author/date line). There is no local overlay (mathviz v0.10.0 removed the kit for one).
 
 ## Writing an app
 
@@ -91,7 +92,7 @@ simulation on every load (no `vm-app`, no controls):
 ## Conventions
 
 - A new page is a folder `<slug>/index.qmd` (lowercase, hyphenated, so the URL is `<site>/<slug>/`). Add it to `website.sidebar` in `_quarto.yml` by hand; leave `draft: true` pages out. There are no old-URL redirects.
-- Cross-page references are plain links (`[text](../<slug>/#sec-id)`); `@sec-` works only within a page.
+- Sections are unnumbered (`number-sections: false`), so link to one by its title, `[Title](#sec-id)` within a page or `[text](../<slug>/#sec-id)` across pages, never `@sec-`. Exercises, definitions and figures keep their numbers and `@exr-`/`@def-`/`@fig-` refs.
 - Citations use `references.bib` (`[@key]`). There is no global References page: a page that cites ends with `## References` and `::: {#refs}` `:::`.
 - Prefer explicit `for`/`while` loops and `if`/`else` over `.map()/.filter()/.reduce()` chains and nested ternaries, in OJS cells — the readers are used to other languages' plain loops and conditionals. Callbacks an API requires (Plotly, `addEventListener`) are fine.
 - Keep each app's logic in small named OJS cells (simulate → derive → plot → readouts) rather than one large cell.

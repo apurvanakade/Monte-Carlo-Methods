@@ -57,7 +57,7 @@ website:
         contents:
           - probability/index.qmd
           - markov-chains/index.qmd
-  page-footer: "© 2025 Apurva Nakade. All rights reserved."
+  page-footer: "© 2026 Apurva Nakade"
 
 bibliography: references.bib
 
@@ -72,8 +72,8 @@ comments:
     category: General
     category-id: DIC_kwDOPX0lZs4DIeN8
     mapping: pathname
-    reactions-enabled: true
-    input-position: top
+    reactions-enabled: false
+    input-position: bottom
 
 # mathviz (https://github.com/apurvanakade/mathviz): puts math.js, Plotly,
 # window.VM and the mathviz stylesheet into every page's <head>.
@@ -105,21 +105,27 @@ format:
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    # A per-page table of contents, for finding your way around long pages.
-    toc: true
-    # Number sections within each page (1, 1.1, ...). Pages are independent,
-    # so numbering restarts on every page.
-    number-sections: true
+    # No per-page table of contents: the page is one column, like the blog.
+    toc: false
+    # Unnumbered sections: with no table of contents nothing refers to them
+    # by number. Link to a section by its title: [Title](#sec-id).
+    number-sections: false
+    # Callouts are drawn without icons (_chrome/callouts.css styles them).
+    callout-icon: false
     # Body column width on wide screens (the sidebar rail centres it); the
-    # Quarto default is 800px.
+    # Quarto default is 800px. Prose is capped at 40rem (640px) inside it, so
+    # the cap barely narrows anything; prose and apps share the column.
     grid:
-      body-width: 1000px
+      body-width: 680px
     # Prose measure: caps paragraphs and headings at 40rem inside the column.
     # Exercises: textbook-style #exr- blocks, with "Next exercise" buttons
     # from the script in _chrome/exercises.html.
+    # Callouts and the title block: quiet, like the blog's.
     css:
       - _chrome/reading-measure.css
       - _chrome/exercises.css
+      - _chrome/callouts.css
+      - _chrome/title-block.css
     include-after-body:
       - _chrome/exercises.html
     include-in-header:

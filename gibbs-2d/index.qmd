@@ -21,7 +21,7 @@ The Gibbs sampling algorithm for sampling from a joint distribution $f_{X, Y}(x,
 3. Return the sequence $(X_0, Y_0), (X_1, Y_1), \ldots, (X_N, Y_N)$.
 :::
 
-The algorithm generates a sample path of length $N$ of the Markov Chain as described in @sec-gibbs-markov-chain. If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.
+The algorithm generates a sample path of length $N$ of the Markov Chain as described in [Markov Chain](#sec-gibbs-markov-chain). If needed, we can discard the initial samples to ensure that the Markov Chain has converged to the stationary distribution.
 
 ## Joint Exponential Distribution
 

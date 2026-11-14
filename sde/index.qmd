@@ -92,7 +92,7 @@ This results in a simple algorithm for generating sample paths of Brownian motio
 4. Return $W_0, W_1, \ldots, W_N$ at times $t_0 = 0, t_1 = \Delta t, \ldots, t_N = T$.
 :::
 
-This algorithm exploits the fact that Brownian motion has independent increments with $W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)$, making it a special case of the Euler-Maruyama method from @sec-euler-maruyama with $a(x,t) = 0$ and $b(x,t) = 1$.
+This algorithm exploits the fact that Brownian motion has independent increments with $W_{t+\Delta t} - W_t \sim \mathcal{N}(0, \Delta t)$, making it a special case of the Euler-Maruyama method from [Euler-Maruyama Method](#sec-euler-maruyama) with $a(x,t) = 0$ and $b(x,t) = 1$.
 
 
 ```{ojs}

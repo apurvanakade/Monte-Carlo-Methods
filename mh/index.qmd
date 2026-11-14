@@ -845,7 +845,7 @@ $$
 \end{cases}
 $$
 
-This means that we always accept a proposal $y$ if it is in the region $\Omega$ and reject it otherwise. This is equivalent to the random walk Metropolis--Hastings algorithm in @sec-random-walks.
+This means that we always accept a proposal $y$ if it is in the region $\Omega$ and reject it otherwise. This is equivalent to the random walk Metropolis--Hastings algorithm in [Random Walks Metropolis--Hastings Algorithm](#sec-random-walks).
 
 Several other algorithms, such as rejection sampling, random walks on graphs, and Gibbs sampling, can be viewed as special cases of the Metropolis--Hastings algorithm. 
 
