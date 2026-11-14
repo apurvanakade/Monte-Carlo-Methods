@@ -40,7 +40,7 @@ To estimate any quantity θ, we:
 :::
 
 In fact, we do not even need $\mathbb{E}[X] = \theta$. It suffices that $\lim_{n \to \infty} \hat{\theta} = \theta$ with high probability.
-For details, see [Statistical Estimation and the Sample Mean](../probability-review/#sec-estimation-theory).
+For details, see [Estimators](../probability-review/#sec-estimation-theory).
 
 ## Why This Works
 
