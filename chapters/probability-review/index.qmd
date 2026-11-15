@@ -6,27 +6,14 @@ execute:
   echo: false
 ---
 
-Every Monte Carlo method in these notes ends the same way: we average $N$ random samples and ask how close the average is to the number we want. This appendix collects the facts from probability and statistics that answer that question.
+Every Monte Carlo method in these notes ends the same way: we average $N$ random samples and ask how close the average is to the number we want. This appendix collects the facts from probability and statistics that answer that question. We review random variables and the rules for their means and variances, then use them to measure how good an estimator is, how fast a sample average converges, and what changes for nonlinear estimators and dependent samples.
 
-::: {.callout-important title="The Monte Carlo principle"}
-Write the quantity we want as the expectation of a random variable, then estimate that expectation by an average of many samples.
-:::
-
-The appendix answers five questions.
-
-1. What are random variables, expectations and variances, and which rules do we use to compute them?
-2. What makes an estimator good? We measure it by its bias, standard error and mean squared error.
-3. Why does the sample average converge, and how fast? The law of large numbers and the central limit theorem answer this, and give confidence intervals.
-4. What changes when the estimator is a nonlinear function of an average? The delta method answers this.
-5. What changes when the samples are not independent?
-
-## Random variables
+## Random variables {#sec-random-variables}
 
 A *random variable* $X$ is a numerical outcome of a random experiment. Its *cumulative distribution function* (CDF) is
 $$F_X(x) = P(X \le x).$$
 
-- A *discrete* random variable takes values $x_1, x_2, \ldots$ with probabilities $p_i = P(X = x_i)$, where $\sum_i p_i = 1$.
-- A *continuous* random variable has a *density* $f_X \ge 0$ with $\int_{-\infty}^{\infty} f_X(x)\,dx = 1$, and
+A *discrete* random variable takes values $x_1, x_2, \ldots$ with probabilities $p_i = P(X = x_i)$, where $\sum_i p_i = 1$. A *continuous* random variable has a *density* $f_X \ge 0$ with $\int_{-\infty}^{\infty} f_X(x)\,dx = 1$, and
 $$F_X(x) = \int_{-\infty}^{x} f_X(t)\,dt, \qquad f_X(x) = F_X'(x).$$
 
 The same definitions apply to a random vector $(X, Y)$, with a joint density $f_{X,Y}(x, y)$ in place of $f_X(x)$. The point $(X, Y)$ uniform on the square $[-1, 1]^2$ of [Estimating $\pi$](../estimating-pi/) has density $1/4$ on the square and $0$ outside it.
@@ -47,10 +34,7 @@ $$\text{Var}(X) = \mathbb{E}\big[(X - \mathbb{E}[X])^2\big] = \mathbb{E}[X^2] - 
 and its *standard deviation* is $\sqrt{\text{Var}(X)}$.
 :::
 
-Two special cases recur throughout the notes.
-
-- **Probabilities are expectations.** For an event $A$, the *indicator* $\mathbf{1}_A$ is $1$ when $A$ happens and $0$ otherwise, so $\mathbb{E}[\mathbf{1}_A] = P(A)$. This is how the circle estimator writes $\pi/4$ as an expectation.
-- **Integrals are expectations.** If $U$ is uniform on $[a, b]$, then $\mathbb{E}[g(U)] = \frac{1}{b - a}\int_a^b g(x)\,dx$. This is the starting point of [Estimating integrals](../estimating-integrals/).
+Two special cases recur throughout the notes: probabilities and integrals are expectations. For an event $A$, the *indicator* $\mathbf{1}_A$ is $1$ when $A$ happens and $0$ otherwise, so $\mathbb{E}[\mathbf{1}_A] = P(A)$; this is how the circle estimator writes $\pi/4$ as an expectation. If $U$ is uniform on $[a, b]$, then $\mathbb{E}[g(U)] = \frac{1}{b - a}\int_a^b g(x)\,dx$; this is the starting point of [Estimating integrals](../estimating-integrals/).
 
 | Distribution | Values | $\mathbb{E}[X]$ | $\text{Var}(X)$ |
 |---|---|---|---|
@@ -69,11 +53,11 @@ $$\text{Cov}(X, Y) = \mathbb{E}\big[(X - \mathbb{E}[X])(Y - \mathbb{E}[Y])\big],
 and independent random variables have covariance zero. Three rules compute almost every mean and variance in the notes.
 
 ::: {.callout-important title="Means and variances of sums"}
-For constants $a$, $b$ and random variables $X$, $Y$, $X_1, \ldots, X_N$:
-
-- **Linearity**, always: $\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y]$.
-- **Scaling**: $\text{Var}(aX + b) = a^2\,\text{Var}(X)$.
-- **Variance of a sum**: $\text{Var}\big(\sum_i X_i\big) = \sum_i \text{Var}(X_i) + 2\sum_{i < j} \text{Cov}(X_i, X_j)$, which is $\sum_i \text{Var}(X_i)$ when the $X_i$ are independent.
+For constants $a$, $b$ and random variables $X$, $Y$, $X_1, \ldots, X_N$, expectation is always linear,
+$$\mathbb{E}[aX + bY] = a\,\mathbb{E}[X] + b\,\mathbb{E}[Y],$$
+variance scales as $\text{Var}(aX + b) = a^2\,\text{Var}(X)$, and the variance of a sum is
+$$\text{Var}\Big(\sum_i X_i\Big) = \sum_i \text{Var}(X_i) + 2\sum_{i < j} \text{Cov}(X_i, X_j),$$
+which is $\sum_i \text{Var}(X_i)$ when the $X_i$ are independent.
 :::
 
 Linearity holds even for dependent random variables. That is what makes Barbier's noodle work ([Estimating $\pi$](../estimating-pi/#rem-noodle)): the pieces of a bent needle are dependent, but the expected number of crossings is still the sum of the pieces' expectations. The variance rule needs independence, or the covariances.
@@ -96,21 +80,14 @@ Three numbers measure how far an estimator is from $\theta$.
 
 ::: {#def-estimator-error}
 ## Bias, standard error, MSE
-For an estimator $\hat\theta_N$ of $\theta$:
-
-- the *bias* is $\text{Bias}(\hat\theta_N) = \mathbb{E}[\hat\theta_N] - \theta$, and $\hat\theta_N$ is *unbiased* if the bias is $0$;
-- the *standard error* is $\text{SE}(\hat\theta_N) = \sqrt{\text{Var}(\hat\theta_N)}$;
-- the *mean squared error* is $\text{MSE}(\hat\theta_N) = \mathbb{E}\big[(\hat\theta_N - \theta)^2\big]$.
+For an estimator $\hat\theta_N$ of $\theta$, the *bias* is $\text{Bias}(\hat\theta_N) = \mathbb{E}[\hat\theta_N] - \theta$, and $\hat\theta_N$ is *unbiased* if the bias is $0$. The *standard error* is $\text{SE}(\hat\theta_N) = \sqrt{\text{Var}(\hat\theta_N)}$, and the *mean squared error* is $\text{MSE}(\hat\theta_N) = \mathbb{E}\big[(\hat\theta_N - \theta)^2\big]$.
 :::
 
 The MSE combines the other two. Expanding $\hat\theta_N - \theta = (\hat\theta_N - \mathbb{E}[\hat\theta_N]) + \text{Bias}(\hat\theta_N)$ and squaring, the cross term has expectation zero, so
 $$\text{MSE}(\hat\theta_N) = \text{Var}(\hat\theta_N) + \text{Bias}(\hat\theta_N)^2.$$
 For an unbiased estimator the MSE is the variance, and the standard error is the natural measure of uncertainty. For a biased one, the MSE is.
 
-The rules for sums give the sample mean's bias and standard error directly. Write $\sigma^2 = \text{Var}(g(X))$.
-
-- Linearity gives $\mathbb{E}[\hat\theta_N] = \frac{1}{N}\sum_i \mathbb{E}[g(X_i)] = \theta$, so the sample mean is unbiased.
-- Independence gives $\text{Var}(\hat\theta_N) = \frac{1}{N^2}\sum_i \text{Var}(g(X_i)) = \sigma^2/N$.
+The rules for sums give the sample mean's bias and standard error directly. Write $\sigma^2 = \text{Var}(g(X))$. Linearity gives $\mathbb{E}[\hat\theta_N] = \frac{1}{N}\sum_i \mathbb{E}[g(X_i)] = \theta$, so the sample mean is unbiased, and independence gives $\text{Var}(\hat\theta_N) = \frac{1}{N^2}\sum_i \text{Var}(g(X_i)) = \sigma^2/N$.
 
 ::: {.callout-important title="The $N^{-1/2}$ rate"}
 The sample mean of $N$ i.i.d. samples with finite variance $\sigma^2$ is unbiased, with
@@ -120,7 +97,7 @@ The error falls like $N^{-1/2}$ whatever the problem, and whatever its dimension
 
 So the two ways to make a Monte Carlo estimate more accurate are more samples, which is slow, and a smaller $\sigma$, which is the subject of [Variance reduction](../variance-reduction/).
 
-## Limit theorems
+## Limit theorems {#sec-limit-theorems}
 
 The standard error says how large the error typically is. Two theorems say more: the error goes to zero, and for large $N$ its distribution is normal.
 
@@ -170,21 +147,22 @@ with $\sigma$ estimated from a small pilot run.
 |---|---|---|---|---|
 | $z_{1-\alpha/2}$ | $1.00$ | $1.645$ | $1.96$ | $2.576$ |
 
-## The delta method
+## The delta method {#sec-delta-method}
 
 Many estimators are not averages but smooth functions $g(\hat p)$ of an average $\hat p$ of mean $p$: Buffon's estimator of $\pi$ is $\frac{2\ell}{t}\cdot\frac{1}{\hat p}$. Since $g$ is not linear, in general
 $$\mathbb{E}[g(\hat p)] \ne g(\mathbb{E}[\hat p]),$$
 so $g(\hat p)$ is biased. A Taylor expansion of $g$ about $p$ approximates both its bias and its variance.
 
-- **Bias, to second order.** $g(\hat p) \approx g(p) + g'(p)(\hat p - p) + \tfrac12 g''(p)(\hat p - p)^2$. Taking expectations, the linear term vanishes, and
+For the bias, expand to second order: $g(\hat p) \approx g(p) + g'(p)(\hat p - p) + \tfrac12 g''(p)(\hat p - p)^2$. Taking expectations, the linear term vanishes, and
 $$\text{Bias}(g(\hat p)) \approx \tfrac12\, g''(p)\,\text{Var}(\hat p).$$
 Since $\text{Var}(\hat p)$ is of order $1/N$, the bias shrinks like $1/N$. Its sign is the sign of $g''$: a convex $g$ overestimates on average (Jensen's inequality, $\mathbb{E}[g(\hat p)] \ge g(\mathbb{E}[\hat p])$).
-- **Variance, to first order.** This is the *delta method*:
+
+For the variance, the first order is enough. This is the *delta method*:
 $$\text{Var}(g(\hat p)) \approx g'(p)^2\,\text{Var}(\hat p), \qquad \text{SE}(g(\hat p)) \approx |g'(p)|\,\text{SE}(\hat p).$$
 
 So the bias is of order $1/N$, while the standard error is of order $N^{-1/2}$. For large $N$ the squared bias is negligible in the MSE, and the error still falls at the $N^{-1/2}$ rate, with the constant multiplied by $|g'(p)|$. [Estimating $\pi$](../estimating-pi/) works this out for Buffon's needle.
 
-## Dependent samples
+## Dependent samples {#sec-dependent-samples}
 
 Markov chain Monte Carlo produces samples $X_1, X_2, \ldots$ that are identically distributed (in the long run) but *not* independent: each sample is a small step from the previous one. Linearity still makes their average unbiased in the long run, but the variance of a sum now includes the covariances, and positively correlated samples have a larger variance than independent ones,
 $$\text{Var}(\bar X_N) = \frac{\sigma^2}{N}\Big(1 + \frac{2}{N}\sum_{i < j}\text{Corr}(X_i, X_j)\Big).$$
@@ -192,11 +170,10 @@ The *effective sample size* is the number of independent samples that would give
 
 ## Summary
 
-- **Expectations everywhere.** A probability is the expectation of an indicator, and an integral over $[a, b]$ is $(b - a)$ times the expectation of $g(U)$ for uniform $U$. Linearity of expectation needs no independence; the variance of a sum adds up only without covariances.
-- **Measuring an estimator.** Bias, standard error and MSE, with $\text{MSE} = \text{Var} + \text{Bias}^2$. For unbiased estimators the standard error is the measure; for biased ones, the MSE.
-- **The $N^{-1/2}$ rate.** The sample mean of $N$ i.i.d. samples is unbiased with standard error $\sigma/\sqrt N$, whatever the dimension. One more digit costs a hundred times more samples.
-- **Limit theorems.** The law of large numbers makes the sample mean consistent; the central limit theorem makes it approximately normal, which, with $\sigma$ replaced by $S_N$, gives confidence intervals $\hat\theta_N \pm 1.96\,S_N/\sqrt N$. With infinite variance the CLT, and these intervals, fail.
-- **Nonlinear estimators.** A smooth function $g(\hat p)$ of an average has bias $\approx \tfrac12 g''(p)\,\text{Var}(\hat p)$, of order $1/N$, and standard error $\approx |g'(p)|\,\text{SE}(\hat p)$ (the delta method), so the rate stays $N^{-1/2}$.
-- **Dependent samples.** Positive correlations inflate the variance of an average; the effective sample size counts how many independent samples a chain is worth.
+- In [Random variables](#sec-random-variables) we reviewed distributions, expectation and variance, saw that probabilities and integrals are expectations, and collected the rules for means and variances of sums. Linearity needs no independence; the variance of a sum drops its covariances only for independent terms.
+- In [Estimators](#sec-estimation-theory) we measured an estimator by its bias, standard error and mean squared error, with $\text{MSE} = \text{Var} + \text{Bias}^2$, and showed that the sample mean is unbiased with standard error $\sigma/\sqrt N$, whatever the dimension.
+- In [Limit theorems](#sec-limit-theorems) the law of large numbers made the sample mean consistent, and the central limit theorem made it approximately normal, which, with $S_N$ in place of $\sigma$, gave confidence intervals. With infinite variance the theorem and the intervals fail.
+- In [The delta method](#sec-delta-method) a Taylor expansion of a nonlinear estimator $g(\hat p)$ gave a bias of order $1/N$ and a standard error of about $|g'(p)|\,\text{SE}(\hat p)$, so the rate stays $N^{-1/2}$.
+- In [Dependent samples](#sec-dependent-samples) we saw that positive correlations inflate the variance of an average, and that the effective sample size counts how many independent samples a chain is worth.
 
 The next appendix, [Markov chains](../markov-chains/), reviews the chains that MCMC samples from.
