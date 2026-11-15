@@ -12,13 +12,7 @@ How can coin flips compute $\pi$? The answer is a quintessential example of the 
 Write the quantity we want as the expectation of a random variable, then estimate that expectation by an average of many samples.
 :::
 
-This chapter works through three questions, with $\pi$ as the running example.
-
-1. How do we write $\pi$ as an expectation? We give two ways: points in a circle, and needles on a floor.
-2. How accurate is the resulting estimate, and how fast does it improve as we add samples?
-3. Are randomness-based methods faster or slower than non-random methods?
-
-Along the way, we review the basics of probability that we'll need throughout the course.
+In this chapter we use this principle to estimate $\pi$, see how accurate the estimates are, and compare them with methods that use no randomness at all, reviewing the probability we'll need along the way.
 
 
 ```{ojs}
@@ -52,7 +46,7 @@ import {dropPoints, circleEstimate, runningCircleEstimates, dropNeedles, needleC
 ```
 
 
-## The circle estimator
+## The circle estimator {#sec-circle-estimator}
 
 Inscribe the unit circle in the square $[-1, 1] \times [-1, 1]$. A point chosen uniformly from the square lands inside the circle with probability equal to the ratio of the two areas,
 $$P(X^2 + Y^2 \leq 1) = \frac{\pi}{4}.$$
@@ -251,7 +245,7 @@ piUrlSync = VM.ui.syncUrlParams({pi_seed: [piSeed, piDefaultSeed], pi_n: [piN, p
 ```
 
 
-### Quantifying uncertainty
+### Quantifying uncertainty {#sec-pi-uncertainty}
 
 One way to quantify uncertainty in an unbiased estimator is via the *standard error*, $$\text{SE}(\hat\pi_N) = \sqrt{\text{Var}(\hat\pi_N)}.$$
 
@@ -445,7 +439,7 @@ b. Use your formula from @exr-pi-variance to compute the half-width $1.96\,\text
 c. Set [the app](#pi-app) to $N = 1000$ and click *Draw new points* 20 times. Each time, record whether $|\text{estimate} - \pi|$ is below your half-width from (b). How many misses do you expect? How many did you get?
 :::
 
-## Buffon's needle
+## Buffon's needle {#sec-buffon}
 
 A second method to estimate $\pi$ by random sampling goes back to Buffon in 1777. Take a floor made of parallel strips of wood, each of width $t$, and drop a needle of length $\ell \le t$ onto it at random. What is the probability that the needle lies across a line between two strips? The answer involves $\pi$, so counting the needles that cross gives us a way to estimate $\pi$.
 
@@ -873,7 +867,7 @@ You should find
 $$p = P(\text{cross}) = \frac{2\ell}{\pi t}.$$
 Now $\pi$ sits inside a probability that we can estimate by dropping needles.
 
-### The estimator
+### The estimator {#sec-buffon-estimator}
 
 If $C$ of $N$ needles cross a line, the fraction $\hat p = C/N$ is an average of independent indicators, exactly like the circle estimator. So $\hat p$ is unbiased for $p$, and the analysis of @exr-pi-variance applies to it. Solving $p = 2\ell/(\pi t)$ for $\pi$ and substituting $\hat p$ for $p$ gives our second estimator.
 
@@ -1008,7 +1002,7 @@ Bend the needle into any curve of length $\ell$. Each short piece is a small nee
 :::
 
 
-## Randomness is slow
+## Randomness is slow {#sec-randomness-slow}
 
 Both random methods converge at the Monte Carlo rate $O(N^{-1/2})$ (@exr-pi-variance, @exr-buffon-mse), so each extra decimal digit costs a hundred times more samples. That is far too slow to compute $\pi$ in practice: the two methods are proofs of concept, not practical algorithms. Non-random methods do much better. We start with two that still count points in the disk, and end with a table of standard numerical methods.
 
@@ -1044,7 +1038,7 @@ function circlePath(r) {
 }
 ```
 
-### The Gauss circle method
+### The Gauss circle method {#sec-gauss-circle}
 
 Gauss came up with a simple idea to measure the area of a circle: count the integer points $(x, y)$ with $x^2 + y^2 \le r^2$, and call the count $L(r)$. This approximates the disk's area $\pi r^2$, and
 $$
@@ -1182,7 +1176,7 @@ so $\hat\pi_r = L(r)/r^2$ needs only one loop over $x$, of $2r + 1$ steps.
 
 
 
-### Halton points
+### Halton points {#sec-halton}
 
 Gauss's method is a grid: its points come all at once, $(2r + 1)^2$ of them, and the one-loop trick of @exr-gauss-count relies on the shape of the disk. Can we keep the grid's even coverage, but add points one at a time, as with random points?
 
@@ -1424,7 +1418,7 @@ Error of the three estimates of π against the number of points $N$, or the radi
 
 :::
 
-### Other numerical methods for $\pi$
+### Other numerical methods for $\pi$ {#sec-pi-other-methods}
 
 The table compares the methods on this page with deterministic ones, from slowest to fastest.
 
@@ -1446,10 +1440,8 @@ The table compares the methods on this page with deterministic ones, from slowes
 
 ## Summary
 
-- **The Monte Carlo principle.** Write a deterministic quantity as the expectation of a random variable, then estimate it by a sample average.
-- **Two estimators of $\pi$.** The circle estimator is 4 times the fraction of uniform points of the square that land in the disk. Buffon's estimator inverts the fraction of needles that cross a line, whose expectation is $2\ell/(\pi t)$; by linearity, a needle of any shape gives the same mean (Barbier).
-- **The Monte Carlo rate.** An average of $N$ i.i.d. samples with finite variance is unbiased, with standard error proportional to $N^{-1/2}$. Each extra digit costs a hundred times more samples, whatever the problem. For large $N$ the average is approximately normal, which gives confidence intervals.
-- **Bias, variance and MSE.** A nonlinear function of an average, like Buffon's $1/\hat p$, is biased. A Taylor expansion approximates the bias (second order) and the variance (first order, the *delta method*), and $\text{MSE} = \text{Var} + \text{Bias}^2$. The bias shrinks like $1/N$, faster than the standard error, so the rate stays $N^{-1/2}$ and only the constant changes.
-- **Randomness is slow.** Points that cover the square more evenly than random ones do better: Halton points (quasi-Monte Carlo) and the Gauss circle method's grid. Deterministic methods, such as quadrature and Newton's method, are faster still.
+- In [the circle estimator](#sec-circle-estimator) we met the Monte Carlo principle for the first time, and used the [standard error](#sec-pi-uncertainty) and the central limit theorem to see that the error shrinks like $N^{-1/2}$.
+- In [Buffon's needle](#sec-buffon) we saw a biased estimator, built from an unbiased one, and used the delta method to find its bias, variance and mean squared error. The bias is $O(1/N)$, so the error still shrinks like $N^{-1/2}$.
+- In [Randomness is slow](#sec-randomness-slow) we saw that evenly spread points, from Gauss's grid and the Halton sequence, beat random ones, and that deterministic methods are faster still.
 
 The next chapter, [Estimating integrals](../estimating-integrals/), applies the same principle to integrals, where the dimension of the problem decides whether randomness pays off.

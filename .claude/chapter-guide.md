@@ -40,14 +40,15 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 ## Structure of a chapter
 
 - Open with a concrete question, and state the chapter's governing principle in a `callout-important` if it has one.
-- Give a short numbered list of the questions the chapter answers.
-- Sections answer those questions in order; each one sets up a model, poses exercises, confirms results, and shows them in an app or figure.
+- Follow with one short sentence or paragraph on what is to come, not a full preview of the sections: no list, no "First, … Second, …".
+- Each section sets up a model, poses exercises, confirms results, and shows them in an app or figure.
 - Short asides go in a `.remark` block (`::: {#rem-… .remark}`).
-- End with `## Summary`: bold-labelled bullets, one per main idea, then a one-line link to the next chapter.
+- End with `## Summary`: one bullet per main section saying what the reader learned there ("In [Buffon's needle](#sec-buffon) we saw …"), linking back to the section (give it a `{#sec-…}` id) rather than re-explaining it. Not so terse it is a bare list of facts, not so long it re-teaches. Then a one-line link to the next chapter.
 - Cite with `[@key]`; a page that cites ends with `## References` and `::: {#refs}` `:::`.
 
 ## Prose
 
+- Running prose, not bullet or numbered lists; lists only in the Summary. Fold an enumeration into ordinary sentences.
 - Plain, direct sentences; no filler. Define every symbol where it first appears.
 - Say why a quantity matters before computing it (e.g. "Because the estimator is biased, standard error is no longer a good measure of uncertainty").
 - Compare methods quantitatively (rates, constants, sample counts), not qualitatively.
