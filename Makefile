@@ -14,7 +14,7 @@ update-mathviz:
 
 # Publish: fast-forward main to develop. The remote refuses anything that is
 # not a fast-forward, and nothing is checked out, so a running preview in the
-# develop folder is untouched. See CLAUDE.md, "Branches, PRs and releases".
+# develop folder is untouched. See CLAUDE.md, "Branches".
 release:
 	git fetch origin
 	git push origin origin/develop:main
