@@ -24,7 +24,7 @@ Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `np
 
 - `docs/` is local build output and is **not tracked** (`.gitignore`). Never commit it.
 - Publishing: a push to `main` runs `.github/workflows/publish.yml`, which renders the site (via the shared `.github/actions/render` composite: pinned Quarto, then `quarto render`) and force-pushes `docs/` to the orphan `gh-pages` branch, which Pages serves directly (Pages source: branch `gh-pages`, `/`). Don't add a workflow triggered by the `gh-pages` push: a push made with `GITHUB_TOKEN` never triggers another workflow. `pr-check.yml` runs the same render on every PR into `develop` and attaches the site as a downloadable `site` artifact. When bumping Quarto locally, bump the `version:` pin in the composite too.
-- `_extensions/apurvanakade/mathviz/` is the installed upstream release, managed by `scripts/update-mathviz.sh`. **Never edit it** — the next update overwrites it. A bug in it is fixed in mathviz (see "Contributing to mathviz").
+- `_extensions/apurvanakade/mathviz/` is the installed upstream release, managed by `scripts/update-mathviz.sh`. It is **not tracked** (`.gitignore`): the hook installs it before every render and `npm test` (`pretest`). **Never edit it** — the next update overwrites it. A bug in it is fixed in mathviz (see "Contributing to mathviz").
 - `_legacy/` and the old per-chapter `app/` folders are gone; the apps now live in the chapters as OJS. Don't reintroduce D3/precomputed-JSON apps.
 
 ## Layout
@@ -33,7 +33,7 @@ Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `np
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
 _chrome/         this site's own chrome: exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
                  callouts.css (callouts as an accent left rule; exercises as a light bordered box; both spaced by mathviz's $vm-block-gap), title-block.css (title only)
-_extensions/     apurvanakade/mathviz (installed, don't edit)
+_extensions/     apurvanakade/mathviz (installed by the hook, untracked, don't edit)
 index.qmd        preface
 chapters/<slug>/ one folder per published page, chapters/<slug>/index.qmd (+ method.js, method.test.js, its static images):
                  the chapters and appendices, e.g. estimating-pi/, metropolis-hastings/; served at <site>/chapters/<slug>/
@@ -46,7 +46,7 @@ references.bib   the bibliography; each page prints its own cited entries under 
 
 ### How the site gets it
 
-- `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues. So a new mathviz release reaches this site on the next render with no change here.
+- `_quarto.yml`'s `pre-render: scripts/update-mathviz.sh` runs before every render. It pulls the **latest tagged mathviz release** into `_extensions/apurvanakade/mathviz/` (`quarto add`/`quarto update extension`). A full render always checks; `quarto preview` checks at most once an hour (stamp in `.quarto/mathviz-updated`). Offline, it keeps the installed copy and the build continues (a fresh clone has none, so its first render or `npm test` needs the network). `npm test` runs the same script first (`pretest` in `package.json`), since the tests load the installed bundle. So a new mathviz release reaches this site on the next render with no change here.
 - `filters: [mathviz]` — mathviz's filter puts math.js, Plotly, `mathviz.min.js` and `mathviz.min.css` into `<head>`.
 - The `mathviz:` block turns on `referrer`, `sidebar-search` (a title filter atop the sidebar), self-hosted `fonts`, `report-bug` (select text → an issue on this repo) and `share` (a Share button on every `.vm-app`, which also enables `?embed=` mode). The theme is mathviz's: `format.html.theme.{light,dark}` name its generated SCSS; the site has no overrides of its own. If it ever needs one, it goes in a site SCSS file listed *after* each, setting only `$vm-*` tokens under `/*-- scss:defaults --*/`. Pages have no table of contents (`toc: false` in `_quarto.yml`): one column, like the blog.
 - **The sidebar is a drawer**: mathviz's `sidebar-rail` option (mathviz v1.4.0+), set to `mcm-sidebar-pinned` in `_quarto.yml`, which is the localStorage key the pin is kept under (keep it unchanged, or readers lose their pins). The sidebar is off-canvas at every width, behind a slim rail with a hamburger (open; Escape, click-outside or the hamburger again close it) and a pin (keeps it open). The body column is 680px wide above 992px, from `format.html.grid: body-width: 680px` (the rail centres the column on that width; the Quarto default is 800px). It assumes `style: floating`. The column is the prose measure too (680px is 40rem at the theme's 17px root, about 70 characters), so prose, apps and figures share one width; there is no separate prose cap.
