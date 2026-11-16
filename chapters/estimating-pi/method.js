@@ -326,8 +326,8 @@ export function latticeErrors(counts) {
 
 // The least-squares line through (log10 n, log10 error) over n >= 100 (n is
 // the work: the number of points, or loop steps for the Gauss circle method),
-// skipping errors at rounding level:
-// error ≈ 10^intercept * n^(-order). null with fewer than two points. Uses VM.numerical.linearRegression.
+// skipping errors at rounding level: error ≈ 10^intercept * n^(-order).
+// null with fewer than two points. Uses VM.numerical.linearRegression.
 export function convergenceFit(points) {
   const logPoints = []
   for (const p of points) {
