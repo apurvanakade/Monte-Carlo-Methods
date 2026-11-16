@@ -180,15 +180,17 @@ test('convergenceFit recovers an exact power law', () => {
   assert.equal(convergenceFit([{n: 100, error: 1}]), null)
 })
 
-test('convergence orders: random 1/2 and Halton about 3/4 in N, Gauss about 3/2 in r', () => {
-  // The page's figure: N (and r) up to 10^5, 40 random runs, seed 7. The
-  // random RMS error is sqrt(pi (4 - pi) / N) exactly, so its fit is 1/2 up
-  // to the noise of 40 runs. Halton's is near (log N)^2 / N, which over
-  // 10^2..10^5 fits as about N^(-3/4), not N^(-1), at the 24 samples per
-  // decade the page uses. The Gauss circle error is r^(-1) or better by
-  // Gauss's own argument (r^(-1.37) by Huxley) and conjectured
-  // r^(-3/2 + eps); its fit over 10^2..10^5 is about 1.44.
-  const counts = checkpoints(1e5)
+test('convergence orders against work: random 1/2, Halton about 3/4, Gauss about 1.4', () => {
+  // The page's figure: work up to 10^5, 40 random runs, seed 7. The work is
+  // the number of points N for random and Halton, and the 2r + 1 loop steps
+  // of latticeCount for Gauss. The random RMS error is sqrt(pi (4 - pi) / N)
+  // exactly, so its fit is 1/2 up to the noise of 40 runs. Halton's fits as
+  // about N^(-3/4) over 10^2..10^5 at the 24 checkpoints per decade the page
+  // uses for all three. The Gauss circle error is r^(-1) or better by Gauss's
+  // own argument (r^(-1.37) by Huxley) and conjectured r^(-3/2 + eps); its
+  // fit over 2r + 1 in 10^2..10^5 is about 1.43 (1.41 to 1.44 as the
+  // checkpoint density varies).
+  const counts = checkpoints(1e5, 24)
   assert.equal(counts[0], 10)
   assert.equal(counts[counts.length - 1], 1e5)
   const random = randomCircleErrors(VM.sampling.seededRandom(7), counts, 40)
@@ -197,8 +199,8 @@ test('convergence orders: random 1/2 and Halton about 3/4 in N, Gauss about 3/2 
   assert.ok(last.lo <= last.error && last.error <= last.hi)
   const orders = [
     ["random", convergenceOrder(random), 0.5, 0.06],
-    ["Gauss", convergenceOrder(latticeErrors(1e5)), 1.45, 0.08],
-    ["Halton", convergenceOrder(haltonCircleErrors(checkpoints(1e5, 24))), 0.75, 0.08]
+    ["Gauss", convergenceOrder(latticeErrors(counts)), 1.43, 0.06],
+    ["Halton", convergenceOrder(haltonCircleErrors(counts)), 0.75, 0.08]
   ]
   for (const [label, order, want, tolerance] of orders) {
     assert.ok(Math.abs(order - want) <= tolerance, `${label}: order ${order}, expected about ${want}`)

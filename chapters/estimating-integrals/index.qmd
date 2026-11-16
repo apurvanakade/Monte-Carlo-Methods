@@ -216,6 +216,18 @@ Note that this is a very weak bound and not useful in practice. There are no uni
 
 ## Multidimensional Integration
 
+<!-- TODO: use Gauss's circle method (../estimating-pi/#sec-gauss-circle) as a
+worked example of why 1-D integration is faster than 2-D. Counted point by
+point over its (2r + 1)^2-point grid it is a 2-D rule, with error about
+N^(-3/4) in the number of points N, no better than Halton. The one-loop count
+of @exr-gauss-count turns it into a 1-D rectangle rule for
+pi = int_{-1}^{1} 2 sqrt(1 - t^2) dt with step 1/r: 2r + 1 steps for an error
+of about r^(-3/2) (the sqrt singularity at t = +-1 caps it there; the floor
+rounding errors cancel like random noise, the Gauss circle conjecture). So the
+same estimate is twice as fast in its order once it is done as a 1-D integral.
+The comparison figure in estimating-pi (#fig-pi-methods) plots it against this
+work (order about 1.43 vs Halton's 0.73). -->
+
 One of Monte Carlo integration's greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson's rule) suffer from the "curse of dimensionality"—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their $O(1/\sqrt{n})$ convergence rate regardless of dimension.
 
 In $d$ dimensions, a grid-based method with $m$ points per dimension requires $m^d$ total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.
