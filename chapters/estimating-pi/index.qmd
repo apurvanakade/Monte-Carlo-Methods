@@ -1308,17 +1308,19 @@ haltonUrlSync = VM.ui.syncUrlParams({halton_n: [haltonN, haltonDefaultN]})
 
 ### Comparing the three
 
-@fig-pi-methods plots each method's error on log-log axes, against the number of points $N$ for random and Halton points, and against the radius $r$, the length of the loop in @exr-gauss-count, for the Gauss circle method.
+@fig-pi-methods plots each method's error on log-log axes against its work: the number of points $N$ for random and Halton points, and the $2r + 1$ steps of the loop in @exr-gauss-count for the Gauss circle method.
 
 
 ```{ojs}
 //| output: false
 cmpMaxN = 1e5
-cmpCounts = checkpoints(cmpMaxN)
+// One list of checkpoints for all three methods, so each is plotted and
+// fitted at the same work (Gauss at the nearest loop length 2r + 1).
+cmpCounts = checkpoints(cmpMaxN, 24)
 cmpSeries = [
   {label: "Random points", token: "fn", points: randomCircleErrors(VM.sampling.seededRandom(7), cmpCounts, 40), scatter: false},
-  {label: "Gauss circle (against r)", token: "warn", points: latticeErrors(cmpMaxN), scatter: true},
-  {label: "Halton points", token: "ok", points: haltonCircleErrors(checkpoints(cmpMaxN, 24)), scatter: true}
+  {label: "Gauss circle", token: "warn", points: latticeErrors(cmpCounts), scatter: true},
+  {label: "Halton points", token: "ok", points: haltonCircleErrors(cmpCounts), scatter: true}
 ]
 ```
 
@@ -1390,7 +1392,7 @@ a statRow under its chart (and keeps it there in fullscreen). -->
   }
   const chart = Plot.plot(VM.plotting.plotOptions({
     width, height: 420, marginLeft: 50, marginRight: 40, marginBottom: 40,
-    x: piLogAxis(xLo, cmpMaxN, {label: "N (points), or r for Gauss", labelAnchor: "center", tickFormat: "~s"}),
+    x: piLogAxis(xLo, cmpMaxN, {label: "work: points N, or loop steps 2r + 1 for Gauss", labelAnchor: "center", tickFormat: "~s"}),
     y: piLogAxis(lo, hi, {label: "|estimate − π|"}, 1.25),
     marks
   }))
@@ -1405,7 +1407,7 @@ a statRow under its chart (and keeps it there in fullscreen). -->
   const stats = []
   for (const s of cmpSeries) {
     stats.push({label: s.label, value: `order ≈ ${convergenceOrder(s.points).toFixed(2)}`,
-      title: "minus the slope of the least-squares line through the log-log points with N (or r) ≥ 100"})
+      title: "minus the slope of the least-squares line through the log-log points with work ≥ 100"})
   }
   return VM.ui.statRow(stats)
 }
@@ -1414,7 +1416,7 @@ a statRow under its chart (and keeps it there in fullscreen). -->
 </div>
 
 
-Error of the three estimates of π against the number of points $N$, or the radius $r$ for the Gauss circle method.
+Error of the three estimates of π against their work: the number of points $N$, or the $2r + 1$ loop steps of the Gauss circle method.
 
 :::
 
@@ -1427,7 +1429,7 @@ The table compares the methods on this page with deterministic ones, from slowes
 | Circle method (random points) | 4 × P(a uniform point of the square lands in the disk) | $O(N^{-1/2})$ | [above](#pi-app) |
 | Buffon's needle / Barbier's noodle | 2ℓ / (t × mean crossings per drop) | $O(N^{-1/2})$ | [above](#buffon-app) |
 | Circle method (Halton points) | 4 × fraction of Halton points in the disk | about $O(N^{-3/4})$ | [above](#halton-app) |
-| Gauss circle method | lattice points in the disk of radius r, divided by r² | $O(r^{-1})$ proven, about $O(r^{-3/2})$ conjectured | [above](#gauss-app) |
+| Gauss circle method | lattice points in the disk of radius r, divided by r², counted in 2r + 1 loop steps | $O(r^{-1})$ proven, about $O(r^{-3/2})$ conjectured | [above](#gauss-app) |
 | Linear interpolation | the length of y = √(1 − x²) over [−1, 1], a semicircle | $O(N^{-3/2})$ | [Linear interpolation of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,linear,nodes){target="_blank"} |
 | Cubic spline | the length of y = √(1 − x²) over [−1, 1] | $O(N^{-3/2})$ | [Cubic spline of the semicircle](https://www.visualmathlab.com/apps/polynomial-interpolation/index.html?embed=1&f=sqrt(1-x%5E2)&a=-1&b=1&max=40&n=8&show=original,cubic,nodes){target="_blank"} |
 | Adaptive Simpson | ∫₀¹ 4/(1 + x²) dx | $O(N^{-6})$ | [Adaptive integration of 4/(1 + x²)](https://www.visualmathlab.com/apps/adaptive-integration/index.html?embed=1&f=4%2F(1%2Bx%5E2)&a=0&b=1){target="_blank"} |

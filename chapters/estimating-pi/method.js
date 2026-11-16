@@ -306,27 +306,28 @@ export function haltonCircleErrors(counts) {
   return points
 }
 
-// The Gauss circle estimate's error against the radius, as points {n: r,
-// error}: at every radius up to 1000, then about 400 radii per decade up to
-// maxR. Dense, not a light sample: the error jumps about from one radius to
-// the next, and a fit through a few radii swings with the choice of radii.
-export function latticeErrors(maxR) {
-  const radii = []
-  for (let r = 1; r <= Math.min(1000, maxR); r++) radii.push(r)
-  if (maxR > 1000) {
-    for (const r of checkpoints(maxR, 400)) {
-      if (r > 1000) radii.push(r)
+// The Gauss circle estimate's error against its work, the 2r + 1 steps of
+// latticeCount's loop, at about each n in counts: the radius
+// r = round((n - 1) / 2), at least 1. Returns {n: 2r + 1, r, error}, one per
+// radius (nearby n can share one), so it plots on the same work axis as the
+// random and Halton errors, whose work is their N points.
+export function latticeErrors(counts) {
+  const points = []
+  let lastR = 0
+  for (const n of counts) {
+    const r = Math.max(1, Math.round((n - 1) / 2))
+    if (r !== lastR) {
+      points.push({n: 2 * r + 1, r, error: latticeEstimate(r).error})
+      lastR = r
     }
   }
-  const points = []
-  for (const r of radii) points.push({n: r, error: latticeEstimate(r).error})
   return points
 }
 
 // The least-squares line through (log10 n, log10 error) over n >= 100 (n is
-// the number of points, or the radius r for the Gauss circle method),
-// skipping errors at rounding level: error ≈ 10^intercept * n^(-order).
-// null with fewer than two points. Uses VM.numerical.linearRegression.
+// the work: the number of points, or loop steps for the Gauss circle method),
+// skipping errors at rounding level:
+// error ≈ 10^intercept * n^(-order). null with fewer than two points. Uses VM.numerical.linearRegression.
 export function convergenceFit(points) {
   const logPoints = []
   for (const p of points) {
