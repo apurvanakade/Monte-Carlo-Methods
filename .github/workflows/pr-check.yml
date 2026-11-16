@@ -39,11 +39,13 @@ jobs:
       - name: Install dev tooling
         run: npm ci
 
-      - name: Test the methods
-        run: npm test
-
+      # The render installs Quarto and mathviz; the tests (via `pretest`)
+      # need both, so they run after it.
       - name: Render the site
         uses: ./.github/actions/render
+
+      - name: Test the methods
+        run: npm test
 
       - name: Attach the rendered site
         uses: actions/upload-artifact@v7

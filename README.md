@@ -13,7 +13,8 @@ make preview    # = quarto preview
 Every build first runs `scripts/update-mathviz.sh` (a `pre-render` hook in
 `_quarto.yml`), which pulls the latest mathviz release into `_extensions/`.
 A full render always checks; `quarto preview` checks at most once an hour.
-Offline, the build continues with the copy already installed.
+Offline, the build continues with the copy already installed. `_extensions/`
+is not tracked; `npm test` runs the same script first.
 
 Every code cell is OJS and runs in the reader's browser, so there is nothing
 to install beyond Quarto.
@@ -22,7 +23,7 @@ to install beyond Quarto.
 
 ```
 _quarto.yml           site config (sidebar, mathviz options); enables the mathviz filter
-_extensions/          apurvanakade/mathviz (managed by scripts/update-mathviz.sh -- don't edit)
+_extensions/          apurvanakade/mathviz (installed by scripts/update-mathviz.sh, untracked -- don't edit)
 index.qmd             preface
 chapters/<slug>/       one folder per published page: index.qmd (+ method.js, tests, images)
 drafts/<slug>/         draft pages, same shape
