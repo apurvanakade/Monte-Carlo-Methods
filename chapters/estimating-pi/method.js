@@ -5,7 +5,7 @@
  */
 
 // The methods behind chapters/estimating-pi/index.qmd: the hit-or-miss estimate of pi,
-// Buffon's needle and Barbier's noodle, and the non-random Gauss circle and
+// Buffon's needle and Barbier's noodles, and the non-random Gauss circle and
 // Halton estimates. None of the samplers uses pi; it appears only in the
 // reported errors. Imported by the page's OJS
 // cells and by method.test.js. Pure functions of numbers and a random source
@@ -91,12 +91,103 @@ export function dropNeedles(rng, n, width, height) {
   return {cx, cy, c, s}
 }
 
+// [cos(k a), sin(k a)] for k = 0, ..., count - 1, from [c, s] = [cos a, sin a]
+// by repeated rotation, so the shapes below need no pi.
+export function turns(c, s, count) {
+  const out = []
+  let x = 1, y = 0
+  for (let k = 0; k < count; k++) {
+    out.push([x, y])
+    const next = x * c - y * s
+    y = x * s + y * c
+    x = next
+  }
+  return out
+}
+
+// A polyline moved so its bounding box is centered at the origin and scaled
+// to total length 1.
+export function unitPolyline(points) {
+  let total = 0
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  for (let j = 0; j < points.length; j++) {
+    const [x, y] = points[j]
+    if (j > 0) total += Math.hypot(x - points[j - 1][0], y - points[j - 1][1])
+    minX = Math.min(minX, x)
+    maxX = Math.max(maxX, x)
+    minY = Math.min(minY, y)
+    maxY = Math.max(maxY, y)
+  }
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2
+  const out = []
+  for (const [x, y] of points) out.push([(x - cx) / total, (y - cy) / total])
+  return out
+}
+
+// Steps of 30 and 36 degrees: cos 30 = sqrt(3) / 2, cos 36 = (1 + sqrt(5)) / 4.
+const turns30 = turns(Math.sqrt(3) / 2, 1 / 2, 37)
+const cos36 = (1 + Math.sqrt(5)) / 4
+const turns36 = turns(cos36, Math.sqrt(1 - cos36 * cos36), 11)
+
+// Barbier's noodles. Zigzag: three straight pieces, steps (0.8, +-0.6).
+export function zigzagShape() {
+  return unitPolyline([[0, 0], [0.8, 0.6], [1.6, 0], [2.4, 0.6]])
+}
+
+// Five-pointed star outline: ten corners 36 degrees apart, alternately on
+// radius 1 and on the inner pentagon's radius (3 - sqrt(5)) / 2, closed.
+export function starShape() {
+  const inner = (3 - Math.sqrt(5)) / 2
+  const points = []
+  for (let k = 0; k <= 10; k++) {
+    const [c, s] = turns36[k]
+    let r = 1
+    if (k % 2 === 1) r = inner
+    points.push([-r * s, r * c])
+  }
+  return unitPolyline(points)
+}
+
+// Two turns of a spiral, radius growing by 1 every 30 degrees.
+export function spiralShape() {
+  const points = []
+  for (let k = 0; k <= 24; k++) points.push([k * turns30[k][0], k * turns30[k][1]])
+  return unitPolyline(points)
+}
+
+// A stretched spring: a point going round a circle of radius 0.5 while the
+// circle moves forward 1.2 per turn, three loops.
+export function springShape() {
+  const points = []
+  for (let k = 0; k <= 36; k++) points.push([1.2 * k / 12 - 0.5 * turns30[k][0], 0.5 * turns30[k][1]])
+  return unitPolyline(points)
+}
+
+// A heart, closed: two semicircles of radius 1 over (-2, 0)-(0, 0) and
+// (0, 0)-(2, 0), then straight down to the tip (0, -2.6) and back.
+export function heartShape() {
+  const points = []
+  for (const center of [-1, 1]) {
+    for (let j = 0; j <= 6; j++) {
+      if (center === 1 && j === 0) continue
+      const [c, s] = turns30[6 - j]
+      points.push([center + c, s])
+    }
+  }
+  points.push([0, -2.6], [-2, 0])
+  return unitPolyline(points)
+}
+
 // The shapes dropped, as polylines of total length 1 about their centers:
-// the needle, and Barbier's noodle, a zigzag of three straight pieces of
-// length 1/3 each (steps of (0.8, +-0.6) / 3).
+// the needle, and Barbier's noodles. Keys are the app's Shape options in
+// lower case.
 export const buffonShapes = {
   needle: [[-0.5, 0], [0.5, 0]],
-  noodle: [[-0.4, -0.1], [-0.4 / 3, 0.1], [0.4 / 3, -0.1], [0.4, 0.1]]
+  zigzag: zigzagShape(),
+  star: starShape(),
+  spiral: spiralShape(),
+  spring: springShape(),
+  heart: heartShape()
 }
 
 // Each drop of the shape, scaled to total length `length` and turned to its

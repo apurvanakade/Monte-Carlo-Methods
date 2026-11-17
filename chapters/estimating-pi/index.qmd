@@ -441,7 +441,7 @@ c. Set [the app](#pi-app) to $N = 1000$ and click *Draw new points* 20 times. Ea
 A second method to estimate $\pi$ by random sampling goes back to Buffon in 1777. Take a floor made of parallel strips of wood, each of width $t$, and drop a needle of length $\ell \le t$ onto it at random. What is the probability that the needle lies across a line between two strips? The answer involves $\pi$, so counting the needles that cross gives us a way to estimate $\pi$.
 
 
-The app below drops $N$ needles of length $\ell$ on lines spaced $t = 1$ apart and colors the ones that cross a line. Leave the *Shape* switch on *Needle* for now; the noodle is the subject of @rem-noodle.
+The app below drops $N$ needles of length $\ell$ on lines spaced $t = 1$ apart and colors the ones that cross a line. Leave *Shape* on *Needle* for now; the other shapes are the subject of @rem-noodle.
 
 
 ```{ojs}
@@ -450,7 +450,7 @@ buffonMaxN = 10000
 buffonDefaultSeed = 1
 buffonDefaultN = 100
 buffonDefaultLength = 0.8
-buffonShapeOptions = ["Needle", "Noodle"]
+buffonShapeOptions = ["Needle", "Zigzag", "Star", "Spiral", "Spring", "Heart"]
 // Lines y = 0, 1, ..., 6 (spacing t = 1) across a board 8 wide.
 buffonSpacing = 1
 buffonWidth = 8
@@ -471,9 +471,16 @@ buffonTraceColors = new Map([
 
 
 ```{ojs}
+// buffonShape: an option from buffonShapeOptions. The URL holds it in lower
+// case; an unknown value, or the old "noodle", falls back.
 viewof buffonShape = {
-  const initial = VM.ui.urlParam("buffon_shape", "needle") === "noodle" ? "Noodle" : "Needle"
-  return Inputs.radio(buffonShapeOptions, {value: initial, label: "Shape"})
+  let initial = "Needle"
+  let param = String(VM.ui.urlParam("buffon_shape", "needle"))
+  if (param === "noodle") param = "zigzag"
+  for (const option of buffonShapeOptions) {
+    if (option.toLowerCase() === param) initial = option
+  }
+  return Inputs.select(buffonShapeOptions, {value: initial, label: "Shape"})
 }
 ```
 
@@ -546,7 +553,7 @@ buffonSeed = {
 ```{ojs}
 //| output: false
 // buffonDrops: each drop's center and direction, drawn once per seed. The
-// length input and the needle/noodle switch only redraw the shape about
+// length input and the shape selector only redraw the shape about
 // those centers, so changing them shows the same drops.
 buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
 ```
@@ -994,7 +1001,7 @@ Running estimates from 8 runs, and the error over 200 runs.
 
 ::: {#rem-noodle .remark}
 ## The shape does not matter
-Bend the needle into any curve of length $\ell$. Each short piece is a small needle, expected to cross $2/(\pi t)$ times per unit length, so by linearity of expectation (dependent pieces are fine) a drop still crosses $2\ell/(\pi t)$ times on average, and Buffon's estimator still estimates $\pi$ (Barbier, 1860). Try *Noodle*, a three-piece zigzag, in [the app](#buffon-app). Only the mean ignores the shape: the variance, and with it the bias, does not.
+One fun fact is that the shape of the noodle does not matter (Barbier, 1860)! You can imagine that each short piece is a small needle, expected to cross $2/(\pi t)$ times per unit length, so by linearity of expectation (dependent pieces are fine) a drop still crosses $2\ell/(\pi t)$ times on average, and Buffon's estimator still estimates $\pi$. Try the other shapes in [the app](#buffon-app): a zigzag, a star, a spiral, a spring and a heart. But note that only the mean ignores the shape: the variance, and with it the bias, does not. For $\ell \le t$, the straight needle has the lowest variance among noodles of length $\ell$.
 :::
 
 
