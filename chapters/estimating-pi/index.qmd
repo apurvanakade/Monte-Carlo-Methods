@@ -4,6 +4,8 @@ date: 2025-08-04 00:38:57
 author: Apurva Nakade
 execute:
   echo: false
+mathviz-page:
+  quiet-apps: true
 ---
 
 How can coin flips compute $\pi$? The answer is a quintessential example of the *Monte Carlo principle*:
