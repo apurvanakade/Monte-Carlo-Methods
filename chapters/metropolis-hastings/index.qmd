@@ -270,20 +270,6 @@ rwView = regionView(rwChain, rwN)
 ```
 
 ```{ojs}
-{
-  const steps = rwView.n - 1
-  let rate = 0
-  if (steps > 0) rate = rwView.acceptedSteps / steps
-  return VM.ui.statRow([
-    {label: "Samples N", value: rwView.n.toLocaleString()},
-    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${rwView.acceptedSteps} of ${steps} proposals accepted`},
-    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(rwView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
-    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(rwView.ys).toFixed(1)}
-  ])
-}
-```
-
-```{ojs}
 //| output: false
 rwPlot = VM.plotting.persistentPlot()
 ```
@@ -376,6 +362,20 @@ viewof rwN = {
 ```
 
 </div>
+
+```{ojs}
+{
+  const steps = rwView.n - 1
+  let rate = 0
+  if (steps > 0) rate = rwView.acceptedSteps / steps
+  return VM.ui.statRow([
+    {label: "Samples N", value: rwView.n.toLocaleString()},
+    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${rwView.acceptedSteps} of ${steps} proposals accepted`},
+    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(rwView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(rwView.ys).toFixed(1)}
+  ])
+}
+```
 
 </div>
 
@@ -663,21 +663,6 @@ mhView = normalView(mhChain, mhN, mhMax)
 ```
 
 ```{ojs}
-{
-  const steps = mhView.n - 1
-  let rate = 0
-  if (steps > 0) rate = mhView.acceptedSteps / steps
-  return VM.ui.statRow([
-    {label: "Samples N", value: mhView.n.toLocaleString()},
-    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${mhView.acceptedSteps} of ${steps} proposals accepted`},
-    {label: "ESS", value: VM.mcmc.effectiveSampleSize(mhView.samples).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
-    {label: "Mean (target 0)", value: mhView.mean.toFixed(3)},
-    {label: "SD (target 1)", value: mhView.sd.toFixed(3)}
-  ])
-}
-```
-
-```{ojs}
 //| output: false
 mhPlot = VM.plotting.persistentPlot()
 ```
@@ -767,6 +752,21 @@ viewof mhN = {
 ```
 
 </div>
+
+```{ojs}
+{
+  const steps = mhView.n - 1
+  let rate = 0
+  if (steps > 0) rate = mhView.acceptedSteps / steps
+  return VM.ui.statRow([
+    {label: "Samples N", value: mhView.n.toLocaleString()},
+    {label: "Acceptance rate", value: `${(100 * rate).toFixed(1)}%`, title: `${mhView.acceptedSteps} of ${steps} proposals accepted`},
+    {label: "ESS", value: VM.mcmc.effectiveSampleSize(mhView.samples).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "Mean (target 0)", value: mhView.mean.toFixed(3)},
+    {label: "SD (target 1)", value: mhView.sd.toFixed(3)}
+  ])
+}
+```
 
 </div>
 

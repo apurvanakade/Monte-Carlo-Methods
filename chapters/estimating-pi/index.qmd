@@ -132,19 +132,6 @@ piPoints = dropPoints(VM.sampling.seededRandom(piSeed), piMaxN)
 piStats = circleEstimate(piPoints.insideCount[piN], piN)
 ```
 
-
-
-```{ojs}
-VM.ui.statRow([
-  {label: "Inside", value: piStats.inside.toLocaleString()},
-  {label: "Estimate of π", value: piStats.estimate.toFixed(4), title: "4 · inside / N"},
-  {label: "Standard error", value: piStats.stdError.toFixed(4), title: "4 · sqrt(p(1 − p) / N), p = inside / N"},
-  {label: "|estimate − π|", value: piStats.error.toFixed(4)}
-])
-```
-
-
-
 ```{ojs}
 //| output: false
 piPlot = VM.plotting.persistentPlot()
@@ -233,6 +220,15 @@ viewof piN = {
 
 
 </div>
+
+```{ojs}
+VM.ui.statRow([
+  {label: "Inside", value: piStats.inside.toLocaleString()},
+  {label: "Estimate of π", value: piStats.estimate.toFixed(4), title: "4 · inside / N"},
+  {label: "Standard error", value: piStats.stdError.toFixed(4), title: "4 · sqrt(p(1 − p) / N), p = inside / N"},
+  {label: "|estimate − π|", value: piStats.error.toFixed(4)}
+])
+```
 
 </div>
 
@@ -571,25 +567,6 @@ buffonNeedles = needleCrossings(buffonDrops, buffonLength, buffonSpacing, buffon
 buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles.crossingSquares[buffonN], buffonN, buffonLength, buffonSpacing)
 ```
 
-
-
-```{ojs}
-{
-  const format = value => {
-    if (value === null) return "—"
-    return value.toFixed(4)
-  }
-  return VM.ui.statRow([
-    {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
-    {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
-    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
-    {label: "|estimate − π|", value: format(buffonStats.error)}
-  ])
-}
-```
-
-
-
 ```{ojs}
 //| output: false
 buffonPlot = VM.plotting.persistentPlot()
@@ -676,6 +653,21 @@ viewof buffonN = {
 
 
 </div>
+
+```{ojs}
+{
+  const format = value => {
+    if (value === null) return "—"
+    return value.toFixed(4)
+  }
+  return VM.ui.statRow([
+    {label: "Crossings C", value: buffonStats.crossings.toLocaleString()},
+    {label: "Estimate of π", value: format(buffonStats.estimate), title: "2ℓN / (tC)"},
+    {label: "Standard error", value: format(buffonStats.stdError), title: "(2ℓ/t) · s / (√N m²), m and s the mean and SD of crossings per drop"},
+    {label: "|estimate − π|", value: format(buffonStats.error)}
+  ])
+}
+```
 
 </div>
 
@@ -1054,18 +1046,6 @@ estimates $\pi$.
 gaussStats = latticeEstimate(gaussR)
 ```
 
-
-
-```{ojs}
-VM.ui.statRow([
-  {label: "In the disk L(r)", value: gaussStats.count.toLocaleString()},
-  {label: "Estimate of π", value: gaussStats.estimate.toFixed(4), title: "count / r²"},
-  {label: "|estimate − π|", value: gaussStats.error.toFixed(4)}
-])
-```
-
-
-
 ```{ojs}
 //| output: false
 gaussPlot = VM.plotting.persistentPlot()
@@ -1153,6 +1133,14 @@ viewof gaussR = {
 
 </div>
 
+```{ojs}
+VM.ui.statRow([
+  {label: "In the disk L(r)", value: gaussStats.count.toLocaleString()},
+  {label: "Estimate of π", value: gaussStats.estimate.toFixed(4), title: "count / r²"},
+  {label: "|estimate − π|", value: gaussStats.error.toFixed(4)}
+])
+```
+
 </div>
 
 </div>
@@ -1198,20 +1186,6 @@ haltonAll = haltonPoints(haltonMaxN)
 //| output: false
 haltonStats = circleEstimate(haltonAll.insideCount[haltonN], haltonN)
 ```
-
-
-
-```{ojs}
-VM.ui.statRow([
-  {label: "Inside", value: haltonStats.inside.toLocaleString()},
-  {label: "Estimate of π", value: haltonStats.estimate.toFixed(4), title: "4 · inside / N"},
-  {label: "|estimate − π|", value: haltonStats.error.toFixed(4)},
-  {label: "Random SE at this N", value: Math.sqrt(Math.PI * (4 - Math.PI) / haltonN).toFixed(4),
-    title: "sqrt(π(4 − π) / N), the circle method's standard error, for comparison"}
-])
-```
-
-
 
 ```{ojs}
 //| output: false
@@ -1294,6 +1268,16 @@ viewof haltonN = {
 
 
 </div>
+
+```{ojs}
+VM.ui.statRow([
+  {label: "Inside", value: haltonStats.inside.toLocaleString()},
+  {label: "Estimate of π", value: haltonStats.estimate.toFixed(4), title: "4 · inside / N"},
+  {label: "|estimate − π|", value: haltonStats.error.toFixed(4)},
+  {label: "Random SE at this N", value: Math.sqrt(Math.PI * (4 - Math.PI) / haltonN).toFixed(4),
+    title: "sqrt(π(4 − π) / N), the circle method's standard error, for comparison"}
+])
+```
 
 </div>
 

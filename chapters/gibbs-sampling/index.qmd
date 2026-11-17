@@ -305,20 +305,6 @@ gibbsView = chainSummary(gibbsChain, gibbsN)
 ```
 
 ```{ojs}
-{
-  let corrText = "—"
-  if (Number.isFinite(gibbsView.corr)) corrText = gibbsView.corr.toFixed(3)
-  return VM.ui.statRow([
-    {label: "Sweeps N", value: gibbsView.n.toLocaleString()},
-    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(gibbsView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
-    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(gibbsView.ys).toFixed(1)},
-    {label: "Sample correlation", value: corrText, title: `Target correlation ρ = ${gibbsRho}`},
-    {label: "Mean (target 0, 0)", value: `${gibbsView.mx.toFixed(2)}, ${gibbsView.my.toFixed(2)}`}
-  ])
-}
-```
-
-```{ojs}
 //| output: false
 gibbsPlot = VM.plotting.persistentPlot()
 ```
@@ -403,6 +389,20 @@ viewof gibbsN = {
 ```
 
 </div>
+
+```{ojs}
+{
+  let corrText = "—"
+  if (Number.isFinite(gibbsView.corr)) corrText = gibbsView.corr.toFixed(3)
+  return VM.ui.statRow([
+    {label: "Sweeps N", value: gibbsView.n.toLocaleString()},
+    {label: "ESS of x", value: VM.mcmc.effectiveSampleSize(gibbsView.xs).toFixed(1), title: "Effective sample size: how many independent draws the correlated chain is worth"},
+    {label: "ESS of y", value: VM.mcmc.effectiveSampleSize(gibbsView.ys).toFixed(1)},
+    {label: "Sample correlation", value: corrText, title: `Target correlation ρ = ${gibbsRho}`},
+    {label: "Mean (target 0, 0)", value: `${gibbsView.mx.toFixed(2)}, ${gibbsView.my.toFixed(2)}`}
+  ])
+}
+```
 
 </div>
 

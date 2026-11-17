@@ -442,21 +442,6 @@ walkRun = walkMixing(walkGraph.P, walkGraph.stationary, walkStart, walkMaxTime, 
 ```
 
 ```{ojs}
-{
-  const ev = walkGraph.eigenvalues
-  let mixingText = `> ${walkMaxTime}`
-  if (walkRun.mixingTime !== null) mixingText = String(walkRun.mixingTime)
-  return VM.ui.statRow([
-    {label: "Vertices", value: walkGraph.nodeCount},
-    {label: `TV at t = ${walkT}`, value: walkRun.tv[walkT].toFixed(4)},
-    {label: "Mixing time", value: mixingText, title: "First step after which the TV distance stays ≤ ¼, from this start vertex"},
-    {label: "Spectral gap 1 − λ₂", value: (1 - ev[1]).toFixed(4), title: "λ₂: second-largest eigenvalue of P"},
-    {label: "Smallest eigenvalue", value: ev[ev.length - 1].toFixed(4), title: "−1 exactly when the walk is periodic (bipartite graph, not lazy)"}
-  ])
-}
-```
-
-```{ojs}
 //| output: false
 walkPlot = VM.plotting.persistentPlot()
 ```
@@ -571,6 +556,21 @@ viewof walkT = {
 ```
 
 </div>
+
+```{ojs}
+{
+  const ev = walkGraph.eigenvalues
+  let mixingText = `> ${walkMaxTime}`
+  if (walkRun.mixingTime !== null) mixingText = String(walkRun.mixingTime)
+  return VM.ui.statRow([
+    {label: "Vertices", value: walkGraph.nodeCount},
+    {label: `TV at t = ${walkT}`, value: walkRun.tv[walkT].toFixed(4)},
+    {label: "Mixing time", value: mixingText, title: "First step after which the TV distance stays ≤ ¼, from this start vertex"},
+    {label: "Spectral gap 1 − λ₂", value: (1 - ev[1]).toFixed(4), title: "λ₂: second-largest eigenvalue of P"},
+    {label: "Smallest eigenvalue", value: ev[ev.length - 1].toFixed(4), title: "−1 exactly when the walk is periodic (bipartite graph, not lazy)"}
+  ])
+}
+```
 
 </div>
 
