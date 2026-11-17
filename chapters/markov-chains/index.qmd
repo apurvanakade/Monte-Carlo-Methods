@@ -443,7 +443,9 @@ walkRun = walkMixing(walkGraph.P, walkGraph.stationary, walkStart, walkMaxTime, 
 
 ```{ojs}
 //| output: false
-walkPlot = VM.plotting.persistentPlot()
+// The graph panel is a square at equal scales in the left half, so the
+// chart is about twice as wide as it is tall.
+walkPlot = VM.plotting.persistentPlot({aspectRatio: 7 / 4})
 ```
 
 ```{ojs}

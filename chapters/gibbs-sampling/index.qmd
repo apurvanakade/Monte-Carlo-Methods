@@ -306,7 +306,8 @@ gibbsView = chainSummary(gibbsChain, gibbsN)
 
 ```{ojs}
 //| output: false
-gibbsPlot = VM.plotting.persistentPlot()
+// Square: the axes span [-4, 4]^2 at equal scales.
+gibbsPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 ```
 
 ```{ojs}

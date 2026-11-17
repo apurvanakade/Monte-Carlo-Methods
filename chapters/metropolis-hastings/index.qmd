@@ -82,7 +82,7 @@ mhLRegion = rwRegions.get("L-shape")
 mhLShapePlot = VM.plotting.persistentPlot({height: "380px"})
 mhLSamplePlots = {
   const plots = []
-  for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({height: "400px"}))
+  for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({aspectRatio: 1}))
   return plots
 }
 ```
@@ -271,7 +271,9 @@ rwView = regionView(rwChain, rwN)
 
 ```{ojs}
 //| output: false
-rwPlot = VM.plotting.persistentPlot()
+// The regions span 1.7 by 1.2 (L-shape) and 4.4 by 2.6 (two discs) at equal
+// scales; 3 : 2 sits between them.
+rwPlot = VM.plotting.persistentPlot({aspectRatio: 3 / 2})
 ```
 
 ```{ojs}
