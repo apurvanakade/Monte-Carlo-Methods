@@ -49,6 +49,13 @@ mmnSim = mmnSimulate({arrivalRate: 2.0, serviceRate: 1.5, servers: 2, maxCustome
 ```
 
 ```{ojs}
+mmnQueuePlot([{x: mmnSim.log.times, y: mmnSim.log.lengths, type: "scatter", mode: "lines", line: {shape: "hv", color: chartColors.fn, width: 1.5}}], {
+  title: {text: "Queue length over time"}, margin: {t: 40}, showlegend: false,
+  xaxis: {title: "Simulation time"}, yaxis: {title: "Queue length"}
+})
+```
+
+```{ojs}
 {
   const sim = mmnSim
   const {waits, sojourns} = waitAndSojourn(sim)
@@ -60,11 +67,4 @@ mmnSim = mmnSimulate({arrivalRate: 2.0, serviceRate: 1.5, servers: 2, maxCustome
     {label: "Server utilization (theoretical)", value: utilization.toFixed(4)}
   ])
 }
-```
-
-```{ojs}
-mmnQueuePlot([{x: mmnSim.log.times, y: mmnSim.log.lengths, type: "scatter", mode: "lines", line: {shape: "hv", color: chartColors.fn, width: 1.5}}], {
-  title: {text: "Queue length over time"}, margin: {t: 40}, showlegend: false,
-  xaxis: {title: "Simulation time"}, yaxis: {title: "Queue length"}
-})
 ```
