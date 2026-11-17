@@ -88,7 +88,8 @@ Suppose we start at vertex $A$. This means that the initial distribution is $\pi
 // method.test.js checks them.
 import {transitionMatrix, firstBelowThreshold, cycleWalk, visitFrequencies, thin, acfRuns, acfSimilarity, makeWalkGraphs, symmetrizedWalkMatrix, walkMixing} from "./method.js"
 
-mcGraphPlot = VM.plotting.persistentPlot({height: "340px"})
+// The graph spans 2.6 by 2 at equal scales, so the chart takes that shape.
+mcGraphPlot = VM.plotting.persistentPlot({aspectRatio: 13 / 10})
 mcTvPlot = VM.plotting.persistentPlot({height: "340px"})
 
 mcStates = ["A", "B", "C", "D"]
@@ -654,7 +655,8 @@ We can either discard the first 40 samples or select every 40th sample to reduce
 
 ```{ojs}
 //| output: false
-mcCyclePlot = VM.plotting.persistentPlot({height: "380px"})
+// Square: the cycle spans [-1.25, 1.25]^2 at equal scales.
+mcCyclePlot = VM.plotting.persistentPlot({aspectRatio: 1})
 mcBurnInPlot = VM.plotting.persistentPlot({height: "320px"})
 mcThinPlot = VM.plotting.persistentPlot({height: "320px"})
 mcTraceShortPlot = VM.plotting.persistentPlot({height: "320px"})

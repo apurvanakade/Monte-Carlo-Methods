@@ -26,13 +26,17 @@ function isingHeatmap(lattice, axes) {
 
 ```{ojs}
 //| output: false
-isingArrowPlot = VM.plotting.persistentPlot({height: "480px"})
+// Square: an L x L lattice at equal scales.
+isingArrowPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 isingAnnealPlot = VM.plotting.persistentPlot({height: "380px"})
-isingSnapshotPlot = VM.plotting.persistentPlot({height: "380px"})
-isingGibbsLatticePlot = VM.plotting.persistentPlot({height: "340px"})
-isingGibbsTracePlot = VM.plotting.persistentPlot({height: "340px"})
-isingMetropolisLatticePlot = VM.plotting.persistentPlot({height: "340px"})
-isingMetropolisTracePlot = VM.plotting.persistentPlot({height: "340px"})
+// A 2 x 4 grid of square lattices under a title.
+isingSnapshotPlot = VM.plotting.persistentPlot({aspectRatio: 8 / 5})
+// Each lattice is a square under a title, side by side with its trace;
+// both panels take its shape so they stay the same height.
+isingGibbsLatticePlot = VM.plotting.persistentPlot({aspectRatio: 9 / 10})
+isingGibbsTracePlot = VM.plotting.persistentPlot({aspectRatio: 9 / 10})
+isingMetropolisLatticePlot = VM.plotting.persistentPlot({aspectRatio: 9 / 10})
+isingMetropolisTracePlot = VM.plotting.persistentPlot({aspectRatio: 9 / 10})
 ```
 
 ## The Physical Ising Model
