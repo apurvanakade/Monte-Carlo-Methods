@@ -12,6 +12,7 @@ import assert from 'node:assert/strict'
 import { loadVM } from '../../scripts/load-vm.mjs'
 import {
   dropPoints, circleEstimate, runningCircleEstimates, randomDirection, dropNeedles, needleCrossings, buffonEstimate,
+  buffonShapes, turns, unitPolyline, zigzagShape, starShape, spiralShape, springShape, heartShape,
   latticeCount, latticeEstimate, vanDerCorput, haltonPoints,
   checkpoints, randomCircleErrors, runningBuffonEstimates, randomBuffonErrors, haltonCircleErrors, latticeErrors, convergenceFit, convergenceOrder
 } from './method.js'
@@ -117,17 +118,50 @@ test('needleCrossings: crossing probability is 2 l / (pi t)', () => {
   assert.ok(Math.abs(p - expected) < 4 * sd, `p ${p}, expected ${expected}`)
 })
 
-test('needleCrossings: the noodle has length l and crosses 2 l / (pi t) times on average (Barbier)', () => {
-  const drops = dropNeedles(VM.sampling.seededRandom(1), 2000, 8, 6)
+test('buffonShapes: each is a polyline of length 1 centered on its bounding box', () => {
+  for (const [shape, points] of Object.entries(buffonShapes)) {
+    let total = 0
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+    for (let j = 0; j < points.length; j++) {
+      if (j > 0) total += Math.hypot(points[j][0] - points[j - 1][0], points[j][1] - points[j - 1][1])
+      minX = Math.min(minX, points[j][0])
+      maxX = Math.max(maxX, points[j][0])
+      minY = Math.min(minY, points[j][1])
+      maxY = Math.max(maxY, points[j][1])
+    }
+    assert.ok(Math.abs(total - 1) < 1e-12, `${shape}: length ${total}`)
+    assert.ok(Math.abs(minX + maxX) < 1e-12 && Math.abs(minY + maxY) < 1e-12, shape)
+  }
+  // The rotations behind the shapes: 12 steps of 30 degrees and 10 of 36 come
+  // back to the start.
+  const t30 = turns(Math.sqrt(3) / 2, 1 / 2, 13)[12]
+  assert.ok(Math.abs(t30[0] - 1) < 1e-12 && Math.abs(t30[1]) < 1e-12)
+  const c36 = (1 + Math.sqrt(5)) / 4
+  const t36 = turns(c36, Math.sqrt(1 - c36 * c36), 11)[10]
+  assert.ok(Math.abs(t36[0] - 1) < 1e-12 && Math.abs(t36[1]) < 1e-12)
+})
+
+test('needleCrossings: every noodle has length l and crosses 2 l / (pi t) times on average (Barbier)', () => {
+  const n = 4000
+  const drops = dropNeedles(VM.sampling.seededRandom(1), n, 8, 6)
   const length = 0.8
-  const c = needleCrossings(drops, length, 1, "noodle")
-  let total = 0
-  for (let j = 1; j < 4; j++) total += Math.hypot(c.xs[0][j] - c.xs[0][j - 1], c.ys[0][j] - c.ys[0][j - 1])
-  assert.ok(Math.abs(total - length) < 1e-12, `length ${total}`)
-  const mean = c.crossingCount[2000] / 2000
-  const sd = Math.sqrt((c.crossingSquares[2000] / 2000 - mean * mean) / 2000)
   const expected = 2 * length / Math.PI
-  assert.ok(Math.abs(mean - expected) < 4 * sd, `mean ${mean}, expected ${expected}`)
+  for (const shape of Object.keys(buffonShapes)) {
+    const c = needleCrossings(drops, length, 1, shape)
+    let total = 0
+    for (let j = 1; j < c.xs[0].length; j++) total += Math.hypot(c.xs[0][j] - c.xs[0][j - 1], c.ys[0][j] - c.ys[0][j - 1])
+    assert.ok(Math.abs(total - length) < 1e-12, `${shape}: length ${total}`)
+    const mean = c.crossingCount[n] / n
+    const sd = Math.sqrt((c.crossingSquares[n] / n - mean * mean) / n)
+    assert.ok(Math.abs(mean - expected) < 4 * sd, `${shape}: mean ${mean}, expected ${expected}`)
+  }
+})
+
+test('needleCrossings: closed shapes cross an even number of times', () => {
+  const drops = dropNeedles(VM.sampling.seededRandom(1), 2000, 8, 6)
+  for (const shape of ["star", "heart"]) {
+    for (const k of needleCrossings(drops, 0.8, 1, shape).crossings) assert.equal(k % 2, 0, shape)
+  }
 })
 
 test('buffonEstimate: undefined before the first crossing, near pi after', () => {
@@ -137,7 +171,7 @@ test('buffonEstimate: undefined before the first crossing, near pi after', () =>
   const needleSe = (2 * 0.8) * Math.sqrt((1 - p) / (100 * p ** 3))
   assert.ok(Math.abs(buffonEstimate(50, 50, 100, 0.8, 1).stdError - needleSe) < 1e-12)
   const drops = dropNeedles(VM.sampling.seededRandom(1), 2000, 8, 6)
-  for (const shape of ["needle", "noodle"]) {
+  for (const shape of Object.keys(buffonShapes)) {
     const c = needleCrossings(drops, 0.8, 1, shape)
     const s = buffonEstimate(c.crossingCount[2000], c.crossingSquares[2000], 2000, 0.8, 1)
     assert.ok(s.error < 4 * s.stdError, `${shape}: error ${s.error}, se ${s.stdError}`)
@@ -166,7 +200,8 @@ test('haltonPoints: van der Corput digits, and an error far below Monte Carlo', 
 })
 
 test('no sampler uses pi', () => {
-  for (const f of [dropPoints, randomDirection, dropNeedles, needleCrossings, latticeCount, vanDerCorput, haltonPoints]) {
+  for (const f of [dropPoints, randomDirection, dropNeedles, needleCrossings, turns, unitPolyline, zigzagShape, starShape,
+    spiralShape, springShape, heartShape, latticeCount, vanDerCorput, haltonPoints]) {
     assert.doesNotMatch(f.toString(), /Math\.PI/, f.name)
   }
 })
