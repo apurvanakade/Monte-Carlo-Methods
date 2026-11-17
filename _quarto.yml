@@ -87,9 +87,6 @@ mathviz:
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
   fonts: true
-  # Select text -> "Report bug" opens an issue linking the page's .qmd source.
-  report-bug:
-    repo: apurvanakade/Monte-Carlo-Methods
   # A "Share" button on every app (each <div class="vm-app">) with the page
   # link and an <iframe> snippet. Turns on embed mode too: any app page
   # loaded with ?embed=1 shows the app alone, for a frame.
