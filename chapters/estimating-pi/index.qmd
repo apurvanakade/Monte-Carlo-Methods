@@ -134,7 +134,8 @@ piStats = circleEstimate(piPoints.insideCount[piN], piN)
 
 ```{ojs}
 //| output: false
-piPlot = VM.plotting.persistentPlot()
+// Square: the axes span the square [-1, 1]^2 at equal scales.
+piPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 ```
 
 
@@ -569,7 +570,8 @@ buffonStats = buffonEstimate(buffonNeedles.crossingCount[buffonN], buffonNeedles
 
 ```{ojs}
 //| output: false
-buffonPlot = VM.plotting.persistentPlot()
+// The floor spans 9 by 7.2 at equal scales, so the chart takes that shape.
+buffonPlot = VM.plotting.persistentPlot({aspectRatio: 5 / 4})
 ```
 
 
@@ -704,8 +706,10 @@ buffonFigLength = 0.84
 buffonFigStart = ({theta: 50 * Math.PI / 180, d: 0.42})
 buffonFigThetaRange = [-0.1, Math.PI + 0.1]
 buffonFigDRange = [-0.02, 0.52]
-buffonFigNeedlePlot = VM.plotting.persistentPlot({height: "420px"})
-buffonFigRegionPlot = VM.plotting.persistentPlot({height: "420px"})
+// The needle panel is a square at equal scales below a title; both panels
+// take its shape so they stay the same height side by side.
+buffonFigNeedlePlot = VM.plotting.persistentPlot({aspectRatio: 7 / 8})
+buffonFigRegionPlot = VM.plotting.persistentPlot({aspectRatio: 7 / 8})
 // The axes are fixed, so the zoom and pan toolbar would do nothing here.
 buffonFigConfig = ({...VM.plotting.config(), displayModeBar: false})
 // Label sizes, scaled from the chart theme's own font size so they follow it:
@@ -1048,7 +1052,8 @@ gaussStats = latticeEstimate(gaussR)
 
 ```{ojs}
 //| output: false
-gaussPlot = VM.plotting.persistentPlot()
+// Square: the axes span [-view, view]^2 at equal scales.
+gaussPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 ```
 
 
@@ -1189,7 +1194,8 @@ haltonStats = circleEstimate(haltonAll.insideCount[haltonN], haltonN)
 
 ```{ojs}
 //| output: false
-haltonPlot = VM.plotting.persistentPlot()
+// Square: the axes span the square [-1, 1]^2 at equal scales.
+haltonPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 ```
 
 
