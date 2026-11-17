@@ -553,7 +553,7 @@ buffonSeed = {
 ```{ojs}
 //| output: false
 // buffonDrops: each drop's center and direction, drawn once per seed. The
-// length input and the needle/noodle switch only redraw the shape about
+// length input and the shape selector only redraw the shape about
 // those centers, so changing them shows the same drops.
 buffonDrops = dropNeedles(VM.sampling.seededRandom(buffonSeed), buffonMaxN, buffonWidth, buffonHeight)
 ```
