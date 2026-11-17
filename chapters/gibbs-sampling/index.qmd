@@ -70,11 +70,12 @@ import {jointExponentialDensity, bivariateNormalDensity, truncatedExponential, d
 //| output: false
 // The figures in this chapter, before the app. VM and chartColors are
 // defined with the app below.
-g2ExpContourPlot = VM.plotting.persistentPlot({height: "420px"})
+// The contour plots are square grids at equal scales.
+g2ExpContourPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 g2ExpSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
 g2ExpScatterPlot = VM.plotting.persistentPlot({height: "480px"})
 g2ExpPathPlot = VM.plotting.persistentPlot({height: "480px"})
-g2NormContourPlot = VM.plotting.persistentPlot({height: "420px"})
+g2NormContourPlot = VM.plotting.persistentPlot({aspectRatio: 1})
 g2NormSurfacePlot = VM.plotting.persistentPlot3d({height: "460px"})
 g2NormScatterPlot = VM.plotting.persistentPlot({height: "480px"})
 g2NormPathPlot = VM.plotting.persistentPlot({height: "480px"})

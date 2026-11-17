@@ -79,7 +79,8 @@ Consider the L-shaped region in $\mathbb{R}^2$ as shown below. This is a non-con
 ```{ojs}
 //| output: false
 mhLRegion = rwRegions.get("L-shape")
-mhLShapePlot = VM.plotting.persistentPlot({height: "380px"})
+// Square: the axes span [-0.1, 1.1]^2 at equal scales.
+mhLShapePlot = VM.plotting.persistentPlot({aspectRatio: 1})
 mhLSamplePlots = {
   const plots = []
   for (let i = 0; i < 4; i++) plots.push(VM.plotting.persistentPlot({aspectRatio: 1}))
