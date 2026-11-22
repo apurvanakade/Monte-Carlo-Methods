@@ -80,9 +80,14 @@ filters:
   - mathviz
 mathviz:
   referrer: same-origin
-  # The sidebar is off-canvas behind a slim rail (open, pin); the string is
-  # the localStorage key the pin is kept under, so readers' pins survive.
-  sidebar-rail: mcm-sidebar-pinned
+  # The sidebar is off-canvas behind a slim rail (open, pin). pin-key is the
+  # localStorage key the pin is kept under, so readers' pins survive. It
+  # starts closed at every width until the reader pins it: the right margin
+  # holds the table of contents, and a docked sidebar as well crowds a
+  # laptop screen.
+  sidebar-rail:
+    pin-key: mcm-sidebar-pinned
+    default: closed
   # A title search box at the top of the sidebar.
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
@@ -101,10 +106,12 @@ format:
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    # No per-page table of contents: the page is one column, like the blog.
-    toc: false
-    # Unnumbered sections: with no table of contents nothing refers to them
-    # by number. Link to a section by its title: [Title](#sec-id).
+    # A table of contents in the right margin of every page, top-level
+    # sections only, to keep it short. The introduction pages turn it off
+    # (`toc: false` in their front matter).
+    toc: true
+    toc-depth: 2
+    # Unnumbered sections. Link to a section by its title: [Title](#sec-id).
     number-sections: false
     # Callouts are drawn without icons (_chrome/callouts.css styles them).
     callout-icon: false
