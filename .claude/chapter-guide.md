@@ -1,6 +1,6 @@
 # Chapter writing guide
 
-Instructions for writing or redoing a chapter of these notes. Read this whole file before drafting; it is about the *content and pedagogy*. The mechanics (OJS cells, `method.js`, figures, apps) are in `CLAUDE.md`.
+Instructions for writing or redoing a chapter of these notes. Read this whole file before drafting; it is about the *content and pedagogy*. The mechanics (OJS cells, `method.js`, figures, apps) are in `CLAUDE.md`. The order of work for redoing an existing chapter is in `chapter-rewrite.md`, beside this file.
 
 ## The model chapter
 
@@ -49,6 +49,13 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 ## Prose
 
 - Running prose, not bullet or numbered lists; lists only in the Summary. Fold an enumeration into ordinary sentences.
-- Plain, direct sentences; no filler. Define every symbol where it first appears.
+- Write in the author's voice: the inviting voice of a textbook or a math paper, not a manual. Read the model chapter's prose for it.
+  - "We" and "let us" throughout; "you" when the reader is asked to do something.
+  - Full sentences joined by connectives ("So", "But", "Notice that", "In other words", "Recall that"), not a run of clipped statements or aphorisms ("The rate is free of the dimension. The constant is not.").
+  - Questions that move the argument along ("Can we do better?", "So why flip the coin at all?").
+  - Say when something is surprising or worth noticing, with an occasional exclamation mark.
+  - Explain why a result holds or what it means, not only that it holds.
+- No filler all the same. Define every symbol where it first appears.
+- Keep a figure's caption to the bare minimum: name what is plotted, in a few words ("The midpoint rule for $\sin x$ on $[0, \pi]$."). Leave out anything the reader can see in the picture or its key (the number of cells, what a dot marks), and anything the text or an exercise beside it already says or asks.
 - Say why a quantity matters before computing it (e.g. "Because the estimator is biased, standard error is no longer a good measure of uncertainty").
 - Compare methods quantitatively (rates, constants, sample counts), not qualitatively.
