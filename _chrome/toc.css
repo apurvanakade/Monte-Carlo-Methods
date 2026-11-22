@@ -51,3 +51,29 @@ body #quarto-margin-sidebar nav#TOC ul > li > a:hover { color: var(--vm-accent);
   flex-direction: column;
 }
 #quarto-margin-sidebar nav#TOC { margin-block: auto; }
+
+/* The text column is centred on the window on every page, with the list
+ * hung in the space to its right. mathviz's rail grid centres the column
+ * only on a page with no table of contents; on one with a list it restores
+ * Quarto's margin tracks, which centres the column and the list as a pair
+ * and so moves the text about 110px left of where an introduction page has
+ * it. From 1280px up there is room for the list (--vm-rail-margin-width)
+ * right of a centred column, so those pages take the grid mathviz gives a
+ * page without a list (the template below is a copy of it) and the margin
+ * sidebar moves into the right-hand free track. Not while the sidebar is
+ * pinned: docked, it takes that room, and mathviz's own grid stands.
+ * This belongs in mathviz's chrome/sidebar-rail.css; it is here on trial. */
+@media (min-width: 1280px) {
+  html.vm-sidebar-rail:not(.vm-sidebar-pinned):not(.vm-embed) body.floating:has(nav#TOC) .page-columns {
+    grid-template-columns:
+      [screen-start] var(--vm-rail-gutter, 1.5em) [screen-start-inset] 5fr
+      [page-start page-start-inset body-start-outset body-start] var(--vm-rail-gutter, 1.5em)
+      [body-content-start] minmax(0, calc(var(--vm-rail-body-width, 800px) - 2 * var(--vm-rail-gutter, 1.5em))) [body-content-end] var(--vm-rail-gutter, 1.5em)
+      [body-end body-end-outset page-end-inset] var(--vm-rail-gutter, 1.5em)
+      [page-end] 5fr [screen-end-inset] var(--vm-rail-gutter, 1.5em) [screen-end] !important;
+  }
+  html.vm-sidebar-rail:not(.vm-sidebar-pinned):not(.vm-embed) body.floating:has(nav#TOC) #quarto-margin-sidebar {
+    grid-column: page-end / screen-end-inset;
+    width: var(--vm-rail-margin-width, 250px);
+  }
+}
