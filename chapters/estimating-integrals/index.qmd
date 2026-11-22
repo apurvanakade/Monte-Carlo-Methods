@@ -3,6 +3,8 @@ title: "Estimating Integrals"
 
 execute:
   echo: false
+
+toc: true
 ---
 
 How would you compute
@@ -27,7 +29,7 @@ chartColors = VM.plotting.colors(vmTheme)
 
 // The methods themselves live in method.js, where method.test.js checks them
 // against theory.
-import {integrands, hitMissSample, sampleMeanSample, sampleMeanEstimate, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
+import {integrands, hitMissSample, sampleMeanSample, sortedSample, sampleMeanEstimate, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
   gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, gaussianCubeHaltonErrors,
   gaussianCubeShiftedErrors, pointSet, boxCount, starDiscrepancy2d, discrepancyStudy, convergenceFit} from "./method.js"
 ```
@@ -691,9 +693,11 @@ So even though  the rate does not depend on the dimension, but the number of poi
 
 ## The sample-mean estimator {#sec-int-mean}
 
-Let us look again at how hit-or-miss uses a point $(X, Y)$. All it asks is whether $Y \le f(X)$. But once we know $X$, this is just a coin flip that succeeds with probability $f(X)/c$, and we can compute this probability ourselves. So why flip the coin at all?
-
-To see what to do instead, let us go back to the integral $I = \int_a^b f(x)\,dx$. If $X$ is uniform on $[a, b]$, then its density is $1/(b-a)$ on the interval, and so $\mathbb{E}[f(X)] = I/(b-a)$. In other words, the integral is the width of the interval times the *average height* of $f$. The same is true in any dimension:
+There is a more direct way to write $I = \int_a^b f(x)\,dx$ as an expectation. Recall the *law of the unconscious statistician*: if $X$ has density $p$, then
+$$\mathbb{E}[f(X)] = \int f(x)\,p(x)\,dx.$$
+If $X$ is uniform on $[a, b]$, then $p(x) = 1/(b-a)$ on the interval, and so
+$$\mathbb{E}[f(X)] = \frac{1}{b-a}\int_a^b f(x)\,dx = \frac{I}{b-a}.$$
+In other words, the integral is the width of the interval times the *average height* of $f$. The same is true in any dimension:
 
 ::: {.callout-important title="An integral is an expectation"}
 If $X$ is uniformly distributed on a region $D$ of volume $|D|$, then
@@ -709,189 +713,72 @@ Given $N$ independent uniform points $X_1, \ldots, X_N$ in $[a, b]$, estimate $I
 $$\hat I_N = \frac{b-a}{N}\sum_{i=1}^{N} f(X_i).$$
 :::
 
-The app below shows it in action. The vertical sticks are the heights $f(X_i)$, and the shaded rectangle has their average height, so that its area is $\hat I_N$.
-
-
-```{ojs}
-//| output: false
-meanMaxN = 2000
-meanDefaultSeed = 1
-meanDefaultN = 100
-meanDefaultKey = "sin"
-```
-
-
-<div class="vm-app" id="mean-app">
-
-<div class="ojs-panel ojs-row">
-
-```{ojs}
-// meanKey: a key of `integrands`. An unknown URL value falls back.
-viewof meanKey = {
-  const keys = Object.keys(integrands)
-  let initial = String(VM.ui.urlParam("mean_f", meanDefaultKey))
-  if (!keys.includes(initial)) initial = meanDefaultKey
-  return Inputs.select(keys, {value: initial, label: "Integrand", format: key => integrands[key].label})
-}
-```
-
-```{ojs}
-// Draws a fresh set of points. The first draw (on page load) uses the seed
-// in the URL, so a shared link reproduces the same points.
-viewof meanRedraw = {
-  const button = Inputs.button("Draw new points", {value: 0, reduce: v => v + 1})
-  button.classList.add("ojs-end")
-  return button
-}
-```
-
-</div>
-
+Notice that $\hat I_N = \sum_i \frac{b-a}{N}\,f(X_i)$ is the total area of $N$ bars, each of width $(b-a)/N$. So this is a Riemann sum, just like the midpoint rule, except that the heights are measured at random points instead of at the centers of the cells. @fig-int-sample shows it for $\sin x$ on $[0, \pi]$: the points are sorted from left to right, and the $i$-th bar gets the height of the $i$-th point, which is usually not inside its own bar.
 
 ```{ojs}
 //| output: false
-meanSeed = {
-  if (meanRedraw === 0) return VM.ui.urlParam("mean_seed", meanDefaultSeed)
-  return Math.floor(Math.random() * 1e9)
-}
+intSamplePoints = 6
+intSampleSeed = 1
 ```
 
 ```{ojs}
 //| output: false
-meanIntegrand = integrands[meanKey]
+// The random points from left to right, with their heights.
+intSampleSorted = sortedSample(sampleMeanSample(VM.sampling.seededRandom(intSampleSeed), integrands.sin, intSamplePoints), intSamplePoints)
 ```
 
-```{ojs}
-//| output: false
-// meanSample: all meanMaxN points x of [a, b] with their heights f(x), drawn
-// once per seed and integrand. The slider only chooses how many to show.
-meanSample = sampleMeanSample(VM.sampling.seededRandom(meanSeed), meanIntegrand, meanMaxN)
-```
-
-```{ojs}
-//| output: false
-// The estimate, its estimated standard error and its true error.
-meanStats = {
-  const width = meanIntegrand.b - meanIntegrand.a
-  const stats = sampleMeanEstimate(meanSample.sumF[meanN], meanSample.sumF2[meanN], meanN, width)
-  return {...stats, error: Math.abs(stats.estimate - meanIntegrand.exact)}
-}
-```
-
-```{ojs}
-//| output: false
-meanPlot = VM.plotting.persistentPlot({height: "420px"})
-```
-
-```{ojs}
-//| output: false
-meanTraceItems = [
-  {label: "f(x)", color: chartColors.ink},
-  {label: "Samples f(Xᵢ)", color: chartColors.fn},
-  {label: "Mean height", color: chartColors.alt}
-]
-```
-
-```{ojs}
-//| output: false
-meanShow = new Set(meanTraces)
-```
-
-
-<div class="ojs-chart-block">
+:::: {#fig-int-sample}
 
 ```{ojs}
 {
-  const g = meanIntegrand
-  const curveX = [], curveY = []
-  for (let k = 0; k <= 600; k++) {
-    const x = g.a + (g.b - g.a) * k / 600
-    curveX.push(x)
-    curveY.push(g.f(x))
+  const a = 0
+  const b = Math.PI
+  const h = (b - a) / intSamplePoints
+
+  const curve = []
+  for (let k = 0; k <= 300; k++) {
+    const x = a + (b - a) * k / 300
+    curve.push({x, y: Math.sin(x)})
   }
 
-  const data = []
-  if (meanShow.has("Mean height")) {
-    const h = meanStats.mean
-    data.push({x: [g.a, g.b, g.b, g.a, g.a], y: [0, 0, h, h, 0], type: "scatter", mode: "lines", fill: "toself", name: "Mean height",
-      showlegend: false, fillcolor: VM.plotting.alpha(chartColors.alt, 0.15), line: {color: chartColors.alt, width: 2}, hoverinfo: "skip"})
-  }
-  if (meanShow.has("Samples f(Xᵢ)")) {
-    // One stick per sample, from the axis up to the curve, as a single
-    // trace with the sticks separated by nulls.
-    const stickX = [], stickY = [], dotX = [], dotY = []
-    for (let i = 0; i < meanN; i++) {
-      stickX.push(meanSample.xs[i], meanSample.xs[i], null)
-      stickY.push(0, meanSample.fs[i], null)
-      dotX.push(meanSample.xs[i])
-      dotY.push(meanSample.fs[i])
-    }
-    data.push({x: stickX, y: stickY, type: "scatter", mode: "lines", name: "Samples", showlegend: false,
-      line: {color: VM.plotting.alpha(chartColors.fn, 0.35), width: 1}, hoverinfo: "skip"})
-    data.push({x: dotX, y: dotY, type: "scattergl", mode: "markers", name: "Samples", showlegend: false,
-      marker: {color: chartColors.fn, size: 4}, hoverinfo: "skip"})
-  }
-  if (meanShow.has("f(x)")) {
-    data.push({x: curveX, y: curveY, type: "scatter", mode: "lines", name: "f(x)", showlegend: false,
-      line: {color: chartColors.ink, width: 2.5}, hoverinfo: "skip"})
+  // One bar per point, side by side: bar i has the height of the i-th point
+  // from the left, which sits on the curve wherever it was drawn.
+  const bars = []
+  for (let i = 0; i < intSamplePoints; i++) {
+    const left = a + i * h
+    bars.push({left, right: left + h, center: left + h / 2, x: intSampleSorted.xs[i], height: intSampleSorted.fs[i]})
   }
 
-  const pad = 0.03 * (g.b - g.a)
-  return meanPlot(data, {
-    xaxis: {range: [g.a - pad, g.b + pad], zeroline: false, title: "x"},
-    yaxis: {range: [-0.04 * g.max, 1.08 * g.max], zeroline: false},
-    hovermode: false,
-    // A new integrand resets any zoom; a new sample keeps it.
-    uirevision: meanKey,
-    autosize: true
-  })
+  const fill = VM.plotting.alpha(chartColors.fn, 0.15)
+  const chart = Plot.plot(VM.plotting.plotOptions({
+    width, height: 300, marginLeft: 40, marginBottom: 40,
+    x: {domain: [a, b], label: "x", labelAnchor: "center"},
+    y: {domain: [0, 1.05], label: null},
+    marks: [
+      Plot.rect(bars, {x1: "left", x2: "right", y1: 0, y2: "height", fill, stroke: chartColors.fn, strokeWidth: 1.5}),
+      Plot.line(curve, {x: "x", y: "y", stroke: chartColors.ink, strokeWidth: 2.5}),
+      // A level line from each point to the middle of its bar's top.
+      Plot.link(bars, {x1: "x", x2: "center", y1: "height", y2: "height", stroke: chartColors.alt, strokeWidth: 1.5, strokeDasharray: "3,3"}),
+      Plot.dot(bars, {x: "x", y: "height", fill: chartColors.alt, r: 3.5})
+    ]
+  }))
+  return intFigure(chart, [
+    {label: "sin x", stroke: chartColors.ink, strokeWidth: 2.5},
+    {label: "Bars of width (b − a)/N", marks: [
+      {mark: "area", fill},
+      {mark: "line", stroke: chartColors.fn, strokeWidth: 1.5}
+    ]},
+    {label: "Random points Xᵢ", marks: [
+      {mark: "line", stroke: chartColors.alt, strokeWidth: 1.5, strokeDasharray: "3,3"},
+      {mark: "dot", fill: chartColors.alt, r: 3.5}
+    ]}
+  ])
 }
 ```
 
-```{ojs}
-viewof meanTraces = {
-  const labels = []
-  for (const item of meanTraceItems) labels.push(item.label)
-  return VM.ui.legendOverlay(meanTraceItems, {value: labels})
-}
-```
+The sample-mean estimator for $\sin x$ on $[0, \pi]$ as a Riemann sum. Each random point gives its height to one bar.
 
-<div class="ojs-chart-controls">
-
-```{ojs}
-viewof meanN = {
-  const initial = Math.min(meanMaxN, Math.max(10, Math.round(VM.ui.urlParam("mean_n", meanDefaultN))))
-  const slider = Inputs.range([10, meanMaxN], {step: 10, value: initial, label: "Points N"})
-  slider.classList.add("ojs-fill")
-  return slider
-}
-```
-
-</div>
-
-```{ojs}
-VM.ui.statRow([
-  {label: "Estimate", value: meanStats.estimate.toFixed(4)},
-  {label: "Standard error", value: meanStats.stdError.toFixed(4),
-    title: "(b − a) · s / √N, s the sample standard deviation of the heights f(Xᵢ)"},
-  {label: "|estimate − I|", value: meanStats.error.toFixed(4)},
-  {label: "True value I", value: meanIntegrand.exact.toFixed(4)}
-])
-```
-
-</div>
-
-</div>
-
-
-```{ojs}
-//| output: false
-meanUrlSync = VM.ui.syncUrlParams({
-  mean_f: [meanKey, meanDefaultKey],
-  mean_n: [meanN, meanDefaultN],
-  mean_seed: [meanSeed, meanDefaultSeed]
-})
-```
+::::
 
 Once again our estimator is an average of i.i.d. samples, so we already know how to analyze it. Let us write
 $$
@@ -911,45 +798,44 @@ You should find
 $$
 \text{SE}(\hat I_N) = \frac{(b-a)\,\sigma_f}{\sqrt N},
 $$
-which is the $N^{-1/2}$ rate once more. Notice that the constant depends on $f$ only through $\sigma_f$. For $\sin x$ the standard error is about $0.967/\sqrt N$, so three correct decimal places cost about a million points, less than half of what hit-or-miss needed in @exr-int-hit (c).
+which is the $N^{-1/2}$ rate once more. Notice that the constant depends on $f$ only through $\sigma_f$. For $\sin x$ the standard error is about $0.967/\sqrt N$, so three correct decimal places cost about a million points.
 
 There is one new difficulty. For hit-or-miss the samples were Bernoulli, so once we had estimated their mean we also knew their variance. Here $\sigma_f$ is a second unknown integral. In practice we estimate it from the same samples, using their sample standard deviation
 $$
 s = \sqrt{\frac{1}{N-1}\sum_{i=1}^N \big(f(X_i) - \bar f\,\big)^2}, \qquad \bar f = \frac1N\sum_{i=1}^N f(X_i),
 $$
-and we report $(b-a)\,s/\sqrt N$ as the standard error. This is the number shown as *Standard error* in the app above.
+and we report $(b-a)\,s/\sqrt N$ as the standard error.
 
 ::: {#exr-int-clt}
 ## Confidence intervals
 a. Write an approximate 95% confidence interval for $I$ centered at $\hat I_N$, for large $N$, that uses only the samples.
-b. Use @exr-int-variance (c) to predict the standard error for $\sin x$ at $N = 100$. Does *Standard error* in [the app](#mean-app) agree? Why is it not exactly your prediction, and why does it change when you click *Draw new points*?
-c. Click *Draw new points* 20 times at $N = 100$ and record how often $|\text{estimate} - I|$ exceeds $1.96$ times the standard error shown. How many misses do you expect?
+b. Use @exr-int-variance (c) to predict the standard error for $\sin x$ at $N = 100$.
 :::
 
 ### Hit or miss against the sample mean {#sec-int-compare}
 
-We now have two unbiased estimators of the same integral, and they even use the same points $X_i$. Which one should we prefer?
+We now have two unbiased estimators of the same integral, and they even use the same points $X_i$. Is there any reason to choose one over the other? Both have the $N^{-1/2}$ rate, so any difference must be in the constants. Let us first compare them on an example, and then ask whether what we see there is an accident.
 
 ::: {#exr-int-hitmiss}
 ## Hit or miss against the sample mean
-a. Use @exr-int-hit (b) and @exr-int-variance (b) to show that
-$$
-N\,\text{Var}(\hat I_N^{\,\text{HM}}) - N\,\text{Var}(\hat I_N) = (b-a)\int_a^b f(x)\,\big(c - f(x)\big)\,dx.
-$$
-What is the sign of the right-hand side? For which functions $f$ is it zero?
-b. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so that $I = \pi$ and hit-or-miss is the circle estimator. Compute both variances. How many times more points does hit-or-miss need for the same standard error?
-c. Check (b) in the two apps: choose $4\sqrt{1 - x^2}$ in both, with $c = 4$ in [the hit-or-miss app](#hit-app), and compare *Standard error* in it and in [the sample-mean app](#mean-app) at $N = 2000$.
+a. Take $f(x) = \sin x$ on $[0, \pi]$ with $c = 1$. Use @exr-int-hit (c) and @exr-int-variance (c) to compute the standard error of each estimator at $N = 100$. Which is smaller? How many times more points does the other one need to match it?
+b. Is (a) special to $\sin x$? Use @exr-int-hit (b) and @exr-int-variance (b) to write $\text{Var}(\hat I_N^{\,\text{HM}}) - \text{Var}(\hat I_N)$ as a single integral over $[a, b]$, for a general $f$ with $0 \le f \le c$. Can you tell its sign? For which functions $f$ is it zero?
+c. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so that $I = \pi$ and hit-or-miss is the circle estimator. Compute both variances. How many times more points does hit-or-miss need for the same standard error?
 :::
 
-You should find that hit-or-miss is never better than the sample mean, and that for the quarter circle it needs about $3.4$ times as many points. The computation in (a) proves this, but it does not really explain it. The explanation is the coin flip we started this section with: given $X$, the hit $H$ is a coin flip with success probability $f(X)/c$. Hit-or-miss actually flips the coin, whereas the sample mean uses its probability directly. The next exercise turns this observation into a proof.
+You should find that $\text{Var}(\hat I_N)$ is never larger than $\text{Var}(\hat I_N^{\,\text{HM}})$. The algebra in (b) proves this, but it does not really explain it. The explanation is in how hit-or-miss uses a point $(X, Y)$: all it asks is whether $Y \le f(X)$. Given $X$, the hit $H$ is a coin flip with success probability $f(X)/c$. So $c\,H$ is a noisy stand-in for the height $f(X)$: it is right on average, but it is only ever $0$ or $c$. Hit-or-miss therefore has two sources of randomness, the choice of $X$ and the coin flip, whereas the sample mean has only the first, because it uses $f(X)$ itself. The extra variance of hit-or-miss is the variance of the coin flip! The next exercise turns this observation into a proof.
 
 ::: {#exr-int-conditioning}
 ## Why the sample mean wins
-Write $Z^{\text{HM}} = c\,(b-a)\,H$ and $Z = (b-a)\,f(X)$ for one sample of each estimator.
+Let $(X, Y)$ be a single uniform point in the box $[a, b] \times [0, c]$, and let $H$ be its hit: $H = 1$ if $Y \le f(X)$ and $H = 0$ otherwise. Write
+$$
+Z^{\text{HM}} = c\,(b-a)\,H \qquad\text{and}\qquad Z = (b-a)\,f(X)
+$$
+for what this one point contributes to each estimator, so that $\hat I_N^{\,\text{HM}}$ is the average of $N$ independent copies of $Z^{\text{HM}}$, and $\hat I_N$ is the average of $N$ independent copies of $Z$.
 
 a. Show that $\mathbb{E}[Z^{\text{HM}} \mid X] = Z$.
-b. Recall the law of total variance, $\text{Var}(W) = \text{Var}(\mathbb{E}[W \mid X]) + \mathbb{E}[\text{Var}(W \mid X)]$. Apply it to $W = Z^{\text{HM}}$ to show $\text{Var}(Z^{\text{HM}}) \ge \text{Var}(Z)$, without computing an integral.
-c. Compute $\mathbb{E}[\text{Var}(Z^{\text{HM}} \mid X)]$ and check that it is the right-hand side of @exr-int-hitmiss (a).
+b. Use the law of total variance, conditioning on $X$, to show $\text{Var}(Z^{\text{HM}}) \ge \text{Var}(Z)$, without computing an integral.
+c. Compute $\mathbb{E}[\text{Var}(Z^{\text{HM}} \mid X)]$ and check that it is $N$ times the difference you found in @exr-int-hitmiss (b).
 d. In (b) you never used the form of $H$. State the general fact you proved.
 :::
 
@@ -957,7 +843,7 @@ d. In (b) you never used the form of $H$. State the general fact you proved.
 If we replace a random variable by its conditional expectation, the mean stays the same and the variance can only go down. So whatever part of an integral we can do exactly, we should, and sample only the rest.
 :::
 
-In statistics this trick is known as *Rao-Blackwellization*. In our case the part done exactly is the integral over $y$: the sample mean is just hit-or-miss with $Y$ integrated out. @fig-int-hitmiss runs both estimators on the quarter circle. Both errors fall along lines of slope $-1/2$, and the two lines stay a fixed distance apart on the log scale. That distance is the ratio of standard errors you found in @exr-int-hitmiss (b).
+In statistics this trick is known as *Rao-Blackwellization*. In our case the part done exactly is the integral over $y$: the sample mean is just hit-or-miss with $Y$ integrated out. @fig-int-hitmiss runs both estimators on the quarter circle. Both errors fall along lines of slope $-1/2$, and the two lines stay a fixed distance apart on the log scale. That distance is the ratio of standard errors you found in @exr-int-hitmiss (c).
 
 
 ```{ojs}
@@ -1004,7 +890,6 @@ The standard error $(b-a)\,\sigma_f/\sqrt N$ tells us that Monte Carlo sees the 
 a. Let $U$ be uniform on $[0, 1)$ and let $k$ be a positive integer. Show that $kU \bmod 1$, the fractional part of $kU$, is again uniform on $[0, 1)$.
 b. Deduce that if $X$ is uniform on $[0, \pi]$, then $\sin^2(kX)$ has the same distribution for every positive integer $k$. What does this say about the standard error of $\hat I_N$ for $\int_0^\pi \sin^2(kx)\,dx$?
 c. Compute that standard error.
-d. Check (b) in [the app](#mean-app): compare *Standard error* for $\sin^2 x$ and $\sin^2(10x)$ at the same $N$.
 :::
 
 You should find that the standard error is $\pi/\sqrt{8N} \approx 1.11/\sqrt N$ no matter what the frequency $k$ is. This may come as a surprise, but it makes sense once we notice that the variance $\sigma_f^2$ depends only on the distribution of the *values* of $f$, and not on the order in which these values occur along the axis. We could cut the graph into pieces and shuffle them around, and Monte Carlo would not notice.

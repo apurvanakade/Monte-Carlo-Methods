@@ -10,7 +10,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { loadVM } from '../../scripts/load-vm.mjs'
-import { integrands, hitMissSample, sampleMeanSample, sampleMeanEstimate, hitMissEstimate, midpointRule, midpointErrors, checkpoints,
+import { integrands, hitMissSample, sampleMeanSample, sortedSample, sampleMeanEstimate, hitMissEstimate, midpointRule, midpointErrors, checkpoints,
   integrandErrors, gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, primes,
   vanDerCorput, gaussianCubeHaltonErrors, gaussianCubeShiftedErrors, pointSet, boxCount, starDiscrepancy1d,
   starDiscrepancy2d, discrepancyStudy, convergenceFit } from './method.js'
@@ -76,6 +76,24 @@ test('sampleMeanSample: running sums match the points, and equal seeds agree', (
   assert.ok(Math.abs(s.sumF[500] - sum) < 1e-9)
   assert.ok(Math.abs(s.sumF2[500] - sum2) < 1e-9)
   assert.deepEqual(sampleMeanSample(VM.sampling.seededRandom(3), integrands.circle, 500), s)
+})
+
+test('sortedSample: the first n points in increasing order, each with its own height, so the bars sum to the estimate', () => {
+  const g = integrands.sin
+  const s = sampleMeanSample(VM.sampling.seededRandom(3), g, 500)
+  const sorted = sortedSample(s, 200)
+  assert.equal(sorted.xs.length, 200)
+  let sum = 0
+  for (let i = 0; i < 200; i++) {
+    if (i > 0) assert.ok(sorted.xs[i - 1] <= sorted.xs[i])
+    assert.equal(sorted.fs[i], g.f(sorted.xs[i]))
+    sum += sorted.fs[i]
+  }
+  // Sorting only reorders the first 200 heights, so their sum is unchanged:
+  // bars of width (b - a) / 200 have total area (b - a) * mean, the estimate.
+  assert.ok(Math.abs(sum - s.sumF[200]) < 1e-9)
+  const barArea = (g.b - g.a) / 200 * sum
+  assert.ok(Math.abs(barArea - sampleMeanEstimate(s.sumF[200], s.sumF2[200], 200, g.b - g.a).estimate) < 1e-9)
 })
 
 test('sampleMeanEstimate: sin on [0, pi] is within 4 standard errors of 2, and the estimated SE matches theory', () => {

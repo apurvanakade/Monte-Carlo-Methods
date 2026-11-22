@@ -64,6 +64,21 @@ export function sampleMeanSample(rng, integrand, n) {
   return {xs, fs, sumF, sumF2}
 }
 
+// The first n points of a sample from sampleMeanSample, in increasing order
+// of x, with their heights: {xs, fs}. Bars of width (b - a) / n and heights
+// fs have total area (b - a) * mean(f), the sample-mean estimate.
+export function sortedSample(sample, n) {
+  const order = []
+  for (let i = 0; i < n; i++) order.push(i)
+  order.sort((i, j) => sample.xs[i] - sample.xs[j])
+  const xs = [], fs = []
+  for (const i of order) {
+    xs.push(sample.xs[i])
+    fs.push(sample.fs[i])
+  }
+  return {xs, fs}
+}
+
 // The sample-mean estimate width * mean(f) from the sums of f and f^2 over n
 // points, and its estimated standard error width * s / sqrt(n), s the sample
 // standard deviation (divisor n - 1; null when n < 2).
