@@ -33,3 +33,21 @@ body #quarto-margin-sidebar nav#TOC ul > li > a:hover { color: var(--vm-accent);
 @media (prefers-reduced-motion: reduce) {
   #quarto-margin-sidebar nav#TOC { transition: none; }
 }
+
+/* The list sits at the middle of the window's height, not under the navbar.
+ * Quarto pins the margin sidebar below the navbar and moves it up when the
+ * navbar slides away, and at the foot of the page the footer pushes it up
+ * off the screen. Here the sidebar is a box as tall as the window, stuck to
+ * its top whatever the navbar does (!important outranks the inline `top`
+ * and `max-height` Quarto's script writes), with the list centred in it:
+ * the navbar never reaches it, and the footer only nudges it. Auto margins,
+ * not justify-content, so a list taller than the window still scrolls from
+ * its first entry. */
+#quarto-margin-sidebar {
+  top: 0 !important;
+  height: 100vh;
+  max-height: 100vh !important;
+  display: flex;
+  flex-direction: column;
+}
+#quarto-margin-sidebar nav#TOC { margin-block: auto; }
