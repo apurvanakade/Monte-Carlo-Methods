@@ -92,6 +92,10 @@ mathviz:
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
   fonts: true
+  # The table of contents drawn quietly: no heading or rule, small soft
+  # text, faded until hovered or focused, at the middle of the window's
+  # height (see format.html.toc below).
+  quiet-toc: true
   # A "Share" button on every app (each <div class="vm-app">) with the page
   # link and an <iframe> snippet. Turns on embed mode too: any app page
   # loaded with ?embed=1 shows the app alone, for a frame.
@@ -107,7 +111,7 @@ format:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
     # A table of contents in the right margin of every page, drawn quietly
-    # (_chrome/toc.css). It lists the top-level sections; a section's
+    # (mathviz's quiet-toc, above). It lists the top-level sections; a section's
     # subsections show only while the reader is in it (toc-depth: 3 with
     # Quarto's default toc-expand; toc-depth: 2 drops them altogether). The
     # introduction pages turn it off (`toc: false` in their front matter).
@@ -129,7 +133,6 @@ format:
       - _chrome/exercises.css
       - _chrome/callouts.css
       - _chrome/title-block.css
-      - _chrome/toc.css
     include-after-body:
       - _chrome/exercises.html
     include-in-header:
