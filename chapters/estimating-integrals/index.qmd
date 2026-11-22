@@ -834,16 +834,16 @@ $$
 for what this one point contributes to each estimator, so that $\hat I_N^{\,\text{HM}}$ is the average of $N$ independent copies of $Z^{\text{HM}}$, and $\hat I_N$ is the average of $N$ independent copies of $Z$.
 
 a. Show that $\mathbb{E}[Z^{\text{HM}} \mid X] = Z$.
-b. Use the law of total variance, conditioning on $X$, to show $\text{Var}(Z^{\text{HM}}) \ge \text{Var}(Z)$, without computing an integral.
+b. Use the [law of total variance](../probability-review/#sec-conditioning), conditioning on $X$, to show $\text{Var}(Z^{\text{HM}}) \ge \text{Var}(Z)$, without computing an integral.
 c. Compute $\mathbb{E}[\text{Var}(Z^{\text{HM}} \mid X)]$ and check that it is $N$ times the difference you found in @exr-int-hitmiss (b).
 d. In (b) you never used the form of $H$. State the general fact you proved.
 :::
 
-::: {.callout-important title="Integrate out what you can"}
-If we replace a random variable by its conditional expectation, the mean stays the same and the variance can only go down. So whatever part of an integral we can do exactly, we should, and sample only the rest.
+::: {.callout-important title="Conditioning reduces variance"}
+If we replace a random variable by its conditional expectation, the mean stays the same and the variance goes down. 
 :::
 
-In statistics this trick is known as *Rao-Blackwellization*. In our case the part done exactly is the integral over $y$: the sample mean is just hit-or-miss with $Y$ integrated out. @fig-int-hitmiss runs both estimators on the quarter circle. Both errors fall along lines of slope $-1/2$, and the two lines stay a fixed distance apart on the log scale. That distance is the ratio of standard errors you found in @exr-int-hitmiss (c).
+In statistics this trick is known as *Rao-Blackwellization*. In our case we conditioned on $X$: the sample mean is just hit-or-miss with each hit $H_i$ replaced by its conditional expectation $\mathbb{E}[H_i \mid X_i] = f(X_i)/c$. @fig-int-hitmiss runs both estimators on the quarter circle. Both errors fall along lines of slope $-1/2$, and the two lines stay a fixed distance apart on the log scale. That distance is the ratio of standard errors you found in @exr-int-hitmiss (c).
 
 
 ```{ojs}
