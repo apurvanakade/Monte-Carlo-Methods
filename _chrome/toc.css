@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* A quiet table of contents: it stays in the right margin of every page but
+ * recedes beside the text. No "On this page" heading and no rule down its
+ * left edge; small, soft text, with the section being read in the accent
+ * colour (Quarto's own rule); and the whole list faded until the pointer or
+ * keyboard focus is on it. Listed under format.html.css in _quarto.yml. */
+
+#quarto-margin-sidebar nav#TOC #toc-title { display: none; }
+
+/* `body` outranks Quarto's `.sidebar nav[role="doc-toc"] ul > li > a` rules,
+ * which draw the rule and set the colour. Subsections keep Quarto's indent. */
+body #quarto-margin-sidebar nav#TOC ul > li > a {
+  border-left: 0;
+  font-size: 0.8rem;
+  color: var(--vm-text-soft);
+}
+body #quarto-margin-sidebar nav#TOC ul > li > a:hover { color: var(--vm-accent); }
+
+/* Faded only where there is a pointer to bring it back. */
+@media (hover: hover) {
+  #quarto-margin-sidebar nav#TOC {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+  #quarto-margin-sidebar nav#TOC:hover,
+  #quarto-margin-sidebar nav#TOC:focus-within { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #quarto-margin-sidebar nav#TOC { transition: none; }
+}

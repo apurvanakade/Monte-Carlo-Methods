@@ -106,11 +106,13 @@ format:
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    # A table of contents in the right margin of every page, top-level
-    # sections only, to keep it short. The introduction pages turn it off
-    # (`toc: false` in their front matter).
+    # A table of contents in the right margin of every page, drawn quietly
+    # (_chrome/toc.css). It lists the top-level sections; a section's
+    # subsections show only while the reader is in it (toc-depth: 3 with
+    # Quarto's default toc-expand; toc-depth: 2 drops them altogether). The
+    # introduction pages turn it off (`toc: false` in their front matter).
     toc: true
-    toc-depth: 2
+    toc-depth: 3
     # Unnumbered sections. Link to a section by its title: [Title](#sec-id).
     number-sections: false
     # Callouts are drawn without icons (_chrome/callouts.css styles them).
@@ -127,6 +129,7 @@ format:
       - _chrome/exercises.css
       - _chrome/callouts.css
       - _chrome/title-block.css
+      - _chrome/toc.css
     include-after-body:
       - _chrome/exercises.html
     include-in-header:
