@@ -129,12 +129,10 @@ format:
     # Exercises: textbook-style #exr- blocks, with "Next exercise" buttons
     # from the script in _chrome/exercises.html.
     # Callouts and the title block: quiet, like the blog's.
-    # The reference list: set as in a paper (smaller, hanging indents).
     css:
       - _chrome/exercises.css
       - _chrome/callouts.css
       - _chrome/title-block.css
-      - _chrome/references.css
     include-after-body:
       - _chrome/exercises.html
     include-in-header:
