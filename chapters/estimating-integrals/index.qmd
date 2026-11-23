@@ -3,347 +3,1247 @@ title: "Estimating Integrals"
 
 execute:
   echo: false
+
+toc: true
 ---
 
-Monte Carlo integration transforms the problem of computing definite integrals into a sampling problem, making it particularly powerful for high-dimensional integration where traditional methods fail.
-
-Consider the problem of estimating the integral $\ell = \int_a^b f(x) \, dx$. The key insight is to rewrite this integral as an expectation. If $X \sim \text{Uniform}(a, b)$, then:
-$$\int_a^b f(x) \, dx = (b-a) \mathbb{E}[f(X)]$$
-
-This reformulation allows us to estimate the integral using sample averages. Given $N$ independent samples $X_1, \ldots, X_N \sim \text{Uniform}(a, b)$, our Monte Carlo estimator is:
-$$\hat{\ell}_N = \frac{b - a}{N} \sum_{i=1}^{N} f(X_i)$$
-
-::: {.callout-note}
-## Geometric Interpretation
-We're approximating the area under $f(x)$ by averaging function values at random points and scaling by interval width.
-:::
-
-## Statistical Properties
-
-The Monte Carlo integration estimator possesses several important statistical properties. First, it is unbiased:
+How would you compute
 $$
-\begin{aligned}
-\mathbb{E}[\hat{\ell}_N] &= \frac{b - a}{N} \sum_{i=1}^{N} \mathbb{E}[f(X_i)] = \frac{b - a}{N} \sum_{i=1}^{N} \int_a^b f(x) \frac{1}{b - a} \, dx = \ell
-\end{aligned}
+\int_{[0,1]^{20}} e^{-\|x\|^2}\,dx,
 $$
+an integral over a cube in twenty dimensions? The simplest method is to lay down a grid and add up the values of the integrand on it. But a grid with only ten points along each axis has $10^{20}$ points, and even at a billion function evaluations a second the sum would take three thousand years! By contrast, just thirty thousand random points give the answer to about 1% accuracy. This is the [Monte Carlo principle](../estimating-pi/) at work again.
 
-The variance of our estimator is:
-$$\text{Var}(\hat{\ell}_N) = \frac{(b - a)^2}{N} \cdot \sigma^2_f$$
-where $\sigma^2_f = \text{Var}(f(X))$ is the variance of $f(X)$ under the uniform distribution.
+In this chapter we will see why grids break down as the dimension grows, and how random points get around the problem. We build two estimators out of random points and ask how accurate each one is, which turns out to be a question about variance. We end with a brief look at quasi-random points, which try to combine the evenness of a grid with the flexibility of random points.
 
 
-::: {.callout-important}
-## Key Properties
-
-- **Standard Error**: $\text{SE} = \frac{(b-a)\sigma_f}{\sqrt{N}}$
-
-- **Convergence Rate**: $O(1/\sqrt{N})$ regardless of dimension
-
-- **CLT**: $\sqrt{N}(\hat{\ell}_N - \ell) \xrightarrow{d} \mathcal{N}(0, (b-a)^2\sigma^2_f)$
-:::
-
-## Function Characteristics and Performance
-
-Monte Carlo integration's performance depends heavily on the function's characteristics. While the convergence rate is theoretically independent of function complexity, practical performance varies significantly with function smoothness and oscillatory behavior.
-
-Functions with high-frequency oscillations present particular challenges for Monte Carlo methods because random sampling may miss important features or fail to adequately capture rapid variations. This example compares Monte Carlo integration performance on two trigonometric functions with dramatically different oscillation frequencies, illustrating how function characteristics affect integration accuracy and convergence behavior.
-
-### Example: Low vs. High Frequency Functions
-
-The following example integrates two functions over the interval $[0, \pi]$:
-
-- **Smooth decay**: $f_1(x) = \sin(x)$ — a smooth, slowly varying function
-
-- **Oscillatory**: $f_2(x) = 25\sin(25x)$ — a rapidly oscillating function with many periods
 
 ```{ojs}
 //| output: false
+// VM is the mathviz library, loaded on every page by the mathviz extension.
 VM = window.VM
+
+// vmTheme re-runs every cell that bakes a palette color into a trace when
+// the reader toggles dark mode; chartColors is that palette.
 vmTheme = Generators.observe(notify => VM.plotting.onThemeChange(notify))
 chartColors = VM.plotting.colors(vmTheme)
 
-// The simulations themselves live in method.js, where
-// method.test.js checks them against theory.
-import {logSampleSizes, integrandStudy, dimensionStudy} from "./method.js"
+// The methods themselves live in method.js, where method.test.js checks them
+// against theory.
+import {integrands, hitMissSample, sampleMeanSample, sortedSample, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
+  gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, gaussianCubeHaltonErrors,
+  convergenceFit} from "./method.js"
+```
 
-intSmoothPlot = VM.plotting.persistentPlot({height: "300px"})
-intOscPlot = VM.plotting.persistentPlot({height: "300px"})
-intEstimatePlot = VM.plotting.persistentPlot({height: "380px"})
-intErrorPlot = VM.plotting.persistentPlot({height: "380px"})
+```{=html}
+<style>
+/* The analysis figures (intFigure): an Observable Plot chart with its title
+   above and its key under, centered in the column. */
+.int-figure { width: fit-content; max-width: 100%; margin-inline: auto; }
+.int-figure-title { font-weight: 600; text-align: center; color: var(--vm-text); }
+</style>
+```
 
-// The two integrands on [0, pi]; both integrate to exactly 2.
-intFunctions = [
-  {name: "Smooth", title: "Smooth: sin(x)", f: x => Math.sin(x), trueValue: 2, color: "fn", marker: "circle"},
-  {name: "Oscillatory", title: "Oscillatory: 25 sin(25x)", f: x => 25 * Math.sin(25 * x), trueValue: 2, color: "alt", marker: "square"}
-]
 
-intSampleSizes = logSampleSizes(20, 2, 5)
+```{ojs}
+//| output: false
+// The analysis figures (error against work, on log-log axes) are static
+// Observable Plot charts with a key under them. These functions read
+// chartColors, so every figure built with them redraws on a dark-mode toggle.
 
-intResults = {
-  const studies = integrandStudy(VM.sampling.seededRandom(0), intFunctions, 0, Math.PI, intSampleSizes, 10000, 25)
-  const results = []
-  for (let i = 0; i < intFunctions.length; i++) results.push({...intFunctions[i], ...studies[i]})
-  return results
-}
-
-function intFunctionFigure(fn, plot) {
-  const xs = [], ys = []
-  for (let i = 0; i <= 2000; i++) {
-    const x = Math.PI * i / 2000
-    xs.push(x)
-    ys.push(fn.f(x))
+// A chart with a key under it (VM.ui.staticKey) and an optional title above.
+// The title is a plain div rather than Plot's own `title` option, which
+// renders an <h2> and so takes the page's section-heading style.
+function intFigure(chart, key, title) {
+  const figure = document.createElement("div")
+  figure.className = "int-figure"
+  if (title) {
+    const heading = document.createElement("div")
+    heading.className = "int-figure-title"
+    heading.textContent = title
+    figure.append(heading)
   }
-  const color = chartColors[fn.color]
-  return plot([{x: xs, y: ys, type: "scatter", mode: "lines", fill: "tozeroy", line: {color, width: 2},
-    fillcolor: VM.plotting.alpha(color, 0.3)}], {title: {text: fn.title}, margin: {t: 40}, showlegend: false, xaxis: {title: "x"}})
+  figure.append(chart, VM.ui.staticKey(key))
+  return figure
+}
+
+// "10⁻³" for 0.001: tick labels for a log axis whose ticks are powers of ten.
+function intPowerOfTen(value) {
+  const superscripts = {"-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹"}
+  let exponent = ""
+  for (const ch of String(Math.round(Math.log10(value)))) exponent += superscripts[ch]
+  return `10${exponent}`
+}
+
+// Every power of ten from `lo` to `hi`.
+function intDecades(lo, hi) {
+  const ticks = []
+  for (let k = Math.ceil(Math.log10(lo) - 1e-9); k <= Math.floor(Math.log10(hi) + 1e-9); k++) ticks.push(10 ** k)
+  return ticks
+}
+
+// A log axis over [lo, hi] with a tick at each power of ten inside it.
+function intLogAxis(lo, hi, options) {
+  return {type: "log", domain: [lo, hi], ticks: intDecades(lo, hi), tickFormat: intPowerOfTen, ...options}
+}
+
+// Error against work for several methods. Each of `series` is
+// {label, token, points, kind}, with points [{n, error, ...}] and kind:
+//   "band"    a random method: its RMS error as a line with dots, over the
+//             band between points' lo and hi (the middle 80% of runs);
+//   "scatter" a deterministic method, whose error swings from one n to the
+//             next: unjoined dots, and the least-squares line through them,
+//             solid over the fitted range n ≥ 100 and dashed before it;
+//   "line"    a formula: a dashed line.
+// `references` are slopes to compare with, {label, order, at}: a muted line
+// of slope -order starting at height `at` on the left edge, labelled at its
+// right end. The axes are xDomain and yDomain; anything outside is clipped.
+function intRateFigure({series, references = [], xDomain, yDomain, xLabel, yLabel, title, height = 300, chartWidth = width}) {
+  const marks = []
+  const key = []
+  for (const s of series) {
+    const color = chartColors[s.token]
+    // A deterministic error can be exactly zero, which a log axis can't show.
+    const rows = []
+    for (const p of s.points) {
+      if (p.error > 0 && p.n >= xDomain[0] && p.n <= xDomain[1]) rows.push(p)
+    }
+    if (s.kind === "band") {
+      const band = []
+      for (const p of rows) band.push({n: p.n, lo: Math.max(p.lo, yDomain[0]), hi: p.hi})
+      const bandColor = VM.plotting.alpha(color, 0.15)
+      marks.push(Plot.areaY(band, {x: "n", y1: "lo", y2: "hi", fill: bandColor, clip: true}))
+      marks.push(Plot.line(rows, {x: "n", y: "error", stroke: color, strokeWidth: 2, clip: true}))
+      marks.push(Plot.dot(rows, {x: "n", y: "error", fill: color, r: 2, clip: true}))
+      key.push({label: s.label, marks: [
+        {mark: "area", fill: bandColor},
+        {mark: "line", stroke: color, strokeWidth: 2},
+        {mark: "dot", fill: color, r: 2}
+      ]})
+    } else if (s.kind === "scatter") {
+      marks.push(Plot.dot(rows, {x: "n", y: "error", fill: color, r: 2, clip: true}))
+      const fit = convergenceFit(s.points)
+      if (fit && rows.length > 0) {
+        const fitLine = n => 10 ** fit.intercept * n ** -fit.order
+        const first = rows[0].n
+        const last = rows[rows.length - 1].n
+        const from = Math.max(100, first)
+        marks.push(Plot.line([{n: from, error: fitLine(from)}, {n: last, error: fitLine(last)}], {x: "n", y: "error", stroke: color, strokeWidth: 2, clip: true}))
+        if (first < 100) {
+          marks.push(Plot.line([{n: first, error: fitLine(first)}, {n: 100, error: fitLine(100)}], {x: "n", y: "error", stroke: color, strokeWidth: 2, strokeDasharray: "6,4", clip: true}))
+        }
+      }
+      key.push({label: s.label, marks: [
+        {mark: "line", stroke: color, strokeWidth: 2},
+        {mark: "dot", fill: color, r: 2}
+      ]})
+    } else {
+      marks.push(Plot.line(rows, {x: "n", y: "error", stroke: color, strokeWidth: 1.5, strokeDasharray: "6,4", clip: true}))
+      key.push({label: s.label, stroke: color, strokeWidth: 1.5, strokeDasharray: "6,4"})
+    }
+  }
+  for (const ref of references) {
+    const ends = [
+      {n: xDomain[0], error: ref.at},
+      {n: xDomain[1], error: ref.at * (xDomain[1] / xDomain[0]) ** -ref.order}
+    ]
+    marks.push(Plot.line(ends, {x: "n", y: "error", stroke: chartColors.muted, strokeWidth: 1, strokeDasharray: "2,3", clip: true}))
+    marks.push(Plot.text([ends[1]], {x: "n", y: "error", text: () => ref.label, textAnchor: "start", dx: 4, fill: chartColors.muted}))
+  }
+  const chart = Plot.plot(VM.plotting.plotOptions({
+    width: chartWidth, height, marginLeft: 50, marginRight: 44, marginBottom: 40,
+    x: intLogAxis(xDomain[0], xDomain[1], {label: xLabel, labelAnchor: "center"}),
+    y: intLogAxis(yDomain[0], yDomain[1], {label: yLabel}),
+    marks
+  }))
+  return intFigure(chart, key, title)
+}
+
+// One readout per series: the fitted order of convergence, minus the slope of
+// the least-squares line through its log-log points with n ≥ 100.
+function intOrderStats(series) {
+  const stats = []
+  for (const s of series) {
+    const fit = convergenceFit(s.points)
+    let value = "—"
+    if (fit) value = `order ≈ ${fit.order.toFixed(2)}`
+    stats.push({label: s.label, value, title: "minus the slope of the least-squares line through the log-log points with N ≥ 100"})
+  }
+  return stats
+}
+
+// A slider's value once it has paused for 300 ms: for a figure that
+// re-simulates on every change, too much for every tick of a drag.
+function intPaused(input) {
+  return Generators.observe(notify => {
+    let timer = null
+    const onInput = () => {
+      clearTimeout(timer)
+      timer = setTimeout(() => notify(input.value), 300)
+    }
+    notify(input.value)
+    input.addEventListener("input", onInput)
+    return () => {
+      clearTimeout(timer)
+      input.removeEventListener("input", onInput)
+    }
+  })
+}
+
+// Sample sizes for the figures: log-spaced, so they read evenly on a log axis.
+intCounts = checkpoints(10000)
+intCountsLong = checkpoints(100000)
+```
+
+
+## Grids and the curse of dimensionality {#sec-int-grid}
+
+Let us start in one dimension, where we want to compute
+$$
+I = \int_a^b f(x)\,dx.
+$$
+Perhaps the simplest numerical method for this is the *midpoint rule*. We cut $[a, b]$ into $N$ cells of width $h = (b-a)/N$, and on each cell we replace $f$ by its value at the center $c_j = a + (j - \tfrac12)h$ of the cell. Adding up the areas of the resulting rectangles gives
+$$
+M_N = \frac{b-a}{N}\sum_{j=1}^N f(c_j).
+$$
+@fig-int-riemann shows these rectangles for $\sin x$ on $[0, \pi]$.
+
+```{ojs}
+//| output: false
+intRiemannCells = 6
+```
+
+:::: {#fig-int-riemann}
+
+```{ojs}
+{
+  const a = 0
+  const b = Math.PI
+  const h = (b - a) / intRiemannCells
+
+  const curve = []
+  for (let k = 0; k <= 300; k++) {
+    const x = a + (b - a) * k / 300
+    curve.push({x, y: Math.sin(x)})
+  }
+
+  // One rectangle per cell, and a dot where it meets the curve, at the
+  // cell's center.
+  const cells = []
+  for (let j = 0; j < intRiemannCells; j++) {
+    const left = a + j * h
+    const center = left + h / 2
+    cells.push({left, right: left + h, center, height: Math.sin(center)})
+  }
+
+  const fill = VM.plotting.alpha(chartColors.fn, 0.15)
+  const chart = Plot.plot(VM.plotting.plotOptions({
+    width, height: 300, marginLeft: 40, marginBottom: 40,
+    x: {domain: [a, b], label: "x", labelAnchor: "center"},
+    y: {domain: [0, 1.05], label: null},
+    marks: [
+      Plot.rect(cells, {x1: "left", x2: "right", y1: 0, y2: "height", fill, stroke: chartColors.fn, strokeWidth: 1.5}),
+      Plot.line(curve, {x: "x", y: "y", stroke: chartColors.ink, strokeWidth: 2.5}),
+      Plot.dot(cells, {x: "center", y: "height", fill: chartColors.fn, r: 3.5})
+    ]
+  }))
+  return intFigure(chart, [
+    {label: "sin x", stroke: chartColors.ink, strokeWidth: 2.5},
+    {label: "Midpoint rectangles", marks: [
+      {mark: "area", fill},
+      {mark: "line", stroke: chartColors.fn, strokeWidth: 1.5},
+      {mark: "dot", fill: chartColors.fn, r: 3.5}
+    ]}
+  ])
 }
 ```
 
-::: {layout-ncol=2}
+The midpoint rule for $\sin x$ on $[0, \pi]$.
 
-```{ojs}
-intFunctionFigure(intFunctions[0], intSmoothPlot)
-```
+::::
 
-```{ojs}
-intFunctionFigure(intFunctions[1], intOscPlot)
-```
+How quickly does $M_N$ approach $I$ as we add more points?
 
+::: {#exr-int-midpoint}
+## The midpoint rule
+Let $I = \int_a^b f(x)\,dx$. Cut $[a, b]$ into $N$ cells of width $h = (b-a)/N$ with centers $c_1, \ldots, c_N$, and let $M_N = h\sum_{j=1}^N f(c_j)$ be the midpoint rule. Assume $f$ has as many continuous derivatives as you need.
+
+a. Expand $f(c + t)$ to second order about the center $c$ of one cell and integrate over $-h/2 \le t \le h/2$ to show
+$$
+\int_{c-h/2}^{c+h/2} f(x)\,dx = h\,f(c) + \frac{h^3}{24}\,f''(c) + O(h^5).
+$$
+Why does the first-order term contribute nothing? Why is the remainder $O(h^5)$ rather than $O(h^4)$?
+b. Sum over the cells to conclude
+$$
+I - M_N = \frac{h^2}{24}\,\big(f'(b) - f'(a)\big) + O(h^4).
+$$
+c. Using (b), write the error of the midpoint rule as a power of $N$. By what factor does it shrink when $N$ doubles? How many times more points does one more correct decimal place cost? Compare with the [standard-error exercise](../estimating-pi/#exr-pi-variance) of the last chapter.
 :::
 
+::::: {#fig-int-tangent}
+
+```{ojs}
+{
+  const a = 0
+  const b = Math.PI
+  const h = (b - a) / intRiemannCells
+  const chosen = 1
+
+  const curve = []
+  for (let k = 0; k <= 300; k++) {
+    const x = a + (b - a) * k / 300
+    curve.push({x, y: Math.sin(x)})
+  }
+
+  // The same rectangles as @fig-int-riemann. One cell also gets the tangent
+  // line at its center, and the trapezoid under that line.
+  const cells = []
+  for (let j = 0; j < intRiemannCells; j++) {
+    const left = a + j * h
+    const center = left + h / 2
+    cells.push({left, right: left + h, center, height: Math.sin(center)})
+  }
+  const cell = cells[chosen]
+  const tangent = []
+  for (const x of [cell.left, cell.right]) {
+    tangent.push({x, y: cell.height + Math.cos(cell.center) * (x - cell.center)})
+  }
+
+  // The slanted line: the warn color pulled toward the ink color, so it stands out from its fill.
+  const tangentStroke = `color-mix(in srgb, ${chartColors.warn} 60%, ${chartColors.ink})`
+  const trapezoidFill = VM.plotting.alpha(chartColors.warn, 0.35)
+  const chart = Plot.plot(VM.plotting.plotOptions({
+    width, height: 300, marginLeft: 40, marginBottom: 40,
+    x: {domain: [a, b], label: "x", labelAnchor: "center"},
+    y: {domain: [0, 1.05], label: null},
+    marks: [
+      Plot.areaY(tangent, {x: "x", y1: 0, y2: "y", fill: trapezoidFill}),
+      Plot.rect([cell], {x1: "left", x2: "right", y1: 0, y2: "height", fill: "none", stroke: chartColors.fn, strokeWidth: 2, strokeDasharray: "6,4"}),
+      Plot.line(tangent, {x: "x", y: "y", stroke: tangentStroke, strokeWidth: 2.5}),
+      Plot.line(curve, {x: "x", y: "y", stroke: chartColors.ink, strokeWidth: 2.5}),
+      Plot.dot([cell], {x: "center", y: "height", fill: chartColors.fn, r: 3.5})
+    ]
+  }))
+  return intFigure(chart, [
+    {label: "sin x", stroke: chartColors.ink, strokeWidth: 2.5},
+    {label: "Midpoint rectangle", stroke: chartColors.fn, strokeWidth: 2, strokeDasharray: "6,4"},
+    {label: "Tangent at the center and the trapezoid under it", marks: [
+      {mark: "area", fill: trapezoidFill},
+      {mark: "line", stroke: tangentStroke, strokeWidth: 2.5}
+    ]}
+  ])
+}
+```
+
+One cell of the midpoint rule for $\sin x$, with the tangent line at its center.
+
+:::::
+
+::: {#exr-int-concave}
+## Over or under?
+Let $f$ be concave on $[a, b]$, that is, $f'' \le 0$, as $\sin x$ is on $[0, \pi]$. As in @exr-int-midpoint, $M_N$ is the midpoint rule with $N$ cells for $I = \int_a^b f(x)\,dx$.
+
+a. From @fig-int-riemann, guess whether $M_N$ overestimates or underestimates $I$ for $\sin x$.
+b. The graph of a concave function lies below each of its tangent lines. @fig-int-tangent shows the tangent at the center of one cell. Compare the area of the trapezoid under the tangent with the area of the midpoint rectangle. What do you conclude about $M_N$?
+c. Now prove this algebraically, using the expansion in @exr-int-midpoint (a).
+d. What happens if $f$ is convex, $f'' \ge 0$?
+:::
+
+::: {#exr-int-sine}
+## The midpoint rule for $\sin x$
+a. For $\sin x$ on $[0, \pi]$, evaluate the leading term $\frac{h^2}{24}\big(f'(b) - f'(a)\big)$ of @exr-int-midpoint (b) at $N = 100$, where $h = (b-a)/N$ is the cell width. Does its sign agree with your answer to @exr-int-concave?
+b. How many points does the midpoint rule need for the error in (a) to fall to $0.001$?
+:::
+
+You should find that the error of the midpoint rule falls like $N^{-2}$, so one more correct decimal place costs only about 3.2 times as many points. By comparison, the circle estimator of the last chapter requires 100 times as many computations for each extra decimal place. You can watch the rule at work on [Visual Math Lab](https://www.visualmathlab.com/apps/numerical-integration/index.html?f=sin(x)&a=0&b=pi&max=40&n=12&show=f,midpoint){target="_blank"}. So in one dimension, Riemann sums (and their optimizations) are fast enough for computing integrals.
+
+### The curse of dimensionality {#sec-int-curse}
+
+The trouble starts when we move to higher dimensions. Let $f$ now be a function on the unit cube $[0, 1]^d$, and suppose we want
+$$
+I = \int_{[0,1]^d} f(x)\,dx.
+$$
+The midpoint rule generalizes directly. We cut each of the $d$ axes into $m$ cells of width $h = 1/m$, which cuts the cube into $N = m^d$ small cubes, and we replace $f$ on each small cube by its value at the center. Since the cube has volume 1, the estimate $M_N$ is simply the average of $f$ over the $N$ centers.
+
+How accurate is it? Repeating the argument of @exr-int-midpoint along each axis gives one error term per axis,
+$$
+I - M_N \approx \frac{h^2}{24}\sum_{k=1}^{d}\int_{[0,1]^d}\frac{\partial^2 f}{\partial x_k^2}(x)\,dx.
+$$
+Since $h = 1/m = N^{-1/d}$, the error falls like $N^{-2/d}$.
+
+::: {#exr-int-curse}
+## The curse of dimensionality
+The product midpoint rule on the cube $[0, 1]^d$ uses $m$ points along each axis, $N = m^d$ in all.
+
+a. In dimension $d$, how many times more points does one more correct decimal place cost? Evaluate your answer for $d = 1$, $2$, $10$ and $20$.
+b. The integral of the opening paragraph has $d = 20$. How many points does the grid with $m = 10$ have? At $10^9$ evaluations of $f$ a second, how long does the sum take?
+c. Halving the cell width divides the error by 4. By what factor does it multiply the running time in (b)?
+d. The coarsest grid that can see any variation along an axis has $m = 2$. How many points does it have for $d = 100$?
+:::
+
+::: {.callout-important title="The curse of dimensionality"}
+A grid rule whose error is $m^{-r}$ per axis has error $N^{-r/d}$ in terms of the total number of points $N = m^d$. The rate gets worse as the dimension grows: one more correct decimal place costs $10^{d/r}$ times as many points.
+:::
+
+@fig-int-grid shows the curse of dimensionality for the integral we started with, $e^{-\|x\|^2}$ over $[0, 1]^d$: on the log-log plot the errors fall along lines of slope $-2/d$, which get flatter and flatter as $d$ grows.
+
+
 ```{ojs}
 //| output: false
-intEstimateTraces = {
-  const traces = []
-  for (const r of intResults) {
-    const color = chartColors[r.color]
-    traces.push({x: intSampleSizes, y: r.estimates, type: "scatter", mode: "lines+markers", name: r.name,
-      line: {color}, marker: {color, symbol: r.marker}})
+// The product midpoint rule on exp(-|x|^2) in d = 1, 2, 4, 8, for every m
+// with m^d <= 10^6. The integrand is a product, so the grid sum costs nothing.
+intGridSeries = {
+  const dims = [1, 2, 4, 8]
+  const tokens = ["fn", "warn", "alt", "ink"]
+  const series = []
+  for (let k = 0; k < dims.length; k++) {
+    series.push({label: `d = ${dims[k]}`, token: tokens[k], points: gaussianCubeGridErrors(dims[k], 1e6), kind: "scatter"})
   }
-  traces.push({x: [intSampleSizes[0], intSampleSizes[19]], y: [2, 2], type: "scatter", mode: "lines",
-    name: "True value", line: {color: chartColors.ink, dash: "dash"}})
-  return traces
+  return series
+}
+```
+
+:::: {#fig-int-grid}
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: intGridSeries, references: [],
+  xDomain: [10, 1e6], yDomain: [1e-8, 1], xLabel: "Points (N = mᵈ)", yLabel: "relative error"})
+```
+
+```{ojs}
+VM.ui.statRow(intOrderStats(intGridSeries))
+```
+
+</div>
+
+Relative error of the product midpoint rule for the integral of $e^{-\|x\|^2}$ over $[0,1]^d$: one dot for each $m$ with $m^d \le 10^6$, and the fitted line.
+
+::::
+
+
+## Hit or miss {#sec-int-hitmiss}
+
+Can random points do better? We have already seen one method that does not use a grid. In the last chapter, the circle estimator threw random points into a square and counted how many landed in the disk, using the fact that the area of the disk is the area of the square times the probability of landing in it. But an integral is an area too, namely the area under a graph, so the same idea should work here. Suppose $0 \le f \le c$ on $[a, b]$. We draw a point $(X, Y)$ uniformly from the box $[a, b] \times [0, c]$ and record the *hit*
+$$
+H = \mathbf{1}_{\{Y \le f(X)\}},
+$$
+which is 1 when the point lands under the curve, and 0 otherwise.
+
+::: {#def-int-hitmiss}
+## The hit-or-miss estimator
+Given $N$ independent uniform points $(X_i, Y_i)$ in the box $[a, b] \times [0, c]$, with hits $H_i$, estimate $I$ by
+$$\hat I_N^{\,\text{HM}} = c\,(b-a)\cdot\frac{1}{N}\sum_{i=1}^{N} H_i = \text{box area} \times \text{fraction of points under the curve}.$$
+:::
+
+The app below draws $N$ points in the box and colors them according to whether they land under the curve.
+
+
+```{ojs}
+//| output: false
+hitMaxN = 2000
+hitDefaultSeed = 1
+hitDefaultN = 100
+hitDefaultKey = "sin"
+// The box height c runs from max f up to hitMaxFactor times max f.
+hitMaxFactor = 4
+```
+
+
+<div class="vm-app" id="hit-app">
+
+<div class="ojs-panel ojs-row">
+
+```{ojs}
+// hitKey: a key of `integrands`. An unknown URL value falls back.
+viewof hitKey = {
+  const keys = Object.keys(integrands)
+  let initial = String(VM.ui.urlParam("hit_f", hitDefaultKey))
+  if (!keys.includes(initial)) initial = hitDefaultKey
+  return Inputs.select(keys, {value: initial, label: "Integrand", format: key => integrands[key].label})
 }
 ```
 
 ```{ojs}
-VM.plotting.plotWithLegend(intEstimatePlot, intEstimateTraces, {title: {text: "Estimate vs sample size"}, margin: {t: 40},
-  xaxis: {title: "Sample size", type: "log"}, yaxis: {title: "Integral estimate"}})
+// Draws a fresh set of points. The first draw (on page load) uses the seed
+// in the URL, so a shared link reproduces the same points.
+viewof hitRedraw = {
+  const button = Inputs.button("Draw new points", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-end")
+  return button
+}
 ```
+
+</div>
+
 
 ```{ojs}
 //| output: false
-intErrorTraces = {
-  const traces = []
-  for (const r of intResults) {
-    const color = chartColors[r.color]
-    traces.push({x: intSampleSizes, y: r.errors, type: "scatter", mode: "lines+markers", name: r.name,
-      line: {color, width: 2}, marker: {color, symbol: r.marker}})
-  }
-  return traces
+hitSeed = {
+  if (hitRedraw === 0) return VM.ui.urlParam("hit_seed", hitDefaultSeed)
+  return Math.floor(Math.random() * 1e9)
 }
 ```
 
 ```{ojs}
-VM.plotting.plotWithLegend(intErrorPlot, intErrorTraces, {title: {text: "Error vs sample size"}, margin: {t: 40},
-  xaxis: {title: "Sample size", type: "log"}, yaxis: {title: "Absolute error", type: "log"}})
+//| output: false
+hitIntegrand = integrands[hitKey]
+```
+
+```{ojs}
+//| output: false
+// hitSample: all hitMaxN points (x, y) of the box [a, b] x [0, c]. The N
+// slider only chooses how many to show. Moving c keeps the seed, so the same
+// points stretch upward with the box.
+hitSample = hitMissSample(VM.sampling.seededRandom(hitSeed), hitIntegrand, hitC, hitMaxN)
+```
+
+```{ojs}
+//| output: false
+// The estimate, its estimated standard error and its true error.
+hitStats = {
+  const boxArea = (hitIntegrand.b - hitIntegrand.a) * hitC
+  const stats = hitMissEstimate(hitSample.hits[hitN], hitN, boxArea)
+  return {...stats, error: Math.abs(stats.estimate - hitIntegrand.exact)}
+}
+```
+
+```{ojs}
+//| output: false
+hitPlot = VM.plotting.persistentPlot({height: "420px"})
+```
+
+```{ojs}
+//| output: false
+hitTraceItems = [
+  {label: "f(x)", color: chartColors.ink},
+  {label: "Under the curve", color: chartColors.fn},
+  {label: "Above the curve", color: chartColors.warn},
+  {label: "Box", color: chartColors.muted}
+]
+```
+
+```{ojs}
+//| output: false
+hitShow = new Set(hitTraces)
+```
+
+
+<div class="ojs-chart-block">
+
+```{ojs}
+{
+  const g = hitIntegrand
+  const curveX = [], curveY = []
+  for (let k = 0; k <= 600; k++) {
+    const x = g.a + (g.b - g.a) * k / 600
+    curveX.push(x)
+    curveY.push(g.f(x))
+  }
+
+  const underX = [], underY = [], aboveX = [], aboveY = []
+  for (let i = 0; i < hitN; i++) {
+    if (hitSample.under[i]) {
+      underX.push(hitSample.xs[i])
+      underY.push(hitSample.ys[i])
+    } else {
+      aboveX.push(hitSample.xs[i])
+      aboveY.push(hitSample.ys[i])
+    }
+  }
+
+  const data = []
+  if (hitShow.has("Box")) {
+    data.push({x: [g.a, g.b, g.b, g.a, g.a], y: [0, 0, hitC, hitC, 0], type: "scatter", mode: "lines", name: "Box", showlegend: false,
+      line: {color: chartColors.muted, width: 1.5}, hoverinfo: "skip"})
+  }
+  if (hitShow.has("Under the curve")) {
+    data.push({x: underX, y: underY, type: "scattergl", mode: "markers", name: "Under the curve", showlegend: false,
+      marker: {color: chartColors.fn, size: 4}, hoverinfo: "skip"})
+  }
+  if (hitShow.has("Above the curve")) {
+    data.push({x: aboveX, y: aboveY, type: "scattergl", mode: "markers", name: "Above the curve", showlegend: false,
+      marker: {color: chartColors.warn, size: 4}, hoverinfo: "skip"})
+  }
+  if (hitShow.has("f(x)")) {
+    data.push({x: curveX, y: curveY, type: "scatter", mode: "lines", name: "f(x)", showlegend: false,
+      line: {color: chartColors.ink, width: 2.5}, hoverinfo: "skip"})
+  }
+
+  // The axis follows the box, so a taller box shrinks the curve inside it.
+  const pad = 0.03 * (g.b - g.a)
+  return hitPlot(data, {
+    xaxis: {range: [g.a - pad, g.b + pad], zeroline: false, title: "x"},
+    yaxis: {range: [-0.04 * hitC, 1.08 * hitC], zeroline: false},
+    hovermode: false,
+    // A new integrand or box height resets any zoom; a new sample keeps it.
+    uirevision: hitKey + ":" + hitC,
+    autosize: true
+  })
+}
+```
+
+```{ojs}
+viewof hitTraces = {
+  const labels = []
+  for (const item of hitTraceItems) labels.push(item.label)
+  return VM.ui.legendOverlay(hitTraceItems, {value: labels})
+}
+```
+
+<div class="ojs-chart-controls ojs-grid">
+
+```{ojs}
+// hitC: the height c of the box, from max f (the tightest box) upward. A new
+// integrand rebuilds the slider; a URL value outside its range falls back to
+// max f.
+viewof hitC = {
+  const max = hitIntegrand.max
+  let initial = Number(VM.ui.urlParam("hit_c", max))
+  if (!(initial >= max && initial <= hitMaxFactor * max)) initial = max
+  const slider = Inputs.range([max, hitMaxFactor * max], {step: max / 20, value: initial, label: "Box height c"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+```{ojs}
+viewof hitN = {
+  const initial = Math.min(hitMaxN, Math.max(10, Math.round(VM.ui.urlParam("hit_n", hitDefaultN))))
+  const slider = Inputs.range([10, hitMaxN], {step: 10, value: initial, label: "Points N"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+```{ojs}
+VM.ui.statRow([
+  {label: "Estimate", value: hitStats.estimate.toFixed(4)},
+  {label: "Standard error", value: hitStats.stdError.toFixed(4),
+    title: "box area · sqrt(p(1 − p) / N), p the fraction of points under the curve"},
+  {label: "|estimate − I|", value: hitStats.error.toFixed(4)},
+  {label: "True value I", value: hitIntegrand.exact.toFixed(4)}
+])
+```
+
+</div>
+
+</div>
+
+
+```{ojs}
+//| output: false
+hitUrlSync = VM.ui.syncUrlParams({
+  hit_f: [hitKey, hitDefaultKey],
+  hit_c: [hitC, hitIntegrand.max],
+  hit_n: [hitN, hitDefaultN],
+  hit_seed: [hitSeed, hitDefaultSeed]
+})
+```
+
+
+Since this is the circle estimator with a box in place of the square, we can analyze it in exactly the same way.
+
+::: {#exr-int-hit}
+## Bias and standard error
+Suppose $0 \le f \le c$ on $[a, b]$, and let $I = \int_a^b f(x)\,dx$. Let $(X_1, Y_1), \ldots, (X_N, Y_N)$ be independent uniform points in the box $[a, b] \times [0, c]$. Let $H_i = 1$ if $Y_i \le f(X_i)$ and $H_i = 0$ otherwise, and let $\hat I_N^{\,\text{HM}} = c\,(b-a)\cdot\frac1N\sum_{i=1}^N H_i$ be the hit-or-miss estimator (@def-int-hitmiss).
+
+a. Find $P(H_i = 1)$ and show that $\hat I_N^{\,\text{HM}}$ is unbiased.
+b. Find $\text{SE}\big(\hat I_N^{\,\text{HM}}\big)$ in terms of $a, b, c, I$. Where do you use independence?
+c. Take $f(x) = \sin x$ on $[0, \pi]$ with $c = 1$, so $I = 2$. Compute the standard error, and the smallest $N$ for which it is at most $0.001$. Compare with @exr-int-sine (b).
+d. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so $I = \pi$. Check that you recover the standard error of the circle estimator from the [last chapter](../estimating-pi/#exr-pi-variance).
+e. The height $c$ of the box is your choice, as long as $f \le c$. How does choosing a larger $c$ affect $\hat I_N^{\,\text{HM}}$? Which $c$ is best?
+f. Check (e) in [the app](#hit-app): for $\sin x$ at $N = 2000$, compare *Standard error* at $c = 1$ and at $c = 4$ with your formula from (b).
+:::
+
+You should find that we get the $N^{-1/2}$ rate again, with a constant that gets worse the more of the box lies above the curve. Raising $c$ in the app shows why: a point that lands above the curve tells us nothing about $f$, and a taller box wastes more of its points up there. For $\sin x$ the standard error is about $1.51/\sqrt N$, so three correct decimal places cost about 2.3 million points. The midpoint rule needs only 29! In one dimension, random points are simply a poor choice, just as they were for [computing $\pi$](../estimating-pi/#sec-randomness-slow).
+
+### Hit or miss in many dimensions {#sec-int-ball}
+
+So why bother with random points at all? The reason is that hit-or-miss works in exactly the same way in any dimension. Let $f$ be a function on the unit cube $[0, 1]^d$ with $0 \le f \le c$, and let
+$$
+I = \int_{[0,1]^d} f(x)\,dx.
+$$
+We draw $X$ uniformly from the cube, which just means drawing each of its $d$ coordinates independently and uniformly, and we draw $Y$ uniformly from $[0, c]$. As before, we record a hit $H = 1$ when $Y \le f(X)$, and we estimate $I$ by $c$ times the fraction of hits,
+$$
+\hat I_N^{\,\text{HM}} = \frac{c}{N}\sum_{i=1}^{N} H_i.
+$$
+
+::: {#exr-int-hit-dimension}
+## The rate does not see the dimension
+a. Show that $\hat I_N^{\,\text{HM}}$ is unbiased with standard error $\sqrt{I\,(c - I)/N}$. Where does the dimension $d$ appear in your argument?
+b. Compare with the $N^{-2/d}$ rate of the [product midpoint rule](#sec-int-curse). For which dimensions $d$ does hit-or-miss have the better rate? 
+:::
+
+You should find that the dimension does not appear anywhere in the argument. The rate is $N^{-1/2}$ in *every dimension*, and it beats the midpoint rule's $N^{-2/d}$ as soon as $d > 4$. This is the reason why random sampling is the standard tool for high-dimensional integrals, even though it is nearly useless for one-dimensional ones.
+
+Have we escaped the curse of dimensionality, then? Not quite. The rate does not depend on the dimension, but the constant in front of it does, and it can be enormous. A good example is the volume $V_d$ of the unit ball in $d$ dimensions. We can estimate it just as we estimated the area of the disk: draw uniform points in the cube $[-1, 1]^d$, which has volume $2^d$, call a point a *hit* if it lands in the ball, and multiply the fraction of hits by $2^d$. To keep the formulas simple, let us only look at even dimensions $d = 2k$. The exact value is then known to be $V_{2k} = \pi^k/k!$, so we can check our estimates.
+
+::: {#exr-int-ball}
+## The ball in the cube
+Let $V_d$ be the volume of the unit ball in $d$ dimensions, and let $p_d = V_d/2^d$ be the probability that a uniform point of the cube $[-1, 1]^d$ lands in the ball. The *relative standard error* of an estimator is its standard error divided by the quantity it estimates.
+
+a. Compute $p_d$ for $d = 2$, $d = 10$ and $d = 20$. How does it behave as $d$ grows?
+b. Find the relative standard error of the hit-or-miss estimator of $V_d$ with $N$ points, in terms of $p_d$ and $N$. For each $d$ in (a), find the smallest $N$ for which it is at most $0.1$.
+c. Take $d = 20$ and draw $N = 10^5$ points. How many hits do you expect? What does the estimator return when there are none, and what is its *estimated* standard error then?
+:::
+
+You should find that the fraction of the cube filled by the ball shrinks faster than exponentially in $d$, and the number of points we need grows just as fast: 28 points at $d = 2$, about 40,000 at $d = 10$, and about $4 \times 10^9$ at $d = 20$. In twenty dimensions, 100,000 points give about $0.0025$ hits on average, so we should expect every one of them to miss the ball. The estimate is then 0, and worse, the estimated standard error is also 0, so the method reports a wrong answer with complete confidence! What is going on is that in high dimensions nearly all of the volume of a cube *sits in its corners*, far from the ball, and so uniform points spend almost all of their time where the integrand vanishes.
+
+So even though the rate does not depend on the dimension, the number of points we need still does: it grows like $1/p_d$. One way out is to sample more often where the integrand is large and then correct for this, an idea called *importance sampling*, which we will study in [Variance reduction](../variance-reduction/). Another is to make better use of the samples we already have, and this is what we turn to next.
+
+
+## The sample-mean estimator {#sec-int-mean}
+
+There is a more direct way to write $I = \int_a^b f(x)\,dx$ as an expectation. Recall the *law of the unconscious statistician*: if $X$ has density $p$, then
+$$\mathbb{E}[f(X)] = \int f(x)\,p(x)\,dx.$$
+If $X$ is uniform on $[a, b]$, then $p(x) = 1/(b-a)$ on the interval, and so
+$$\mathbb{E}[f(X)] = \frac{1}{b-a}\int_a^b f(x)\,dx = \frac{I}{b-a}.$$
+In other words, the integral is the width of the interval times the *average height* of $f$. The same is true in any dimension:
+
+::: {.callout-important title="An integral is an expectation"}
+If $X$ is uniformly distributed on a region $D$ of volume $|D|$, then
+$$\int_D f(x)\,dx = |D|\;\mathbb{E}[f(X)],$$
+so an average of $f$ over random points of $D$, times $|D|$, estimates the integral.
+:::
+
+This is exactly the kind of statement the Monte Carlo principle asks for. Replacing the expectation by a sample average gives our second estimator, which needs neither a box nor the extra coordinate $Y$.
+
+::: {#def-int-mean}
+## The sample-mean estimator
+Given $N$ independent uniform points $X_1, \ldots, X_N$ in $[a, b]$, estimate $I = \int_a^b f(x)\,dx$ by
+$$\hat I_N = \frac{b-a}{N}\sum_{i=1}^{N} f(X_i).$$
+:::
+
+Notice that $\hat I_N = \sum_i \frac{b-a}{N}\,f(X_i)$ is the total area of $N$ bars, each of width $(b-a)/N$. So this is a Riemann sum, just like the midpoint rule, except that the heights are measured at random points instead of at the centers of the cells. @fig-int-sample shows it for $\sin x$ on $[0, \pi]$: the points are sorted from left to right, and the $i$-th bar gets the height of the $i$-th point, which is usually not inside its own bar.
+
+```{ojs}
+//| output: false
+intSamplePoints = 6
+intSampleSeed = 1
+```
+
+```{ojs}
+//| output: false
+// The random points from left to right, with their heights.
+intSampleSorted = sortedSample(sampleMeanSample(VM.sampling.seededRandom(intSampleSeed), integrands.sin, intSamplePoints), intSamplePoints)
+```
+
+:::: {#fig-int-sample}
+
+```{ojs}
+{
+  const a = 0
+  const b = Math.PI
+  const h = (b - a) / intSamplePoints
+
+  const curve = []
+  for (let k = 0; k <= 300; k++) {
+    const x = a + (b - a) * k / 300
+    curve.push({x, y: Math.sin(x)})
+  }
+
+  // One bar per point, side by side: bar i has the height of the i-th point
+  // from the left, which sits on the curve wherever it was drawn.
+  const bars = []
+  for (let i = 0; i < intSamplePoints; i++) {
+    const left = a + i * h
+    bars.push({left, right: left + h, center: left + h / 2, x: intSampleSorted.xs[i], height: intSampleSorted.fs[i]})
+  }
+
+  const fill = VM.plotting.alpha(chartColors.fn, 0.15)
+  const chart = Plot.plot(VM.plotting.plotOptions({
+    width, height: 300, marginLeft: 40, marginBottom: 40,
+    x: {domain: [a, b], label: "x", labelAnchor: "center"},
+    y: {domain: [0, 1.05], label: null},
+    marks: [
+      Plot.rect(bars, {x1: "left", x2: "right", y1: 0, y2: "height", fill, stroke: chartColors.fn, strokeWidth: 1.5}),
+      Plot.line(curve, {x: "x", y: "y", stroke: chartColors.ink, strokeWidth: 2.5}),
+      // A level line from each point to the middle of its bar's top.
+      Plot.link(bars, {x1: "x", x2: "center", y1: "height", y2: "height", stroke: chartColors.alt, strokeWidth: 1.5, strokeDasharray: "3,3"}),
+      Plot.dot(bars, {x: "x", y: "height", fill: chartColors.alt, r: 3.5})
+    ]
+  }))
+  return intFigure(chart, [
+    {label: "sin x", stroke: chartColors.ink, strokeWidth: 2.5},
+    {label: "Bars of width (b − a)/N", marks: [
+      {mark: "area", fill},
+      {mark: "line", stroke: chartColors.fn, strokeWidth: 1.5}
+    ]},
+    {label: "Random points Xᵢ", marks: [
+      {mark: "line", stroke: chartColors.alt, strokeWidth: 1.5, strokeDasharray: "3,3"},
+      {mark: "dot", fill: chartColors.alt, r: 3.5}
+    ]}
+  ])
+}
+```
+
+The sample-mean estimator for $\sin x$ on $[0, \pi]$ as a Riemann sum. Each random point gives its height to one bar.
+
+::::
+
+Once again our estimator is an average of i.i.d. samples, so we already know how to analyze it. Let us write
+$$
+\sigma_f^2 = \text{Var}(f(X)) = \frac{1}{b-a}\int_a^b f(x)^2\,dx - \left(\frac{I}{b-a}\right)^2
+$$
+for the variance of the height of $f$ at a uniform point $X$ of $[a, b]$.
+
+::: {#exr-int-variance}
+## Bias and standard error
+Let $X_1, \ldots, X_N$ be independent uniform points in $[a, b]$, and let $\hat I_N = \frac{b-a}{N}\sum_{i=1}^N f(X_i)$ be the sample-mean estimator of $I = \int_a^b f(x)\,dx$ (@def-int-mean). Write $\sigma_f^2 = \text{Var}(f(X_i))$.
+
+a. Show that $\hat I_N$ is unbiased.
+b. Compute $\text{Var}(\hat I_N)$ and $\text{SE}(\hat I_N)$ in terms of $\sigma_f$. Where do you use independence?
+c. Take $f(x) = \sin x$ on $[0, \pi]$, so $I = 2$. Compute $\sigma_f^2$ and $\text{SE}(\hat I_N)$.
+d. Find the smallest $N$ for which $\text{SE}(\hat I_N) \le 0.001$ in (c).
+:::
+
+You should find
+$$
+\text{SE}(\hat I_N) = \frac{(b-a)\,\sigma_f}{\sqrt N},
+$$
+which is the $N^{-1/2}$ rate once more. Notice that the constant depends on $f$ only through $\sigma_f$. For $\sin x$ the standard error is about $0.967/\sqrt N$, so three correct decimal places cost about a million points.
+
+There is one new difficulty. For hit-or-miss the samples were Bernoulli, so once we had estimated their mean we also knew their variance. Here $\sigma_f$ is a second unknown integral. In practice we estimate it from the same samples, using their sample standard deviation
+$$
+s = \sqrt{\frac{1}{N-1}\sum_{i=1}^N \big(f(X_i) - \bar f\,\big)^2}, \qquad \bar f = \frac1N\sum_{i=1}^N f(X_i),
+$$
+and we report $(b-a)\,s/\sqrt N$ as the standard error.
+
+::: {#exr-int-clt}
+## Confidence intervals
+a. Write an approximate 95% confidence interval for $I = \int_a^b f(x)\,dx$ centered at the sample-mean estimator $\hat I_N$, for large $N$, that uses only the samples $f(X_1), \ldots, f(X_N)$.
+b. Use @exr-int-variance (c) to predict the standard error for $\sin x$ at $N = 100$.
+:::
+
+### Hit or miss against the sample mean {#sec-int-compare}
+
+We now have two unbiased estimators of the same integral, and they even use the same points $X_i$. Is there any reason to choose one over the other? Both have the $N^{-1/2}$ rate, so any difference must be in the constants. Let us first compare them on an example, and then ask whether what we see there is an accident.
+
+::: {#exr-int-hitmiss}
+## Hit or miss against the sample mean
+Let $I = \int_a^b f(x)\,dx$ with $0 \le f \le c$. With $N$ points each, let $\hat I_N^{\,\text{HM}}$ be the hit-or-miss estimator of $I$ with box height $c$ (@def-int-hitmiss), and $\hat I_N$ the sample-mean estimator (@def-int-mean).
+
+a. Take $f(x) = \sin x$ on $[0, \pi]$ with $c = 1$. Use @exr-int-hit (c) and @exr-int-variance (c) to compute the standard error of each estimator at $N = 100$. Which is smaller? How many times more points does the other one need to match it?
+b. Is (a) special to $\sin x$? Use @exr-int-hit (b) and @exr-int-variance (b) to write $\text{Var}(\hat I_N^{\,\text{HM}}) - \text{Var}(\hat I_N)$ as a single integral over $[a, b]$, for a general $f$ with $0 \le f \le c$. Can you tell its sign? For which functions $f$ is it zero?
+c. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so that $I = \pi$ and hit-or-miss is the circle estimator. Compute both variances. How many times more points does hit-or-miss need for the same standard error?
+:::
+
+You should find that $\text{Var}(\hat I_N)$ is never larger than $\text{Var}(\hat I_N^{\,\text{HM}})$. The algebra in (b) proves this, but it does not really explain it. The explanation is in how hit-or-miss uses a point $(X, Y)$: all it asks is whether $Y \le f(X)$. Given $X$, the hit $H$ is a coin flip with success probability $f(X)/c$. So $c\,H$ is a noisy stand-in for the height $f(X)$: it is right on average, but it is only ever $0$ or $c$. Hit-or-miss therefore has two sources of randomness, the choice of $X$ and the coin flip, whereas the sample mean has only the first, because it uses $f(X)$ itself. The extra variance of hit-or-miss is the variance of the coin flip! The next exercise turns this observation into a proof.
+
+::: {#exr-int-conditioning}
+## Why the sample mean wins
+Let $(X, Y)$ be a single uniform point in the box $[a, b] \times [0, c]$, and let $H$ be its hit: $H = 1$ if $Y \le f(X)$ and $H = 0$ otherwise. Write
+$$
+Z^{\text{HM}} = c\,(b-a)\,H \qquad\text{and}\qquad Z = (b-a)\,f(X)
+$$
+for what this one point contributes to each estimator, so that $\hat I_N^{\,\text{HM}}$ is the average of $N$ independent copies of $Z^{\text{HM}}$, and $\hat I_N$ is the average of $N$ independent copies of $Z$.
+
+a. Show that $\mathbb{E}[Z^{\text{HM}} \mid X] = Z$.
+b. Use the [law of total variance](../probability-review/#sec-conditioning), conditioning on $X$, to show $\text{Var}(Z^{\text{HM}}) \ge \text{Var}(Z)$, without computing an integral.
+c. Compute $\mathbb{E}[\text{Var}(Z^{\text{HM}} \mid X)]$ and check that it is $N$ times the difference you found in @exr-int-hitmiss (b).
+d. In (b) you never used the form of $H$. State the general fact you proved.
+:::
+
+::: {.callout-important title="Conditioning reduces variance"}
+If we replace a random variable by its conditional expectation, the mean stays the same and the variance goes down. 
+:::
+
+In statistics this trick is known as *Rao-Blackwellization*. In our case we conditioned on $X$: the sample mean is just hit-or-miss with each hit $H_i$ replaced by its conditional expectation $\mathbb{E}[H_i \mid X_i] = f(X_i)/c$. @fig-int-hitmiss runs both estimators on the quarter circle. Both errors fall along lines of slope $-1/2$, and the two lines stay a fixed distance apart on the log scale. That distance is the ratio of standard errors you found in @exr-int-hitmiss (c).
+
+
+```{ojs}
+//| output: false
+intHitErrors = integrandErrors(VM.sampling.seededRandom(21), integrands.circle, intCounts, 200)
+intHitSeries = [
+  {label: "Hit or miss", token: "warn", points: intHitErrors.hitMiss, kind: "band"},
+  {label: "Sample mean", token: "fn", points: intHitErrors.sampleMean, kind: "band"}
+]
+```
+
+:::: {#fig-int-hitmiss}
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: intHitSeries, references: [{label: "N⁻¹ᐟ²", order: 0.5, at: 3}],
+  xDomain: [10, 10000], yDomain: [0.001, 10], xLabel: "Points (N)", yLabel: "|estimate − π|"})
 ```
 
 ```{ojs}
 {
-  const rows = []
-  const smoothSd = intResults[0].repeat.sd
-  for (const r of intResults) {
-    let ratio = "–"
-    if (r.name === "Oscillatory") ratio = (r.repeat.sd / smoothSd).toFixed(4)
-    rows.push([r.name, r.trueValue.toFixed(4), r.repeat.mean.toFixed(4),
-      Math.abs(r.repeat.mean - r.trueValue).toFixed(4), r.repeat.sd.toFixed(4), ratio])
-  }
-  return VM.ui.renderTable({html, rows, filename: "smooth-vs-oscillatory.csv",
-    headers: ["Function", "True value", "Mean est. (25 runs, n = 10,000)", "Error", "Std dev", "Std ratio"]})
+  const last = intCounts.length - 1
+  const stats = intOrderStats(intHitSeries)
+  stats.push({label: "Error ratio", value: (intHitErrors.hitMiss[last].error / intHitErrors.sampleMean[last].error).toFixed(2),
+    title: "RMS error of hit-or-miss divided by RMS error of the sample mean, at N = 10,000"})
+  return VM.ui.statRow(stats)
 }
 ```
 
-The contrast between the smooth $\sin(x)$ and rapidly oscillating $25\sin(25x)$ demonstrates why integration difficulty varies. The high-frequency function has many more sign changes and local extrema that random sampling must capture.
+</div>
 
-The log-log error plot reveals that while both functions follow the expected $O(1/\sqrt{n})$ convergence rate, the high-frequency function consistently maintains higher absolute errors across all sample sizes. The variance ratio indicates that the oscillatory function's variance is around 70 times higher than the smooth function's variance, illustrating how oscillations increase uncertainty in Monte Carlo estimates.
+Two estimators of $\pi = \int_0^1 4\sqrt{1-x^2}\,dx$: the RMS error over 200 runs, and the band holding the middle 80% of runs.
 
-### Remarks
+::::
 
-- **Smooth functions** are well-suited for Monte Carlo integration, converging quickly with relatively few samples.
+## What makes an integrand hard? {#sec-int-hard}
 
-- **Highly oscillatory functions** present challenges, requiring larger sample sizes and exhibiting higher variance.
+The standard error $(b-a)\,\sigma_f/\sqrt N$ tells us that Monte Carlo sees the integrand only through its variance. What kind of functions have a large variance? In numerical analysis we learn that smooth functions are easy to integrate and rapidly oscillating ones are hard. Is the same true here?
 
-- For oscillatory integrals, consider **alternative approaches** such as:
-  - Stratified sampling to ensure adequate coverage of oscillation periods
-  - Importance sampling with distributions that account for function behavior
-  - Transformation techniques to reduce oscillations.
-
-This example demonstrates why understanding your function's characteristics is crucial for effective Monte Carlo integration.
-
-### Variance Bounds Using Derivatives
-
-For smooth functions, we can bound the variance using derivative information. 
-
-::: {.callout-important}
-## Theorem (Variance Bound via Derivatives)
-If $g$ is differentiable on $[a,b]$ with derivative $g'$, then:
-$$\text{Var}(g(X)) \leq (b-a)^2 \cdot \max_{x \in [a,b]} |g'(x)|^2$$
+::: {#exr-int-blind}
+## Monte Carlo is blind to smoothness
+Let $k$ be a positive integer and $f(x) = \sin^2(kx)$ on $[0, \pi]$. Compute the standard error of the sample-mean estimator $\hat I_N$ of $\int_0^\pi f(x)\,dx$ algebraically, by evaluating the integrals for $\sigma_f^2 = \text{Var}(f(X))$, where $X$ is uniform on $[0, \pi]$.
 :::
 
-::: {.proof}
-Let $M = \max_{x \in [a,b]} |g'(x)|$ and $\mu = \mathbb{E}[g(X)]$. 
+You should find that the standard error is independent of the frequency $k$. This may come as a surprise, but it makes sense once we notice that the variance $\sigma_f^2$ depends only on the distribution of the *values* of $f$, and not on the order in which these values occur along the axis. We could cut the graph into pieces and shuffle them around, and Monte Carlo would not notice.
 
-Since $g$ is continuous on the compact interval $[a,b]$, it attains its minimum and maximum values. Let $g_{\min} = \min_{x \in [a,b]} g(x)$ and $g_{\max} = \max_{x \in [a,b]} g(x)$.
-
-By the mean value theorem, for any two points in $[a,b]$:
-$$g_{\max} - g_{\min} \leq M(b - a)$$
-
-Since $\mu = \mathbb{E}[g(X)]$ lies between $g_{\min}$ and $g_{\max}$, we have for any $x \in [a,b]$:
-$$|g(x) - \mu| \leq g_{\max} - g_{\min} \leq M(b - a)$$
-
-Squaring both sides and taking expectations:
-$$\text{Var}(g(X)) = \mathbb{E}[(g(X) - \mu)^2] \leq [M(b - a)]^2$$
-
-This gives us the desired bound.
-
+::: {#exr-int-blind-distribution}
+## Same values, different order
+Let $X$ be uniform on $[0, \pi]$. Explain why $\sin^2(kX)$ has the same distribution for every nonzero integer $k$.
 :::
 
-<hr/>
+Oscillation can still hurt Monte Carlo, but for a different reason.
 
+::: {#exr-int-oscillation}
+## Cancellation
+Let $f_k(x) = k \sin(kx)$ on $[0, \pi]$, with $k$ an odd positive integer. Let $\hat I_N$ be the sample-mean estimator of its integral with $N$ points, and $\sigma_{f_k}^2 = \text{Var}(f_k(X))$ for $X$ uniform on $[0, \pi]$.
 
-Note that this is a very weak bound and not useful in practice. There are no universal techniques that give us good bounds on $\text{Var}(g(X))$. In practice, we rely on the heuristic that oscillatory functions are high variance. 
+a. Compute $I = \int_0^\pi f_k(x)\,dx$.
+b. Compute $\sigma_{f_k}^2$ and $\text{SE}(\hat I_N)$. How does the standard error grow with $k$?
+c. By what factor is the standard error at $k = 25$ larger than at $k = 1$?
+d. How many points does $k = 25$ need for $\text{SE}(\hat I_N) \le 0.01$?
+e. The positive and negative lobes of $f_k$ nearly cancel. Explain why cancellation is expensive for an average of random samples.
+:::
 
-## Multidimensional Integration
+You should find that the standard error grows like $k$. The integral stays at 2 for every $k$, but the values we are averaging swing between $-k$ and $k$, and we are relying on them to cancel. @fig-int-oscillation shows the two cases $k = 1$ and $k = 25$. The slopes are the same, as they must be, and the constants differ by the factor of about 57 from part (c).
 
-<!-- TODO: use Gauss's circle method (../estimating-pi/#sec-gauss-circle) as a
-worked example of why 1-D integration is faster than 2-D. Counted point by
-point over its (2r + 1)^2-point grid it is a 2-D rule, with error about
-N^(-3/4) in the number of points N, no better than Halton. The one-loop count
-of @exr-gauss-count turns it into a 1-D rectangle rule for
-pi = int_{-1}^{1} 2 sqrt(1 - t^2) dt with step 1/r: 2r + 1 steps for an error
-of about r^(-3/2) (the sqrt singularity at t = +-1 caps it there; the floor
-rounding errors cancel like random noise, the Gauss circle conjecture). So the
-same estimate is twice as fast in its order once it is done as a 1-D integral.
-The comparison figure in estimating-pi (#fig-pi-methods) plots it against this
-work (order about 1.43 vs Halton's 0.73). -->
+::: {.callout-important title="The variance decides"}
+For Monte Carlo, an integrand is hard when its values are spread far from their mean, compared with the size of the integral. Whether it is smooth or not plays no role.
+:::
 
-One of Monte Carlo integration's greatest advantages becomes apparent in higher dimensions. While traditional numerical integration methods (like the trapezoidal rule or Simpson's rule) suffer from the "curse of dimensionality"—requiring exponentially more grid points as dimensions increase—Monte Carlo methods maintain their $O(1/\sqrt{n})$ convergence rate regardless of dimension.
-
-In $d$ dimensions, a grid-based method with $m$ points per dimension requires $m^d$ total evaluations. For even modest accuracy in high dimensions, this becomes computationally prohibitive. Monte Carlo integration, however, uses the same number of random samples regardless of dimension, making it the method of choice for high-dimensional problems in physics, finance, and machine learning.
-
-### Example: Gaussian-like Function in Multiple Dimensions
-
-The following example demonstrates Monte Carlo integration of the function $f(\mathbf{x}) = e^{-\|\mathbf{x}\|^2}$ over the unit hypercube $[0,1]^d$ for dimensions $d = 1, 2, 3, 4, 5$.
 
 ```{ojs}
 //| output: false
-intErrorDimPlot = VM.plotting.persistentPlot({height: "380px"})
-intSdDimPlot = VM.plotting.persistentPlot({height: "380px"})
-
-// Integrate f(x) = exp(-|x|²) over [0, 1]^d, d = 1..5 (exact value in the method file).
-intDimensions = {
-  const sizes = logSampleSizes(15, 2, 3.5)
-  return {sizes, results: dimensionStudy(VM.sampling.seededRandom(0), 5, sizes, 30)}
+// f_k(x) = k sin(kx) on [0, pi], integral 2 for odd k. Only the sample-mean
+// errors are used; `max` serves the unused hit-or-miss half.
+intOscErrors = {
+  const out = []
+  for (const k of [1, 25]) {
+    const integrand = {f: x => k * Math.sin(k * x), a: 0, b: Math.PI, max: k, exact: 2}
+    out.push(integrandErrors(VM.sampling.seededRandom(22), integrand, intCounts, 200).sampleMean)
+  }
+  return out
 }
+intOscSeries = [
+  {label: "25 sin(25x)", token: "alt", points: intOscErrors[1], kind: "band"},
+  {label: "sin x", token: "fn", points: intOscErrors[0], kind: "band"}
+]
+```
 
-intDimColors = ["fn", "alt", "ok", "warn", "accent2"]
+:::: {#fig-int-oscillation}
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: intOscSeries, references: [{label: "N⁻¹ᐟ²", order: 0.5, at: 3}],
+  xDomain: [10, 10000], yDomain: [0.001, 100], xLabel: "Points (N)", yLabel: "|estimate − 2|"})
+```
+
+```{ojs}
+{
+  const last = intCounts.length - 1
+  const stats = intOrderStats(intOscSeries)
+  stats.push({label: "Error ratio", value: (intOscErrors[1][last].error / intOscErrors[0][last].error).toFixed(1),
+    title: "RMS error for 25 sin(25x) divided by RMS error for sin x, at N = 10,000"})
+  return VM.ui.statRow(stats)
+}
+```
+
+</div>
+
+The sample-mean estimator on $\int_0^\pi k\sin(kx)\,dx = 2$ for $k = 1$ and $k = 25$: RMS error over 200 runs, with the middle 80% of runs.
+
+::::
+
+Since we do not know $\sigma_f$ in advance, it is useful to have a bound on it that does not require computing an integral.
+
+::: {#exr-int-popoviciu}
+## A bound on the variance
+Suppose $m \le f(x) \le M$ on $[a, b]$. Let $X$ be uniform on $[a, b]$ and write $Z = f(X)$, so that $\sigma_f^2 = \text{Var}(Z)$.
+
+a. Show that $\text{Var}(Z) \le \mathbb{E}[(Z - c)^2]$ for every constant $c$.
+b. Choose $c$ to conclude that $\sigma_f^2 \le (M - m)^2/4$.
+c. Let $\hat I_N $ be the sample-mean estimator (@def-int-mean). Bound $\text{SE}(\hat I_N)$ in terms of $a$, $b$, $m$, $M$ and $N$.
+:::
+
+Let us now return to the midpoint rule of [the first section](#sec-int-grid). Its convergence rate of $N^{-2}$ comes from the smoothness of $f$; recall that the derivation in @exr-int-midpoint needed $f''$. This is the exact opposite of what we saw in @exr-int-blind: a grid exploits smoothness, while random points ignore it.
+
+::: {#exr-int-grid-random}
+## Random against evenly spaced points
+Take $\sin x$ on $[0, \pi]$. How many random points does the sample-mean estimator need for its standard error (@exr-int-variance) to match the error of the midpoint rule at $N = 100$ (@exr-int-sine (a))?
+:::
+
+You should find that 100 evenly spaced points give the same accuracy as about $10^8$ random ones. The gap widens as $N$ grows, because $N^{-2}$ shrinks much faster than $N^{-1/2}$. In other words, for a smooth integrand in one dimension, Monte Carlo integration always converges more slowly than the midpoint rule. @fig-int-midpoint shows the two side by side.
+
+
+```{ojs}
+//| output: false
+intMidSeries = [
+  {label: "Sample mean", token: "fn", points: intOscErrors[0], kind: "band"},
+  {label: "Midpoint rule", token: "warn", points: midpointErrors(Math.sin, 0, Math.PI, 2, intCounts), kind: "scatter"}
+]
+```
+
+:::: {#fig-int-midpoint}
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: intMidSeries, references: [{label: "N⁻¹ᐟ²", order: 0.5, at: 3}, {label: "N⁻²", order: 2, at: 0.1}],
+  xDomain: [10, 10000], yDomain: [1e-9, 10], xLabel: "Points (N)", yLabel: "|estimate − 2|"})
+```
+
+```{ojs}
+VM.ui.statRow(intOrderStats(intMidSeries))
+```
+
+</div>
+
+Random and evenly spaced points on $\int_0^\pi \sin x\,dx = 2$.
+
+::::
+
+
+## Many dimensions {#sec-int-dimension}
+
+Just like hit-or-miss, the sample mean works in any dimension. Let $f$ again be a function on the unit cube $[0, 1]^d$, with $I = \int_{[0,1]^d} f(x)\,dx$. Since the cube has volume 1, we simply have $I = \mathbb{E}[f(U)]$ for $U$ uniform on the cube.
+
+::: {#def-int-cube}
+## The sample-mean estimator on the cube
+Given $N$ independent uniform points $U_1, \ldots, U_N$ in $[0, 1]^d$, estimate $I$ by
+$$\hat I_N = \frac{1}{N}\sum_{i=1}^{N} f(U_i).$$
+:::
+
+Notice that the argument of @exr-int-variance never used the dimension either. So $\hat I_N$ is unbiased with $\text{SE}(\hat I_N) = \sigma_f/\sqrt N$, where $\sigma_f^2 = \text{Var}(f(U))$, and the rate is $N^{-1/2}$ *in every dimension*. Whatever effect the dimension has must therefore be hiding in the constant $\sigma_f$. For [the ball](#sec-int-ball) we saw this constant explode. Fortunately, for smooth integrands it grows far more slowly.
+
+### The constant depends on the dimension {#sec-int-constant}
+
+The integral we started the chapter with is a good example, because for it we can compute exactly how the constant grows. The integrand is a product,
+$$
+f(x) = e^{-\|x\|^2} = \prod_{k=1}^d g(x_k), \qquad g(t) = e^{-t^2}.
+$$
+Let us first see what the sample mean does with any integrand of this form, and then return to this one.
+
+::: {#exr-int-product}
+## A product integrand
+Let $g$ be a function on $[0, 1]$, and write
+$$
+\alpha = \int_0^1 g(t)\,dt, \qquad \beta = \int_0^1 g(t)^2\,dt.
+$$
+Suppose $\alpha \ne 0$. Let $f(x) = \prod_{k=1}^d g(x_k)$ on the cube $[0, 1]^d$. Let $U$ be uniform on the cube, $I = \int_{[0,1]^d} f(x)\,dx$, and $\hat I_N$ the sample-mean estimator of $I$ with $N$ points (@def-int-cube).
+
+a. Show that $I = \alpha^d$ and $\mathbb{E}[f(U)^2] = \beta^d$. Where do you use independence?
+b. The *relative* standard error is $\text{SE}(\hat I_N)/|I|$. Compute it in terms of $d$, $N$ and $\rho = \beta/\alpha^2$.
+c. Show that $\rho \ge 1$. When is $\rho = 1$?
+:::
+
+::: {#exr-int-gaussian}
+## The integral we started with
+Take $g(t) = e^{-t^2}$ in @exr-int-product, so that $f(x) = e^{-\|x\|^2}$. For this $g$,
+$$
+\alpha \approx 0.7468, \qquad \beta \approx 0.5981.
+$$
+
+a. Compute $\rho$.
+b. How many points give a relative standard error of 1% for $d = 1$, $d = 10$, $d = 20$ and $d = 100$?
+c. The product midpoint rule reaches 1% relative error at $d = 10$ with $m = 7$ points per axis. How many points is that?
+:::
+
+You should find that the number of points needed for a fixed relative accuracy grows like $\rho^d$. This is exponential in the dimension, just like the grid's $m^d$, but with a base that is barely above 1. At $d = 10$, Monte Carlo needs about $10^4$ points where the grid needs $7^{10} \approx 2.8 \times 10^8$. You will often hear that Monte Carlo is immune to the curse of dimensionality. This is true of the rate but not of the constant, and how fast the constant grows depends on the integrand: like $\rho^d$ here, and like $1/p_d$ for [the ball](#sec-int-ball) (@exr-int-ball).
+
+@fig-int-dimension compares random points with the product midpoint rule on this integral. Move the slider to change $d$ and watch the grid fall behind.
+
+<div class="ojs-panel ojs-grid">
+
+```{ojs}
+viewof intDim = {
+  const slider = Inputs.range([1, 10], {step: 1, value: 2, label: "Dimension d"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+</div>
+
+```{ojs}
+//| output: false
+intDimPaused = intPaused(viewof intDim)
 ```
 
 ```{ojs}
 //| output: false
-intErrorDimTraces = {
-  const traces = []
-  for (let i = 0; i < intDimensions.results.length; i++) {
-    const r = intDimensions.results[i]
-    const color = chartColors[intDimColors[i]]
-    traces.push({x: intDimensions.sizes, y: r.relErrors, type: "scatter", mode: "lines+markers", name: `Dim ${r.d}`,
-      line: {color, width: 2}, marker: {color, size: 5}})
-  }
-  return traces
+// Fixed seed, so the same dimension always draws the same picture. Both
+// methods run to 100,000 points: the most the random runs can afford on every
+// slider move, and enough for the grid to keep two dots (m = 2, 3) at d = 10.
+intDimMax = 1e5
+```
+
+```{ojs}
+//| output: false
+intDimSeries = {
+  const d = intDimPaused
+  const relativeSd = gaussianCubeSd(d) / gaussianCubeExact(d)
+  return [
+    {label: "Random points", token: "fn", points: gaussianCubeRandomErrors(VM.sampling.seededRandom(31), d, checkpoints(intDimMax), 40), kind: "band"},
+    {label: "σ / (I √N)", token: "ink", points: [{n: 10, error: relativeSd / Math.sqrt(10)}, {n: intDimMax, error: relativeSd / Math.sqrt(intDimMax)}], kind: "line"},
+    {label: "Midpoint grid, N = mᵈ", token: "warn", points: gaussianCubeGridErrors(d, intDimMax), kind: "scatter"}
+  ]
+}
+```
+
+:::: {#fig-int-dimension}
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: intDimSeries, references: [],
+  xDomain: [10, intDimMax], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error",
+  title: `exp(−|x|²) on the cube, d = ${intDimPaused}`})
+```
+
+```{ojs}
+VM.ui.statRow([
+  intOrderStats([intDimSeries[0]])[0],
+  intOrderStats([intDimSeries[2]])[0],
+  {label: "2 / d", value: (2 / intDimPaused).toFixed(2), title: "the product midpoint rule's predicted order in N"}
+])
+```
+
+</div>
+
+Random points against the midpoint grid on $[0,1]^d$.
+
+::::
+
+
+## Further reading: quasi-Monte Carlo {#sec-int-qmc}
+
+We now have two kinds of points, each with its own strength. Grid points are spread evenly, and this evenness is what gives the midpoint rule its fast rate. But a grid has to be built all at once, with $m^d$ points, and its rate gets worse as $d$ grows. Random points can be added one at a time in any dimension, but they clump together and leave gaps, and we pay for this with the slow rate $N^{-1/2}$. Can we have the best of both?
+
+In the last chapter we met a third kind of points, the [Halton points](../estimating-pi/#sec-halton), which are generated one at a time and still spread evenly. Such points are called *quasi-random*, and using them in place of random points in the sample-mean estimator is called *quasi-Monte Carlo*. For a smooth integrand, the error with $N$ Halton points is at most a constant times $(\log N)^d/N$ [@halton1960; @niederreiter1992], which is almost $N^{-1}$, compared with $N^{-1/2}$ for random points. The app below runs all three methods on the integral of $e^{-\|x\|^2}$ over $[0, 1]^d$ that we started the chapter with. Move the slider to change $d$, and compare the fitted orders: the grid's order falls like $2/d$ and Monte Carlo's stays at $1/2$, whereas the Halton points keep an order near $0.9$ all the way through ten dimensions! Notice that the quasi-Monte Carlo error is not random, so it comes with no standard error. 
+
+```{ojs}
+//| output: false
+qmcDefaultDim = 5
+qmcDefaultSeed = 31
+// All three methods run to 100,000 points, as in the figure above.
+qmcMax = 1e5
+```
+
+
+<div class="vm-app" id="qmc-app">
+
+<div class="ojs-panel ojs-row">
+
+```{ojs}
+viewof qmcDim = {
+  const initial = Math.min(10, Math.max(1, Math.round(VM.ui.urlParam("qmc_d", qmcDefaultDim))))
+  const slider = Inputs.range([1, 10], {step: 1, value: initial, label: "Dimension d"})
+  slider.classList.add("ojs-fill")
+  return slider
+}
+```
+
+```{ojs}
+// Only Monte Carlo changes with the seed. The first draw (on page load) uses
+// the seed in the URL, so a shared link reproduces the same picture.
+viewof qmcRedraw = {
+  const button = Inputs.button("Draw new random points", {value: 0, reduce: v => v + 1})
+  button.classList.add("ojs-end")
+  return button
+}
+```
+
+</div>
+
+
+```{ojs}
+//| output: false
+qmcDimPaused = intPaused(viewof qmcDim)
+```
+
+```{ojs}
+//| output: false
+qmcSeed = {
+  if (qmcRedraw === 0) return VM.ui.urlParam("qmc_seed", qmcDefaultSeed)
+  return Math.floor(Math.random() * 1e9)
 }
 ```
 
 ```{ojs}
 //| output: false
-intSdDimTraces = {
-  const sizes = intDimensions.sizes
-  const traces = []
-  let firstSdTotal = 0
-  for (let i = 0; i < intDimensions.results.length; i++) {
-    const r = intDimensions.results[i]
-    const color = chartColors[intDimColors[i]]
-    firstSdTotal += r.sds[0]
-    traces.push({x: sizes, y: r.sds, type: "scatter", mode: "lines+markers", name: `Dim ${r.d}`,
-      line: {color, width: 2}, marker: {color, size: 5}})
-  }
-  // A 1/sqrt(n) line through the average first standard deviation.
-  const scale = firstSdTotal / intDimensions.results.length * Math.sqrt(sizes[0])
-  const reference = []
-  for (const n of sizes) reference.push(scale / Math.sqrt(n))
-  traces.push({x: sizes, y: reference, type: "scatter", mode: "lines", name: "∝ 1/√n",
-    line: {color: chartColors.ink, dash: "dash", width: 2}})
-  return traces
-}
-```
-
-::: {#fig-multidimensional}
-
-```{ojs}
-VM.plotting.plotWithLegend(intErrorDimPlot, intErrorDimTraces, {title: {text: "Relative error vs sample size"}, margin: {t: 40},
-  xaxis: {title: "Number of samples", type: "log"}, yaxis: {type: "log"}})
+// The deterministic methods depend on the dimension only, so a new seed
+// leaves them alone.
+qmcGridErrors = gaussianCubeGridErrors(qmcDimPaused, qmcMax)
+qmcHaltonErrors = gaussianCubeHaltonErrors(qmcDimPaused, intCountsLong)
 ```
 
 ```{ojs}
-VM.plotting.plotWithLegend(intSdDimPlot, intSdDimTraces, {title: {text: "Standard deviation vs sample size"}, margin: {t: 40},
-  xaxis: {title: "Number of samples", type: "log"}, yaxis: {title: "Standard deviation", type: "log"}})
+//| output: false
+qmcRandomErrors = gaussianCubeRandomErrors(VM.sampling.seededRandom(qmcSeed), qmcDimPaused, intCountsLong, 40)
 ```
 
-Monte Carlo advantage in higher dimensions
+```{ojs}
+//| output: false
+qmcSeries = [
+  {label: "Midpoint grid, N = mᵈ", token: "warn", points: qmcGridErrors, kind: "scatter"},
+  {label: "Monte Carlo", token: "fn", points: qmcRandomErrors, kind: "band"},
+  {label: "Halton", token: "ok", points: qmcHaltonErrors, kind: "scatter"}
+]
+```
 
+
+<div class="ojs-chart-block ojs-svg-block">
+
+```{ojs}
+intRateFigure({series: qmcSeries, references: [],
+  xDomain: [10, qmcMax], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error", height: 340,
+  title: `exp(−|x|²) on the cube, d = ${qmcDimPaused}`})
+```
+
+```{ojs}
+VM.ui.statRow(intOrderStats(qmcSeries))
+```
+
+</div>
+
+</div>
+
+
+```{ojs}
+//| output: false
+qmcUrlSync = VM.ui.syncUrlParams({
+  qmc_d: [qmcDim, qmcDefaultDim],
+  qmc_seed: [qmcSeed, qmcDefaultSeed]
+})
+```
+
+
+
+## Summary
+
+- In [Grids and the curse of dimensionality](#sec-int-grid) we derived the midpoint rule's $N^{-2}$ error and saw it decay to $N^{-2/d}$ in $d$ dimensions, where one more decimal place costs $10^{d/2}$ times the work.
+- In [Hit or miss](#sec-int-hitmiss) we turned the circle estimator into an estimator of any integral. Its rate is $N^{-1/2}$ in every dimension, but its constant [explodes](#sec-int-ball) when the region fills a vanishing fraction of its box.
+- In [The sample-mean estimator](#sec-int-mean) we wrote an integral as the interval's width times an average height, found its standard error $(b-a)\,\sigma_f/\sqrt N$, and saw by conditioning that it [always beats hit or miss](#sec-int-compare): integrate out what you can.
+- In [What makes an integrand hard?](#sec-int-hard) we saw that Monte Carlo sees only the variance of the values of $f$. It is blind to smoothness and frequency, and what hurts it is cancellation. A grid uses the smoothness that random points ignore, and in one dimension it wins at every $N$.
+- In [Many dimensions](#sec-int-dimension) we saw that the sample mean's rate is free of the dimension but [its constant](#sec-int-constant) is not: for a product integrand the work grows like $\rho^d$, slowly enough that random points beat the grid within a few dimensions.
+
+Every method in this chapter assumed a supply of uniform random numbers. The next part, [Sampling](../sampling-overview/), asks where they come from, and how to turn them into samples from other distributions.
+
+
+## References
+
+::: {#refs}
 :::
-
-
-The example reveals several important properties of multidimensional integration:
-
-1. **Dimension-Independent Convergence**: The relative error plots demonstrate Monte Carlo's key advantage - convergence behavior remains consistent across all dimensions, avoiding the curse of dimensionality that plagues grid-based methods.
-
-2. **Theoretical Validation**: The standard deviation follows the expected $1/\sqrt{n}$ scaling (shown by the dashed reference line) regardless of dimension, confirming Monte Carlo's theoretical foundation.
-
-3. **Constant Computational Cost**: Unlike deterministic methods requiring $n^d$ evaluations, Monte Carlo uses the same number of function evaluations per sample regardless of dimension.
-
-This dimensional robustness makes Monte Carlo indispensable for high-dimensional applications in physics, statistics, and finance where traditional methods become computationally intractable.
-
-::: {.callout-tip}
-## When to Use Monte Carlo Integration
-
-**Advantages:**
-
-- **High dimensions**: Performance doesn't degrade with dimension
-
-- **Complex domains**: Easy to handle irregular integration regions
-
-- **Rough functions**: Works with discontinuous or highly oscillatory functions
-
-**Disadvantages:**
-
-- **Slow convergence**: $O(1/\sqrt{N})$ rate
-
-- **Random error**: Introduces stochastic uncertainty
-
-- **Low dimensions**: Often outperformed by deterministic methods
-
-**Practical Considerations:**
-
-- **Sample size**: Need large $N$ for high precision
-
-- **Function smoothness**: Smoother functions → lower variance → better estimates
-
-- **Variance reduction**: Techniques like antithetic variables can improve efficiency
-
-- **Error estimation**: Use sample variance to estimate uncertainty
-:::
-
-## Conclusion
-
-Monte Carlo integration transforms integration into a sampling problem, making it invaluable for high-dimensional problems where traditional quadrature fails. While it converges slowly, its dimension-independent performance and ability to handle complex functions make it essential for modern computational statistics and machine learning applications.
