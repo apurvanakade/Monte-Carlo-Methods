@@ -22,7 +22,22 @@ Why reach for randomness in these problems? Monte Carlo methods are most valuabl
 
 ## The Monte Carlo workflow
 
-A typical Monte Carlo analysis moves through four stages. We begin by formulating a model, a mathematical description of the real-world system that says explicitly which of its quantities are random. Next we specify the probability distributions of these random variables, drawing on whatever data, theory or expert judgment we have. Then comes the simulation itself: we generate samples from these distributions and run our computational experiments on them. Finally, we compare the results of the simulation with what is actually observed. If the two disagree, then the model is not yet adequate and we go back to refine it, so in practice the four stages form a loop and not a straight line.
+A typical Monte Carlo analysis moves through four stages:
+
+1. **Model formulation.** We write down a mathematical description of the real-world system that says explicitly which of its quantities are random.
+2. **Distribution specification.** We specify the probability distributions of these random variables, drawing on whatever data, theory or expert judgment we have.
+3. **Simulation.** We generate samples from these distributions and run our computational experiments on them.
+4. **Validation and refinement.** We compare the results of the simulation with what is actually observed.
+
+If the simulation and the observations disagree, then the model is not yet adequate and we go back to refine it. So in practice the four stages form a loop and not a straight line:
+
+```{mermaid}
+flowchart LR
+  A[Model<br>formulation] --> B[Distribution<br>specification]
+  B --> C[Simulation]
+  C --> D[Validation]
+  D -- refine --> A
+```
 
 In these notes we will see how Monte Carlo methods give both theoretical insight and practical solutions in fields that range from finance and physics to machine learning and engineering. We begin with [estimation](../estimation-overview/).
 <!-- ![Topics](topics.png) -->
