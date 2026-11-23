@@ -29,7 +29,7 @@ chartColors = VM.plotting.colors(vmTheme)
 
 // The methods themselves live in method.js, where method.test.js checks them
 // against theory.
-import {integrands, hitMissSample, sampleMeanSample, sortedSample, sampleMeanEstimate, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
+import {integrands, hitMissSample, sampleMeanSample, sortedSample, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
   gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, gaussianCubeHaltonErrors,
   convergenceFit} from "./method.js"
 ```
@@ -389,7 +389,7 @@ A grid rule whose error is $m^{-r}$ per axis has error $N^{-r/d}$ in terms of th
 
 ```{ojs}
 //| output: false
-// The product midpoint rule on exp(-|x|^2) in four dimensions, for every m
+// The product midpoint rule on exp(-|x|^2) in d = 1, 2, 4, 8, for every m
 // with m^d <= 10^6. The integrand is a product, so the grid sum costs nothing.
 intGridSeries = {
   const dims = [1, 2, 4, 8]
@@ -690,9 +690,9 @@ b. Find the relative standard error of the hit-or-miss estimator of $V_d$ with $
 c. Take $d = 20$ and draw $N = 10^5$ points. How many hits do you expect? What does the estimator return when there are none, and what is its *estimated* standard error then?
 :::
 
-You should find that the fraction of the cube filled by the ball shrinks faster than exponentially in $d$, and the number of points we need grows just as fast: 27 points at $d = 2$, about 40,000 at $d = 10$, and about $4 \times 10^9$ at $d = 20$. In twenty dimensions, 100,000 points give about $0.0025$ hits on average, so we should expect every one of them to miss the ball. The estimate is then 0, and worse, the estimated standard error is also 0, so the method reports a wrong answer with complete confidence! What is going on is that in high dimensions nearly all of the volume of a cube *sits in its corners*, far from the ball, and so uniform points spend almost all of their time where the integrand vanishes.
+You should find that the fraction of the cube filled by the ball shrinks faster than exponentially in $d$, and the number of points we need grows just as fast: 28 points at $d = 2$, about 40,000 at $d = 10$, and about $4 \times 10^9$ at $d = 20$. In twenty dimensions, 100,000 points give about $0.0025$ hits on average, so we should expect every one of them to miss the ball. The estimate is then 0, and worse, the estimated standard error is also 0, so the method reports a wrong answer with complete confidence! What is going on is that in high dimensions nearly all of the volume of a cube *sits in its corners*, far from the ball, and so uniform points spend almost all of their time where the integrand vanishes.
 
-So even though  the rate does not depend on the dimension, but the number of points we need still does: it grows like $1/p_d$. One way out is to sample more often where the integrand is large and then correct for this, an idea called *importance sampling*, which we will study in [Variance reduction](../variance-reduction/). Another is to make better use of the samples we already have, and this is what we turn to next.
+So even though the rate does not depend on the dimension, the number of points we need still does: it grows like $1/p_d$. One way out is to sample more often where the integrand is large and then correct for this, an idea called *importance sampling*, which we will study in [Variance reduction](../variance-reduction/). Another is to make better use of the samples we already have, and this is what we turn to next.
 
 
 ## The sample-mean estimator {#sec-int-mean}
@@ -991,7 +991,7 @@ You should find that 100 evenly spaced points give the same accuracy as about $1
 ```{ojs}
 //| output: false
 intMidSeries = [
-  {label: "Sample mean (random points)", token: "fn", points: intOscErrors[0], kind: "band"},
+  {label: "Sample mean", token: "fn", points: intOscErrors[0], kind: "band"},
   {label: "Midpoint rule", token: "warn", points: midpointErrors(Math.sin, 0, Math.PI, 2, intCounts), kind: "scatter"}
 ]
 ```
@@ -1200,7 +1200,7 @@ qmcRandomErrors = gaussianCubeRandomErrors(VM.sampling.seededRandom(qmcSeed), qm
 qmcSeries = [
   {label: "Midpoint grid, N = mᵈ", token: "warn", points: qmcGridErrors, kind: "scatter"},
   {label: "Monte Carlo", token: "fn", points: qmcRandomErrors, kind: "band"},
-  {label: "Quasi-Monte Carlo (Halton)", token: "ok", points: qmcHaltonErrors, kind: "scatter"}
+  {label: "Halton", token: "ok", points: qmcHaltonErrors, kind: "scatter"}
 ]
 ```
 

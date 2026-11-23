@@ -88,7 +88,7 @@ Decide these before writing anything:
   - a product or other structure that makes a hard quantity computable in closed form (the variance of a product integrand is $\beta^d - \alpha^{2d}$);
   - an identity behind an inequality (Koksma's inequality is one integration by parts);
   - the failure case, where the method returns a confident wrong answer (zero hits, estimated standard error zero).
-- **One thread.** Find an idea that recurs and name it once in a callout ("Integrate out what you can"), then point back to it from later sections and from other chapters' examples.
+- **One thread.** Find an idea that recurs and name it once in a callout ("Conditioning reduces variance"), then point back to it from later sections and from other chapters' examples.
 - **The order of the sections.** Start from what the reader already has, and let each section's failure motivate the next:
   - first the deterministic method they know from a numerical analysis course, and the problem that breaks it (for integrals: a grid, and the curse of dimensionality, worked as an exercise on the opening question's numbers);
   - then the direct generalization of the previous chapter's method (hit or miss generalizes the circle estimator), with where it in turn fails;
@@ -111,7 +111,7 @@ Write `method.js` and compute every number the prose will quote **before** writi
   - the time each study takes (a figure that re-simulates on a slider should take well under 200 ms).
 
   Delete the script when done.
-- Use what it shows. If the simulation disagrees with the planned prose, the prose changes. If a comparison comes out the other way from expected (in two dimensions a grid has about the same star discrepancy as random points), that is usually worth an exercise.
+- Use what it shows. If the simulation disagrees with the planned prose, the prose changes. If a comparison comes out the other way from expected, that is usually worth an exercise.
 - Then write `method.test.js`: fixed seeds, and for each assertion a comment saying why the number is right (a closed form, a known limit, a brute-force check of a clever algorithm).
 
 ### 4. Write the page
@@ -125,11 +125,10 @@ In this order: setup cell and helpers, then section by section.
 
 Patterns that worked:
 
-- **One app per estimator, in the section that defines it.** A method selector made the reader set a control ("leave *Method* on …") before the second method existed. Two apps share the integrand list, and an exercise that compares them names both.
+- **An app in the section that defines its method**, not one app with a method selector: a selector made the reader set a control ("leave *Method* on …") before the second method existed. A comparison of two estimators (hit or miss against the sample mean) is a figure in the section that makes it.
 - **A slider for the method's free parameter** (the box height $c$ of hit or miss) with the same seed across its values, so the same points move and only the parameter's effect changes the readout.
 - **A slider-driven figure** keeps fixed axes (set both domains, clip the marks), so only the curves move, and reads its slider through a 300 ms pause.
 - **Random against deterministic on one chart**: a random method is its RMS error with a band over many runs; a deterministic one is unjoined dots with its fitted line. The fitted orders go in a `statRow` under the chart, and the exercise asks the reader to compare them with the derived rate.
-- **A draggable point** (`VM.plotting.draggablePoints`) when the definition being taught is a supremum over positions (the box in the star discrepancy): the reader moves the box, the readout gives the local value and the supremum.
 - **A product integrand** makes a grid in $d$ dimensions free to evaluate (the grid sum is a one-dimensional sum to the power $d$), so the curse of dimensionality can be drawn out to $10^6$ points.
 
 ### 5. Check

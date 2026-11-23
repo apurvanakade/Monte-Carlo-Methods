@@ -6,10 +6,8 @@
 
 // The methods behind chapters/estimating-integrals/index.qmd: the sample-mean
 // and hit-or-miss estimators of a one-dimensional integral, the midpoint rule,
-// the integral of exp(-|x|^2) over the cube [0, 1]^d by random, grid and
-// Halton points, and the volume of the unit ball by hit-or-miss. Imported by
-// the page's OJS cells and by
-// method.test.js. Functions of numbers and a random source `rng` (a function
+// and the integral of exp(-|x|^2) over the cube [0, 1]^d by random, grid and
+// Halton points. Imported by the page's OJS cells and by method.test.js. Functions of numbers and a random source `rng` (a function
 // returning uniforms on [0, 1), e.g. from VM.sampling.seededRandom); the
 // library is read as globalThis.VM; no DOM, no OJS.
 
@@ -17,8 +15,9 @@
 // One dimension
 // ---------------------------------------------------------------------------
 
-// The integrands of the two apps: f on [a, b] with 0 <= f <= max there, and
-// the exact integral. Keys are the apps' URL values.
+// The integrands of the hit-or-miss app (also drawn from by the page's
+// figures): f on [a, b] with 0 <= f <= max there, and the exact integral.
+// Keys are the app's URL values.
 export const integrands = {
   sin: {label: "sin x on [0, π]", f: x => Math.sin(x), a: 0, b: Math.PI, max: 1, exact: 2},
   sin2: {label: "sin² x on [0, π]", f: x => Math.sin(x) ** 2, a: 0, b: Math.PI, max: 1, exact: Math.PI / 2},
