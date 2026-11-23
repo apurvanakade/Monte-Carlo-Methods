@@ -77,7 +77,10 @@ Apps live in the chapter that explains them (`chapters/estimating-pi/index.qmd` 
 ## Figures
 
 A chapter's non-interactive figures are OJS too, drawn from the same seeded
-simulation on every load (no `vm-app`, no controls):
+simulation on every load (no `vm-app`, no controls). The one exception is a
+diagram:
+
+- A diagram (a flowchart, not a plot of data) may be a ```` ```{mermaid} ```` fence (`chapters/monte-carlo/` has one). Mermaid draws it in the reader's browser too, and it re-themes through the theme's `--mermaid-*` variables, which the light and dark Bootstrap CSS both define; don't hand-color it.
 
 - One setup cell per chapter (`//| output: false`) with the `VM`/`vmTheme`/`chartColors` trio, unless the page's app already defines them — a page-wide name defined twice is an OJS error. Prefix every other cell name with a short chapter tag (`vr`, `ising`, `pf`, ...), as for apps.
 - Simulate in an `output: false` cell with `VM.sampling.seededRandom(<fixed seed>)`, then draw in its own cell through a `VM.plotting.persistentPlot({height: "<px>"})` made once in a setup cell (`height` replaces the 72vh main-chart height; the box keeps its full width). A chart with equal-scale axes (`scaleanchor`) over fixed ranges takes `{aspectRatio: <width / height>}` instead, the shape of its data, so its box is neither taller nor wider than the plot it holds. A 3-D chart (`surface`, `scatter3d`, ...) uses `VM.plotting.persistentPlot3d` instead, which makes a drag rotate the scene (turntable) and gives it the 3-D modebar and themed scene axes; don't hand-color scene axes. Colors from `chartColors.*`, fills through `VM.plotting.alpha`. A chart whose traces need a legend is drawn through `VM.plotting.plotWithLegend(plot, traces, layout)` — mathviz's overlay legend, never Plotly's; hiding a trace keeps the axes and grid fixed. A chart without one sets `showlegend: false`.

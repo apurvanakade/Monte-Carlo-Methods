@@ -16,8 +16,8 @@ A full render always checks; `quarto preview` checks at most once an hour.
 Offline, the build continues with the copy already installed. `_extensions/`
 is not tracked; `npm test` runs the same script first.
 
-Every code cell is OJS and runs in the reader's browser, so there is nothing
-to install beyond Quarto.
+Every code cell is OJS (or, for a diagram, a Mermaid fence) and runs in the
+reader's browser, so there is nothing to install beyond Quarto.
 
 ## Layout
 

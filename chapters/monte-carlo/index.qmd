@@ -6,8 +6,6 @@ execute:
   echo: false
 ---
 
-<!-- ![](flowchart.png) -->
-
 Monte Carlo methods are algorithms that use random sampling to solve numerical problems. The name comes from the Monte Carlo Casino in Monaco, and the reference to gambling is apt: we answer a question by playing a game of chance many times and looking at how the games come out. What is surprising is that the question need not involve chance at all! An integral, or the number $\pi$, is a fixed quantity, and yet we can turn the problem of computing it into a probabilistic one and approximate the answer by simulation.
 
 ## What are Monte Carlo methods?
