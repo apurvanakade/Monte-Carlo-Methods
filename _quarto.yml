@@ -27,7 +27,7 @@ website:
     contents:
       - text: Preface
         href: index.qmd
-      - chapters/monte-carlo/index.qmd
+      - chapters/introduction/index.qmd
       - section: Estimation
         href: chapters/estimation-overview/index.qmd
         contents:
