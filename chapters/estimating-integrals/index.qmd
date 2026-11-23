@@ -888,19 +888,6 @@ Two estimators of $\pi = \int_0^1 4\sqrt{1-x^2}\,dx$: the RMS error over 200 run
 
 ::::
 
-The same principle, integrating out what we can, also explains a trick from the last chapter.
-
-::: {#exr-int-gauss}
-## Gauss's circle, revisited
-The [Gauss circle method](../estimating-pi/#sec-gauss-circle) estimates $\pi$ by $L(r)/r^2$, where $L(r)$ counts the integer points in the disk of radius $r$. Its observed error is about $r^{-3/2}$.
-
-a. Counted point by point, the method tests $N = (2r+1)^2$ grid points. Write its error as a power of $N$.
-b. The [one-loop count](../estimating-pi/#exr-gauss-count) of the last chapter sums $2\lfloor\sqrt{r^2 - x^2}\rfloor + 1$ over $2r + 1$ values of $x$. Write its error as a power of the number of loop steps.
-c. Show that the one-loop count is, up to rounding, a Riemann sum for the one-dimensional integral $\int_{-1}^{1} 2\sqrt{1 - t^2}\,dt = \pi$.
-d. Which estimator of @exr-int-hitmiss does each count correspond to? What was integrated out?
-:::
-
-
 ## What makes an integrand hard? {#sec-int-hard}
 
 The standard error $(b-a)\,\sigma_f/\sqrt N$ tells us that Monte Carlo sees the integrand only through its variance. What kind of functions have a large variance? In numerical analysis we learn that smooth functions are easy to integrate and rapidly oscillating ones are hard. Is the same true here?
