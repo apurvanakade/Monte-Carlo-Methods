@@ -12,24 +12,9 @@ import assert from 'node:assert/strict'
 import { loadVM } from '../../scripts/load-vm.mjs'
 import { integrands, hitMissSample, sampleMeanSample, sortedSample, sampleMeanEstimate, hitMissEstimate, midpointRule, midpointErrors, checkpoints,
   integrandErrors, gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, primes,
-  vanDerCorput, gaussianCubeHaltonErrors, gaussianCubeShiftedErrors, pointSet, boxCount, starDiscrepancy1d,
-  starDiscrepancy2d, discrepancyStudy, convergenceFit } from './method.js'
+  vanDerCorput, gaussianCubeHaltonErrors, convergenceFit } from './method.js'
 
 const VM = loadVM()
-
-// The largest gap between the fraction of points in [0, x) x [0, y) and xy,
-// over a fine mesh of corners: a lower bound for the star discrepancy that is
-// within 2 / steps of it.
-function meshDiscrepancy(xs, ys, steps) {
-  let worst = 0
-  for (let i = 1; i <= steps; i++) {
-    for (let j = 1; j <= steps; j++) {
-      const x = i / steps, y = j / steps
-      worst = Math.max(worst, Math.abs(boxCount(xs, ys, x, y) / xs.length - x * y))
-    }
-  }
-  return worst
-}
 
 test('integrands: each stated integral matches a fine midpoint rule, and 0 <= f <= max', () => {
   for (const key of Object.keys(integrands)) {
@@ -213,91 +198,6 @@ test('gaussianCubeHaltonErrors: Halton points beat the Monte Carlo standard erro
     // The fitted order is near 1, far from Monte Carlo's 1/2.
     assert.ok(convergenceFit(errors).order > 0.75, `d ${d}`)
   }
-})
-
-test('gaussianCubeShiftedErrors: randomly shifted Halton points converge, faster than N^(-1/2)', () => {
-  const counts = checkpoints(100000)
-  const errors = gaussianCubeShiftedErrors(VM.sampling.seededRandom(32), 5, counts, 20)
-  const last = errors[errors.length - 1]
-  assert.ok(last.error < gaussianCubeSd(5) / gaussianCubeExact(5) / Math.sqrt(last.n) / 3)
-  assert.ok(convergenceFit(errors).order > 0.7)
-  assert.deepEqual(gaussianCubeShiftedErrors(VM.sampling.seededRandom(32), 5, counts, 20), errors)
-})
-
-test('pointSet: sizes, ranges and the Halton formula', () => {
-  const random = pointSet('random', 300, VM.sampling.seededRandom(1))
-  assert.equal(random.xs.length, 300)
-  const grid = pointSet('grid', 300, null)
-  assert.equal(grid.xs.length, 17 * 17)
-  assert.equal(grid.xs[0], 0.5 / 17)
-  const halton = pointSet('halton-17-19', 300, null)
-  assert.equal(halton.xs.length, 300)
-  // Before the first carry, point n is (n/17, n/19): on a line.
-  for (let n = 1; n < 17; n++) {
-    assert.ok(Math.abs(halton.xs[n - 1] - n / 17) < 1e-15)
-    assert.ok(Math.abs(halton.ys[n - 1] - n / 19) < 1e-15)
-  }
-  for (const set of [random, grid, halton]) {
-    for (let i = 0; i < set.xs.length; i++) assert.ok(set.xs[i] >= 0 && set.xs[i] < 1 && set.ys[i] >= 0 && set.ys[i] < 1)
-  }
-})
-
-test('boxCount: counts the points with both coordinates below the corner', () => {
-  assert.equal(boxCount([0.1, 0.5, 0.9], [0.2, 0.5, 0.1], 0.6, 0.6), 2)
-  assert.equal(boxCount([0.1, 0.5, 0.9], [0.2, 0.5, 0.1], 0.5, 0.6), 1)
-})
-
-test('starDiscrepancy1d: 1/(2N) for the midpoint grid, 1/N for the left-endpoint grid', () => {
-  const midpoints = [], lefts = []
-  for (let j = 0; j < 10; j++) {
-    midpoints.push((j + 0.5) / 10)
-    lefts.push(j / 10)
-  }
-  // Midpoints: the empirical fraction is never more than half a step from t.
-  assert.ok(Math.abs(starDiscrepancy1d(midpoints) - 0.05) < 1e-12)
-  // Left endpoints: just past each point the fraction leads t by a full step.
-  assert.ok(Math.abs(starDiscrepancy1d(lefts) - 0.1) < 1e-12)
-  // One point at x: the worse of the empty interval [0, x) and the interval just past it.
-  assert.ok(Math.abs(starDiscrepancy1d([0.3]) - 0.7) < 1e-12)
-})
-
-test('starDiscrepancy2d: hand-computed cases, and agreement with a brute-force mesh', () => {
-  // One point at the center: the box just past it holds everything in area 1/4.
-  assert.ok(Math.abs(starDiscrepancy2d([0.5], [0.5]) - 0.75) < 1e-12)
-  // One point at the far corner region: the empty box [0, 0.9) x [0, 1) has area 0.9.
-  assert.ok(Math.abs(starDiscrepancy2d([0.9], [0.9]) - 0.9) < 1e-12)
-  // The 2 x 2 midpoint grid: the box just past (3/4, 3/4) holds all 4 points
-  // in area 9/16, a gap of 7/16.
-  assert.ok(Math.abs(starDiscrepancy2d([0.25, 0.25, 0.75, 0.75], [0.25, 0.75, 0.25, 0.75]) - 7 / 16) < 1e-12)
-  // The m x m midpoint grid misses the strip [0, 1/(2m)) x [0, 1), so its
-  // discrepancy is at least 1/(2m).
-  const grid = pointSet('grid', 400, null)
-  assert.ok(starDiscrepancy2d(grid.xs, grid.ys) >= 1 / 40 - 1e-12)
-  // Against a 400 x 400 mesh of corners: the mesh maximum is a lower bound,
-  // and within 2/400 of the exact value.
-  for (const kind of ['random', 'grid', 'halton-2-3', 'halton-17-19']) {
-    const set = pointSet(kind, 150, VM.sampling.seededRandom(9))
-    const exact = starDiscrepancy2d(set.xs, set.ys)
-    const mesh = meshDiscrepancy(set.xs, set.ys, 400)
-    assert.ok(exact >= mesh - 1e-12 && exact - mesh < 2 / 400, `${kind}: exact ${exact}, mesh ${mesh}`)
-  }
-})
-
-test('discrepancyStudy: 1/(2N) for the grid, about 1/N for van der Corput, about N^(-1/2) for random points', () => {
-  const counts = checkpoints(10000)
-  const study = discrepancyStudy(VM.sampling.seededRandom(41), counts, 50)
-  for (const p of study.grid) assert.ok(Math.abs(p.error - 1 / (2 * p.n)) < 1e-12)
-  // van der Corput in base 2: N D* <= log2(N) / 3 + 1 (Bejian and Faure), and at least 1/2.
-  for (const p of study.corput) {
-    assert.ok(p.n * p.error <= Math.log2(p.n) / 3 + 1 + 1e-9, `n ${p.n}`)
-    assert.ok(p.n * p.error >= 0.5 - 1e-9)
-  }
-  // Random points: sqrt(N) D* converges to the Kolmogorov distribution, whose
-  // mean is 0.8687 and root mean square 0.9069. The RMS of 50 runs is within 25%.
-  for (const p of study.random) {
-    if (p.n >= 100) assert.ok(Math.abs(p.error * Math.sqrt(p.n) / 0.9069 - 1) < 0.25, `n ${p.n}`)
-  }
-  assert.ok(Math.abs(convergenceFit(study.random).order - 0.5) < 0.05)
 })
 
 test('convergenceFit: recovers the order and constant of an exact power law', () => {

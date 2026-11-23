@@ -13,7 +13,7 @@ $$
 $$
 an integral over a cube in twenty dimensions? The simplest method is to lay down a grid and add up the values of the integrand on it. But a grid with only ten points along each axis has $10^{20}$ points, and even at a billion function evaluations a second the sum would take three thousand years! By contrast, just thirty thousand random points give the answer to about 1% accuracy. This is the [Monte Carlo principle](../estimating-pi/) at work again.
 
-In this chapter we will see why grids break down as the dimension grows, and how random points get around the problem. We build two estimators out of random points and ask how accurate each one is, which turns out to be a question about variance. We end with quasi-random points, which try to combine the evenness of a grid with the flexibility of random points.
+In this chapter we will see why grids break down as the dimension grows, and how random points get around the problem. We build two estimators out of random points and ask how accurate each one is, which turns out to be a question about variance. We end with a brief look at quasi-random points, which try to combine the evenness of a grid with the flexibility of random points.
 
 
 
@@ -31,7 +31,7 @@ chartColors = VM.plotting.colors(vmTheme)
 // against theory.
 import {integrands, hitMissSample, sampleMeanSample, sortedSample, sampleMeanEstimate, hitMissEstimate, midpointErrors, checkpoints, integrandErrors,
   gaussianCubeExact, gaussianCubeSd, gaussianCubeRandomErrors, gaussianCubeGridErrors, gaussianCubeHaltonErrors,
-  gaussianCubeShiftedErrors, pointSet, boxCount, starDiscrepancy2d, discrepancyStudy, convergenceFit} from "./method.js"
+  convergenceFit} from "./method.js"
 ```
 
 ```{=html}
@@ -1128,70 +1128,18 @@ Random points against the midpoint grid on $[0,1]^d$.
 ::::
 
 
-## Quasi-random points {#sec-int-qmc}
+## Further reading: quasi-Monte Carlo {#sec-int-qmc}
 
-We now have two kinds of points, each with its own strength. Grid points are spread evenly, and this evenness is what gives the midpoint rule its fast rate. But a grid has to be built all at once, with $m^d$ points, and its rate gets worse as $d$ grows. Random points can be added one at a time in any dimension, but they clump together and leave gaps, and we pay for this with the slow rate $N^{-1/2}$. Can we have the best of both? In the last chapter we met a third kind of points, the [Halton points](../estimating-pi/#sec-halton), which arrive one at a time and still spread evenly. Such points are called *quasi-random*, and using them in place of random points is called *quasi-Monte Carlo* [@niederreiter1992; @caflisch1998]. In this section we make precise what "spread evenly" means, and see what it buys us.
+We now have two kinds of points, each with its own strength. Grid points are spread evenly, and this evenness is what gives the midpoint rule its fast rate. But a grid has to be built all at once, with $m^d$ points, and its rate gets worse as $d$ grows. Random points can be added one at a time in any dimension, but they clump together and leave gaps, and we pay for this with the slow rate $N^{-1/2}$. Can we have the best of both?
 
-### The van der Corput and Halton sequences {#sec-int-halton}
-
-The construction starts in one dimension, with a surprisingly simple idea: write the integers backwards.
-
-::: {#def-int-vdc}
-## The van der Corput sequence
-Fix a base $b \ge 2$ and write $n$ in base $b$, $n = a_0 + a_1 b + a_2 b^2 + \cdots$ with digits $0 \le a_k < b$. The *radical inverse* of $n$ mirrors the digits about the radix point:
-$$
-\varphi_b(n) = \frac{a_0}{b} + \frac{a_1}{b^2} + \frac{a_2}{b^3} + \cdots.
-$$
-The van der Corput sequence in base $b$ is $\varphi_b(1), \varphi_b(2), \varphi_b(3), \ldots$
-:::
-
-For example, $6 = 110_2$ in binary, and reversing the digits gives $\varphi_2(6) = 0.011_2 = 3/8$.
-
-::: {#exr-int-vdc}
-## Counting backwards
-a. Compute $\varphi_2(n)$ for $n = 1, \ldots, 8$ and mark the points on $[0, 1]$ in order. Describe in words where each new point lands.
-b. Show that $\varphi_2(0), \varphi_2(1), \ldots, \varphi_2(2^k - 1)$ are exactly the grid points $j/2^k$, $j = 0, \ldots, 2^k - 1$, in some order.
-c. Show more: among any $2^k$ *consecutive* terms of the sequence, each interval $[j/2^k, (j+1)/2^k)$ contains exactly one. Which digits of $n$ decide the interval?
-d. To fill the square we need pairs. Why is $(\varphi_2(n), \varphi_2(n))$ useless? Show that the points $(\varphi_2(n), \varphi_3(n))$ put exactly one of any $2^j 3^k$ consecutive points in each box $[\tfrac{p}{2^j}, \tfrac{p+1}{2^j}) \times [\tfrac{q}{3^k}, \tfrac{q+1}{3^k})$. Which theorem about remainders do you need?
-:::
-
-Part (c) is the whole point of the construction. The sequence behaves like a grid at every scale at once, and it completes a finer grid each time $n$ passes a power of $b$. Part (d) explains why the bases must have no common factor, and tells us how to go to higher dimensions.
-
-::: {#def-int-halton}
-## The Halton sequence
-Let $b_1, \ldots, b_d$ be the first $d$ primes. The Halton sequence in $[0, 1)^d$ is
-$$
-x_n = \big(\varphi_{b_1}(n), \ldots, \varphi_{b_d}(n)\big), \qquad n = 1, 2, 3, \ldots
-$$
-:::
-
-### Discrepancy {#sec-int-discrepancy}
-
-How can we measure whether a set of points is spread evenly? If it is, then every region should receive its fair share of the points: the fraction of points in the region should be close to its volume. We test this on all boxes with a corner at the origin, and record the worst case.
-
-::: {#def-int-discrepancy}
-## Star discrepancy
-For points $x_1, \ldots, x_N$ in $[0, 1]^d$ and a corner $t = (t_1, \ldots, t_d)$ in the cube, write $B_t = [0, t_1) \times \cdots \times [0, t_d)$. The *local discrepancy* at $t$ is the difference between the fraction of points in the box and its volume, and the *star discrepancy* is its largest size:
-$$
-D_N^* = \sup_{t \in [0,1]^d}\;\left|\,\frac{\#\{i : x_i \in B_t\}}{N} - t_1 t_2 \cdots t_d\,\right|.
-$$
-:::
-
-In the app below you can drag the corner of the box. The readouts show the fraction of points in the box, the area of the box, and the difference between the two, which is the local discrepancy. The star discrepancy is the worst local discrepancy over all positions of the corner.
-
+In the last chapter we met a third kind of points, the [Halton points](../estimating-pi/#sec-halton), which are generated one at a time and still spread evenly. Such points are called *quasi-random*, and using them in place of random points in the sample-mean estimator is called *quasi-Monte Carlo*. For a smooth integrand, the error with $N$ Halton points is at most a constant times $(\log N)^d/N$ [@halton1960; @niederreiter1992], which is almost $N^{-1}$, compared with $N^{-1/2}$ for random points. The app below runs all three methods on the integral of $e^{-\|x\|^2}$ over $[0, 1]^d$ that we started the chapter with. Move the slider to change $d$, and compare the fitted orders: the grid's order falls like $2/d$ and Monte Carlo's stays at $1/2$, whereas the Halton points keep an order near $0.9$ all the way through ten dimensions! Notice that the quasi-Monte Carlo error is not random, so it comes with no standard error. 
 
 ```{ojs}
 //| output: false
-qmcMaxN = 1000
-qmcDefaultN = 100
-qmcDefaultSeed = 1
-qmcDefaultKind = "halton-2-3"
-qmcKinds = [
-  {key: "random", label: "Random"},
-  {key: "grid", label: "Grid"},
-  {key: "halton-2-3", label: "Halton, bases 2 and 3"},
-  {key: "halton-17-19", label: "Halton, bases 17 and 19"}
-]
+qmcDefaultDim = 5
+qmcDefaultSeed = 31
+// All three methods run to 100,000 points, as in the figure above.
+qmcMax = 1e5
 ```
 
 
@@ -1200,22 +1148,17 @@ qmcKinds = [
 <div class="ojs-panel ojs-row">
 
 ```{ojs}
-// qmcKind: a key of qmcKinds. An unknown URL value falls back.
-viewof qmcKind = {
-  const keys = []
-  const labels = new Map()
-  for (const kind of qmcKinds) {
-    keys.push(kind.key)
-    labels.set(kind.key, kind.label)
-  }
-  let initial = String(VM.ui.urlParam("qmc_points", qmcDefaultKind))
-  if (!keys.includes(initial)) initial = qmcDefaultKind
-  return Inputs.select(keys, {value: initial, label: "Points", format: key => labels.get(key)})
+viewof qmcDim = {
+  const initial = Math.min(10, Math.max(1, Math.round(VM.ui.urlParam("qmc_d", qmcDefaultDim))))
+  const slider = Inputs.range([1, 10], {step: 1, value: initial, label: "Dimension d"})
+  slider.classList.add("ojs-fill")
+  return slider
 }
 ```
 
 ```{ojs}
-// Only the random points change with the seed.
+// Only Monte Carlo changes with the seed. The first draw (on page load) uses
+// the seed in the URL, so a shared link reproduces the same picture.
 viewof qmcRedraw = {
   const button = Inputs.button("Draw new random points", {value: 0, reduce: v => v + 1})
   button.classList.add("ojs-end")
@@ -1228,6 +1171,11 @@ viewof qmcRedraw = {
 
 ```{ojs}
 //| output: false
+qmcDimPaused = intPaused(viewof qmcDim)
+```
+
+```{ojs}
+//| output: false
 qmcSeed = {
   if (qmcRedraw === 0) return VM.ui.urlParam("qmc_seed", qmcDefaultSeed)
   return Math.floor(Math.random() * 1e9)
@@ -1236,336 +1184,52 @@ qmcSeed = {
 
 ```{ojs}
 //| output: false
-// The first qmcN points of the chosen kind (for the grid, the largest square
-// grid with at most qmcN points).
-qmcPoints = pointSet(qmcKind, qmcN, VM.sampling.seededRandom(qmcSeed))
+// The deterministic methods depend on the dimension only, so a new seed
+// leaves them alone.
+qmcGridErrors = gaussianCubeGridErrors(qmcDimPaused, qmcMax)
+qmcHaltonErrors = gaussianCubeHaltonErrors(qmcDimPaused, intCountsLong)
 ```
 
 ```{ojs}
 //| output: false
-// Exact, over every box: recomputed when the points change, not on a drag.
-qmcStar = starDiscrepancy2d(qmcPoints.xs, qmcPoints.ys)
+qmcRandomErrors = gaussianCubeRandomErrors(VM.sampling.seededRandom(qmcSeed), qmcDimPaused, intCountsLong, 40)
 ```
 
 ```{ojs}
 //| output: false
-// Square: the axes span the unit square at equal scales.
-qmcPlot = VM.plotting.persistentPlot({aspectRatio: 1})
-```
-
-
-<div class="ojs-chart-block">
-
-```{ojs}
-// qmcCorner: the dragged corner (x, y) of the box [0, x) x [0, y). The chart
-// itself is the input, and the cell below paints it, so changing the theme
-// keeps the corner in place. jump: a click anywhere moves the corner there.
-viewof qmcCorner = VM.plotting.draggablePoints(qmcPlot, {
-  value: {x: 0.62, y: 0.47},
-  xBounds: [0, 1], yBounds: [0, 1],
-  step: {x: 0.01, y: 0.01},
-  jump: true, label: "Box corner", color: "var(--vm-color-alt)",
-  format: p => `x ${p.x.toFixed(2)}, y ${p.y.toFixed(2)}`
-})
-```
-
-<div class="ojs-chart-controls">
-
-```{ojs}
-viewof qmcN = {
-  const initial = Math.min(qmcMaxN, Math.max(10, Math.round(VM.ui.urlParam("qmc_n", qmcDefaultN))))
-  const slider = Inputs.range([10, qmcMaxN], {step: 10, value: initial, label: "Points N"})
-  slider.classList.add("ojs-fill")
-  return slider
-}
-```
-
-</div>
-
-```{ojs}
-{
-  const n = qmcPoints.xs.length
-  const inside = boxCount(qmcPoints.xs, qmcPoints.ys, qmcCorner.x, qmcCorner.y)
-  const area = qmcCorner.x * qmcCorner.y
-  return VM.ui.statRow([
-    {label: "Fraction in the box", value: (inside / n).toFixed(4), title: `${inside} of ${n} points`},
-    {label: "Box area", value: area.toFixed(4)},
-    {label: "Local discrepancy", value: Math.abs(inside / n - area).toFixed(4), title: "|fraction in the box − box area|"},
-    {label: "Star discrepancy", value: qmcStar.toFixed(4), title: "D*: the largest local discrepancy over all positions of the corner"}
-  ])
-}
-```
-
-</div>
-
-</div>
-
-
-```{ojs}
-//| output: false
-{
-  const cx = qmcCorner.x, cy = qmcCorner.y
-  const inX = [], inY = [], outX = [], outY = []
-  for (let i = 0; i < qmcPoints.xs.length; i++) {
-    if (qmcPoints.xs[i] < cx && qmcPoints.ys[i] < cy) {
-      inX.push(qmcPoints.xs[i])
-      inY.push(qmcPoints.ys[i])
-    } else {
-      outX.push(qmcPoints.xs[i])
-      outY.push(qmcPoints.ys[i])
-    }
-  }
-  // Keep the hint inside the square by flipping it past the middle.
-  let hintAnchor = "left"
-  let hintShift = 12
-  if (cx > 0.7) {
-    hintAnchor = "right"
-    hintShift = -12
-  }
-  const data = [
-    {x: [0, 1, 1, 0, 0], y: [0, 0, 1, 1, 0], type: "scatter", mode: "lines", showlegend: false, hoverinfo: "skip",
-      line: {color: chartColors.ink, width: 1.5}},
-    {x: [0, cx, cx, 0, 0], y: [0, 0, cy, cy, 0], type: "scatter", mode: "lines", fill: "toself", showlegend: false, hoverinfo: "skip",
-      fillcolor: VM.plotting.alpha(chartColors.fn, 0.15), line: {color: chartColors.fn, width: 1.5}},
-    {x: outX, y: outY, type: "scattergl", mode: "markers", showlegend: false, hoverinfo: "skip",
-      marker: {color: chartColors.muted, size: 5}},
-    {x: inX, y: inY, type: "scattergl", mode: "markers", showlegend: false, hoverinfo: "skip",
-      marker: {color: chartColors.fn, size: 5}}
-  ]
-  return qmcPlot(data, {
-    xaxis: {range: [-0.03, 1.03], fixedrange: true, zeroline: false, showgrid: false, constrain: "domain",
-      tickmode: "array", tickvals: [0, 0.5, 1]},
-    yaxis: {range: [-0.03, 1.03], fixedrange: true, zeroline: false, showgrid: false, scaleanchor: "x", constrain: "domain",
-      tickmode: "array", tickvals: [0, 0.5, 1]},
-    annotations: [{x: cx, y: cy, text: "drag me", xanchor: hintAnchor, xshift: hintShift, yshift: 12,
-      showarrow: false, font: {color: chartColors.alt}}],
-    dragmode: false, hovermode: false, uirevision: "static", autosize: true
-  }, {...VM.plotting.config(), displayModeBar: false})
-}
-```
-
-```{ojs}
-//| output: false
-qmcUrlSync = VM.ui.syncUrlParams({
-  qmc_points: [qmcKind, qmcDefaultKind],
-  qmc_n: [qmcN, qmcDefaultN],
-  qmc_seed: [qmcSeed, qmcDefaultSeed]
-})
-```
-
-
-::: {#exr-int-discrepancy}
-## Three kinds of points
-Recall from @def-int-discrepancy that for points $x_1, \ldots, x_N$ in $[0, 1]^d$, the local discrepancy at a corner $t$ is the fraction of the points in the box $B_t = [0, t_1) \times \cdots \times [0, t_d)$ minus the volume of the box, and the star discrepancy $D_N^*$ is its largest absolute value over all $t$.
-
-a. In one dimension, compute $D_N^*$ for the midpoint grid $x_j = (j - \tfrac12)/N$. For which $t$ is the local discrepancy largest?
-b. For $N$ random points in $[0, 1]$ and a fixed $t$, what is the distribution of the number of points in $[0, t)$? Find the standard deviation of the local discrepancy at $t$. How does it scale with $N$?
-c. Now in the square, with [the app](#qmc-app) at $N = 100$: record *Star discrepancy* for the random points, the grid, and the Halton points with bases 2 and 3. Repeat at $N = 1000$. Which improves fastest?
-d. The $m \times m$ midpoint grid has $N = m^2$ points. Find a box $B_t$ of area $1/(2m)$ that contains none of them, and conclude that $D_N^* \ge 1/(2\sqrt N)$. Find the box in the app. What is the corresponding bound in $d$ dimensions?
-:::
-
-You should find that $D_N^* = 1/(2N)$ for the midpoint grid in one dimension (and in fact no set of $N$ points can do better), whereas random points have a local discrepancy of order $N^{-1/2}$. Part (d) is the curse of dimensionality again, this time seen through discrepancy: in $d$ dimensions a grid has $D_N^* \ge 1/(2N^{1/d})$, because the slabs between its layers contain no points at all. So already in the square, a grid is hardly more evenly spread than random points. The Halton points do better than both, and the next theorem tells us by how much.
-
-::: {#thm-int-halton}
-## Discrepancy of the Halton sequence
-For every dimension $d$ there is a constant $C_d$ such that the first $N$ points of the Halton sequence in $[0, 1)^d$ satisfy
-$$
-D_N^* \le C_d\,\frac{(\log N)^d}{N} \qquad \text{for all } N \ge 2
-$$
-[@halton1960; @niederreiter1992].
-:::
-
-@fig-int-discrepancy compares the three kinds of points in one dimension, where the Halton sequence is just the van der Corput sequence in base 2.
-
-
-```{ojs}
-//| output: false
-intDiscrepancy = discrepancyStudy(VM.sampling.seededRandom(41), intCounts, 50)
-intDiscSeries = [
-  {label: "Random points", token: "fn", points: intDiscrepancy.random, kind: "band"},
-  {label: "van der Corput, base 2", token: "ok", points: intDiscrepancy.corput, kind: "scatter"},
-  {label: "Midpoint grid", token: "warn", points: intDiscrepancy.grid, kind: "scatter"}
+qmcSeries = [
+  {label: "Midpoint grid, N = mᵈ", token: "warn", points: qmcGridErrors, kind: "scatter"},
+  {label: "Monte Carlo", token: "fn", points: qmcRandomErrors, kind: "band"},
+  {label: "Quasi-Monte Carlo (Halton)", token: "ok", points: qmcHaltonErrors, kind: "scatter"}
 ]
 ```
 
-:::: {#fig-int-discrepancy}
 
 <div class="ojs-chart-block ojs-svg-block">
 
 ```{ojs}
-intRateFigure({series: intDiscSeries, references: [{label: "N⁻¹ᐟ²", order: 0.5, at: 1}, {label: "N⁻¹", order: 1, at: 0.02}],
-  xDomain: [10, 10000], yDomain: [1e-5, 1], xLabel: "Points (N)", yLabel: "star discrepancy"})
-```
-
-```{ojs}
-VM.ui.statRow(intOrderStats(intDiscSeries))
-```
-
-</div>
-
-Star discrepancy of the first $N$ points in $[0, 1]$. Random points: RMS over 50 runs, with the middle 80%. The grid is rebuilt for each $N$. The van der Corput sequence only adds points.
-
-::::
-
-::: {#rem-int-ks .remark}
-## A statistic you know
-You may have met $D_N^*$ before. In one dimension it is the Kolmogorov-Smirnov statistic for testing whether $x_1, \ldots, x_N$ are a sample from the uniform distribution, namely the largest gap between their empirical distribution function and $t$. For truly random points, $\sqrt N\,D_N^*$ converges in distribution to a limit with mean about $0.87$. Quasi-random points fail this test, but in an unusual direction: they are far too uniform to be random!
-:::
-
-### Even points integrate well {#sec-int-koksma}
-
-Why should a small discrepancy lead to a small integration error? In one dimension the two are related by an exact identity, and all it takes to prove it is one integration by parts.
-
-::: {#exr-int-koksma}
-## Koksma's inequality
-Let $f$ be continuously differentiable on $[0, 1]$, let $x_1, \ldots, x_N$ be any points in $[0, 1]$, and let $F_N(t)$ be the fraction of the points that are less than $t$.
-
-a. Show that $f(x_i) = f(1) - \int_0^1 \mathbf{1}_{\{x_i < t\}}\,f'(t)\,dt$.
-b. Average (a) over $i$ to express $\frac1N\sum_i f(x_i)$ through $F_N$.
-c. Integrate by parts to show that $\int_0^1 f(x)\,dx = f(1) - \int_0^1 t\,f'(t)\,dt$.
-d. Subtract, and conclude that
-$$
-\frac{1}{N}\sum_{i=1}^{N} f(x_i) - \int_0^1 f(x)\,dx = -\int_0^1 \big(F_N(t) - t\big)\,f'(t)\,dt.
-$$
-e. Deduce that
-$$
-\left|\frac{1}{N}\sum_{i=1}^{N} f(x_i) - \int_0^1 f(x)\,dx\right| \le D_N^*\int_0^1 |f'(t)|\,dt,
-$$
-where $D_N^*$ is the star discrepancy of the points (@def-int-discrepancy).
-f. The integral $V(f) = \int_0^1 |f'(t)|\,dt$ is the *total variation* of $f$. Describe it in words for a function that rises from 0 to 1 and falls back to 0, $k$ times. Compute $V(f)$ for $f(u) = \sin^2(k\pi u)$.
-:::
-
-The identity in (d) is quite remarkable: it writes the integration error as the local discrepancy of the points, weighted by the slope of $f$. The bound in (e) continues to hold in every dimension, once we find the right notion of variation.
-
-::: {#thm-int-koksma}
-## The Koksma-Hlawka inequality
-Let $f$ have bounded variation $V(f)$ on $[0, 1]^d$ in the sense of Hardy and Krause. Then for any points $x_1, \ldots, x_N$ in $[0, 1]^d$,
-$$
-\left|\frac{1}{N}\sum_{i=1}^{N} f(x_i) - \int_{[0,1]^d} f(x)\,dx\right| \le V(f)\,D_N^*
-$$
-[@niederreiter1992].
-:::
-
-Here the variation in the sense of Hardy and Krause is the $d$-dimensional analogue of $\int |f'|$, and is built from the mixed partial derivatives of $f$. All we need to know about it is that it is finite for smooth functions.
-
-::: {.callout-important title="Error ≤ variation × discrepancy"}
-The Koksma-Hlawka inequality splits the error into two factors: one depends only on the integrand, and the other only on the points. With Halton points the error is $O\big((\log N)^d/N\big)$, which is almost $N^{-1}$, compared with $N^{-1/2}$ for random points.
-:::
-
-It is worth comparing this with the Monte Carlo error $\sigma_f/\sqrt N$. In both cases the error is a property of $f$ times a property of the points, but the two methods care about different properties of $f$.
-
-::: {#exr-int-qmc-mc}
-## Variation against variance
-Take $f(u) = \sin^2(k\pi u)$ on $[0, 1]$, the integrand of @exr-int-blind rescaled to the unit interval. Recall that $\sigma_f^2 = \text{Var}(f(U))$ for $U$ uniform on $[0, 1]$, and that $V(f) = \int_0^1 |f'(t)|\,dt$ is the total variation of $f$.
-
-a. How do $\sigma_f$ and $V(f)$ depend on $k$?
-b. Which method's error bound feels the frequency $k$? Is that consistent with @exr-int-midpoint?
-c. A bound, unlike a standard error, is a guarantee. What does the Koksma-Hlawka inequality guarantee that a 95% confidence interval does not? What does it cost to evaluate?
-:::
-
-::: {#rem-int-indicator .remark}
-## Why the circle was slower
-The indicator function of a disk jumps along a curve, and it turns out that its variation in the sense of Hardy and Krause is infinite, so @thm-int-koksma tells us nothing about it. This is why the Halton points in the last chapter estimated $\pi$ at a rate of only about $N^{-3/4}$ rather than $N^{-1}$. So hit-or-miss integrands are the worst case for quasi-Monte Carlo. Integrating out a variable (@exr-int-conditioning) leaves us with a smoother integrand, and this helps quasi-random points even more than it helps random ones.
-:::
-
-### Does it survive the dimension? {#sec-int-qmc-dimension}
-
-You may have noticed that in the bound $(\log N)^d/N$ the dimension is back in an exponent. Should we be worried?
-
-::: {#exr-int-qmc-dimension}
-## The fine print
-Let $g(N) = (\ln N)^d/N$, the bound of @thm-int-halton for $N$ Halton points in dimension $d$, without its constant.
-
-a. Show that $g$ *increases* until $N = e^d$. Evaluate $e^d$ for $d = 10$ and $d = 30$.
-b. For $d = 10$, show that $g(N) < N^{-1/2}$ requires $\ln N > 20 \ln \ln N$, and solve this numerically. Is such an $N$ feasible?
-c. Does (b) show that Halton points are worse than random points in ten dimensions for feasible $N$? What exactly does it show?
-:::
-
-You should find that for $d = 10$ the bound does not fall below the Monte Carlo rate until about $N = 10^{39}$, which is hopeless. But a bound that tells us nothing is not the same as a method that fails. Let us see what actually happens: @fig-int-qmc runs the Halton points on the Gaussian integral of @fig-int-dimension.
-
-<div class="ojs-panel ojs-grid">
-
-```{ojs}
-viewof qmcDim = {
-  const slider = Inputs.range([1, 10], {step: 1, value: 5, label: "Dimension d"})
-  slider.classList.add("ojs-fill")
-  return slider
-}
-```
-
-</div>
-
-```{ojs}
-//| output: false
-qmcDimPaused = intPaused(viewof qmcDim)
-```
-
-```{ojs}
-//| output: false
-qmcDimSeries = {
-  const d = qmcDimPaused
-  const relativeSd = gaussianCubeSd(d) / gaussianCubeExact(d)
-  return [
-    {label: "Random points, σ / (I √N)", token: "fn", points: [{n: 10, error: relativeSd / Math.sqrt(10)}, {n: 1e5, error: relativeSd / Math.sqrt(1e5)}], kind: "line"},
-    {label: "Midpoint grid, N = mᵈ", token: "warn", points: gaussianCubeGridErrors(d, 1e5), kind: "scatter"},
-    {label: "Halton points", token: "ok", points: gaussianCubeHaltonErrors(d, intCountsLong), kind: "scatter"},
-    {label: "Randomly shifted Halton", token: "alt", points: gaussianCubeShiftedErrors(VM.sampling.seededRandom(32), d, intCountsLong, 20), kind: "band"}
-  ]
-}
-```
-
-:::: {#fig-int-qmc}
-
-<div class="ojs-chart-block ojs-svg-block">
-
-```{ojs}
-intRateFigure({series: qmcDimSeries, references: [{label: "N⁻¹", order: 1, at: 3}],
-  xDomain: [10, 1e5], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error", height: 340,
+intRateFigure({series: qmcSeries, references: [],
+  xDomain: [10, qmcMax], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error", height: 340,
   title: `exp(−|x|²) on the cube, d = ${qmcDimPaused}`})
 ```
 
 ```{ojs}
-VM.ui.statRow(intOrderStats([qmcDimSeries[1], qmcDimSeries[2], qmcDimSeries[3]]))
+VM.ui.statRow(intOrderStats(qmcSeries))
 ```
 
 </div>
 
-Relative error of the integral of $e^{-\|x\|^2}$ over $[0,1]^d$ with random, grid and Halton points. The randomly shifted Halton points are the subject of [the next section](#sec-int-rqmc): RMS over 20 shifts, with the middle 80%.
+</div>
 
-::::
 
-::: {#exr-int-qmc-figure}
-## Halton points in practice
-a. In @fig-int-qmc, how does the fitted order of the Halton points change as $d$ goes from 1 to 10? Compare it with the grid's.
-b. At $d = 10$ and $N = 10^5$, by what factor do the Halton points beat the Monte Carlo standard error? How many random points would match them?
-c. In [the app](#qmc-app), choose *Halton, bases 17 and 19* at $N = 100$. What do you see? Explain it from @def-int-vdc: what are $\varphi_{17}(n)$ and $\varphi_{19}(n)$ for $n < 17$? Compare *Star discrepancy* with the random points.
-d. In which coordinates of a high-dimensional Halton sequence does the problem of (c) appear, and until which $N$?
-:::
+```{ojs}
+//| output: false
+qmcUrlSync = VM.ui.syncUrlParams({
+  qmc_d: [qmcDim, qmcDefaultDim],
+  qmc_seed: [qmcSeed, qmcDefaultSeed]
+})
+```
 
-You should find that on this smooth integrand the Halton points keep an order near $0.9$ all the way through ten dimensions, which is far better than @thm-int-halton promises for these values of $N$. Their weakness shows up in part (c): a pair of large prime bases starts out on a few parallel lines, and it takes roughly the product of the two bases in points before the square is filled. Modern quasi-random sequences, such as Sobol' points and scrambled Halton points, are designed to avoid this problem. It is also the reason why quasi-Monte Carlo has to be used with care beyond a few dozen dimensions.
-
-### Putting the randomness back {#sec-int-rqmc}
-
-Quasi-Monte Carlo gives us a better estimate, but no way of knowing how good it is. There is no standard error, because nothing is random, and the bound $V(f)\,D_N^*$ is harder to compute than the integral itself. Fortunately, a small dose of randomness fixes this without spoiling the evenness of the points [@cranley1976].
-
-::: {#def-int-shift}
-## Random shift
-Let $x_1, \ldots, x_N$ be quasi-random points in $[0, 1)^d$ and let $U$ be a single uniform point of $[0, 1)^d$. The *shifted* points are $x_i + U \bmod 1$, each coordinate taken modulo 1, and the shifted estimator is
-$$
-\hat I_N^{\,\text{shift}} = \frac1N\sum_{i=1}^N f\big(x_i + U \bmod 1\big).
-$$
-:::
-
-::: {#exr-int-shift}
-## Randomized quasi-Monte Carlo
-a. Show that for a fixed $x \in [0, 1)$ and $U$ uniform on $[0, 1)$, the number $x + U \bmod 1$ is uniform on $[0, 1)$. Conclude that $\hat I_N^{\,\text{shift}}$ is unbiased.
-b. Are the shifted points independent of each other? Does unbiasedness need them to be? Does the formula $\sigma_f/\sqrt N$ for the standard error?
-c. A shift moves all the points together. What does it do to the gaps between them, and why should the error stay small?
-d. One shifted estimate is one random number, with no standard error of its own. Describe how to get an unbiased estimate of $I$ *and* a standard error for it from $R$ independent shifts. How many function evaluations does it use?
-e. Find the randomly shifted Halton points in @fig-int-qmc. Is their fitted order closer to the Halton points' or to Monte Carlo's?
-:::
-
-You should find that $R$ independent shifts give $R$ i.i.d. unbiased estimates. Their average and their sample standard deviation then give an estimate and a standard error, exactly as in @exr-int-clt. Notice that the points within a single shift are as far from independent as they could be, and it is precisely this dependence that makes the error small.
 
 
 ## Summary
@@ -1575,7 +1239,6 @@ You should find that $R$ independent shifts give $R$ i.i.d. unbiased estimates. 
 - In [The sample-mean estimator](#sec-int-mean) we wrote an integral as the interval's width times an average height, found its standard error $(b-a)\,\sigma_f/\sqrt N$, and saw by conditioning that it [always beats hit or miss](#sec-int-compare): integrate out what you can.
 - In [What makes an integrand hard?](#sec-int-hard) we saw that Monte Carlo sees only the variance of the values of $f$. It is blind to smoothness and frequency, and what hurts it is cancellation. A grid uses the smoothness that random points ignore, and in one dimension it wins at every $N$.
 - In [Many dimensions](#sec-int-dimension) we saw that the sample mean's rate is free of the dimension but [its constant](#sec-int-constant) is not: for a product integrand the work grows like $\rho^d$, slowly enough that random points beat the grid within a few dimensions.
-- In [Quasi-random points](#sec-int-qmc) we measured evenness by the star discrepancy, proved in one dimension that the error is at most variation times discrepancy, and saw Halton points reach nearly $N^{-1}$. A [random shift](#sec-int-rqmc) gives them a standard error.
 
 Every method in this chapter assumed a supply of uniform random numbers. The next part, [Sampling](../sampling-overview/), asks where they come from, and how to turn them into samples from other distributions.
 

@@ -100,8 +100,8 @@ After:
 - **The sample-mean estimator**: definition, standard error, confidence intervals from the sample standard deviation; variance compared exactly with hit or miss, then explained by conditioning and the law of total variance. Callout "Integrate out what you can". App `mean-app`.
 - **What makes an integrand hard?**: Monte Carlo is blind to smoothness ($kU \bmod 1$ is uniform); cancellation is what costs; a variance bound from the range, whose worst case is a fair coin; random against evenly spaced points in one dimension.
 - **Many dimensions**: the constant's growth $\rho^d$ for a product integrand; Gauss's circle as an integrated-out variable (the old chapter's TODO).
-- **Quasi-random points**: van der Corput and Halton sequences, star discrepancy, Koksma's inequality as an exercise, Koksma-Hlawka and Halton's bound as theorems, the $(\log N)^d/N$ fine print, bad pairs of bases, random shifts. App `qmc-app`.
-- Seven error figures (two with a dimension slider), four new references.
+- **Further reading: quasi-Monte Carlo**: a short mention only (not course material): what quasi-random points are, the $(\log N)^d/N$ rate, random shifts in a sentence, pointers to the literature. App `qmc-app` compares the midpoint grid, Monte Carlo and Halton points on the Gaussian integral.
+- Five error figures (one with a dimension slider), four new references.
 
 Revision 1 (author's request): the first draft opened with the sample mean, then hit or miss, the hard integrands, grids, dimensions. Reordered to grid and curse first, then hit or miss, then the sample mean, so the chapter starts from the previous page's method and each method is motivated by the last one's failure. Added a grid-only figure by dimension and split the old comparison exercises so none refers forward.
 
