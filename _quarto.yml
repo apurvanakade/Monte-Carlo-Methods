@@ -80,13 +80,22 @@ filters:
   - mathviz
 mathviz:
   referrer: same-origin
-  # The sidebar is off-canvas behind a slim rail (open, pin); the string is
-  # the localStorage key the pin is kept under, so readers' pins survive.
-  sidebar-rail: mcm-sidebar-pinned
+  # The sidebar is off-canvas behind a slim rail (open, pin). pin-key is the
+  # localStorage key the pin is kept under, so readers' pins survive. It
+  # starts closed at every width until the reader pins it: the right margin
+  # holds the table of contents, and a docked sidebar as well crowds a
+  # laptop screen.
+  sidebar-rail:
+    pin-key: mcm-sidebar-pinned
+    default: closed
   # A title search box at the top of the sidebar.
   sidebar-search: true
   # Inter + JetBrains Mono from site_libs/ (the theme below names them).
   fonts: true
+  # The table of contents drawn quietly: no heading or rule, small soft
+  # text, faded until hovered or focused, at the middle of the window's
+  # height (see format.html.toc below).
+  quiet-toc: true
   # A "Share" button on every app (each <div class="vm-app">) with the page
   # link and an <iframe> snippet. Turns on embed mode too: any app page
   # loaded with ?embed=1 shows the app alone, for a frame.
@@ -101,10 +110,14 @@ format:
     theme:
       light: [_extensions/apurvanakade/mathviz/theme/mathviz-light.scss]
       dark: [_extensions/apurvanakade/mathviz/theme/mathviz-dark.scss]
-    # No per-page table of contents: the page is one column, like the blog.
-    toc: false
-    # Unnumbered sections: with no table of contents nothing refers to them
-    # by number. Link to a section by its title: [Title](#sec-id).
+    # A table of contents in the right margin of every page, drawn quietly
+    # (mathviz's quiet-toc, above). It lists the top-level sections; a section's
+    # subsections show only while the reader is in it (toc-depth: 3 with
+    # Quarto's default toc-expand; toc-depth: 2 drops them altogether). The
+    # introduction pages turn it off (`toc: false` in their front matter).
+    toc: true
+    toc-depth: 3
+    # Unnumbered sections. Link to a section by its title: [Title](#sec-id).
     number-sections: false
     # Callouts are drawn without icons (_chrome/callouts.css styles them).
     callout-icon: false
