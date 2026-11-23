@@ -140,8 +140,8 @@ format:
       # app alone. Drop this once mathviz's chrome/embed.css lists .giscus.
       - text: "<style>html.vm-embed .giscus { display: none !important; }</style>"
 
-# Every code cell is OJS, run in the reader's browser; nothing executes at
-# render time.
+# Every code cell is OJS (or a Mermaid diagram), run in the reader's browser;
+# nothing executes at render time.
 execute:
   echo: false
   warning: false
