@@ -888,6 +888,18 @@ Two estimators of $\pi = \int_0^1 4\sqrt{1-x^2}\,dx$: the RMS error over 200 run
 
 ::::
 
+The same principle, integrating out what we can, also explains a trick from the last chapter.
+
+::: {#exr-int-gauss}
+## Gauss's circle, revisited
+The [Gauss circle method](../estimating-pi/#sec-gauss-circle) estimates $\pi$ by $L(r)/r^2$, where $L(r)$ counts the integer points in the disk of radius $r$. Its observed error is about $r^{-3/2}$.
+
+a. Counted point by point, the method tests $N = (2r+1)^2$ grid points. Write its error as a power of $N$.
+b. The [one-loop count](../estimating-pi/#exr-gauss-count) of the last chapter sums $2\lfloor\sqrt{r^2 - x^2}\rfloor + 1$ over $2r + 1$ values of $x$. Write its error as a power of the number of loop steps.
+c. Show that the one-loop count is, up to rounding, a Riemann sum for the one-dimensional integral $\int_{-1}^{1} 2\sqrt{1 - t^2}\,dt = \pi$.
+d. Which estimator of @exr-int-hitmiss does each count correspond to? What was integrated out?
+:::
+
 
 ## What makes an integrand hard? {#sec-int-hard}
 
@@ -976,24 +988,17 @@ Suppose $m \le f(x) \le M$ on $[a, b]$. Let $X$ be uniform on $[a, b]$ and write
 
 a. Show that $\text{Var}(Z) \le \mathbb{E}[(Z - c)^2]$ for every constant $c$.
 b. Choose $c$ to conclude that $\sigma_f^2 \le (M - m)^2/4$.
-c. Which random variables $Z$ with values in $[m, M]$ attain the bound? Relate your answer to hit-or-miss.
-d. Let $\hat I_N$ be the sample-mean estimator of $\int_a^b f(x)\,dx$ with $N$ points. Give a sample size $N$, in terms of $a$, $b$, $m$, $M$ and $\varepsilon$, that guarantees $\text{SE}(\hat I_N) \le \varepsilon$ for every such $f$.
-e. For $\sin x$ on $[0, \pi]$, by what factor does (d) overestimate the $N$ actually needed?
+c. Let $\hat I_N $ be the sample-mean estimator (@def-int-mean). Bound $\text{SE}(\hat I_N)$ in terms of $a$, $b$, $m$, $M$ and $N$.
 :::
 
-You should find that the worst case is a variable that only takes the two extreme values $m$ and $M$, each with probability $1/2$: a fair coin! So among all integrands with a given range, the indicator functions that hit-or-miss uses are the hardest ones.
-
-Let us now return to the midpoint rule of [the first section](#sec-int-grid). It earns its $N^{-2}$ rate from the smoothness of $f$; recall that the derivation in @exr-int-midpoint needed $f''$. This is the exact opposite of what we saw in @exr-int-blind: a grid exploits smoothness, while random points ignore it.
+Let us now return to the midpoint rule of [the first section](#sec-int-grid). Its convergence rate of $N^{-2}$ comes from the smoothness of $f$; recall that the derivation in @exr-int-midpoint needed $f''$. This is the exact opposite of what we saw in @exr-int-blind: a grid exploits smoothness, while random points ignore it.
 
 ::: {#exr-int-grid-random}
 ## Random against evenly spaced points
-Take $\sin x$ on $[0, \pi]$.
-
-a. How many random points does the sample-mean estimator need for its standard error (@exr-int-variance) to match the error of the midpoint rule at $N = 100$ (@exr-int-sine (a))?
-b. Solve for the $N$ at which the standard error equals the midpoint rule's error. Is there any $N$ at which random points win?
+Take $\sin x$ on $[0, \pi]$. How many random points does the sample-mean estimator need for its standard error (@exr-int-variance) to match the error of the midpoint rule at $N = 100$ (@exr-int-sine (a))?
 :::
 
-You should find that 100 evenly spaced points are worth more than $10^8$ random ones, and that the two errors cross below $N = 1$. In other words, for a smooth integrand in one dimension, random points never win. @fig-int-midpoint shows the two side by side.
+You should find that 100 evenly spaced points give the same accuracy as about $10^8$ random ones. The gap widens as $N$ grows, because $N^{-2}$ shrinks much faster than $N^{-1/2}$. In other words, for a smooth integrand in one dimension, Monte Carlo integration always converges more slowly than the midpoint rule. @fig-int-midpoint shows the two side by side.
 
 
 ```{ojs}
@@ -1034,31 +1039,42 @@ Given $N$ independent uniform points $U_1, \ldots, U_N$ in $[0, 1]^d$, estimate 
 $$\hat I_N = \frac{1}{N}\sum_{i=1}^{N} f(U_i).$$
 :::
 
-Notice that the argument of @exr-int-variance never used the dimension either. So $\hat I_N$ is unbiased with $\text{SE}(\hat I_N) = \sigma_f/\sqrt N$, where $\sigma_f^2 = \text{Var}(f(U))$, and the rate is $N^{-1/2}$ in every dimension. Whatever effect the dimension has must therefore be hiding in the constant $\sigma_f$. For [the ball](#sec-int-ball) we saw this constant explode. Fortunately, for smooth integrands it grows far more slowly.
+Notice that the argument of @exr-int-variance never used the dimension either. So $\hat I_N$ is unbiased with $\text{SE}(\hat I_N) = \sigma_f/\sqrt N$, where $\sigma_f^2 = \text{Var}(f(U))$, and the rate is $N^{-1/2}$ *in every dimension*. Whatever effect the dimension has must therefore be hiding in the constant $\sigma_f$. For [the ball](#sec-int-ball) we saw this constant explode. Fortunately, for smooth integrands it grows far more slowly.
 
 ### The constant depends on the dimension {#sec-int-constant}
 
 The integral we started the chapter with is a good example, because for it we can compute exactly how the constant grows. The integrand is a product,
 $$
-f(x) = e^{-\|x\|^2} = \prod_{k=1}^d g(x_k), \qquad g(t) = e^{-t^2},
+f(x) = e^{-\|x\|^2} = \prod_{k=1}^d g(x_k), \qquad g(t) = e^{-t^2}.
 $$
-and the two numbers we need are
-$$
-\alpha = \int_0^1 g(t)\,dt \approx 0.7468, \qquad \beta = \int_0^1 g(t)^2\,dt \approx 0.5981.
-$$
+Let us first see what the sample mean does with any integrand of this form, and then return to this one.
 
 ::: {#exr-int-product}
 ## A product integrand
-Let $f(x) = \prod_{k=1}^d g(x_k)$ on the cube $[0, 1]^d$, with $\alpha = \int_0^1 g(t)\,dt$ and $\beta = \int_0^1 g(t)^2\,dt$ as above. Let $U$ be uniform on the cube, $I = \int_{[0,1]^d} f(x)\,dx$, and $\hat I_N$ the sample-mean estimator of $I$ with $N$ points (@def-int-cube).
+Let $g$ be a function on $[0, 1]$, and write
+$$
+\alpha = \int_0^1 g(t)\,dt, \qquad \beta = \int_0^1 g(t)^2\,dt.
+$$
+Suppose $\alpha \ne 0$. Let $f(x) = \prod_{k=1}^d g(x_k)$ on the cube $[0, 1]^d$. Let $U$ be uniform on the cube, $I = \int_{[0,1]^d} f(x)\,dx$, and $\hat I_N$ the sample-mean estimator of $I$ with $N$ points (@def-int-cube).
 
 a. Show that $I = \alpha^d$ and $\mathbb{E}[f(U)^2] = \beta^d$. Where do you use independence?
-b. The *relative* standard error is $\text{SE}(\hat I_N)/I$. Show that it equals $\sqrt{(\rho^d - 1)/N}$ with $\rho = \beta/\alpha^2$.
-c. Show that $\rho \ge 1$ for every function $g$. When is $\rho = 1$?
-d. For $g(t) = e^{-t^2}$, $\rho \approx 1.0724$. How many points give a relative standard error of 1% for $d = 1$, $d = 10$, $d = 20$ and $d = 100$?
-e. The product midpoint rule reaches 1% relative error at $d = 10$ with $m = 7$ points per axis. How many points is that?
+b. The *relative* standard error is $\text{SE}(\hat I_N)/|I|$. Compute it in terms of $d$, $N$ and $\rho = \beta/\alpha^2$.
+c. Show that $\rho \ge 1$. When is $\rho = 1$?
 :::
 
-You should find that the number of points needed for a fixed relative accuracy grows like $\rho^d$. This is exponential in the dimension, just like the grid's $m^d$, but with a base that is barely above 1. At $d = 10$, Monte Carlo needs about $10^4$ points where the grid needs $7^{10} \approx 2.8 \times 10^8$. You will often hear that Monte Carlo is immune to the curse of dimensionality. We now see that this is true of the rate but not of the constant, and how fast the constant grows depends on the integrand: like $\rho^d$ here, and like $1/p_d$ for the ball.
+::: {#exr-int-gaussian}
+## The integral we started with
+Take $g(t) = e^{-t^2}$ in @exr-int-product, so that $f(x) = e^{-\|x\|^2}$. For this $g$,
+$$
+\alpha \approx 0.7468, \qquad \beta \approx 0.5981.
+$$
+
+a. Compute $\rho$.
+b. How many points give a relative standard error of 1% for $d = 1$, $d = 10$, $d = 20$ and $d = 100$?
+c. The product midpoint rule reaches 1% relative error at $d = 10$ with $m = 7$ points per axis. How many points is that?
+:::
+
+You should find that the number of points needed for a fixed relative accuracy grows like $\rho^d$. This is exponential in the dimension, just like the grid's $m^d$, but with a base that is barely above 1. At $d = 10$, Monte Carlo needs about $10^4$ points where the grid needs $7^{10} \approx 2.8 \times 10^8$. You will often hear that Monte Carlo is immune to the curse of dimensionality. This is true of the rate but not of the constant, and how fast the constant grows depends on the integrand: like $\rho^d$ here, and like $1/p_d$ for [the ball](#sec-int-ball) (@exr-int-ball).
 
 @fig-int-dimension compares random points with the product midpoint rule on this integral. Move the slider to change $d$ and watch the grid fall behind.
 
@@ -1081,16 +1097,21 @@ intDimPaused = intPaused(viewof intDim)
 
 ```{ojs}
 //| output: false
-// Fixed seed, so the same dimension always draws the same picture. The grid
-// costs nothing here (the integrand is a product), so it runs to a million
-// points; the random runs stop at 10,000 and the formula continues them.
+// Fixed seed, so the same dimension always draws the same picture. Both
+// methods run to 100,000 points: the most the random runs can afford on every
+// slider move, and enough for the grid to keep two dots (m = 2, 3) at d = 10.
+intDimMax = 1e5
+```
+
+```{ojs}
+//| output: false
 intDimSeries = {
   const d = intDimPaused
   const relativeSd = gaussianCubeSd(d) / gaussianCubeExact(d)
   return [
-    {label: "Random points", token: "fn", points: gaussianCubeRandomErrors(VM.sampling.seededRandom(31), d, intCounts, 40), kind: "band"},
-    {label: "σ / (I √N)", token: "ink", points: [{n: 10, error: relativeSd / Math.sqrt(10)}, {n: 1e6, error: relativeSd / 1000}], kind: "line"},
-    {label: "Midpoint grid, N = mᵈ", token: "warn", points: gaussianCubeGridErrors(d, 1e6), kind: "scatter"}
+    {label: "Random points", token: "fn", points: gaussianCubeRandomErrors(VM.sampling.seededRandom(31), d, checkpoints(intDimMax), 40), kind: "band"},
+    {label: "σ / (I √N)", token: "ink", points: [{n: 10, error: relativeSd / Math.sqrt(10)}, {n: intDimMax, error: relativeSd / Math.sqrt(intDimMax)}], kind: "line"},
+    {label: "Midpoint grid, N = mᵈ", token: "warn", points: gaussianCubeGridErrors(d, intDimMax), kind: "scatter"}
   ]
 }
 ```
@@ -1101,7 +1122,7 @@ intDimSeries = {
 
 ```{ojs}
 intRateFigure({series: intDimSeries, references: [],
-  xDomain: [10, 1e6], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error",
+  xDomain: [10, intDimMax], yDomain: [1e-8, 10], xLabel: "Points (N)", yLabel: "relative error",
   title: `exp(−|x|²) on the cube, d = ${intDimPaused}`})
 ```
 
@@ -1115,28 +1136,9 @@ VM.ui.statRow([
 
 </div>
 
-Relative error of the integral of $e^{-\|x\|^2}$ over $[0,1]^d$: random points (RMS over 40 runs, with the middle 80%) and the product midpoint rule, one dot for each $m$ with $m^d \le 10^6$.
+Random points against the midpoint grid on $[0,1]^d$.
 
 ::::
-
-::: {#exr-int-dimension-figure}
-## Watching the curse
-a. In @fig-int-dimension, does the fitted order of the grid match the $N^{-2/d}$ rate of the [product midpoint rule](#sec-int-curse) as you change $d$?
-b. At $N = 10^4$, find the smallest $d$ for which random points beat the grid. Is it the dimension of @exr-int-hit-dimension (b)? Why might it differ?
-c. Why does the grid have so few dots at $d = 10$?
-:::
-
-The principle of integrating out what we can (@exr-int-conditioning) also explains a trick from the last chapter.
-
-::: {#exr-int-gauss}
-## Gauss's circle, revisited
-The [Gauss circle method](../estimating-pi/#sec-gauss-circle) estimates $\pi$ by $L(r)/r^2$, where $L(r)$ counts the integer points in the disk of radius $r$. Its observed error is about $r^{-3/2}$.
-
-a. Counted point by point, the method tests $N = (2r+1)^2$ grid points. Write its error as a power of $N$.
-b. The [one-loop count](../estimating-pi/#exr-gauss-count) of the last chapter sums $2\lfloor\sqrt{r^2 - x^2}\rfloor + 1$ over $2r + 1$ values of $x$. Write its error as a power of the number of loop steps.
-c. Show that the one-loop count is, up to rounding, a Riemann sum for the one-dimensional integral $\int_{-1}^{1} 2\sqrt{1 - t^2}\,dt = \pi$.
-d. Which estimator of @exr-int-hitmiss does each count correspond to? What was integrated out?
-:::
 
 
 ## Quasi-random points {#sec-int-qmc}
@@ -1476,7 +1478,7 @@ c. A bound, unlike a standard error, is a guarantee. What does the Koksma-Hlawka
 
 ::: {#rem-int-indicator .remark}
 ## Why the circle was slower
-The indicator function of a disk jumps along a curve, and it turns out that its variation in the sense of Hardy and Krause is infinite, so @thm-int-koksma tells us nothing about it. This is why the Halton points in the last chapter estimated $\pi$ at a rate of only about $N^{-3/4}$ rather than $N^{-1}$. So hit-or-miss integrands are the worst case for quasi-Monte Carlo, just as they were for Monte Carlo (@exr-int-popoviciu). Integrating out a variable (@exr-int-conditioning) leaves us with a smoother integrand, and this helps quasi-random points even more than it helps random ones.
+The indicator function of a disk jumps along a curve, and it turns out that its variation in the sense of Hardy and Krause is infinite, so @thm-int-koksma tells us nothing about it. This is why the Halton points in the last chapter estimated $\pi$ at a rate of only about $N^{-3/4}$ rather than $N^{-1}$. So hit-or-miss integrands are the worst case for quasi-Monte Carlo. Integrating out a variable (@exr-int-conditioning) leaves us with a smoother integrand, and this helps quasi-random points even more than it helps random ones.
 :::
 
 ### Does it survive the dimension? {#sec-int-qmc-dimension}

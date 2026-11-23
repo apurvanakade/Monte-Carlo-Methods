@@ -144,6 +144,20 @@ $$\text{SE}(\hat\theta_N) = \frac{\sigma}{\sqrt N}.$$
 The error falls like $N^{-1/2}$ whatever the problem, and whatever its dimension; only the constant $\sigma$ depends on the problem. Halving the error costs four times as many samples, and one more correct decimal digit costs a hundred times as many.
 :::
 
+The standard error is in the units of $\theta$, so whether $0.01$ is small depends on the size of $\theta$. Dividing by $\theta$ removes the units.
+
+::: {#def-relative-standard-error}
+## Relative standard error
+For an estimator $\hat\theta_N$ of $\theta \ne 0$, the *relative standard error* is
+$$\text{RSE}(\hat\theta_N) = \frac{\text{SE}(\hat\theta_N)}{|\theta|}.$$
+:::
+
+A relative standard error of $0.01$ means a typical error of 1% of $\theta$. For the sample mean it is $\sigma/(|\theta|\sqrt N)$, so a relative standard error of $\varepsilon$ takes
+$$N = \frac{\sigma^2}{\theta^2\,\varepsilon^2}$$
+samples. The rate is still $N^{-1/2}$, but the constant is now $\sigma/|\theta|$, and it is large when $\theta$ is small compared to $\sigma$. The standard example is a small probability $p = P(A)$, estimated by the fraction of samples in $A$. Here $\sigma^2 = p(1 - p)$, so
+$$\text{RSE}(\hat p_N) = \sqrt{\frac{1 - p}{p\,N}} \approx \frac{1}{\sqrt{p\,N}},$$
+and we need about $1/(p\,\varepsilon^2)$ samples: the standard error shrinks as $p \to 0$, while the relative standard error grows without bound. [Estimating integrals](../estimating-integrals/) meets this in high dimensions.
+
 So the two ways to make a Monte Carlo estimate more accurate are more samples, which is slow, and a smaller $\sigma$, which is the subject of [Variance reduction](../variance-reduction/).
 
 ## Limit theorems {#sec-limit-theorems}
@@ -221,7 +235,7 @@ The *effective sample size* is the number of independent samples that would give
 
 - In [Random variables](#sec-random-variables) we reviewed distributions, expectation and variance, saw that probabilities and integrals are expectations, and collected the rules for means and variances of sums. Linearity needs no independence; the variance of a sum drops its covariances only for independent terms.
 - In [Conditioning](#sec-conditioning) we defined $\mathbb{E}[Y \mid X]$ and $\text{Var}(Y \mid X)$ as random variables that are functions of $X$, and saw that the variance of $Y$ splits into $\text{Var}(\mathbb{E}[Y \mid X]) + \mathbb{E}[\text{Var}(Y \mid X)]$. So conditioning keeps the mean and can only lower the variance.
-- In [Estimators](#sec-estimation-theory) we measured an estimator by its bias, standard error and mean squared error, with $\text{MSE} = \text{Var} + \text{Bias}^2$, and showed that the sample mean is unbiased with standard error $\sigma/\sqrt N$, whatever the dimension.
+- In [Estimators](#sec-estimation-theory) we measured an estimator by its bias, standard error and mean squared error, with $\text{MSE} = \text{Var} + \text{Bias}^2$, and showed that the sample mean is unbiased with standard error $\sigma/\sqrt N$, whatever the dimension. The relative standard error $\text{SE}/|\theta|$ measures the error against the size of $\theta$, and is large when $\theta$ is small compared to $\sigma$.
 - In [Limit theorems](#sec-limit-theorems) the law of large numbers made the sample mean consistent, and the central limit theorem made it approximately normal, which, with $S_N$ in place of $\sigma$, gave confidence intervals. With infinite variance the theorem and the intervals fail.
 - In [The delta method](#sec-delta-method) a Taylor expansion of a nonlinear estimator $g(\hat p)$ gave a bias of order $1/N$ and a standard error of about $|g'(p)|\,\text{SE}(\hat p)$, so the rate stays $N^{-1/2}$.
 - In [Dependent samples](#sec-dependent-samples) we saw that positive correlations inflate the variance of an average, and that the effective sample size counts how many independent samples a chain is worth.
