@@ -248,9 +248,9 @@ One way to quantify uncertainty in an unbiased estimator is via the *standard er
 
 ::: {#exr-pi-variance}
 ## Standard error
-Let $I_1, \ldots, I_N$ be as in @def-circle-estimator.
+Let $(X_1, Y_1), \ldots, (X_N, Y_N)$ be independent uniform points in the square $[-1, 1] \times [-1, 1]$. Let $I_i = 1$ if $X_i^2 + Y_i^2 \le 1$ and $I_i = 0$ otherwise, and let $\hat\pi_N = \frac{4}{N}\sum_{i=1}^N I_i$ be the circle estimator (@def-circle-estimator).
 
-a. Compute $\text{Var}(I)$.
+a. Compute $\text{Var}(I_i)$.
 b. Compute $\text{Var}(\hat{\pi}_N)$ and $\text{SE}(\hat{\pi}_N)$. Where do you use independence?
 c. How does $\text{SE}(\hat{\pi}_N)$ change with $N$?
 d. How many times more points does one more correct decimal place cost?
@@ -431,7 +431,7 @@ Confidence intervals put a probability on the size of the error. By the central 
 
 ::: {#exr-pi-clt}
 ## Confidence intervals
-a. Write an approximate 95% confidence interval for $\pi$ centered at $\hat{\pi}_N$, for large $N$. The standard error depends on $\pi$ itself, which we don't know: what can you use in its place?
+a. Write an approximate 95% confidence interval for $\pi$ centered at the circle estimator $\hat{\pi}_N$ with $N$ points, for large $N$. The standard error depends on $\pi$ itself, which we don't know: what can you use in its place?
 b. Use your formula from @exr-pi-variance to compute the half-width $1.96\,\text{SE}(\hat\pi_N)$ of this interval at $N = 1000$.
 c. Set [the app](#pi-app) to $N = 1000$ and click *Draw new points* 20 times. Each time, record whether $|\text{estimate} - \pi|$ is below your half-width from (b). How many misses do you expect? How many did you get?
 :::
@@ -701,6 +701,8 @@ Up to sliding along the lines, a drop is determined by two numbers: the angle $\
 
 ::: {#exr-buffon-uniform}
 ## The model
+A needle is dropped on parallel lines spaced $t$ apart. Let $\theta \in [0, \pi)$ be the angle it makes with the lines, and $d \in [0, t/2]$ the distance from its center to the nearest line.
+
 a. There is no uniform distribution on the plane. What should dropping the needle "at random" mean, and why is that enough?
 b. Under your answer to (a), why is $(\theta, d)$ uniformly distributed on the rectangle $[0, \pi) \times [0, t/2]$ (the *All needle drops* panel of @fig-buffon-setup)?
 :::
@@ -861,7 +863,9 @@ Drag the dot in *All needle drops* to move the needle in *One needle drop*.
 
 ::: {#exr-buffon-region}
 ## The crossing probability
-a. In the *One needle drop* panel, express $h$ in terms of $\ell$ and $\theta$. Does your formula still hold when $\theta > \pi/2$?
+A needle of length $\ell \le t$ is dropped on parallel lines spaced $t$ apart. As in @exr-buffon-uniform, $\theta \in [0, \pi)$ is the angle it makes with the lines and $d \in [0, t/2]$ is the distance from its center to the nearest line, so that $(\theta, d)$ is uniform on the rectangle $[0, \pi) \times [0, t/2]$. In the *One needle drop* panel of @fig-buffon-setup, $h$ is the distance from the needle's center to its tip, measured perpendicular to the lines.
+
+a. Express $h$ in terms of $\ell$ and $\theta$. Does your formula still hold when $\theta > \pi/2$?
 b. For which values of $d$ does the needle cross a line? Where do you use $\ell \le t$?
 c. Sketch the region of the $(\theta, d)$ rectangle where the needle crosses a line, and use it to compute $P(\text{cross})$.
 :::
@@ -884,7 +888,7 @@ $$\hat{\pi}_N = \frac{2 \ell N}{t\, C} = \frac{2\ell}{t}\cdot\frac{1}{\hat p}.$$
 
 ::: {#exr-buffon-zero}
 ## An undefined estimator
-If $C = 0$, the estimator is undefined: it divides by zero. Find $P(C = 0)$ in terms of $N$.
+Let $C$ be the number of needles that cross a line, out of $N$ independent drops, each crossing with probability $p$. If $C = 0$, Buffon's estimator $\hat\pi_N = 2\ell N/(t\,C)$ is undefined: it divides by zero. Find $P(C = 0)$ in terms of $p$ and $N$.
 :::
 
 You should find that this probability shrinks geometrically in $N$, so $C = 0$ is negligible in practice. **From here on, we assume that $C \ge 1$.**
@@ -901,6 +905,8 @@ So linearity no longer computes $\mathbb{E}[\hat\pi_N]$, and Buffon's estimator 
 
 ::: {#exr-buffon-bias}
 ## Bias
+Drop $N$ needles of length $\ell$ on lines spaced $t$ apart. Let $p$ be the probability that a needle crosses a line, $\hat p$ the fraction of the $N$ needles that cross, and $\hat\pi_N = \frac{2\ell}{t}\cdot\frac{1}{\hat p}$ Buffon's estimator (@def-buffon-estimator).
+
 a. Expand $1/\hat p$ to second order about $p$ and take expectations to approximate $\mathbb{E}[\hat\pi_N]$ and the bias of $\hat\pi_N$, in terms of $p$ and $N$.
 b. How fast does the bias shrink with $N$?
 c. The second-order term in (a) comes from the convexity of $x \mapsto 1/x$. Use its sign to decide whether, for large $N$, $\hat\pi_N$ overestimates or underestimates $\pi$. Can you interpret this directly?
@@ -915,6 +921,8 @@ $$
 
 ::: {#exr-buffon-variance}
 ## Standard error
+As in @exr-buffon-bias, $p$ is the probability that a needle crosses a line, $\hat p$ is the fraction of $N$ needles that cross, and $\hat\pi_N = \frac{2\ell}{t}\cdot\frac{1}{\hat p}$ is Buffon's estimator.
+
 a. Using the delta method approximate $\text{Var}(\hat\pi_N)$ and $\text{SE}(\hat\pi_N)$, in terms of $p$ and $N$.
 b. How does $\text{SE}(\hat\pi_N)$ grow as $\ell \to 0$?
 c. Take the longest needle, $\ell = t$. How many needles does it take to match the accuracy of $N$ random points in the circle method (@exr-pi-variance)?
@@ -934,6 +942,8 @@ For an unbiased estimator the MSE is just the variance.
 
 ::: {#exr-buffon-mse}
 ## Mean squared error
+Let $\hat\pi_N$ be Buffon's estimator with $N$ needles of length $\ell$ on lines spaced $t$ apart.
+
 a. Using your approximations from @exr-buffon-bias and @exr-buffon-variance, find the ratio $\text{Bias}(\hat\pi_N)/\text{SE}(\hat\pi_N)$.
 b. What happens to this ratio as $N \to \infty$? Which term dominates the MSE?
 c. Evaluate the bias and the standard error for $\ell = t = 1$ and $N = 100$.
@@ -1167,11 +1177,11 @@ Counting the points one at a time takes a double loop over the $(2r + 1)^2$ poin
 
 ::: {#exr-gauss-count}
 ## Counting is cheap
-Show that
+For a positive integer $r$, let $L(r)$ be the number of integer points $(x, y)$ with $x^2 + y^2 \le r^2$. Show that
 $$
 L(r) = \sum_{x=-r}^{r} \left(2\left\lfloor\sqrt{r^2 - x^2}\right\rfloor + 1\right),
 $$
-so $\hat\pi_r = L(r)/r^2$ needs only one loop over $x$, of $2r + 1$ steps.
+so the estimate $\hat\pi_r = L(r)/r^2$ of $\pi$ needs only one loop over $x$, of $2r + 1$ steps.
 :::
 
 

@@ -21,6 +21,7 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 - Ask for interpretation and sanity checks, not just computation: signs, limits, rates, "how many more samples does one more digit cost?".
 - Tie exercises to the chapter's apps where possible: predict a number by hand, then check it in the app (`@exr-pi-decimal`, `@exr-pi-clt` (c)).
 - Use `::: {#exr-…}` blocks with a short `## Title`, and refer to them with `@exr-…`.
+- An exercise stands on its own: a reader who works only the exercises should still learn the subject. Every symbol an exercise uses is defined in the exercise itself, unless the paragraph (or definition block) directly above it introduces it, where the reader can glance up. A symbol defined in some earlier paragraph, or above an app or figure, is restated in a lead-in sentence (with a `@def-`/`@exr-` reference where there is one). A lead-in says what each symbol means; it never states a result the reader derived earlier (a standard error, a probability, a rate): re-deriving a forgotten one is a good exercise.
 
 ## Proofs, derivations, theorems
 

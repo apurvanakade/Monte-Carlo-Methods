@@ -265,7 +265,7 @@ How quickly does $M_N$ approach $I$ as we add more points?
 
 ::: {#exr-int-midpoint}
 ## The midpoint rule
-Assume $f$ has as many continuous derivatives as you need.
+Let $I = \int_a^b f(x)\,dx$. Cut $[a, b]$ into $N$ cells of width $h = (b-a)/N$ with centers $c_1, \ldots, c_N$, and let $M_N = h\sum_{j=1}^N f(c_j)$ be the midpoint rule. Assume $f$ has as many continuous derivatives as you need.
 
 a. Expand $f(c + t)$ to second order about the center $c$ of one cell and integrate over $-h/2 \le t \le h/2$ to show
 $$
@@ -340,7 +340,7 @@ One cell of the midpoint rule for $\sin x$, with the tangent line at its center.
 
 ::: {#exr-int-concave}
 ## Over or under?
-Let $f$ be concave on $[a, b]$, that is, $f'' \le 0$, as $\sin x$ is on $[0, \pi]$.
+Let $f$ be concave on $[a, b]$, that is, $f'' \le 0$, as $\sin x$ is on $[0, \pi]$. As in @exr-int-midpoint, $M_N$ is the midpoint rule with $N$ cells for $I = \int_a^b f(x)\,dx$.
 
 a. From @fig-int-riemann, guess whether $M_N$ overestimates or underestimates $I$ for $\sin x$.
 b. The graph of a concave function lies below each of its tangent lines. @fig-int-tangent shows the tangent at the center of one cell. Compare the area of the trapezoid under the tangent with the area of the midpoint rectangle. What do you conclude about $M_N$?
@@ -350,7 +350,7 @@ d. What happens if $f$ is convex, $f'' \ge 0$?
 
 ::: {#exr-int-sine}
 ## The midpoint rule for $\sin x$
-a. For $\sin x$ on $[0, \pi]$, evaluate the leading term $\frac{h^2}{24}\big(f'(b) - f'(a)\big)$ of @exr-int-midpoint (b) at $N = 100$. Does its sign agree with your answer to @exr-int-concave?
+a. For $\sin x$ on $[0, \pi]$, evaluate the leading term $\frac{h^2}{24}\big(f'(b) - f'(a)\big)$ of @exr-int-midpoint (b) at $N = 100$, where $h = (b-a)/N$ is the cell width. Does its sign agree with your answer to @exr-int-concave?
 b. How many points does the midpoint rule need for the error in (a) to fall to $0.001$?
 :::
 
@@ -372,6 +372,8 @@ Since $h = 1/m = N^{-1/d}$, the error falls like $N^{-2/d}$.
 
 ::: {#exr-int-curse}
 ## The curse of dimensionality
+The product midpoint rule on the cube $[0, 1]^d$ uses $m$ points along each axis, $N = m^d$ in all.
+
 a. In dimension $d$, how many times more points does one more correct decimal place cost? Evaluate your answer for $d = 1$, $2$, $10$ and $20$.
 b. The integral of the opening paragraph has $d = 20$. How many points does the grid with $m = 10$ have? At $10^9$ evaluations of $f$ a second, how long does the sum take?
 c. Halving the cell width divides the error by 4. By what factor does it multiply the running time in (b)?
@@ -646,11 +648,13 @@ Since this is the circle estimator with a box in place of the square, we can ana
 
 ::: {#exr-int-hit}
 ## Bias and standard error
-a. Find $P(H = 1)$ and show that $\hat I_N^{\,\text{HM}}$ is unbiased.
+Suppose $0 \le f \le c$ on $[a, b]$, and let $I = \int_a^b f(x)\,dx$. Let $(X_1, Y_1), \ldots, (X_N, Y_N)$ be independent uniform points in the box $[a, b] \times [0, c]$. Let $H_i = 1$ if $Y_i \le f(X_i)$ and $H_i = 0$ otherwise, and let $\hat I_N^{\,\text{HM}} = c\,(b-a)\cdot\frac1N\sum_{i=1}^N H_i$ be the hit-or-miss estimator (@def-int-hitmiss).
+
+a. Find $P(H_i = 1)$ and show that $\hat I_N^{\,\text{HM}}$ is unbiased.
 b. Find $\text{SE}\big(\hat I_N^{\,\text{HM}}\big)$ in terms of $a, b, c, I$. Where do you use independence?
 c. Take $f(x) = \sin x$ on $[0, \pi]$ with $c = 1$, so $I = 2$. Compute the standard error, and the smallest $N$ for which it is at most $0.001$. Compare with @exr-int-sine (b).
 d. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so $I = \pi$. Check that you recover the standard error of the circle estimator from the [last chapter](../estimating-pi/#exr-pi-variance).
-e. The height $c$ of the box is your choice, as long as $f \le c$. How does choosing a larger $c$ affect $I_N^{\,\text{HM}}$? Which $c$ is best?
+e. The height $c$ of the box is your choice, as long as $f \le c$. How does choosing a larger $c$ affect $\hat I_N^{\,\text{HM}}$? Which $c$ is best?
 f. Check (e) in [the app](#hit-app): for $\sin x$ at $N = 2000$, compare *Standard error* at $c = 1$ and at $c = 4$ with your formula from (b).
 :::
 
@@ -679,10 +683,10 @@ Have we escaped the curse of dimensionality, then? Not quite. The rate does not 
 
 ::: {#exr-int-ball}
 ## The ball in the cube
-Let $p_d = V_d/2^d$ be the probability that a uniform point of the cube lands in the ball. The *relative standard error* of an estimator is its standard error divided by the quantity it estimates.
+Let $V_d$ be the volume of the unit ball in $d$ dimensions, and let $p_d = V_d/2^d$ be the probability that a uniform point of the cube $[-1, 1]^d$ lands in the ball. The *relative standard error* of an estimator is its standard error divided by the quantity it estimates.
 
 a. Compute $p_d$ for $d = 2$, $d = 10$ and $d = 20$. How does it behave as $d$ grows?
-b. Find the relative standard error of the hit-or-miss estimator of $V_d$, in terms of $p_d$ and $N$. For each $d$ in (a), find the smallest $N$ for which it is at most $0.1$.
+b. Find the relative standard error of the hit-or-miss estimator of $V_d$ with $N$ points, in terms of $p_d$ and $N$. For each $d$ in (a), find the smallest $N$ for which it is at most $0.1$.
 c. Take $d = 20$ and draw $N = 10^5$ points. How many hits do you expect? What does the estimator return when there are none, and what is its *estimated* standard error then?
 :::
 
@@ -784,10 +788,12 @@ Once again our estimator is an average of i.i.d. samples, so we already know how
 $$
 \sigma_f^2 = \text{Var}(f(X)) = \frac{1}{b-a}\int_a^b f(x)^2\,dx - \left(\frac{I}{b-a}\right)^2
 $$
-for the variance of the height of $f$ at a uniform point.
+for the variance of the height of $f$ at a uniform point $X$ of $[a, b]$.
 
 ::: {#exr-int-variance}
 ## Bias and standard error
+Let $X_1, \ldots, X_N$ be independent uniform points in $[a, b]$, and let $\hat I_N = \frac{b-a}{N}\sum_{i=1}^N f(X_i)$ be the sample-mean estimator of $I = \int_a^b f(x)\,dx$ (@def-int-mean). Write $\sigma_f^2 = \text{Var}(f(X_i))$.
+
 a. Show that $\hat I_N$ is unbiased.
 b. Compute $\text{Var}(\hat I_N)$ and $\text{SE}(\hat I_N)$ in terms of $\sigma_f$. Where do you use independence?
 c. Take $f(x) = \sin x$ on $[0, \pi]$, so $I = 2$. Compute $\sigma_f^2$ and $\text{SE}(\hat I_N)$.
@@ -808,7 +814,7 @@ and we report $(b-a)\,s/\sqrt N$ as the standard error.
 
 ::: {#exr-int-clt}
 ## Confidence intervals
-a. Write an approximate 95% confidence interval for $I$ centered at $\hat I_N$, for large $N$, that uses only the samples.
+a. Write an approximate 95% confidence interval for $I = \int_a^b f(x)\,dx$ centered at the sample-mean estimator $\hat I_N$, for large $N$, that uses only the samples $f(X_1), \ldots, f(X_N)$.
 b. Use @exr-int-variance (c) to predict the standard error for $\sin x$ at $N = 100$.
 :::
 
@@ -818,6 +824,8 @@ We now have two unbiased estimators of the same integral, and they even use the 
 
 ::: {#exr-int-hitmiss}
 ## Hit or miss against the sample mean
+Let $I = \int_a^b f(x)\,dx$ with $0 \le f \le c$. With $N$ points each, let $\hat I_N^{\,\text{HM}}$ be the hit-or-miss estimator of $I$ with box height $c$ (@def-int-hitmiss), and $\hat I_N$ the sample-mean estimator (@def-int-mean).
+
 a. Take $f(x) = \sin x$ on $[0, \pi]$ with $c = 1$. Use @exr-int-hit (c) and @exr-int-variance (c) to compute the standard error of each estimator at $N = 100$. Which is smaller? How many times more points does the other one need to match it?
 b. Is (a) special to $\sin x$? Use @exr-int-hit (b) and @exr-int-variance (b) to write $\text{Var}(\hat I_N^{\,\text{HM}}) - \text{Var}(\hat I_N)$ as a single integral over $[a, b]$, for a general $f$ with $0 \le f \le c$. Can you tell its sign? For which functions $f$ is it zero?
 c. Take $f(x) = 4\sqrt{1 - x^2}$ on $[0, 1]$ with $c = 4$, so that $I = \pi$ and hit-or-miss is the circle estimator. Compute both variances. How many times more points does hit-or-miss need for the same standard error?
@@ -887,27 +895,30 @@ The standard error $(b-a)\,\sigma_f/\sqrt N$ tells us that Monte Carlo sees the 
 
 ::: {#exr-int-blind}
 ## Monte Carlo is blind to smoothness
-a. Let $U$ be uniform on $[0, 1)$ and let $k$ be a positive integer. Show that $kU \bmod 1$, the fractional part of $kU$, is again uniform on $[0, 1)$.
-b. Deduce that if $X$ is uniform on $[0, \pi]$, then $\sin^2(kX)$ has the same distribution for every positive integer $k$. What does this say about the standard error of $\hat I_N$ for $\int_0^\pi \sin^2(kx)\,dx$?
-c. Compute that standard error.
+Let $k$ be a positive integer and $f(x) = \sin^2(kx)$ on $[0, \pi]$. Compute the standard error of the sample-mean estimator $\hat I_N$ of $\int_0^\pi f(x)\,dx$ algebraically, by evaluating the integrals for $\sigma_f^2 = \text{Var}(f(X))$, where $X$ is uniform on $[0, \pi]$.
 :::
 
-You should find that the standard error is $\pi/\sqrt{8N} \approx 1.11/\sqrt N$ no matter what the frequency $k$ is. This may come as a surprise, but it makes sense once we notice that the variance $\sigma_f^2$ depends only on the distribution of the *values* of $f$, and not on the order in which these values occur along the axis. We could cut the graph into pieces and shuffle them around, and Monte Carlo would not notice.
+You should find that the standard error is independent of the frequency $k$. This may come as a surprise, but it makes sense once we notice that the variance $\sigma_f^2$ depends only on the distribution of the *values* of $f$, and not on the order in which these values occur along the axis. We could cut the graph into pieces and shuffle them around, and Monte Carlo would not notice.
+
+::: {#exr-int-blind-distribution}
+## Same values, different order
+Let $X$ be uniform on $[0, \pi]$. Explain why $\sin^2(kX)$ has the same distribution for every nonzero integer $k$.
+:::
 
 Oscillation can still hurt Monte Carlo, but for a different reason.
 
 ::: {#exr-int-oscillation}
 ## Cancellation
-Let $f_k(x) = k \sin(kx)$ on $[0, \pi]$, with $k$ an odd positive integer.
+Let $f_k(x) = k \sin(kx)$ on $[0, \pi]$, with $k$ an odd positive integer. Let $\hat I_N$ be the sample-mean estimator of its integral with $N$ points, and $\sigma_{f_k}^2 = \text{Var}(f_k(X))$ for $X$ uniform on $[0, \pi]$.
 
-a. Show that $I = \int_0^\pi f_k(x)\,dx = 2$ for every odd $k$.
+a. Compute $I = \int_0^\pi f_k(x)\,dx$.
 b. Compute $\sigma_{f_k}^2$ and $\text{SE}(\hat I_N)$. How does the standard error grow with $k$?
 c. By what factor is the standard error at $k = 25$ larger than at $k = 1$?
 d. How many points does $k = 25$ need for $\text{SE}(\hat I_N) \le 0.01$?
-e. The positive and negative lobes of $f_k$ nearly cancel. Explain in a sentence why cancellation is expensive for an average of random samples.
+e. The positive and negative lobes of $f_k$ nearly cancel. Explain why cancellation is expensive for an average of random samples.
 :::
 
-You should find $\sigma_{f_k}^2 = k^2/2 - 4/\pi^2$, so the standard error grows like $k$. The integral stays at 2 for every $k$, but the values we are averaging swing between $-k$ and $k$, and we are relying on them to cancel. @fig-int-oscillation shows the two cases $k = 1$ and $k = 25$. The slopes are the same, as they must be, and the constants differ by the factor of about 57 from part (c).
+You should find that the standard error grows like $k$. The integral stays at 2 for every $k$, but the values we are averaging swing between $-k$ and $k$, and we are relying on them to cancel. @fig-int-oscillation shows the two cases $k = 1$ and $k = 25$. The slopes are the same, as they must be, and the constants differ by the factor of about 57 from part (c).
 
 ::: {.callout-important title="The variance decides"}
 For Monte Carlo, an integrand is hard when its values are spread far from their mean, compared with the size of the integral. Whether it is smooth or not plays no role.
@@ -961,12 +972,12 @@ Since we do not know $\sigma_f$ in advance, it is useful to have a bound on it t
 
 ::: {#exr-int-popoviciu}
 ## A bound on the variance
-Suppose $m \le f(x) \le M$ on $[a, b]$, and write $Z = f(X)$.
+Suppose $m \le f(x) \le M$ on $[a, b]$. Let $X$ be uniform on $[a, b]$ and write $Z = f(X)$, so that $\sigma_f^2 = \text{Var}(Z)$.
 
 a. Show that $\text{Var}(Z) \le \mathbb{E}[(Z - c)^2]$ for every constant $c$.
 b. Choose $c$ to conclude that $\sigma_f^2 \le (M - m)^2/4$.
 c. Which random variables $Z$ with values in $[m, M]$ attain the bound? Relate your answer to hit-or-miss.
-d. Give a sample size $N$, in terms of $a$, $b$, $m$, $M$ and $\varepsilon$, that guarantees $\text{SE}(\hat I_N) \le \varepsilon$ for every such $f$.
+d. Let $\hat I_N$ be the sample-mean estimator of $\int_a^b f(x)\,dx$ with $N$ points. Give a sample size $N$, in terms of $a$, $b$, $m$, $M$ and $\varepsilon$, that guarantees $\text{SE}(\hat I_N) \le \varepsilon$ for every such $f$.
 e. For $\sin x$ on $[0, \pi]$, by what factor does (d) overestimate the $N$ actually needed?
 :::
 
@@ -1038,10 +1049,12 @@ $$
 
 ::: {#exr-int-product}
 ## A product integrand
+Let $f(x) = \prod_{k=1}^d g(x_k)$ on the cube $[0, 1]^d$, with $\alpha = \int_0^1 g(t)\,dt$ and $\beta = \int_0^1 g(t)^2\,dt$ as above. Let $U$ be uniform on the cube, $I = \int_{[0,1]^d} f(x)\,dx$, and $\hat I_N$ the sample-mean estimator of $I$ with $N$ points (@def-int-cube).
+
 a. Show that $I = \alpha^d$ and $\mathbb{E}[f(U)^2] = \beta^d$. Where do you use independence?
 b. The *relative* standard error is $\text{SE}(\hat I_N)/I$. Show that it equals $\sqrt{(\rho^d - 1)/N}$ with $\rho = \beta/\alpha^2$.
 c. Show that $\rho \ge 1$ for every function $g$. When is $\rho = 1$?
-d. Here $\rho \approx 1.0724$. How many points give a relative standard error of 1% for $d = 1$, $d = 10$, $d = 20$ and $d = 100$?
+d. For $g(t) = e^{-t^2}$, $\rho \approx 1.0724$. How many points give a relative standard error of 1% for $d = 1$, $d = 10$, $d = 20$ and $d = 100$?
 e. The product midpoint rule reaches 1% relative error at $d = 10$ with $m = 7$ points per axis. How many points is that?
 :::
 
@@ -1354,6 +1367,8 @@ qmcUrlSync = VM.ui.syncUrlParams({
 
 ::: {#exr-int-discrepancy}
 ## Three kinds of points
+Recall from @def-int-discrepancy that for points $x_1, \ldots, x_N$ in $[0, 1]^d$, the local discrepancy at a corner $t$ is the fraction of the points in the box $B_t = [0, t_1) \times \cdots \times [0, t_d)$ minus the volume of the box, and the star discrepancy $D_N^*$ is its largest absolute value over all $t$.
+
 a. In one dimension, compute $D_N^*$ for the midpoint grid $x_j = (j - \tfrac12)/N$. For which $t$ is the local discrepancy largest?
 b. For $N$ random points in $[0, 1]$ and a fixed $t$, what is the distribution of the number of points in $[0, t)$? Find the standard deviation of the local discrepancy at $t$. How does it scale with $N$?
 c. Now in the square, with [the app](#qmc-app) at $N = 100$: record *Star discrepancy* for the random points, the grid, and the Halton points with bases 2 and 3. Repeat at $N = 1000$. Which improves fastest?
@@ -1425,8 +1440,9 @@ $$
 $$
 e. Deduce that
 $$
-\left|\frac{1}{N}\sum_{i=1}^{N} f(x_i) - \int_0^1 f(x)\,dx\right| \le D_N^*\int_0^1 |f'(t)|\,dt.
+\left|\frac{1}{N}\sum_{i=1}^{N} f(x_i) - \int_0^1 f(x)\,dx\right| \le D_N^*\int_0^1 |f'(t)|\,dt,
 $$
+where $D_N^*$ is the star discrepancy of the points (@def-int-discrepancy).
 f. The integral $V(f) = \int_0^1 |f'(t)|\,dt$ is the *total variation* of $f$. Describe it in words for a function that rises from 0 to 1 and falls back to 0, $k$ times. Compute $V(f)$ for $f(u) = \sin^2(k\pi u)$.
 :::
 
@@ -1451,7 +1467,7 @@ It is worth comparing this with the Monte Carlo error $\sigma_f/\sqrt N$. In bot
 
 ::: {#exr-int-qmc-mc}
 ## Variation against variance
-Take $f(u) = \sin^2(k\pi u)$ on $[0, 1]$, the integrand of @exr-int-blind rescaled to the unit interval.
+Take $f(u) = \sin^2(k\pi u)$ on $[0, 1]$, the integrand of @exr-int-blind rescaled to the unit interval. Recall that $\sigma_f^2 = \text{Var}(f(U))$ for $U$ uniform on $[0, 1]$, and that $V(f) = \int_0^1 |f'(t)|\,dt$ is the total variation of $f$.
 
 a. How do $\sigma_f$ and $V(f)$ depend on $k$?
 b. Which method's error bound feels the frequency $k$? Is that consistent with @exr-int-midpoint?
@@ -1469,7 +1485,7 @@ You may have noticed that in the bound $(\log N)^d/N$ the dimension is back in a
 
 ::: {#exr-int-qmc-dimension}
 ## The fine print
-Let $g(N) = (\ln N)^d/N$.
+Let $g(N) = (\ln N)^d/N$, the bound of @thm-int-halton for $N$ Halton points in dimension $d$, without its constant.
 
 a. Show that $g$ *increases* until $N = e^d$. Evaluate $e^d$ for $d = 10$ and $d = 30$.
 b. For $d = 10$, show that $g(N) < N^{-1/2}$ requires $\ln N > 20 \ln \ln N$, and solve this numerically. Is such an $N$ feasible?
@@ -1553,7 +1569,7 @@ $$
 
 ::: {#exr-int-shift}
 ## Randomized quasi-Monte Carlo
-a. Show that for a fixed $x \in [0, 1)$ and $U$ uniform on $[0, 1)$, the number $x + U \bmod 1$ is uniform on $[0, 1)$. Conclude that $\hat I_N^{\,\text{shift}}$ is unbiased. Compare with @exr-int-blind (a).
+a. Show that for a fixed $x \in [0, 1)$ and $U$ uniform on $[0, 1)$, the number $x + U \bmod 1$ is uniform on $[0, 1)$. Conclude that $\hat I_N^{\,\text{shift}}$ is unbiased.
 b. Are the shifted points independent of each other? Does unbiasedness need them to be? Does the formula $\sigma_f/\sqrt N$ for the standard error?
 c. A shift moves all the points together. What does it do to the gaps between them, and why should the error stay small?
 d. One shifted estimate is one random number, with no standard error of its own. Describe how to get an unbiased estimate of $I$ *and* a standard error for it from $R$ independent shifts. How many function evaluations does it use?
