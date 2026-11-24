@@ -89,7 +89,7 @@ function rngIntegerValue(text, lo, hi, fallback) {
 
 ## Random numbers from a formula {#sec-prng}
 
-There are physical sources of randomness. The wall of lava lamps below stands in the lobby of the internet company Cloudflare, where a camera films it and the pictures, which never repeat, are turned into encryption keys. Less exotically, most modern processors have a circuit that measures its own thermal noise and turns it into random bits.
+There are physical sources of randomness. The wall of lava lamps below stands in the lobby of the internet company Cloudflare, where a camera films it and the pictures, which never repeat, are mixed into the seeds of the generators that produce the company's encryption keys. Less exotically, Intel's processors have a circuit that turns the thermal noise in their own silicon into random bits.
 
 ![](lava-lamps.jpg){width=600 fig-alt="A wall of lava lamps used as a source of random bits"}
 
@@ -963,6 +963,8 @@ You should find a gap of $1/\sqrt{26} \approx 0.196$ for $a = 5$, a gap of $1/\s
 The points $(u_n, u_{n+1}, \ldots, u_{n+d-1})$ formed by $d$ consecutive outputs of a linear congruential generator with modulus $m$ all lie on at most $(d!\,m)^{1/d}$ parallel hyperplanes [@marsaglia1968].
 :::
 
+Marsaglia proved this for generators with $c = 0$. An increment only shifts the whole pattern, so the same bound holds with one.
+
 ::: {#exr-marsaglia}
 ## Random numbers fall mainly in the planes
 By @thm-marsaglia, the points formed by $d$ consecutive outputs of a linear congruential generator with modulus $m$ lie on at most $(d!\,m)^{1/d}$ parallel hyperplanes.
@@ -983,9 +985,9 @@ The widest gap between neighboring hyperplanes, over all the families of paralle
 
 ## Generators in practice {#sec-practice}
 
-RANDU passed four tests and failed a fifth that we designed after seeing its formula. No finite list of tests can certify a generator, because every generator has a finite state and so fails *some* test. What we can ask is that it pass every test anyone has thought of, at sample sizes larger than we will use. This is what test batteries are for. The best known is TestU01 [@lecuyer2007], whose largest battery, BigCrush, runs about a hundred tests on some $2^{38}$ numbers. The suite of the U.S. National Institute of Standards and Technology [@rukhin2010] begins with the monobit test and includes a version of the runs test.
+RANDU passed four tests and failed a fifth that we designed after seeing its formula. No finite list of tests can certify a generator, because every generator has a finite state and so fails *some* test. What we can ask is that it pass every test anyone has thought of, at sample sizes larger than we will use. This is what test batteries are for. The best known is TestU01 [@lecuyer2007], whose largest battery, BigCrush, runs 106 tests on close to $2^{38}$ numbers. The suite of the U.S. National Institute of Standards and Technology [@rukhin2010] begins with the monobit test and includes a version of the runs test.
 
-Today's default generators pass these batteries, or nearly so. The *Mersenne Twister* [@matsumoto1998], the generator behind Python's `random` module, has a state of 19,937 bits and a period of $2^{19937} - 1$, a number with 6,002 digits. Its consecutive outputs are provably uniform in every dimension up to 623. It still fails a few tests of BigCrush, which exploit the fact that its bits satisfy linear equations. NumPy's default is now *PCG64* [@oneill2014]. At its heart is a linear congruential generator, with a 128-bit state, whose output function scrambles the bits of the state, led by its leading bits, before handing out half of them. This is the lesson of [The low bits](#sec-low-bits), combined with the design of @rem-mulberry.
+Today's default generators pass these batteries, or nearly so. The *Mersenne Twister* [@matsumoto1998], the generator behind Python's `random` module, has a state of 19,937 bits and a period of $2^{19937} - 1$, a number with 6,002 digits. Over a full period its consecutive outputs are provably uniform, to 32 bits of accuracy, in every dimension up to 623. It still fails two tests of BigCrush, both of which exploit the fact that its bits satisfy linear equations. NumPy's default is now *PCG64* [@oneill2014]. At its heart is a linear congruential generator, with a 128-bit state, whose output function folds the two halves of the state together and then rotates the result by an amount that the six leading bits of the state decide. This is the lesson of [The low bits](#sec-low-bits), combined with the design of @rem-mulberry.
 
 For a simulation, then, the advice is short. Use your library's default generator and not one of your own. Set the seed yourself and record it, so that the run can be repeated. And keep the number of values you draw far below the period.
 
