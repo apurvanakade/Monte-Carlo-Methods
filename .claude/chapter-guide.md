@@ -5,7 +5,7 @@ Instructions for writing or redoing a chapter of these notes. Read this whole fi
 ## The model chapter
 
 - `chapters/estimating-pi/index.qmd` is the reference. Read it in full before starting, and match its tone, structure and density.
-- `chapters/estimating-integrals/` is the first chapter rewritten toward it, and the source of the procedure below. Every other chapter is still to be rewritten.
+- `chapters/estimating-integrals/` is the first chapter rewritten toward it, and the source of the procedure below. `chapters/random-numbers/` is the second. Every other chapter is still to be rewritten.
 
 ## Readers
 
@@ -133,7 +133,7 @@ Patterns that worked:
 
 ### 5. Check
 
-- `node --test chapters/<slug>/` passes.
+- `node --test chapters/<slug>/method.test.js` passes.
 - Load the page in a headless browser and collect: uncaught errors, `.observablehq--error` cells, the text of every `.vm-stat-row`. Compare the readouts with the numbers from step 3.
 - Screenshot each app and figure and look at them, at desktop width and at 400 px.
 - Dark mode: emulating `prefers-color-scheme` does not switch the site's theme. Call `window.quartoToggleColorScheme()` in the page, then screenshot.
