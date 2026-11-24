@@ -145,7 +145,7 @@ $$x_{n+1} = (a\,x_n + c) \bmod m, \qquad u_n = \frac{x_n}{m}.$$
 
 RANDU is the generator with $a = 65539$, $c = 0$ and $m = 2^{31}$. The modulus is usually a power of 2, because then "$\bmod\ m$" costs nothing: the computer simply drops the bits that overflow.
 
-The app below runs a small generator of your choice from its seed $x_0$ until a state repeats. It plots every pair of consecutive outputs $(u_n, u_{n+1})$ as a point in the unit square.
+The app below runs a small generator of your choice from its seed $x_0$ until a state repeats. It plots every pair of consecutive outputs $(u_n, u_{n+1})$ as a point in the unit square. Type a modulus and a seed, and move the sliders, or type in their boxes, to change $a$ and $c$.
 
 
 ```{ojs}
@@ -153,6 +153,23 @@ The app below runs a small generator of your choice from its seed $x_0$ until a 
 lcgDefaults = ({m: 16, a: 5, c: 1, seed: 0})
 lcgMaxM = 4096
 lcgMaxOther = 1000000
+
+// The sliders' last values, by name: plain storage that no cell reacts to.
+lcgSliderMemory = ({
+  a: Math.round(VM.ui.urlParam("lcg_a", lcgDefaults.a)),
+  c: Math.round(VM.ui.urlParam("lcg_c", lcgDefaults.c))
+})
+
+// A slider over 0, ..., m - 1 that starts at the remembered value's remainder
+// and records every move.
+function lcgResidueSlider(name, label, m) {
+  let initial = lcgSliderMemory[name]
+  if (!Number.isFinite(initial) || initial < 0) initial = lcgDefaults[name]
+  const slider = Inputs.range([0, m - 1], {step: 1, value: initial % m, label})
+  slider.classList.add("ojs-fill")
+  slider.addEventListener("input", () => { lcgSliderMemory[name] = slider.value })
+  return slider
+}
 ```
 
 
@@ -161,17 +178,11 @@ lcgMaxOther = 1000000
 <div class="ojs-panel ojs-grid">
 
 ```{ojs}
-// Typed values rather than sliders: the exercises ask for particular
-// generators. Each field turns red while its text isn't a usable integer.
+// The modulus and the seed are typed: they set up a generator. The multiplier
+// and the increment, which the reader varies to watch the points move, are
+// sliders over the chart. Each field turns red while its text isn't a usable
+// integer.
 viewof lcgMInput = rngIntegerField("Modulus m", VM.ui.urlParam("lcg_m", lcgDefaults.m), 2, lcgMaxM, "Between 2 and 4096")
-```
-
-```{ojs}
-viewof lcgAInput = rngIntegerField("Multiplier a", VM.ui.urlParam("lcg_a", lcgDefaults.a), 0, lcgMaxOther, "A whole number")
-```
-
-```{ojs}
-viewof lcgCInput = rngIntegerField("Increment c", VM.ui.urlParam("lcg_c", lcgDefaults.c), 0, lcgMaxOther, "A whole number")
 ```
 
 ```{ojs}
@@ -185,8 +196,6 @@ viewof lcgSeedInput = rngIntegerField("Seed x₀", VM.ui.urlParam("lcg_seed", lc
 //| output: false
 // The typed values, or the defaults while a field is invalid.
 lcgM = rngIntegerValue(lcgMInput, 2, lcgMaxM, lcgDefaults.m)
-lcgA = rngIntegerValue(lcgAInput, 0, lcgMaxOther, lcgDefaults.a)
-lcgC = rngIntegerValue(lcgCInput, 0, lcgMaxOther, lcgDefaults.c)
 lcgSeed = rngIntegerValue(lcgSeedInput, 0, lcgMaxOther, lcgDefaults.seed)
 ```
 
@@ -231,6 +240,22 @@ lcgPlot = VM.plotting.persistentPlot({aspectRatio: 1})
   })
 }
 ```
+
+<div class="ojs-chart-controls ojs-grid">
+
+```{ojs}
+// The multiplier and the increment run over the residues 0, ..., m - 1; any
+// other value gives the same generator as its remainder. A new modulus
+// rebuilds both sliders, and lcgSliderMemory carries each value across (the
+// first build reads the URL).
+viewof lcgA = lcgResidueSlider("a", "Multiplier a", lcgM)
+```
+
+```{ojs}
+viewof lcgC = lcgResidueSlider("c", "Increment c", lcgM)
+```
+
+</div>
 
 ```{ojs}
 {
@@ -928,7 +953,7 @@ Let $x_{n+1} = (a\,x_n + c) \bmod m$ and $u_n = x_n/m$.
 a. Show that $u_{n+1} = a\,u_n + c/m - j$ for some integer $j$. Which values can $j$ take? So the pairs $(u_n, u_{n+1})$ lie on a family of parallel lines of slope $a$: about how many?
 b. In [the app](#lcg-app), set *Modulus m* to 1024, *Increment c* to 1, *Seed x₀* to 0 and *Multiplier a* to 5. Count the lines. The tile *Largest gap* shows the distance between neighboring lines: derive its value from (a).
 c. Now set *Multiplier a* to 1021. Does this generator have full period? You should see only a few lines, far fewer than (a) allows. Explain them, using $1021 \equiv -3 \pmod{1024}$, and derive the *Largest gap*.
-d. Set *Multiplier a* to 529. How large is the gap now? Try a few more multipliers with $a \equiv 1 \pmod 4$. Can you beat it?
+d. Set *Multiplier a* to 529. How large is the gap now? Now drag the *Multiplier a* slider slowly, or press its play button, and watch the lines form and dissolve. Can you find a multiplier with $a \equiv 1 \pmod 4$ that beats 529?
 :::
 
 You should find a gap of $1/\sqrt{26} \approx 0.196$ for $a = 5$, a gap of $1/\sqrt{10} \approx 0.316$ for $a = 1021$, and a gap of $0.029$ for $a = 529$, which is about the best that $1024$ points can do. All three generators have full period, and one of them is ten times better than another. The points of an LCG always form a *lattice*, a pattern as regular as a grid, and the art of choosing a multiplier is to make that lattice as fine as possible in every dimension at once. There is a limit to how fine it can be.
