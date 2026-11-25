@@ -25,10 +25,12 @@ reader's browser, so there is nothing to install beyond Quarto.
 _quarto.yml           site config (sidebar, mathviz options); enables the mathviz filter
 _extensions/          apurvanakade/mathviz (installed by scripts/update-mathviz.sh, untracked -- don't edit)
 index.qmd             preface
+privacy.qmd           the privacy page (footer link; not in the sidebar)
 chapters/<slug>/       one folder per published page: index.qmd (+ method.js, tests, images)
 drafts/<slug>/         draft pages, same shape
-_chrome/              site chrome: exercise and callout styling, title block
-scripts/              build hooks
+_chrome/              site chrome: exercise and callout styling, title block,
+                      Google Analytics behind an opt-in consent banner (analytics.html, consent.html)
+scripts/              the pre-render hook (update-mathviz.sh), the tests' mathviz loader, analytics.test.js
 references.bib
 .github/              render on PRs (pr-check), publish main to gh-pages (publish)
 docs/                 local build output (untracked)

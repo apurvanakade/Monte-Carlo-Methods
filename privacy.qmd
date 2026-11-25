@@ -24,11 +24,15 @@ measures anything, even if you allowed analytics on a direct visit here.
 If you accept analytics, the site sends a small event to
 [Google Analytics](https://policies.google.com/privacy) when you open a page,
 when you scroll to the bottom of one, when you follow a link to another site,
-and when the page goes out of view (you close it, navigate away, or switch to
-another tab). Each event carries:
+when you download a file, and when the page goes out of view (you close it,
+navigate away, or switch to another tab). Each event carries:
 
 - the address of the page you are on, and its title
-- the address of the page that referred you, if any
+- the address of the page that referred you, if any, stripped of its query
+  string like the page's own address (see
+  [What is *not* collected](#what-is-not-collected))
+- when you follow a link to another site, the link's text and address
+- when you download a file, its name and extension
 - your screen size and browser language
 - a randomly generated identifier, described below
 - how long you spent on the page
