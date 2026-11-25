@@ -8,7 +8,7 @@ Monte Carlo Methods Lecture Notes is a Quarto **website** (`project.type: websit
 
 ## Commands
 
-- `npm test` (= `node --test`) — runs every page's `method.test.js` (see Conventions). Needs `npm install` once, and Quarto on PATH: `pretest` runs `scripts/update-mathviz.sh` to install mathviz (network needed on a fresh clone).
+- `npm test` (= `node --test`) — runs every page's `method.test.js` (see Conventions) and `scripts/analytics.test.js` (see Analytics and consent). Needs `npm install` once, and Quarto on PATH: `pretest` runs `scripts/update-mathviz.sh` to install mathviz (network needed on a fresh clone).
 - `make build` (= `quarto render`) — render the whole site into `docs/` (untracked; for local checking only).
 - `make preview` (= `quarto preview`) — live-reload preview; the right tool for iterating on one chapter.
 - `make update-mathviz` — force a check for a newer mathviz release (see below).
@@ -33,12 +33,14 @@ Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `np
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
 _chrome/         this site's own chrome: exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
                  callouts.css (callouts as an accent left rule; exercises as a light bordered box; both spaced by mathviz's $vm-block-gap), title-block.css (title only)
+                 analytics.html + consent.html (Google Analytics behind an opt-in banner; see Analytics and consent)
 _extensions/     apurvanakade/mathviz (installed by the hook, untracked, don't edit)
 index.qmd        preface
+privacy.qmd      the privacy page (footer link; not in the sidebar)
 chapters/<slug>/ one folder per published page, chapters/<slug>/index.qmd (+ method.js, method.test.js, its static images):
                  the chapters and appendices, e.g. estimating-pi/, metropolis-hastings/; served at <site>/chapters/<slug>/
 drafts/<slug>/   draft: true pages, same shape; publishing one = git mv drafts/<slug> chapters/<slug> + a sidebar line
-scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests)
+scripts/         update-mathviz.sh (the pre-render hook), load-vm.mjs (loads mathviz for the tests), analytics.test.js
 references.bib   the bibliography; each page prints its own cited entries under a `## References` heading
 ```
 
@@ -59,7 +61,19 @@ mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/ma
 A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. A local mathviz build installed over the release to try a change (`quarto add <path-to-mathviz> --no-prompt`) must be replaced by the release (`make update-mathviz`) before committing.
-- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the exercise and callout styling, and the title block, which hides Quarto's author/date line). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the exercise and callout styling, the title block, which hides Quarto's author/date line, and the analytics snippet and consent banner). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+
+## Analytics and consent
+
+Usage analytics only (Google Analytics 4): no ads signals, no remarketing, no Google Signals. Same design as VisualMathLab's; keep the two in step.
+
+- `_chrome/analytics.html` is the minimal GA4 snippet (~3kB, vendored from [dariusz.wieckiewicz.org](https://dariusz.wieckiewicz.org/en/minimal-google-analytics-4-snippet/)) instead of gtag.js. Its header lists the `LOCAL:` patches: this site's measurement ID, no reporting from localhost, Do Not Track / Global Privacy Control honoured even after consent, the query string (an app's state) dropped from the reported address and from the referrer, `searchKeys` emptied.
+- `_chrome/consent.html` is the banner and the gate. **Quarto's built-in `cookie-consent:` is deliberately not used**: its baked-in copy claims targeted ads and personalized content, which is false.
+- **The gate**: the snippet ships as `<script type="text/plain" data-consent="analytics">`, which no browser executes; consent.html re-creates it as a real script once the visitor allows analytics. Withdrawing reloads the page and deletes the snippet's keys (`cid_v4`, `_ga_*`).
+- Both are `include-after-body`, **analytics.html first**: consent.html looks for the script it emits.
+- The choice is kept in localStorage (`mcm-analytics-consent`), so **the site sets no cookies**. The banner never shows, and analytics never runs, in mathviz embed mode (`html.vm-embed`).
+- `privacy.qmd` states all of this, every third-party host a page loads from and every localStorage entry. A change to what a page loads or stores updates it. The footer links it and "Analytics preferences" (`#analytics-preferences`, which reopens the banner).
+- `scripts/analytics.test.js` pins the patches, the include order, the privacy page's claims, and runs the snippet against a stubbed DOM.
 
 ## Writing an app
 

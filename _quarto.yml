@@ -56,7 +56,9 @@ website:
         contents:
           - chapters/probability-review/index.qmd
           - chapters/markov-chains/index.qmd
-  page-footer: "© 2026 Apurva Nakade"
+  # The footer's "Analytics preferences" link reopens the consent banner
+  # (_chrome/consent.html wires every #analytics-preferences link).
+  page-footer: "© 2026 Apurva Nakade · [Privacy](/privacy.qmd) · [Analytics preferences](#analytics-preferences)"
 
 bibliography: references.bib
 
@@ -133,8 +135,16 @@ format:
       - _chrome/exercises.css
       - _chrome/callouts.css
       - _chrome/title-block.css
+    # Analytics: Google Analytics 4 behind an opt-in consent banner (see
+    # CLAUDE.md "Analytics and consent"; privacy.qmd states what it does).
+    # Order matters: consent.html looks for the gated <script> that
+    # analytics.html emits, so analytics.html has to be in the DOM first.
+    # Quarto's built-in `cookie-consent:` is deliberately not used: its
+    # banner copy claims targeted ads and personalized content, which is false.
     include-after-body:
       - _chrome/exercises.html
+      - _chrome/analytics.html
+      - _chrome/consent.html
     include-in-header:
       # No comment thread in mathviz embed mode (?embed=), which shows the
       # app alone. Drop this once mathviz's chrome/embed.css lists .giscus.

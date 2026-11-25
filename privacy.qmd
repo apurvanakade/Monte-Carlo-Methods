@@ -1,0 +1,169 @@
+---
+title: "Privacy & Cookies"
+comments: false
+---
+
+Monte Carlo Methods Lecture Notes is a static website. Every simulation on
+it runs entirely in your browser: the seeds, sample sizes and parameters you
+set, and the numbers that come out of them, are computed locally. There is
+no backend, no account system and no database of its own; the comment
+section is GitHub's (see [Comments](#comments)).
+
+The only data that leaves your browser *about you* is anonymous usage
+analytics, and only if you agree to it. The other things a page fetches from
+outside this site are a few open-source libraries and the comment section,
+both described under [Third-party resources](#third-party-resources) and
+[Comments](#comments) below.
+
+When one of the apps is shown inside another website (an `<iframe>` with
+`embed` in its address), the page never asks about analytics and never
+measures anything, even if you allowed analytics on a direct visit here.
+
+## What is collected
+
+If you accept analytics, the site sends a small event to
+[Google Analytics](https://policies.google.com/privacy) when you open a page,
+when you scroll to the bottom of one, when you follow a link to another site,
+when you download a file, and when the page goes out of view (you close it,
+navigate away, or switch to another tab). Each event carries:
+
+- the address of the page you are on, and its title
+- the address of the page that referred you, if any, stripped of its query
+  string like the page's own address (see
+  [What is *not* collected](#what-is-not-collected))
+- when you follow a link to another site, the link's text and address
+- when you download a file, its name and extension
+- your screen size and browser language
+- a randomly generated identifier, described below
+- how long you spent on the page
+- a per-browser count of visits and of events within the current visit,
+  used to tell a returning visitor from a new one
+
+Google derives an approximate location (typically city-level) from your IP
+address; Google states that the IP address itself is not logged or stored by
+Google Analytics 4.
+
+## What is *not* collected
+
+- **No advertising.** Google Signals, ads personalization, and remarketing are
+  all off. Nothing collected here is used to target advertising, and it is not
+  shared with advertisers or data brokers.
+- **No personal information.** The site never asks for your name, email
+  address, or any other identifying detail, and has no way to receive one.
+  Commenting is the one exception, and it goes to GitHub, not to this site:
+  you sign in with your GitHub account and post under it (see
+  [Comments](#comments)).
+- **No app settings.** The seeds, sample sizes and parameters you set in an
+  app stay in your browser. They are part of the page address so that you can
+  share a link to a particular picture, but the address recorded in analytics
+  is stripped of that query string before it is sent.
+
+## Third-party resources
+
+Each page loads open-source libraries from public content-delivery networks:
+[Plotly](https://plotly.com/javascript/) from `cdn.plot.ly`,
+[math.js](https://mathjs.org/) and [MathJax](https://www.mathjax.org/) from
+`cdn.jsdelivr.net`, and a small compatibility script from
+`cdnjs.cloudflare.com`. This happens whether or not you allow analytics,
+because the pages cannot draw their figures and equations without them.
+
+Like any web request, fetching a file from one of those hosts shows it your
+IP address, and at most that the request came from this site. It does not
+show it which page you are on: the site tells your browser to send no
+referrer to any other origin, and the one exception — MathJax fetches its own
+math fonts with a referrer of its choosing — carries only the site's domain,
+never the page. Nothing is stored by those hosts on your device, and once
+your browser has cached a library it does not ask for it again.
+
+Fonts are served from this site directly, not from Google Fonts, so no font
+request goes to Google.
+
+## Comments
+
+Every page but this one ends in a comment section run by [giscus](https://giscus.app),
+an open-source service that stores each page's comments as a discussion in
+this site's
+[GitHub repository](https://github.com/apurvanakade/Monte-Carlo-Methods/discussions).
+It is loaded from `giscus.app` when the page opens, whether or not you allow
+analytics.
+
+Loading it shows `giscus.app` your IP address and the full address of the
+page you are on, including any app settings in it. giscus then fetches that
+page's comments from GitHub, and the profile pictures of the people who
+commented load from GitHub's `avatars.githubusercontent.com`, which sees your
+IP address like any other host above.
+
+Reading comments needs no account. To post or react, you sign in with GitHub
+through giscus, and what you post is public on GitHub under your GitHub
+account, subject to
+[GitHub's privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+and [giscus's](https://github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md).
+Signing in stores a giscus session token in this site's local storage (listed
+below); signing out from the comment section deletes it.
+
+## Cookies and local storage
+
+**This site sets no cookies.** Not for analytics, not for remembering your
+choice about analytics, not for anything else.
+
+A small number of values are kept in your browser's local storage instead.
+Two of them concern analytics:
+
+- **Your answer to the analytics question**, so you are not asked again on
+  every page. Stored whether you say yes or no — declining is worth
+  remembering too.
+- **A random identifier**, only if you allowed analytics: something like
+  `529229690.1787577926`, so that repeat visits from the same browser are
+  counted as one returning visitor rather than several new ones. It is
+  generated on your device, is not derived from anything about you, and is
+  not linked to any other service. A few related values record whether the
+  current visit continues a recent one.
+
+The rest are viewing preferences, stored regardless of your answer so the
+site stays as you left it from page to page:
+
+- **Whether you chose the light or dark theme.**
+- **Whether you pinned the navigation sidebar open.**
+- **Where you dragged the legend on an interactive chart** — a legend you
+  moved off the curve stays where you put it. One small entry per chart whose
+  legend you actually move; nothing is stored for the ones you leave alone.
+- **The speed and mode you picked for the play button** that sweeps a slider.
+
+One more is stored only if you sign in to comment:
+
+- **Your giscus session**, so you stay signed in to the comment section from
+  page to page. Signing out deletes it.
+
+All of it stays on your device. Clearing your browser's site data for this
+domain erases every one of these values, and you become an unrecognized
+first-time visitor who will be asked again.
+
+## Changing your mind
+
+Use the **Analytics preferences** link in the footer of any page. It reopens
+the same question and shows what is currently set, so you can switch either
+way at any time. Turning analytics off also deletes the identifier described
+above.
+
+If you say no, the analytics code is never executed at all — it is not merely
+told to stay quiet. It is delivered to your browser as inert text, and only
+becomes a running script if you say yes.
+
+If your browser sends a Global Privacy Control or Do Not Track signal, that is
+taken as an answer already given: analytics stays off and you are not asked.
+The browser signal wins even over the footer link — the reopened banner says
+so, and its Allow button is disabled — so to turn analytics on you would have
+to switch the signal off in your browser first.
+
+## Why collect anything
+
+To find out which chapters people actually read, so that time spent writing
+new material goes where it is useful, and to notice pages that are being
+opened and immediately abandoned, which usually means something on them is
+broken. That is the entire purpose. The data is not sold, shared, or used for
+any other end.
+
+## Questions
+
+Please open an issue on
+[GitHub](https://github.com/apurvanakade/Monte-Carlo-Methods/issues).
