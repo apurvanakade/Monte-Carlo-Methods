@@ -10,7 +10,7 @@ project:
 
 website:
   title: "Monte Carlo Methods Lecture Notes"
-  site-url: https://apurvanakade.github.io/Monte-Carlo-Methods
+  site-url: https://montecarlomethods.com
   open-graph: true
   page-navigation: true
   bread-crumbs: false
@@ -100,7 +100,7 @@ mathviz:
   # link and an <iframe> snippet. Turns on embed mode too: any app page
   # loaded with ?embed=1 shows the app alone, for a frame.
   share:
-    site-url: https://apurvanakade.github.io/Monte-Carlo-Methods
+    site-url: https://montecarlomethods.com
 
 format:
   html:

@@ -1,7 +1,7 @@
 # Monte Carlo Methods Lecture Notes
 
-A Quarto website, rendered by GitHub Actions and published to GitHub Pages. Interactive apps are
-built with [mathviz](https://github.com/apurvanakade/mathviz).
+A Quarto website, rendered by GitHub Actions and published to GitHub Pages at
+<https://montecarlomethods.com>. Interactive apps are built with [mathviz](https://github.com/apurvanakade/mathviz).
 
 ## Build
 
