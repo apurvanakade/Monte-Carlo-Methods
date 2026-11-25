@@ -1,0 +1,322 @@
+<!--
+Copyright (c) 2026 Apurva Nakade. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Apurva Nakade
+-->
+
+<!--
+Analytics consent banner.
+
+This replaces Quarto's built-in `cookie-consent:` support, which is not used
+on this site. That library's copy is baked into its bundle - the banner says
+the site shows "personalized content and targeted ads" and its preferences
+center lists a "Targeting and advertising cookies" category describing ad
+networks combining data across websites. None of that is true here, there is
+no supported way to change the strings, and its 34-language switcher would
+leave every other translation making the same false claim. It also weighs
+207kB to gate a 3kB analytics snippet.
+
+What this does instead: nothing is measured until the visitor says yes. The
+snippet in analytics.html ships as `type="text/plain"`, which a browser
+refuses to execute; allowing analytics re-creates it as a real script, which
+is the same mechanism the library used. The choice is remembered in
+localStorage, so this site sets no cookies at all.
+-->
+
+<style>
+  /* Colours come from mathviz's --vm-* tokens, so the banner re-themes with
+     the site in light and dark mode. Kept inline, next to the only markup
+     that uses these classes. */
+  .mcm-consent {
+    position: fixed;
+    z-index: 1080;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .mcm-consent[hidden] {
+    display: none;
+  }
+
+  .mcm-consent-inner {
+    pointer-events: auto;
+    max-width: 32rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--vm-border);
+    border-radius: var(--vm-radius);
+    background: var(--vm-surface);
+    color: var(--vm-text);
+    box-shadow: 0 0.5rem 1.5rem var(--vm-shadow-color);
+  }
+
+  .mcm-consent-title {
+    /* Quarto gives every h2 a bottom rule and generous spacing; neither suits a
+       small banner heading. */
+    margin: 0 0 0.4rem;
+    padding: 0;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .mcm-consent-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .mcm-consent-text + .mcm-consent-text {
+    margin-top: 0.6rem;
+  }
+
+  .mcm-consent-text-secondary {
+    font-size: 0.8rem;
+    color: var(--vm-text-soft);
+  }
+
+  .mcm-consent-status {
+    margin: 0.6rem 0 0;
+    font-size: 0.85rem;
+    color: var(--vm-text-soft);
+  }
+
+  .mcm-consent-status[hidden] {
+    display: none;
+  }
+
+  .mcm-consent-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+  }
+
+  .mcm-consent-btn {
+    flex: 1 1 auto;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--vm-border);
+    border-radius: var(--vm-radius-sm);
+    background: transparent;
+    color: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mcm-consent-btn:hover {
+    border-color: var(--vm-accent);
+  }
+
+  .mcm-consent-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: none;
+  }
+
+  .mcm-consent-btn-primary {
+    border-color: var(--vm-accent);
+    background: var(--vm-accent);
+    color: var(--vm-on-accent);
+  }
+
+  .mcm-consent-btn-primary:hover {
+    background: var(--vm-accent-hover);
+    border-color: var(--vm-accent-hover);
+  }
+</style>
+
+<div id="mcm-consent" class="mcm-consent" data-vm-embed-hide role="dialog" aria-labelledby="mcm-consent-title" hidden>
+  <div class="mcm-consent-inner">
+    <h2 id="mcm-consent-title" class="mcm-consent-title">Analytics</h2>
+    <p class="mcm-consent-text">
+      Monte Carlo Methods would like to count page visits. It tells us which
+      chapters are being read, so that effort goes where it is most useful.
+      No advertising, no personal information, and nothing shared with third
+      parties. The settings you choose in an app are never reported.
+      <a href="/privacy.html">What is collected</a>.
+    </p>
+    <p class="mcm-consent-text mcm-consent-text-secondary">
+      No cookies are stored by this site, at any point, for any purpose. This
+      notice is shown because GDPR and the ePrivacy Directive require opt-in
+      consent before any tracking technology runs, cookies or not.
+    </p>
+    <p class="mcm-consent-status" id="mcm-consent-status" hidden></p>
+    <div class="mcm-consent-buttons">
+      <button type="button" class="mcm-consent-btn mcm-consent-btn-primary" data-consent-choice="granted">Allow</button>
+      <button type="button" class="mcm-consent-btn" data-consent-choice="denied">No thanks</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const KEY = "mcm-analytics-consent";
+  const GATE = 'script[type="text/plain"][data-consent="analytics"]';
+  const banner = document.getElementById("mcm-consent");
+  const status = document.getElementById("mcm-consent-status");
+  if (!banner) return;
+
+  /* Global Privacy Control and Do Not Track are a standing answer to this
+     question, so don't ask it again. The footer link still opens the banner,
+     but only to say so: the snippet in analytics.html checks the same two
+     signals itself and returns before sending anything, so Allow would
+     record a "yes" that measures nothing. It is disabled instead of
+     pretending (privacy.qmd says the same). */
+  function privacySignalSet() {
+    if (navigator.globalPrivacyControl === true) return true;
+    if (navigator.doNotTrack === "1") return true;
+    if (window.doNotTrack === "1") return true;
+    return false;
+  }
+
+  function readChoice() {
+    try {
+      return localStorage.getItem(KEY);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeChoice(value) {
+    try {
+      localStorage.setItem(KEY, value);
+    } catch (e) {
+      /* Private browsing with storage blocked: the choice just won't stick. */
+    }
+  }
+
+  /* A text/plain script is inert. Re-creating it as text/javascript is what
+     actually runs the analytics snippet - assigning to .type on the original
+     element would not, since a script only executes when it is inserted. */
+  function runGatedScripts() {
+    const gated = document.querySelectorAll(GATE);
+    for (let i = 0; i < gated.length; i++) {
+      const original = gated[i];
+      const live = document.createElement("script");
+      live.type = "text/javascript";
+      live.text = original.innerHTML;
+      original.parentNode.removeChild(original);
+      document.head.appendChild(live);
+    }
+  }
+
+  /* Everything the analytics snippet keeps, so that withdrawing consent
+     leaves nothing behind. */
+  function forgetAnalytics() {
+    try {
+      const doomed = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key === "cid_v4" || key.indexOf("_ga_") === 0) doomed.push(key);
+      }
+      for (let i = 0; i < doomed.length; i++) localStorage.removeItem(doomed[i]);
+    } catch (e) {
+      /* Nothing readable means nothing to clear. */
+    }
+  }
+
+  /* Withdrawing consent reloads the page, and the snippet is still live until
+     it does - its page-hide listener treats that reload as a departure and
+     fires one last event, which also re-creates the identifier being deleted.
+     Both of its transports are closed off first so it cannot get that parting
+     shot in. Breaking them for the few milliseconds before a reload costs
+     nothing. */
+  function silenceAnalytics() {
+    try {
+      navigator.sendBeacon = function () {
+        return false;
+      };
+      window.XMLHttpRequest = function () {
+        return { open: function () {}, send: function () {} };
+      };
+    } catch (e) {
+      /* Frozen globals: the worst case is one extra event. */
+    }
+  }
+
+  function show() {
+    const choice = readChoice();
+    const allow = banner.querySelector('[data-consent-choice="granted"]');
+    if (privacySignalSet()) {
+      status.hidden = false;
+      status.textContent = "Your browser is sending a Do Not Track or Global Privacy Control signal, so analytics stays off whatever is chosen here.";
+      allow.disabled = true;
+    } else {
+      allow.disabled = false;
+      if (choice === null) {
+        status.hidden = true;
+      } else {
+        status.hidden = false;
+        if (choice === "granted") status.textContent = "Analytics is currently allowed.";
+        else status.textContent = "Analytics is currently switched off.";
+      }
+    }
+    banner.hidden = false;
+  }
+
+  function choose(value) {
+    const previous = readChoice();
+    writeChoice(value);
+    banner.hidden = true;
+    if (value === "granted" && previous !== "granted") {
+      runGatedScripts();
+    } else if (value === "denied" && previous === "granted") {
+      /* The snippet has already run and attached its listeners. Reloading is
+         the only way to actually stop it, rather than merely promising to.
+         The clearing happens on the way back in, below - doing it here would
+         race the page-hide event this reload triggers. */
+      silenceAnalytics();
+      window.location.reload();
+    }
+  }
+
+  const buttons = banner.querySelectorAll("[data-consent-choice]");
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      choose(this.getAttribute("data-consent-choice"));
+    });
+  }
+
+  /* The footer's "Analytics preferences" link, at whatever depth the page
+     sits, plus any in-page link using the same fragment. Deferred to
+     DOMContentLoaded because Quarto injects include-after-body content
+     *before* it renders the page footer, so these links do not exist yet
+     when this script runs. */
+  function wireReopeners() {
+    const reopeners = document.querySelectorAll('a[href$="#analytics-preferences"]');
+    for (let i = 0; i < reopeners.length; i++) {
+      reopeners[i].addEventListener("click", function (event) {
+        event.preventDefault();
+        show();
+      });
+    }
+  }
+
+  /* Embed mode (?embed=<app>, mathviz's `embed` option): the app is
+     framed by another site, so this site neither asks nor measures -- no
+     banner, and no analytics even for a visitor who granted them here
+     earlier. privacy.qmd states this. */
+  if (document.documentElement.classList.contains("vm-embed")) return;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wireReopeners);
+  } else {
+    wireReopeners();
+  }
+
+  const choice = readChoice();
+  if (choice === "granted") {
+    runGatedScripts();
+  } else {
+    /* Anything the snippet left behind on an earlier visit goes now, so that
+       "no" and "never asked" leave the same empty state. Idempotent, and a
+       no-op for a first-time visitor. */
+    forgetAnalytics();
+    if (choice === null && !privacySignalSet()) show();
+  }
+})();
+</script>
