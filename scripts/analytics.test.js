@@ -31,7 +31,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
 // The montecarlomethods.com web data stream's measurement ID.
-const TID = 'G-XXXXXXXXXX'
+const TID = 'G-9CF95CCP34'
 const HOST = 'montecarlomethods.com'
 
 const read = (rel) => fs.readFileSync(path.join(repoRoot, rel), 'utf8')
