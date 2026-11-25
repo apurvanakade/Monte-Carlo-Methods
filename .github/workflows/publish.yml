@@ -8,7 +8,9 @@
 # GitHub's own pages-build-deployment. There is deliberately no deploy.yml
 # triggered by the gh-pages push: a push made with GITHUB_TOKEN never triggers
 # another workflow. gh-pages is force-orphaned each time, so it holds only the
-# current build rather than a history of them.
+# current build rather than a history of them. Being orphaned, it would lose
+# the CNAME file that Pages' custom-domain setting writes, so the publish step
+# writes it (`cname:`) on every release.
 
 name: Render and publish to gh-pages
 
@@ -43,3 +45,4 @@ jobs:
           publish_dir: ./docs
           publish_branch: gh-pages
           force_orphan: true
+          cname: montecarlomethods.com
