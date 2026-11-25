@@ -183,7 +183,7 @@ test('consent.html: does nothing in embed mode', () => {
 // 2. Runtime behavior of the analytics snippet, in a stubbed DOM
 // -----------------------------------------------------------------------
 
-function runSnippet(hostname, { search = '', privacySignal = null } = {}) {
+function runSnippet(hostname, { search = '', referrer = '', privacySignal = null } = {}) {
   const store = new Map()
   const localStorage = {
     getItem: (k) => (store.has(k) ? store.get(k) : null),
@@ -202,7 +202,7 @@ function runSnippet(hostname, { search = '', privacySignal = null } = {}) {
   }
   const document = {
     title: 'Estimating Pi',
-    referrer: '',
+    referrer,
     location,
     documentElement: { scrollHeight: 2000, clientHeight: 800, scrollTop: 0 },
     body: { scrollHeight: 2000, scrollTop: 0 },
@@ -253,6 +253,21 @@ test('analytics snippet: sends exactly one page_view on a real page, with correc
   assert.equal(params.get('dl'), 'https://' + HOST + '/chapters/estimating-pi/')
   assert.equal(params.get('ep.search_term'), null, 'an app parameter is not a search')
   assert.ok(store.get('cid_v4'), 'expected a client id to be generated and persisted')
+})
+
+test('analytics snippet: reported referrer has no query string or fragment', () => {
+  // With `referrer: same-origin`, the previous page of this site arrives
+  // whole, app state included -- patch 7 in analytics.html.
+  const from = 'https://' + HOST + '/chapters/estimating-pi/'
+  const { beacons } = runSnippet(HOST, { referrer: from + '?pi_n=1000&pi_seed=3#sec-buffon' })
+  assert.equal(new URL(beacons[0]).searchParams.get('dr'), from)
+  const none = runSnippet(HOST)
+  assert.equal(new URL(none.beacons[0]).searchParams.get('dr'), null, 'no referrer, no dr')
+})
+
+test('analytics.html: dr is the stripped referrer, not document.referrer', () => {
+  assert.match(analyticsHtml, /dr:mcmReferrer\|\|0\[0\]/)
+  assert.doesNotMatch(analyticsHtml, /dr:t\.referrer/)
 })
 
 test('analytics snippet: registers scroll, click, and visibilitychange listeners', () => {

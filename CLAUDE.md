@@ -67,7 +67,7 @@ A utility used by exactly one app stays in that chapter's OJS cells (or its `met
 
 Usage analytics only (Google Analytics 4): no ads signals, no remarketing, no Google Signals. Same design as VisualMathLab's; keep the two in step.
 
-- `_chrome/analytics.html` is the minimal GA4 snippet (~3kB, vendored from [dariusz.wieckiewicz.org](https://dariusz.wieckiewicz.org/en/minimal-google-analytics-4-snippet/)) instead of gtag.js. Its header lists the `LOCAL:` patches: this site's measurement ID, no reporting from localhost, Do Not Track / Global Privacy Control honoured even after consent, the query string (an app's state) dropped from the reported address, `searchKeys` emptied.
+- `_chrome/analytics.html` is the minimal GA4 snippet (~3kB, vendored from [dariusz.wieckiewicz.org](https://dariusz.wieckiewicz.org/en/minimal-google-analytics-4-snippet/)) instead of gtag.js. Its header lists the `LOCAL:` patches: this site's measurement ID, no reporting from localhost, Do Not Track / Global Privacy Control honoured even after consent, the query string (an app's state) dropped from the reported address and from the referrer, `searchKeys` emptied.
 - `_chrome/consent.html` is the banner and the gate. **Quarto's built-in `cookie-consent:` is deliberately not used**: its baked-in copy claims targeted ads and personalized content, which is false.
 - **The gate**: the snippet ships as `<script type="text/plain" data-consent="analytics">`, which no browser executes; consent.html re-creates it as a real script once the visitor allows analytics. Withdrawing reloads the page and deletes the snippet's keys (`cid_v4`, `_ga_*`).
 - Both are `include-after-body`, **analytics.html first**: consent.html looks for the script it emits.
