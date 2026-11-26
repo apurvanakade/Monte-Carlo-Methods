@@ -1,7 +1,5 @@
 ---
 title: Probability review
-date: 2026-11-14
-author: Apurva Nakade
 execute:
   echo: false
 ---

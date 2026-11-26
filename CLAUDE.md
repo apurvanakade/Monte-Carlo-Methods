@@ -32,7 +32,7 @@ Quarto renders the site; Node (`npm install`, for mathjs) is needed only for `np
 ```
 _quarto.yml      site config: the hand-written sidebar, filters [mathviz], mathviz: options, theme, grid, css
 _chrome/         this site's own chrome: exercises.css + exercises.html (textbook-style #exr- blocks and their "Next exercise" buttons)
-                 callouts.css (callouts as an accent left rule; exercises as a light bordered box; both spaced by mathviz's $vm-block-gap), title-block.css (title only)
+                 callouts.css (callouts as an accent left rule; exercises as a light bordered box; both spaced by mathviz's $vm-block-gap), title-block.css (space under the title block)
                  analytics.html + consent.html (Google Analytics behind an opt-in banner; see Analytics and consent)
 _extensions/     apurvanakade/mathviz (installed by the hook, untracked, don't edit)
 index.qmd        preface
@@ -61,7 +61,7 @@ mathviz is authored in [apurvanakade/mathviz](https://github.com/apurvanakade/ma
 A utility used by exactly one app stays in that chapter's OJS cells (or its `method.js`). Beyond that:
 
 - **Any mathviz site could use it, or it's a bug fix to mathviz** → a pull request to mathviz. A local mathviz build installed over the release to try a change (`quarto add <path-to-mathviz> --no-prompt`) must be replaced by the release (`make update-mathviz`) before committing.
-- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the exercise and callout styling, the title block, which hides Quarto's author/date line, and the analytics snippet and consent banner). There is no local overlay (mathviz v0.10.0 removed the kit for one).
+- **Only this site needs it** → it lives in this site's own code (the chapter's cells or `method.js`) until a second site wants it; then it moves to mathviz as above. Site chrome goes in `_chrome/` (today the exercise and callout styling, the spacing under the title block, and the analytics snippet and consent banner). There is no local overlay (mathviz v0.10.0 removed the kit for one).
 
 ## Analytics and consent
 

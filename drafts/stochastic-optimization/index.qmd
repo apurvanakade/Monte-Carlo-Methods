@@ -1,7 +1,5 @@
 ---
 title: Optimization
-date: 2025-08-02 20:30:10
-author: Apurva Nakade
 
 draft: true
 
