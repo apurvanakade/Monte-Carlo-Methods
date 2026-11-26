@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2026 Apurva Nakade. All rights reserved.
+ * Released under Apache 2.0 license as described in the file LICENSE.
+ * Authors: Apurva Nakade
+ */
+
+/* Space under a page's title block. Quarto's AUTHOR / PUBLISHED columns show
+ * only on a page whose front matter sets `author:` / `date:` (today only the
+ * preface). Listed under format.html.css in _quarto.yml. */
+
+#title-block-header { margin-bottom: 1.5rem; }
