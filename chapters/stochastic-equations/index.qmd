@@ -1,7 +1,5 @@
 ---
 title: Stochastic Differential Equations
-date: 2025-02-17 08:21:07
-author: Apurva Nakade
 execute:
   echo: false
 ---

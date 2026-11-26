@@ -1,21 +1,21 @@
 ---
-title: "Welcome"
+title: "Preface"
+author: Apurva Nakade
+date: 2026-11-25
 toc: false
-
-format:
-  html:
-    footer: "© 2025 Apurva Nakade. All rights reserved."
 ---
 
-# Preface {.unnumbered}
+These are the lecture notes for *Monte Carlo Methods* (EN.553.433/633), a course in the Department of Applied Mathematics and Statistics at Johns Hopkins University. The notes are loosely based on course materials by [Dr. Jim Spall](https://sites.google.com/view/james-spall/teaching) and on the textbook by Rubinstein and Kroese [@rubinstein2017].
 
-**⚠️ Note: These notes are very much under construction and subject to significant changes.**
+We assume a first course in probability, in statistics and in linear algebra. You should be comfortable with expectation, variance, independence and conditional distributions, and with the law of large numbers and the central limit theorem. Most importantly, you should know the theory of estimators, because every Monte Carlo method is an estimator. If any of this is rusty, the [probability review](chapters/probability-review/index.qmd) collects the facts we use most often.
 
-These are the lecture notes for *Monte Carlo Methods* (EN.553.433). The notes are loosely based on course materials by [Dr. Jim Spall](https://sites.google.com/view/james-spall/teaching) and the textbook by Rubinstein & Kroese [@rubinstein2017].
+These notes are driven by exercises. Most results are not stated for you to read - they are posed as questions for you to work out. You will need your answers to follow the rest of the chapter. Read these notes with pen and paper, and try each exercise before moving on, since that is where most of the learning happens!
 
-These notes represent only half of the course content. The remaining material consists of Jupyter notebooks assigned as homework, which are not published online.
+Most chapters also have interactive apps and figures, which run the simulations in your browser. You are encouraged to experiment with them. Playing with a method is one of the best ways to build an intuition for it.
 
-## References {.unnumbered}
+Every page has a comment thread at the bottom, which you can post to with a GitHub account. Please use it to ask a question, or to tell us about a typo or a mistake.
+
+## References
 
 ::: {#refs}
 :::

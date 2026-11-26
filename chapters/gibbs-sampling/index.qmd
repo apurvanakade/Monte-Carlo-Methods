@@ -1,7 +1,5 @@
 ---
 title: "Gibbs Sampling"
-date: 2025-06-18
-author: Unknown Author
 
 execute:
   echo: false

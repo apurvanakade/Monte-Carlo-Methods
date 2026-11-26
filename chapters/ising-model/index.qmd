@@ -1,6 +1,5 @@
 ---
 title: "Ising Model"
-date: 2025-03-11
 
 execute:
   echo: false
